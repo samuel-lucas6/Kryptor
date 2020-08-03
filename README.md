@@ -1,3 +1,5 @@
+[![CodeFactor](https://www.codefactor.io/repository/github/kryptor-software/kryptor/badge)](https://www.codefactor.io/repository/github/kryptor-software/kryptor)
+
 # Kryptor
 
 Kryptor is free open source file encryption software for Windows. Linux and Mac OS support is being looked into. Kryptor is licensed under GPLv3.
