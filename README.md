@@ -9,7 +9,7 @@ Kryptor is designed to allow you to encrypt files before backing them up to an e
 ## Main Features:
 
 - 100% offline besides automatically checking for updates (which can be disabled). No account needed.
-- File encryption using XChaCha20 (default), XSalsa20, AES-CTR, or AES-CBC with a 256-bit key.
+- File encryption using XChaCha20 (default), XSalsa20, or AES-CBC with a 256-bit key.
 - Key derivation using Password Hashing Competition winner Argon2.
 - A unique encryption key per file derived from a password and/or keyfile.
 - Optional anonymous renaming of encrypted files and folders.
