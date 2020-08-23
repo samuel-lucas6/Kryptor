@@ -2,7 +2,7 @@
 
 # Kryptor
 
-Kryptor is free open source file encryption software for Windows. Linux and Mac OS support is being looked into. Kryptor is licensed under GPLv3.
+Kryptor is free open source file encryption software for Windows. Linux and macOS support is being looked into. Kryptor is licensed under GPLv3.
 
 Kryptor is designed to allow you to encrypt files before backing them up to an external drive or via a cloud storage provider such as Google Drive, OneDrive, etc. Many of the most popular cloud services are a privacy/security risk as the companies have access to your files. Kryptor can be used to prevent third parties (such as Google and Microsoft) from being able to access your uploaded files using encryption.
 
