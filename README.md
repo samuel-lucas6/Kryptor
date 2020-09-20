@@ -23,6 +23,6 @@ For more information, head over to the [Kryptor website](https://kryptor.co.uk).
 
 ## Donate
 
-You can support the developer of Kryptor by donating through Paypal, GitHub, Flattr, Bitcoin, or Monero. Donations will go towards paying for code signing certificates (£44/yr), website hosting (£50/yr), and the website domain (£8/yr).
+You can support the developer of Kryptor by donating through Paypal, GitHub, Flattr, Bitcoin, or Monero. Donations will go towards paying for a code signing certificate (£65/yr), website hosting (£50/yr), and the website domain (£8/yr).
 
 Find out how to donate [here](https://kryptor.co.uk/Donate.html).
