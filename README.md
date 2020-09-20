@@ -8,7 +8,7 @@ Kryptor is free and open source file encryption software for Windows, Linux, and
 
 ## Main Features:
 
-- 100% offline besides automatic checks for updates (which can be disabled). No account needed.
+- Can be run offline. By default there are automatic checks for updates, but this can be disabled. No account needed.
 - File encryption using XChaCha20 (default), XSalsa20, AES-CBC, or AES-CTR with 256-bit keys.
 - Key derivation using Password Hashing Competition winner Argon2.
 - A unique encryption key per file derived from a password and/or keyfile.
