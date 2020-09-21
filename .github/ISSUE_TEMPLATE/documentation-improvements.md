@@ -1,6 +1,6 @@
 ---
 name: Documentation improvements
-about: Highlight documentation errors and suggest improvements
+about: Highlight documentation errors or suggest improvements
 title: ''
 labels: documentation
 assignees: Kryptor-Software

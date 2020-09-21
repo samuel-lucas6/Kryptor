@@ -11,7 +11,7 @@ assignees: Kryptor-Software
 A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
 
 **Describe the feature you'd like**
-A clear and concise description of what you'd like implemented.
+A clear and concise description of what you'd like to see implemented.
 
 **Why should this feature be implemented?**
 Convince me why it's worth adding.

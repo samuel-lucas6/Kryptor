@@ -30,4 +30,4 @@ Portable: Kryptor/error log.txt
 
 **Desktop (please complete the following information):**
  - OS: [e.g. Windows]
- - Version [e.g. 1.0.0]
+ - Version: [e.g. 1.0.0.0]
