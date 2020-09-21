@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
+about: Suggest a new feature
 title: ''
 labels: feature request
 assignees: Kryptor-Software
@@ -11,4 +11,7 @@ assignees: Kryptor-Software
 A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
 
 **Describe the feature you'd like**
-A clear and concise description of what you want to happen.
+A clear and concise description of what you'd like implemented.
+
+**Why should this feature be implemented?**
+Convince me why it's worth adding.

@@ -22,6 +22,12 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
+**Error log**
+Please upload your error log file to the GitHub issue so I can understand what is causing the problem.
+
+Installed: %APPDATA%\Kryptor\error log.txt 
+Portable: Kryptor/error log.txt 
+
 **Desktop (please complete the following information):**
  - OS: [e.g. Windows]
  - Version [e.g. 1.0.0]
