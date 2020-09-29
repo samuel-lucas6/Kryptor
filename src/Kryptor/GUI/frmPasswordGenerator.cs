@@ -181,7 +181,7 @@ namespace Kryptor
         private void chkLowercase_CheckedChanged(object sender, EventArgs e)
         {
             // Prevent unchecking
-            if (cmbGenerateType.SelectedIndex == (int)Generate.Passphrase || chkUppercase.Checked == false && chkNumbers.Checked == false && chkSymbols.Checked == false)
+            if (cmbGenerateType.SelectedIndex == (int)Generate.Passphrase || (chkUppercase.Checked == false && chkNumbers.Checked == false && chkSymbols.Checked == false))
             {
                 chkLowercase.Checked = true;
             }
@@ -208,7 +208,7 @@ namespace Kryptor
 
         private void chkSymbols_CheckedChanged(object sender, EventArgs e)
         {
-            if (cmbGenerateType.SelectedIndex == (int)Generate.Passphrase || chkLowercase.Checked == false && chkUppercase.Checked == false && chkNumbers.Checked == false)
+            if (cmbGenerateType.SelectedIndex == (int)Generate.Passphrase || (chkLowercase.Checked == false && chkUppercase.Checked == false && chkNumbers.Checked == false))
             {
                 chkSymbols.Checked = true;
             }
