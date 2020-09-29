@@ -40,6 +40,5 @@ namespace Kryptor
         {
             return GenericHash.Hash(message, (byte[])null, Constants.HashLength);
         }
-
     }
 }
