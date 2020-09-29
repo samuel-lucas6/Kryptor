@@ -41,10 +41,9 @@ namespace Kryptor
         public static byte[] GetBufferSize(FileStream fileStream)
         {
             NullChecks.FileStreams(fileStream);
-            const int oneMiB = 1048576;
             int bufferSize = 4096;
             // Use a larger buffer for bigger files
-            if (fileStream.Length >= oneMiB)
+            if (fileStream.Length >= Constants.Mebibyte)
             {
                 // 128 KiB
                 bufferSize = 131072;
