@@ -87,7 +87,6 @@ namespace Kryptor
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.High);
                 DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "Unable to decrypt the file.");
-                // Restore the MAC
                 RestoreMAC(filePath, macBackup);
                 Utilities.ZeroArray(key);
             }
