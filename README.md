@@ -8,7 +8,7 @@ Kryptor is free and open source file encryption software for Windows, Linux, and
 
 ## Main Features:
 
-- File encryption using XChaCha20 (default), XSalsa20, AES-CBC, or AES-CTR with 256-bit keys.
+- File encryption using XChaCha20 (default), XSalsa20, or AES-CBC with 256-bit keys.
 - Key derivation using Password Hashing Competition winner Argon2.
 - A unique encryption key per file derived from a password and/or keyfile.
 - Memory encryption to protect sensitive data in memory.
