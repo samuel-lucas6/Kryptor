@@ -31,7 +31,7 @@ namespace Kryptor
         {
             try
             {
-                if (Globals.MemoryEncryption == true & byteArray != null)
+                if (Globals.MemoryEncryption == true && byteArray != null)
                 {
                     if (Constants.RunningOnMono == false)
                     {
@@ -58,7 +58,7 @@ namespace Kryptor
         {
             try
             {
-                if (Globals.MemoryEncryption == true & byteArray != null)
+                if (Globals.MemoryEncryption == true && byteArray != null)
                 {
                     if (Constants.RunningOnMono == false)
                     {

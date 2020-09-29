@@ -91,14 +91,14 @@
             // 
             this.cmsTextboxMenu.BackColor = System.Drawing.Color.White;
             this.cmsTextboxMenu.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.cmsTextboxMenu.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cmsTextboxMenu.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cmsTextboxMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsmiCopyTextbox,
             this.tsmiClearTextbox,
             this.tsmiClearClipboard});
             this.cmsTextboxMenu.Name = "passwordContextMenu";
             this.cmsTextboxMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.cmsTextboxMenu.Size = new System.Drawing.Size(179, 76);
+            this.cmsTextboxMenu.Size = new System.Drawing.Size(189, 104);
             // 
             // tsmiCopyTextbox
             // 
@@ -106,7 +106,7 @@
             this.tsmiCopyTextbox.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.tsmiCopyTextbox.ImageTransparentColor = System.Drawing.Color.Transparent;
             this.tsmiCopyTextbox.Name = "tsmiCopyTextbox";
-            this.tsmiCopyTextbox.Size = new System.Drawing.Size(178, 24);
+            this.tsmiCopyTextbox.Size = new System.Drawing.Size(188, 26);
             this.tsmiCopyTextbox.Text = "Copy Textbox";
             this.tsmiCopyTextbox.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
             this.tsmiCopyTextbox.Click += new System.EventHandler(this.tsmiCopyTextbox_Click);
@@ -117,7 +117,7 @@
             this.tsmiClearTextbox.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.tsmiClearTextbox.ImageTransparentColor = System.Drawing.Color.Transparent;
             this.tsmiClearTextbox.Name = "tsmiClearTextbox";
-            this.tsmiClearTextbox.Size = new System.Drawing.Size(178, 24);
+            this.tsmiClearTextbox.Size = new System.Drawing.Size(188, 26);
             this.tsmiClearTextbox.Text = "Clear Textbox";
             this.tsmiClearTextbox.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
             this.tsmiClearTextbox.Click += new System.EventHandler(this.tsmiClearTextbox_Click);
@@ -128,7 +128,7 @@
             this.tsmiClearClipboard.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.tsmiClearClipboard.ImageTransparentColor = System.Drawing.Color.Transparent;
             this.tsmiClearClipboard.Name = "tsmiClearClipboard";
-            this.tsmiClearClipboard.Size = new System.Drawing.Size(178, 24);
+            this.tsmiClearClipboard.Size = new System.Drawing.Size(188, 26);
             this.tsmiClearClipboard.Text = "Clear Clipboard";
             this.tsmiClearClipboard.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
             this.tsmiClearClipboard.Click += new System.EventHandler(this.tsmiClearClipboard_Click);
@@ -186,6 +186,7 @@
             this.llbGenerateKeyPair.Name = "llbGenerateKeyPair";
             this.llbGenerateKeyPair.Size = new System.Drawing.Size(203, 21);
             this.llbGenerateKeyPair.TabIndex = 0;
+            this.llbGenerateKeyPair.TabStop = true;
             this.llbGenerateKeyPair.Text = "Recipient: Generate Key Pair";
             this.llbGenerateKeyPair.VisitedLinkColor = System.Drawing.Color.DimGray;
             this.llbGenerateKeyPair.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.llbGenerateKeyPair_LinkClicked);

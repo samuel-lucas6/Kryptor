@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using System.Windows.Forms;
 
 /*  
@@ -31,33 +30,35 @@ namespace Kryptor
 
         private void frmPasswordSharing_Load(object sender, EventArgs e)
         {
-            lblAsymmetricKey.Focus();
             if (Globals.DarkTheme == true)
             {
                 ApplyDarkTheme();
             }
-            // Fix label alignment on Linux & macOS
-            MonoGUI.AlignLabels(lblAsymmetricKey, lblPassword, null, llbGenerateKeyPair);
+            RunningOnMono();
         }
 
         private void ApplyDarkTheme() 
         {
-            this.BackColor = Color.FromArgb(Constants.Red, Constants.Green, Constants.Blue);
-            lblAsymmetricKey.ForeColor = Color.White;
-            lblPassword.ForeColor = Color.White;
-            llbGenerateKeyPair.LinkColor = Color.White;
-            llbGenerateKeyPair.ActiveLinkColor = Color.White;
-            txtKey.BackColor = Color.DimGray;
-            txtKey.ForeColor = Color.White;
-            txtPassword.BackColor = Color.DimGray;
-            txtPassword.ForeColor = Color.White;
-            btnEncryptPassword.BackColor = Color.FromArgb(Constants.Red, Constants.Green, Constants.Blue);
-            btnEncryptPassword.ForeColor = Color.White;
-            btnEncryptPassword.FlatAppearance.MouseDownBackColor = Color.Transparent;
-            btnDecryptPassword.BackColor = Color.FromArgb(Constants.Red, Constants.Green, Constants.Blue);
-            btnDecryptPassword.ForeColor = Color.White;
-            btnDecryptPassword.FlatAppearance.MouseDownBackColor = Color.Transparent;
-            SharedContextMenu.DarkContextMenu(cmsTextboxMenu);
+            this.BackColor = DarkTheme.BackgroundColour();
+            DarkTheme.Labels(lblAsymmetricKey);
+            DarkTheme.Labels(lblPassword);
+            DarkTheme.LinkLabels(llbGenerateKeyPair);
+            DarkTheme.TextBoxes(txtKey);
+            DarkTheme.TextBoxes(txtPassword);
+            DarkTheme.Buttons(btnEncryptPassword);
+            DarkTheme.Buttons(btnDecryptPassword);
+            DarkTheme.ContextMenu(cmsTextboxMenu);
+        }
+
+        private void RunningOnMono()
+        {
+            if (Constants.RunningOnMono == true)
+            {
+                lblAsymmetricKey.Focus();
+                MonoGUI.MoveLabelRight(lblAsymmetricKey);
+                MonoGUI.MoveLabelRight(lblPassword);
+                MonoGUI.MoveLinkLabelLeft(llbGenerateKeyPair);
+            }
         }
 
         private void tsmiCopyTextbox_Click(object sender, EventArgs e)
@@ -78,7 +79,7 @@ namespace Kryptor
         private void picHelp_Click(object sender, EventArgs e)
         {
             const string passwordSharingLink = "https://kryptor.co.uk/Password%20Sharing.html";
-            OpenURL.OpenLink(passwordSharingLink);
+            VisitLink.OpenLink(passwordSharingLink);
         }
 
         private void llbGenerateKeyPair_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -97,37 +98,32 @@ namespace Kryptor
             GetUserInput(encryption);
         }
 
-        private void GetUserInput(bool encryption)
-        {
-            char[] key = txtKey.Text.ToCharArray();
-            char[] password = txtPassword.Text.ToCharArray();
-            if (key.Length > 0 & password.Length > 0)
-            {
-                char[] message = PasswordSharing.ConvertUserInput(encryption, key, password);
-                if (message.Length > 0)
-                {
-                    txtPassword.Text = new string(message);
-                    ClearArrays(key, password, message);
-                }
-            }
-            else
-            {
-                DisplayUserInputError(encryption);
-            }
-        }
-
-        private static void ClearArrays(char[] key, char[] password, char[] message)
-        {
-            Utilities.ZeroArray(key);
-            Utilities.ZeroArray(password);
-            Utilities.ZeroArray(message);
-        }
-
         private void btnDecryptPassword_Click(object sender, EventArgs e)
         {
             lblPassword.Focus();
             bool encryption = false;
             GetUserInput(encryption);
+        }
+
+        private void GetUserInput(bool encryption)
+        {
+            char[] key = txtKey.Text.ToCharArray();
+            char[] password = txtPassword.Text.ToCharArray();
+            if (key.Length > 0 && password.Length > 0)
+            {
+                char[] message = PasswordSharing.ConvertUserInput(encryption, key, password);
+                if (message.Length > 0)
+                {
+                    txtPassword.Text = new string(message);
+                    Utilities.ZeroArray(message);
+                }
+                Utilities.ZeroArray(key);
+                Utilities.ZeroArray(password);
+            }
+            else
+            {
+                DisplayUserInputError(encryption);
+            }
         }
 
         private static void DisplayUserInputError(bool encryption)

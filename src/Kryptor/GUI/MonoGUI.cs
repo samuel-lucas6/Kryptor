@@ -22,24 +22,36 @@ namespace Kryptor
 {
     public static class MonoGUI
     {
-        public static void AlignLabels(Label firstLabel, Label secondLabel, Label thirdLabel, LinkLabel linkLabel)
+        private const int _xAxisAdjustment = 4;
+        public static void MoveLabelRight(Label label)
         {
-            if (Constants.RunningOnMono == true)
+            if (label != null)
             {
-                const int adjustment = 4;
-                if (firstLabel != null & secondLabel != null)
-                {
-                    firstLabel.Left = firstLabel.Location.X + adjustment;
-                    secondLabel.Left = secondLabel.Location.X + adjustment;
-                }
-                if (thirdLabel != null)
-                {
-                    thirdLabel.Left = thirdLabel.Location.X + adjustment;
-                }
-                if (linkLabel != null)
-                {
-                    linkLabel.Left = linkLabel.Location.X - adjustment;
-                }
+                label.Left = label.Location.X + _xAxisAdjustment;
+            }
+        }
+
+        public static void MoveCheckBoxLeft(CheckBox checkBox)
+        {
+            if (checkBox != null)
+            {
+                checkBox.Left = checkBox.Location.X - _xAxisAdjustment;
+            }
+        }
+
+        public static void MoveLabelLeft(Label label)
+        {
+            if (label != null)
+            {
+                label.Left = label.Location.X - _xAxisAdjustment;
+            }
+        }
+
+        public static void MoveLinkLabelLeft(LinkLabel linkLabel)
+        {
+            if (linkLabel != null)
+            {
+                linkLabel.Left = linkLabel.Location.X - _xAxisAdjustment;
             }
         }
     }

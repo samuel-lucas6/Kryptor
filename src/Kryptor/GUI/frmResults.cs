@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using System.Windows.Forms;
 
 /*  
@@ -40,15 +39,14 @@ namespace Kryptor
 
         private void ApplyDarkTheme()
         {
-            this.BackColor = Color.FromArgb(Constants.Red, Constants.Green, Constants.Blue);
-            txtResults.BackColor = Color.DimGray;
-            txtResults.ForeColor = Color.White;
+            this.BackColor = DarkTheme.BackgroundColour();
+            DarkTheme.TextBoxes(txtResults);
         }
 
         private void DisplayResults()
         {
             txtResults.Text = Globals.ResultsText;
-            if (txtResults.Lines.Length > 16 | txtResults.Text.Length > 1000)
+            if (txtResults.Lines.Length > 16 || txtResults.Text.Length > 1000)
             {
                 txtResults.ScrollBars = ScrollBars.Vertical;
             }

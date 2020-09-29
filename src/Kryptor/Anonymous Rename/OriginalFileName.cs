@@ -32,10 +32,10 @@ namespace Kryptor
             {
                 string fileName = Path.GetFileName(filePath);
                 EncodeFileName(filePath, fileName, out byte[] newLineBytes, out byte[] fileNameBytes);
-                using (var fsAppend = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read))
+                using (var fileStream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read))
                 {
-                    fsAppend.Write(newLineBytes, 0, newLineBytes.Length);
-                    fsAppend.Write(fileNameBytes, 0, fileNameBytes.Length);
+                    fileStream.Write(newLineBytes, 0, newLineBytes.Length);
+                    fileStream.Write(fileNameBytes, 0, fileNameBytes.Length);
                 }
                 return true;
             }
@@ -49,7 +49,7 @@ namespace Kryptor
 
         private static void EncodeFileName(string filePath, string fileName, out byte[] newLineBytes, out byte[] fileNameBytes)
         {
-            using (var streamReader = new StreamReader(filePath, true))
+            using (var streamReader = new StreamReader(filePath, Encoding.UTF8, true))
             {
                 streamReader.Peek();
                 var fileEncoding = streamReader.CurrentEncoding;
@@ -132,7 +132,7 @@ namespace Kryptor
             catch (Exception ex) when (ExceptionFilters.CharacterEncodingExceptions(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.High);
-                DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "Unable to remove the original file name stored in the decrypted file. The length of the stored file name could not be calculated.");
+                DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "Unable to remove the original file name stored in the file. The length of the stored file name could not be calculated.");
                 return 0;
             }
         }
@@ -144,7 +144,7 @@ namespace Kryptor
                 NullChecks.Strings(folderPath);
                 string anonymisedDirectoryName = Path.GetFileName(folderPath);
                 // Get the path where the original directory name is stored
-                string storageFileName = anonymisedDirectoryName + ".txt";
+                string storageFileName = $"{anonymisedDirectoryName}.txt";
                 string storageFilePath = Path.Combine(folderPath, storageFileName);
                 if (File.Exists(storageFilePath))
                 {

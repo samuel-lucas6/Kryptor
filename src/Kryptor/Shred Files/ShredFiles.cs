@@ -29,9 +29,12 @@ namespace Kryptor
             int progress = 0;
             Globals.SuccessfulCount = 0;
             Globals.TotalCount = Globals.GetSelectedFiles().Count;
+            // Use XChaCha20 - store current setting
+            int selectedCipher = Globals.EncryptionAlgorithm;
+            Globals.EncryptionAlgorithm = (int)Cipher.XChaCha20;
             foreach (string filePath in Globals.GetSelectedFiles())
             {
-                bool? directory = CheckIsDirectory.PathIsDirectory(filePath);
+                bool? directory = FileHandling.IsDirectory(filePath);
                 if (directory != null)
                 {
                     if (directory == false)
@@ -44,6 +47,8 @@ namespace Kryptor
                     }
                 }
             }
+            // Restore encryption algorithm setting
+            Globals.EncryptionAlgorithm = selectedCipher;
         }
 
         private static void ShredDirectory(string directoryPath, ref int progress, BackgroundWorker bgwShredFiles)
@@ -60,9 +65,9 @@ namespace Kryptor
                 {
                     CallShredFilesMethod(filePath, ref progress, bgwShredFiles);
                 }
-                string anonymisedDirectoryPath = AnonymousFileRename(directoryPath, false);
+                string anonymisedDirectoryPath = AnonymousRename.MoveFile(directoryPath, false);
                 Directory.Delete(anonymisedDirectoryPath, true);
-                Globals.ResultsText += $"{Path.GetFileName(directoryPath)}: Folder erasure successful." + Environment.NewLine;
+                Globals.ResultsText += $"{Path.GetFileName(directoryPath)}: Folder erasure successful.{Environment.NewLine}";
                 Globals.SuccessfulCount += 1;
             }
             catch (Exception ex) when (ExceptionFilters.FileAccessExceptions(ex))
@@ -90,13 +95,13 @@ namespace Kryptor
                         ShredFilesMethods.PseudorandomData(filePath, bgwShredFiles);
                         break;
                     case 3:
-                        ShredFilesMethods.InfosecStandard5Enhanced(filePath, bgwShredFiles);
+                        ShredFilesMethods.EncryptionErasure(filePath, bgwShredFiles);
                         break;
                     case 4:
-                        ShredFilesMethods.PseudorandomData5Passes(filePath, bgwShredFiles);
+                        ShredFilesMethods.InfosecStandard5Enhanced(filePath, bgwShredFiles);
                         break;
                     case 5:
-                        ShredFilesMethods.EncryptionErasure(filePath, bgwShredFiles);
+                        ShredFilesMethods.PseudorandomData5Passes(filePath, bgwShredFiles);
                         break;
                 }
                 DeleteFile(filePath);
@@ -113,7 +118,7 @@ namespace Kryptor
         {
             try
             {
-                string anonymisedFilePath = AnonymousFileRename(filePath, true);
+                string anonymisedFilePath = AnonymousRename.MoveFile(filePath, true);
                 EraseFileMetadata(anonymisedFilePath);
                 File.Delete(anonymisedFilePath);
                 Globals.ResultsText += $"{Path.GetFileName(filePath)}: File erasure successful." + Environment.NewLine;
@@ -133,35 +138,11 @@ namespace Kryptor
                 var eraseDate = new DateTime(2001, 11, 26, 12, 0, 0);
                 File.SetCreationTime(filePath, eraseDate);
                 File.SetLastWriteTime(filePath, eraseDate);
-                File.SetLastAccessTime(filePath, eraseDate);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccessExceptions(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.Medium);
                 DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "Erasure of file metadata failed.");
-            }
-        }
-
-        private static string AnonymousFileRename(string filePath, bool file)
-        {
-            try
-            {
-                string anonymisedFilePath = AnonymousRename.GetAnonymousFileName(filePath);
-                if (file == true)
-                {
-                    File.Move(filePath, anonymisedFilePath);
-                }
-                else
-                {
-                    Directory.Move(filePath, anonymisedFilePath);
-                }
-                return anonymisedFilePath;
-            }
-            catch (Exception ex) when (ExceptionFilters.FileAccessExceptions(ex))
-            {
-                Logging.LogException(ex.ToString(), Logging.Severity.Medium);
-                DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "Unable to anonymously rename file/folder.");
-                return filePath;
             }
         }
     }

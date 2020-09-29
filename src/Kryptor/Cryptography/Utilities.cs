@@ -37,16 +37,5 @@ namespace Kryptor
                 Array.Clear(charArray, 0, charArray.Length);
             }
         }
-
-        public static byte[] XorBytes(byte[] keystream, byte[] fileBytes)
-        {
-            NullChecks.ByteArray(keystream);
-            NullChecks.ByteArray(fileBytes);
-            for (int i = 0; i < fileBytes.Length; i++)
-            {
-                fileBytes[i] = (byte)(fileBytes[i] ^ keystream[i]);
-            }
-            return fileBytes;
-        }
     }
 }

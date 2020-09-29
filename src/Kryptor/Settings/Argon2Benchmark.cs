@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
 
 /*  
     Kryptor: Free and open source file encryption software.
@@ -28,41 +27,33 @@ namespace Kryptor
     {
         public static void RunBenchmark(bool speedMode)
         {
-            const int numberOfTests = 50;
-            int[] benchmarkTimes = new int[numberOfTests];
-            GetBenchmarkInputs(out byte[] passwordBytes, out byte[] keyfileBytes, out byte[] salt, out byte[] associatedData);
-            Globals.Parallelism = Constants.DefaultParallelism;
+            // Benchmark up to 250 MiB
+            const int testCount = 49;
+            int[] benchmarkTimes = new int[testCount];
+            GetBenchmarkInputs(out byte[] passwordBytes, out byte[] salt);
             Globals.Iterations = Constants.DefaultIterations;
-            var memorySize = new List<int>();
-            if (speedMode == true)
+            var memorySize = new List<int>
             {
-                // Start benchmark at 10 MiB memory size
-                memorySize.Add(10240);
-            }
-            else
-            {
-                // Start benchmark at 50 MiB memory size
-                memorySize.Add(51200);
-            }
-            for (int i = 0; i < numberOfTests; i++)
+                // Start benchmark at 10 MiB
+                10485760,
+            };
+            for (int i = 0; i < testCount; i++)
             {
                 var stopwatch = Stopwatch.StartNew();
-                KeyDerivation.DeriveKeys(passwordBytes, keyfileBytes, salt, associatedData, Globals.Parallelism, memorySize[i], Globals.Iterations);
+                KeyDerivation.DeriveKeys(passwordBytes, salt, Globals.Iterations, memorySize[i]);
                 stopwatch.Stop();
                 benchmarkTimes[i] = Convert.ToInt32(stopwatch.ElapsedMilliseconds);
                 // Increment memory size by 5 MiB
-                memorySize.Add(memorySize[i] + 5120);
+                memorySize.Add(memorySize[i] + 5242880);
             }
             CalculateMemorySize(benchmarkTimes, memorySize, speedMode);
         }
 
-        private static void GetBenchmarkInputs(out byte[] passwordBytes, out byte[] keyfileBytes, out byte[] salt, out byte[] associatedData)
+        private static void GetBenchmarkInputs(out byte[] passwordBytes, out byte[] salt)
         {
             char[] password = "K3jmrGo#aysfPs!BwKd@BKw&2T".ToCharArray();
             passwordBytes = FileEncryption.GetPasswordBytes(password);
-            keyfileBytes = null;
             salt = Generate.Salt();
-            associatedData = HashingAlgorithms.Blake2("Benchmark");
         }
 
         private static void CalculateMemorySize(int[] benchmarkTimes, List<int> memorySize, bool speedMode)
@@ -70,13 +61,13 @@ namespace Kryptor
             int i = 0;
             int recommendedMemorySize = Constants.DefaultMemorySize;
             int delayPerFile = 250;
-            if (speedMode == false)
+            if (speedMode == true)
             {
-                delayPerFile = 500;
+                delayPerFile = 150;
             }
             foreach (int timeElapsed in benchmarkTimes)
             {
-                // Recommended memory size is the the closest to the selected delay in ms
+                // Recommended memory size is the closest to the selected delay in ms
                 if (timeElapsed <= delayPerFile)
                 {
                     recommendedMemorySize = memorySize[i];
@@ -94,11 +85,11 @@ namespace Kryptor
                 var benchmarkResults = new List<string>();
                 for (int i = 0; i < benchmarkTimes.Length; i++)
                 {
-                    benchmarkResults.Add($"{memorySize[i] / Constants.Mebibyte} MiB : {benchmarkTimes[i]} ms");
+                    benchmarkResults.Add($"{memorySize[i] / Constants.Mebibyte} MiB = {benchmarkTimes[i]} ms");
                 }
                 benchmarkResults.Add(Environment.NewLine);
                 benchmarkResults.Add($"Recommended Memory Size: {Invariant.ToString(recommendedMemorySize / Constants.Mebibyte)} MiB");
-                benchmarkResults.Add($"This memory size was chosen because it was <= {delayPerFile} ms. This is the delay per file that it takes for Argon2 to derive an encryption key and HMAC key. You can speed up key derivation by lowering the memory size, but this will decrease your security. For more information about Argon2, please read the documentation: https://kryptor.co.uk/Key Derivation.html.");
+                benchmarkResults.Add($"This memory size was chosen because it was <= {delayPerFile} ms. This is the delay per file that it takes for Argon2 to derive an encryption key and MAC key. You can speed up key derivation by lowering the memory size, but this will decrease your security. For more information about Argon2, please read the documentation: https://kryptor.co.uk/Key Derivation.html.");
                 string benchmarkFilePath = Path.Combine(Constants.KryptorDirectory, "benchmark.txt");   
                 File.WriteAllLines(benchmarkFilePath, benchmarkResults);
             }
@@ -111,10 +102,10 @@ namespace Kryptor
 
         public static void DeleteFirstRunFile()
         {
+            const string firstRunFile = "first run.tmp";
             try
             {
                 // Prevent Argon2 benchmark reoccuring automatically
-                const string firstRunFile = "first run.tmp";
                 string firstRunFilePath = Path.Combine(Constants.KryptorDirectory, firstRunFile);
                 if (File.Exists(firstRunFilePath))
                 {
@@ -124,17 +115,17 @@ namespace Kryptor
             catch (Exception ex) when (ExceptionFilters.FileAccessExceptions(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.Medium);
-                DisplayMessage.ErrorMessageBox(ex.GetType().Name, $"Unable to delete {Constants.KryptorDirectory}\\first run.tmp. Please manually delete this file to prevent the Argon2 benchmark from automatically running again.");
+                DisplayMessage.ErrorMessageBox(ex.GetType().Name, $"Unable to delete {Constants.KryptorDirectory}\\{firstRunFile}. Please manually delete this file to prevent the Argon2 benchmark from automatically running again.");
             }
         }
 
-        public static void TestArgon2Parameters()
+        public static int TestArgon2Parameters()
         {
-            GetBenchmarkInputs(out byte[] passwordBytes, out byte[] keyfileBytes, out byte[] salt, out byte[] associatedData);
+            GetBenchmarkInputs(out byte[] passwordBytes, out byte[] salt);
             var stopwatch = Stopwatch.StartNew();
-            KeyDerivation.DeriveKeys(passwordBytes, keyfileBytes, salt, associatedData, Globals.Parallelism, Globals.MemorySize, Globals.Iterations);
+            KeyDerivation.DeriveKeys(passwordBytes, salt, Globals.Iterations, Globals.MemorySize);
             stopwatch.Stop();
-            DisplayMessage.InformationMessageBox($"{Convert.ToInt32(stopwatch.ElapsedMilliseconds)} ms delay per file.", "Argon2 Parameter Results");
+            return Convert.ToInt32(stopwatch.ElapsedMilliseconds);
         }
     }
 }

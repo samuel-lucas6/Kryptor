@@ -1,7 +1,5 @@
-﻿using Konscious.Security.Cryptography;
-using Sodium;
+﻿using Sodium;
 using System.IO;
-using System.Security.Cryptography;
 
 /*  
     Kryptor: Free and open source file encryption software.
@@ -25,37 +23,23 @@ namespace Kryptor
 {
     public static class HashingAlgorithms
     {
-        public static byte[] Blake2(byte[] message)
+        public static byte[] Blake2(byte[] message, byte[] key)
         {
-            using (var blake2 = new HMACBlake2B(512))
+            return GenericHash.Hash(message, key, Constants.HashLength);
+        }
+
+        public static byte[] Blake2(FileStream fileStream, byte[] key)
+        {
+            using (var blake2 = new GenericHash.GenericHashAlgorithm(key, Constants.HashLength))
             {
-                message = blake2.ComputeHash(message);
-                return message;
+                return blake2.ComputeHash(fileStream);
             }
         }
 
         public static byte[] Blake2(string message)
         {
-            byte[] hash = GenericHash.Hash(message, (byte[]) null, 64);
-            return hash;
+            return GenericHash.Hash(message, (byte[])null, Constants.HashLength);
         }
 
-        public static byte[] HMAC(FileStream fileStream, byte[] key)
-        {
-            using (var hmac = new HMACSHA512(key))
-            {
-                byte[] hash = hmac.ComputeHash(fileStream);
-                return hash;
-            }
-        }
-
-        public static byte[] HMAC(byte[] message, byte[] key)
-        {
-            using (var hmac = new HMACSHA512(key))
-            {
-                message = hmac.ComputeHash(message);
-                return message;
-            }
-        }
     }
 }

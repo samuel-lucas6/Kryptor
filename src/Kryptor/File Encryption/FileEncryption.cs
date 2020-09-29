@@ -27,75 +27,86 @@ namespace Kryptor
     {
         public static byte[] GetPasswordBytes(char[] password)
         {
-            if (password != null)
+            byte[] passwordBytes = null;
+            if (password != null && password.Length > 0)
             {
-                byte[] passwordBytes;
-                if (password.Length > 0)
-                {
-                    passwordBytes = Encoding.UTF8.GetBytes(password);
-                    passwordBytes = HashingAlgorithms.Blake2(passwordBytes);
-                }
-                else
-                {
-                    // If only a keyfile was selected, use the keyfile bytes as the password
-                    passwordBytes = Keyfiles.ReadKeyfile(Globals.KeyfilePath);
-                }
-                MemoryEncryption.EncryptByteArray(ref passwordBytes);
-                return passwordBytes;
+                passwordBytes = Encoding.UTF8.GetBytes(password);
+                passwordBytes = HashPasswordBytes(passwordBytes);
+            }
+            return passwordBytes;
+        }
+
+        private static byte[] HashPasswordBytes(byte[] passwordBytes)
+        {
+            byte[] associatedData = Generate.AssociatedData();
+            // Combine associated data and password bytes
+            passwordBytes = HashingAlgorithms.Blake2(passwordBytes, associatedData);
+            MemoryEncryption.EncryptByteArray(ref passwordBytes);
+            return passwordBytes;
+        }
+
+        public static void StartEncryption(bool encryption, byte[] passwordBytes, BackgroundWorker backgroundWorker)
+        {
+            // Don't use keyfile bytes when only a keyfile is selected
+            if (passwordBytes != null)
+            {
+                passwordBytes = GetKeyfileBytes(passwordBytes);
             }
             else
             {
-                return null;
+                passwordBytes = KeyfileAsPassword();
             }
+            GetFilePaths(encryption, passwordBytes, backgroundWorker);
+            Utilities.ZeroArray(passwordBytes);
         }
 
-        public static byte[] GetKeyfileBytes(ref byte[] passwordBytes)
+        private static byte[] GetKeyfileBytes(byte[] passwordBytes)
         {
-            byte[] keyfileBytes;
             if (!string.IsNullOrEmpty(Globals.KeyfilePath))
             {
-                keyfileBytes = Keyfiles.ReadKeyfile(Globals.KeyfilePath);
+                byte[] keyfileBytes = Keyfiles.ReadKeyfile(Globals.KeyfilePath);
                 if (keyfileBytes != null)
                 {
                     MemoryEncryption.DecryptByteArray(ref passwordBytes);
-                    // Mix password and keyfile bytes
-                    passwordBytes = HashingAlgorithms.HMAC(passwordBytes, keyfileBytes);
+                    // Combine password and keyfile bytes
+                    passwordBytes = HashingAlgorithms.Blake2(passwordBytes, keyfileBytes);
                     MemoryEncryption.EncryptByteArray(ref passwordBytes);
-                    MemoryEncryption.EncryptByteArray(ref keyfileBytes);
+                    Utilities.ZeroArray(keyfileBytes);
                 }
-                return keyfileBytes;
             }
-            else
-            {
-                // No keyfile selected
-                return null;
-            }
+            return passwordBytes;
         }
 
-        public static void GetFilePaths(bool encryption, byte[] passwordBytes, byte[] keyfileBytes, BackgroundWorker backgroundWorker)
+        private static byte[] KeyfileAsPassword()
+        {
+            // If only a keyfile was selected, use the keyfile bytes as the password
+            byte[] passwordBytes = Keyfiles.ReadKeyfile(Globals.KeyfilePath);
+            return HashPasswordBytes(passwordBytes);
+        }
+
+        public static void GetFilePaths(bool encryption, byte[] passwordBytes, BackgroundWorker backgroundWorker)
         {
             int progress = 0;
             Globals.SuccessfulCount = 0;
             Globals.TotalCount = Globals.GetSelectedFiles().Count;
-            byte[] associatedData = Generate.AssociatedData();
             foreach (string filePath in Globals.GetSelectedFiles())
             {
-                bool? fileIsDirectory = CheckIsDirectory.PathIsDirectory(filePath);
+                bool? fileIsDirectory = FileHandling.IsDirectory(filePath);
                 if (fileIsDirectory != null)
                 {
                     if (fileIsDirectory == false)
                     {
-                        CallEncryption(encryption, filePath, passwordBytes, keyfileBytes, associatedData, ref progress, backgroundWorker);
+                        CallEncryption(encryption, filePath, passwordBytes, ref progress, backgroundWorker);
                     }
                     else
                     {
-                        DirectoryEncryption(encryption, filePath, passwordBytes, keyfileBytes, associatedData, ref progress, backgroundWorker);
+                        DirectoryEncryption(encryption, filePath, passwordBytes, ref progress, backgroundWorker);
                     }
                 }
             }
         }
 
-        private static void DirectoryEncryption(bool encryption, string folderPath, byte[] passwordBytes, byte[] keyfileBytes, byte[] associatedData, ref int progress, BackgroundWorker backgroundWorker)
+        private static void DirectoryEncryption(bool encryption, string folderPath, byte[] passwordBytes, ref int progress, BackgroundWorker backgroundWorker)
         {
             try
             {
@@ -107,7 +118,7 @@ namespace Kryptor
                 Globals.TotalCount += files.Length - 1;
                 foreach (string filePath in files)
                 {
-                    CallEncryption(encryption, filePath, passwordBytes, keyfileBytes, associatedData, ref progress, backgroundWorker);
+                    CallEncryption(encryption, filePath, passwordBytes, ref progress, backgroundWorker);
                 }
                 // Deanonymise directory names after decryption (if enabled)
                 AnonymousRename.DeanonymiseDirectories(encryption, folderPath);
@@ -115,25 +126,25 @@ namespace Kryptor
             catch (Exception ex) when (ExceptionFilters.FileAccessExceptions(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.High);
-                DisplayMessage.ErrorResultsText(folderPath, ex.GetType().Name, "Unable to retrieve file paths in the directory.");
+                DisplayMessage.ErrorResultsText(folderPath, ex.GetType().Name, "Unable to get files in the directory.");
             }
         }
 
-        private static void CallEncryption(bool encryption, string filePath, byte[] passwordBytes, byte[] keyfileBytes, byte[] associatedData, ref int progress, BackgroundWorker backgroundWorker)
+        private static void CallEncryption(bool encryption, string filePath, byte[] passwordBytes, ref int progress, BackgroundWorker backgroundWorker)
         {
             try
             {
                 bool kryptorExtension = filePath.EndsWith(Constants.EncryptedExtension, StringComparison.Ordinal);
                 // Prevent Read-Only file attribute causing errors
                 File.SetAttributes(filePath, FileAttributes.Normal);
-                if (encryption == true & kryptorExtension == false)
+                if (encryption == true && kryptorExtension == false)
                 {
-                    Encryption.InitializeEncryption(filePath, passwordBytes, keyfileBytes, associatedData, backgroundWorker);
-                    IfOverwriteDisabled(filePath);
+                    Encryption.InitializeEncryption(filePath, passwordBytes, backgroundWorker);
+                    OverwriteDisabled(filePath);
                 }
-                else if (encryption == false & kryptorExtension == true)
+                else if (encryption == false && kryptorExtension == true)
                 {
-                    Decryption.InitializeDecryption(filePath, passwordBytes, keyfileBytes, associatedData, backgroundWorker);
+                    Decryption.InitializeDecryption(filePath, passwordBytes, backgroundWorker);
                 }
                 else
                 {
@@ -144,13 +155,13 @@ namespace Kryptor
             catch (Exception ex) when (ExceptionFilters.FileAccessExceptions(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.High);
-                DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "Unable to set file attributes to normal - encryption/decryption cancelled.");
+                DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "Unable to set file attributes to normal.");
             }
         }
 
-        private static void IfOverwriteDisabled(string filePath)
+        private static void OverwriteDisabled(string filePath)
         {
-            if (Globals.AnonymousRename == true & Globals.OverwriteFiles == false)
+            if (Globals.AnonymousRename == true && Globals.OverwriteFiles == false)
             {
                 // Remove appended file name from the original file
                 OriginalFileName.ReadOriginalFileName(filePath);
@@ -160,7 +171,7 @@ namespace Kryptor
         private static void DisplayFileError(string filePath, bool encryption, bool kryptorExtension)
         {
             string errorMessage;
-            if (encryption == false & kryptorExtension == false)
+            if (encryption == false && kryptorExtension == false)
             {
                 errorMessage = "This file is missing the '.kryptor' extension.";
             }
@@ -169,24 +180,6 @@ namespace Kryptor
                 errorMessage = "This file is already encrypted.";
             }
             Globals.ResultsText += $"{Path.GetFileName(filePath)} - Error: {errorMessage}" + Environment.NewLine;
-        }
-
-        public static void EncryptionDecryptionFailed(byte[] encryptionKey, byte[] hmacKey, string filePath)
-        {
-            Utilities.ZeroArray(encryptionKey);
-            Utilities.ZeroArray(hmacKey);
-            try
-            {
-                if (File.Exists(filePath))
-                {
-                    // Delete the created file (which is empty due to an exception)
-                    File.Delete(filePath);
-                }
-            }
-            catch (Exception ex) when (ExceptionFilters.FileAccessExceptions(ex))
-            {
-                DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "Unable to delete the empty file. This file can be manually deleted.");
-            }
         }
     }
 }

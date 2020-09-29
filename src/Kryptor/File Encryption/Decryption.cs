@@ -25,37 +25,30 @@ namespace Kryptor
 {
     public static class Decryption
     {
-        public static void InitializeDecryption(string filePath, byte[] passwordBytes, byte[] keyfileBytes, byte[] associatedData, BackgroundWorker bgwDecryption)
+        public static void InitializeDecryption(string filePath, byte[] passwordBytes, BackgroundWorker bgwDecryption)
         {
-            int parametersLength = 0;
-            int[] argon2Parameters = ReadTrailers.ReadArgon2Parameters(filePath);
+            int[] argon2Parameters = ReadFileHeaders.ReadArgon2Parameters(filePath);
             if (argon2Parameters != null)
             {
-                // argon2Parameters[3] = Length of parameter bytes in the file
-                parametersLength = argon2Parameters[3];
-            }
-            byte[] nonce = ReadTrailers.ReadNonce(filePath, parametersLength);
-            byte[] salt = ReadTrailers.ReadSalt(filePath, nonce, parametersLength);
-            (byte[], byte[]) keys;
-            if (argon2Parameters != null)
-            {
-                keys = KeyDerivation.DeriveKeys(passwordBytes, keyfileBytes, salt, associatedData, argon2Parameters[0], argon2Parameters[1], argon2Parameters[2]);
+                int parametersLength = argon2Parameters[2];
+                byte[] salt = ReadFileHeaders.ReadSalt(filePath, parametersLength);
+                byte[] nonce = ReadFileHeaders.ReadNonce(filePath, salt, parametersLength);
+                var keys = KeyDerivation.DeriveKeys(passwordBytes, salt, argon2Parameters[1], argon2Parameters[0]);
+                CheckForTampering(filePath, parametersLength, nonce, keys, bgwDecryption);
             }
             else
             {
-                // If the Argon2 parameters are in the file but couldn't be read, then this will fail
-                keys = KeyDerivation.DeriveKeys(passwordBytes, keyfileBytes, salt, associatedData, Globals.Parallelism, Globals.MemorySize, Globals.Iterations);
+                Globals.ResultsText += $"{Path.GetFileName(filePath)}: The Argon2 parameters could not be read from the file.{Environment.NewLine}";
             }
-            CheckForTampering(filePath, keys, nonce, parametersLength, bgwDecryption);
         }
 
-        private static void CheckForTampering(string filePath, (byte[], byte[]) keys, byte[] nonce, int parametersLength, BackgroundWorker bgwDecryption)
+        private static void CheckForTampering(string filePath, int parametersLength, byte[] nonce, (byte[], byte[]) keys, BackgroundWorker bgwDecryption)
         {
-            bool fileTampered = FileAuthentication.AuthenticateFile(filePath, keys.Item2);
+            bool fileTampered = FileAuthentication.AuthenticateFile(filePath, keys.Item2, out byte[] macBackup);
             Utilities.ZeroArray(keys.Item2);
             if (fileTampered == false)
             {
-                DecryptFile(filePath, parametersLength, nonce, keys.Item1, bgwDecryption);
+                DecryptFile(filePath, parametersLength, macBackup, nonce, keys.Item1, bgwDecryption);
             }
             else
             {
@@ -64,28 +57,21 @@ namespace Kryptor
             }
         }
 
-        private static void DecryptFile(string filePath, int parametersLength, byte[] nonce, byte[] key, BackgroundWorker bgwDecryption)
+        private static void DecryptFile(string filePath, int parametersLength, byte[] macBackup, byte[] nonce, byte[] key, BackgroundWorker bgwDecryption)
         {
-            string backupFilePath = Regex.Replace(filePath, Constants.EncryptedExtension, ".backup");
-            string decryptedFilePath = Regex.Replace(filePath, Constants.EncryptedExtension, string.Empty);
             try
             {
-                // Get length of bytes to remove before decryption (salt/nonce, etc)
-                int trailersLength = ReadTrailers.GetTrailersLength(nonce.Length, parametersLength);
-                // Backup data required for decryption in case something goes wrong
-                DecryptionBackup.BackupTrailers(filePath, backupFilePath, trailersLength);
+                string decryptedFilePath = Regex.Replace(filePath, Constants.EncryptedExtension, string.Empty);
+                // Get length of headers bytes (parameters, salt, nonce)
+                int headersLength = ReadFileHeaders.GetHeadersLength(nonce.Length, parametersLength);
                 using (var plaintext = new FileStream(decryptedFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read))
                 using (var ciphertext = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read))
                 {
-                    // Remove trailers from the encrypted file
-                    ciphertext.SetLength(ciphertext.Length - trailersLength);
-                    byte[] fileBytes = new byte[4096];
-                    if (fileBytes.Length > ciphertext.Length)
-                    {
-                        fileBytes = new byte[ciphertext.Length];
-                    }
+                    // Skip the header bytes
+                    ciphertext.Position = headersLength;
+                    byte[] fileBytes = FileHandling.GetBufferSize(ciphertext);
                     MemoryEncryption.DecryptByteArray(ref key);
-                    if (Globals.EncryptionAlgorithm == (int)Cipher.XChaCha20 | Globals.EncryptionAlgorithm == (int)Cipher.XSalsa20)
+                    if (Globals.EncryptionAlgorithm == (int)Cipher.XChaCha20 || Globals.EncryptionAlgorithm == (int)Cipher.XSalsa20)
                     {
                         StreamCiphers.Decrypt(plaintext, ciphertext, fileBytes, nonce, key, bgwDecryption);
                     }
@@ -93,45 +79,45 @@ namespace Kryptor
                     {
                         AesAlgorithms.DecryptAesCBC(plaintext, ciphertext, fileBytes, nonce, key, bgwDecryption);
                     }
-                    else if (Globals.EncryptionAlgorithm == (int)Cipher.AesCTR)
-                    {
-                        AesAlgorithms.AesCTR(ciphertext, plaintext, fileBytes, nonce, key, bgwDecryption);
-                    }
                 }
                 Utilities.ZeroArray(key);
-                CompleteDecryption(filePath, decryptedFilePath, backupFilePath);
+                CompleteDecryption(filePath, decryptedFilePath);
             }
             catch (Exception ex) when (ExceptionFilters.FileEncryptionExceptions(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.High);
                 DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "Unable to decrypt the file.");
-                DecryptionBackup.RestoreTrailers(filePath, backupFilePath);
-                FileEncryption.EncryptionDecryptionFailed(key, null, decryptedFilePath);
+                // Restore the MAC
+                RestoreMAC(filePath, macBackup);
+                Utilities.ZeroArray(key);
             }
         }
 
-        private static void CompleteDecryption(string filePath, string decryptedFilePath, string backupFilePath)
+        private static void RestoreMAC(string filePath, byte[] macBackup)
         {
-            // Deanonymise file name (if anonymous rename is enabled)
+            bool restored = FileAuthentication.AppendHash(filePath, macBackup);
+            if (restored == false)
+            {
+                try
+                {
+                    File.WriteAllBytes($"{filePath}.backup", macBackup);
+                }
+                catch (Exception ex) when (ExceptionFilters.FileAccessExceptions(ex))
+                {
+                    Logging.LogException(ex.ToString(), Logging.Severity.High);
+                    DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "Failed to backup file MAC.");
+                }
+            }
+            Utilities.ZeroArray(macBackup);
+        }
+
+        private static void CompleteDecryption(string filePath, string decryptedFilePath)
+        {
+            // Deanonymise file name
             OriginalFileName.RestoreOriginalFileName(decryptedFilePath);
-            DeleteEncryptedFile(filePath, backupFilePath);
-            Globals.ResultsText += Path.GetFileName(filePath) + ": File decryption successful." + Environment.NewLine;
+            FileHandling.DeleteFile(filePath);
+            Globals.ResultsText += $"{Path.GetFileName(filePath)}: File decryption successful.{Environment.NewLine}";
             Globals.SuccessfulCount += 1;
-        }
-
-        private static void DeleteEncryptedFile(string filePath, string backupFilePath)
-        {
-            try
-            {
-                File.Delete(filePath);
-                File.SetAttributes(backupFilePath, FileAttributes.Normal);
-                File.Delete(backupFilePath);
-            }
-            catch (Exception ex) when (ExceptionFilters.FileAccessExceptions(ex))
-            {
-                Logging.LogException(ex.ToString(), Logging.Severity.Medium);
-                DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "Unable to delete the encrypted file and/or backup file.");
-            }
         }
     }
 }

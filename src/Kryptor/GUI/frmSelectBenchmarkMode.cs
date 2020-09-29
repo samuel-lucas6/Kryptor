@@ -1,6 +1,23 @@
 ﻿using System;
-using System.Drawing;
 using System.Windows.Forms;
+
+/*  
+    Kryptor: Free and open source file encryption software.
+    Copyright(C) 2020 Samuel Lucas
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program. If not, see https://www.gnu.org/licenses/. 
+*/
 
 namespace Kryptor
 {
@@ -21,30 +38,31 @@ namespace Kryptor
 
         private void ApplyDarkTheme()
         {
-            this.BackColor = Color.FromArgb(Constants.Red, Constants.Green, Constants.Blue);
-            btnSpeedMode.BackColor = Color.FromArgb(Constants.Red, Constants.Green, Constants.Blue);
-            btnSpeedMode.ForeColor = Color.White;
-            btnSpeedMode.FlatAppearance.MouseDownBackColor = Color.Transparent;
-            btnSecurityMode.BackColor = Color.FromArgb(Constants.Red, Constants.Green, Constants.Blue);
-            btnSecurityMode.ForeColor = Color.White;
-            btnSecurityMode.FlatAppearance.MouseDownBackColor = Color.Transparent;
+            this.BackColor = DarkTheme.BackgroundColour();
+            DarkTheme.Buttons(btnSpeedMode);
+            DarkTheme.Buttons(btnSecurityMode);
         }
 
         private void btnSpeedMode_Click(object sender, EventArgs e)
         {
             this.DialogResult = DialogResult.Yes;
-            this.Close();
+            CloseForm();
         }
 
         private void btnSecurityMode_Click(object sender, EventArgs e)
         {
             this.DialogResult = DialogResult.No;
+            CloseForm();
+        }
+
+        private void CloseForm()
+        {
             this.Close();
         }
 
         private void frmSelectBenchmarkMode_FormClosing(object sender, EventArgs e)
         {
-            if (this.DialogResult != DialogResult.Yes | this.DialogResult != DialogResult.No)
+            if (this.DialogResult != DialogResult.Yes || this.DialogResult != DialogResult.No)
             {
                 this.DialogResult = DialogResult.Cancel;
             }

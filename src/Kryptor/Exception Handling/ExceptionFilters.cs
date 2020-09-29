@@ -60,14 +60,19 @@ namespace Kryptor
             return ex is CryptographicException || ex is KeyOutOfRangeException || ex is SeedOutOfRangeException || ex is OverflowException || ex is DecoderFallbackException;
         }
 
+        public static bool MemoryEncryptionExceptions(Exception ex)
+        {
+            return ex is NotSupportedException || ex is CryptographicException;
+        }
+
         public static bool OpenLinkExceptions(Exception ex)
         {
             return ex is Win32Exception || ex is InvalidOperationException || ex is FileNotFoundException;
         }
 
-        public static bool MemoryEncryptionExceptions(Exception ex)
+        public static bool ReportProgressExceptions(Exception ex)
         {
-            return ex is NotSupportedException || ex is CryptographicException;
+            return ex is InvalidOperationException || ex is OverflowException || ex is DivideByZeroException;
         }
     }
 }

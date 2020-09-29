@@ -22,7 +22,7 @@ namespace Kryptor
 {
     public static class Globals
     {
-        // Encryption/Shred Files
+        // File Encryption/Shred Files
         private static List<string> _selectedFiles;
 
         public static List<string> GetSelectedFiles()
@@ -45,14 +45,13 @@ namespace Kryptor
         public static bool MemoryEncryption { get; set; } = true;
         public static bool AnonymousRename { get; set; } = true;
         public static bool OverwriteFiles { get; set; } = true;
-        public static int Parallelism { get; set; } = Constants.DefaultParallelism;
         public static int MemorySize { get; set; } = Constants.DefaultMemorySize;
         public static int Iterations { get; set; } = Constants.DefaultIterations;
-        public static int ShredFilesMethod { get; set; } = 2; // Default to 1 pass of random data 
+        public static int ShredFilesMethod { get; set; } = 2; // Default to 1 pass of pseudorandom data
         public static bool ShowPasswordByDefault { get; set; } = true;
         public static bool AutoClearPassword { get; set; } = true;
-        public static int ClearClipboardInterval { get; set; } = 30000; // Default to 30 secs
-        public static bool ClearClipboardOnExit { get; set; }  // Defaults to false
+        public static int ClearClipboardInterval { get; set; } = 30000; // Default to 30 seconds
+        public static bool ExitClearClipboard { get; set; } // Defaults to false
         public static bool CheckForUpdates { get; set; } = true;
         public static bool DarkTheme { get; set; } = true;
     }

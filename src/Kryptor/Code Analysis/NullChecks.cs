@@ -1,5 +1,7 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
+using System.Windows.Forms;
 
 /*  
     Kryptor: Free and open source file encryption software.
@@ -23,6 +25,14 @@ namespace Kryptor
 {
     public static class NullChecks
     { 
+        public static void ComboBoxes(ComboBox comboBox)
+        {
+            if (comboBox == null)
+            {
+                throw new ArgumentNullException(nameof(comboBox));
+            }
+        }
+
         public static void FileEncryption(FileStream plaintext, FileStream ciphertext, byte[] fileBytes, byte[] nonce, byte[] key)
         {
             if (plaintext == null)
@@ -68,6 +78,46 @@ namespace Kryptor
             if (charArray == null)
             {
                 throw new ArgumentNullException(nameof(charArray));
+            }
+        }
+
+        public static void NumericUpDowns(NumericUpDown numericUpDown)
+        {
+            if (numericUpDown == null)
+            {
+                throw new ArgumentNullException(nameof(numericUpDown));
+            }
+        }
+
+        public static void FileStreams(FileStream fileStream)
+        {
+            if (fileStream == null)
+            {
+                throw new ArgumentNullException(nameof(fileStream));
+            }
+        }
+
+        public static void BackgroundWorkers(BackgroundWorker backgroundWorker)
+        {
+            if (backgroundWorker == null)
+            {
+                throw new ArgumentNullException(nameof(backgroundWorker));
+            }
+        }
+
+        public static void FileHeaders(FileStream ciphertext, byte[] salt, byte[] nonce)
+        {
+            if (ciphertext == null)
+            {
+                throw new ArgumentNullException(nameof(ciphertext));
+            }
+            if (salt == null)
+            {
+                throw new ArgumentNullException(nameof(salt));
+            }
+            if (nonce == null)
+            {
+                throw new ArgumentNullException(nameof(nonce));
             }
         }
     }

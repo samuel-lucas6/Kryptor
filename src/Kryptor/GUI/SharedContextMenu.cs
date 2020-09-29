@@ -1,6 +1,4 @@
-﻿using System;
-using System.Drawing;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 
 /*  
     Kryptor: Free and open source file encryption software.
@@ -24,24 +22,10 @@ namespace Kryptor
 {
     public static class SharedContextMenu
     {
-        public static void DarkContextMenu(ContextMenuStrip contextMenu)
-        {
-            if (contextMenu == null)
-            {
-                throw new ArgumentNullException(nameof(contextMenu));
-            }
-            contextMenu.BackColor = Color.FromArgb(Constants.Red, Constants.Green, Constants.Blue);
-            foreach (ToolStripItem toolStripItem in contextMenu.Items)
-            {
-                toolStripItem.ForeColor = Color.White;
-                toolStripItem.BackColor = Color.FromArgb(Constants.Red, Constants.Green, Constants.Blue);
-            }
-        }
-
         public static void CopyTextbox(object sender)
         {
             Control sourceControl = GetSourceControl(sender);
-            if (sourceControl != null & !string.IsNullOrEmpty(sourceControl.Text))
+            if (sourceControl != null && !string.IsNullOrEmpty(sourceControl.Text))
             {
                 EditClipboard.SetClipboard(sourceControl.Text);
                 EditClipboard.AutoClearClipboard();
@@ -62,9 +46,9 @@ namespace Kryptor
             // Return which textbox the context menu was used on
             if (sender is ToolStripItem toolStripItem)
             {
-                if (toolStripItem.Owner is ContextMenuStrip owner)
+                if (toolStripItem.Owner is ContextMenuStrip contextMenuStrip)
                 {
-                    Control sourceControl = owner.SourceControl;
+                    Control sourceControl = contextMenuStrip.SourceControl;
                     return sourceControl;
                 }
             }

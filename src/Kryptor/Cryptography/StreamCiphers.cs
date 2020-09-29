@@ -24,7 +24,7 @@ namespace Kryptor
 {
     public static class StreamCiphers
     {
-        public static void Encrypt(FileStream plaintext, FileStream ciphertext, byte[] fileBytes, byte[] nonce, byte[] key, BackgroundWorker bgwEncryption)
+        public static void Encrypt(FileStream plaintext, FileStream ciphertext, long headersLength, byte[] fileBytes, byte[] nonce, byte[] key, BackgroundWorker bgwEncryption)
         {
             NullChecks.FileEncryption(plaintext, ciphertext, fileBytes, nonce, key);
             int bytesRead;
@@ -33,7 +33,7 @@ namespace Kryptor
                 byte[] encryptedBytes = EncryptFileBytes(fileBytes, nonce, key);
                 ciphertext.Write(encryptedBytes, 0, bytesRead);
                 // Report progress if encrypting a single file
-                ReportProgress.ReportEncryptionProgress(ciphertext.Position, plaintext.Length, bgwEncryption);
+                ReportProgress.ReportEncryptionProgress(ciphertext.Position, plaintext.Length + headersLength, bgwEncryption);
             }
         }
 

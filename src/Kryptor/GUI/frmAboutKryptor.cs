@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
 
@@ -32,33 +31,43 @@ namespace Kryptor
 
         private void frmAboutKryptor_Load(object sender, EventArgs e)
         {
-            DisplayVersion();
             if (Globals.DarkTheme == true)
             {
                 ApplyDarkTheme();
             }
-        }
-
-        private void DisplayVersion()
-        {
-            lblVersion.Text = $"Version {Assembly.GetExecutingAssembly().GetName().Version} Beta";
+            DisplayVersion();
+            RunningOnMono();
         }
 
         private void ApplyDarkTheme()
         {
-            this.BackColor = Color.FromArgb(Constants.Red, Constants.Green, Constants.Blue);
-            txtAbout.BackColor = Color.DimGray;
-            txtAbout.ForeColor = Color.White;
-            lblTitle.ForeColor = Color.White;
-            lblVersion.ForeColor = Color.White;
-            lblProgramDescription.ForeColor = Color.White;
+            this.BackColor = DarkTheme.BackgroundColour();
+            DarkTheme.TextBoxes(txtAbout);
+            DarkTheme.Labels(lblTitle);
+            DarkTheme.Labels(lblVersion);
+            DarkTheme.Labels(lblProgramDescription);
+        }
+
+        private void DisplayVersion()
+        {
+            string assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            lblVersion.Text = $"Version {assemblyVersion.Substring(0, assemblyVersion.Length - 2)} Beta";
+        }
+
+        private void RunningOnMono()
+        {
+            if (Constants.RunningOnMono == true)
+            {
+                lblTitle.Focus();
+                MonoGUI.MoveLabelLeft(lblProgramDescription);
+                txtAbout.Cursor = Cursors.IBeam;
+            }
         }
 
         private void txtAbout_GotFocus(object sender, EventArgs e)
         {
             // Hide the cursor
-            txtAbout.Enabled = false;
-            txtAbout.Enabled = true;
+            lblTitle.Focus();
         }
     }
 }

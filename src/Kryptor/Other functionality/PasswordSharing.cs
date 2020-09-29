@@ -25,6 +25,16 @@ namespace Kryptor
 {
     public static class PasswordSharing
     {
+        public static (string, string) GenerateKeyPair()
+        {
+            using (var keyPair = PublicKeyBox.GenerateKeyPair())
+            {
+                string publicKey = Convert.ToBase64String(keyPair.PublicKey);
+                string privateKey = Convert.ToBase64String(keyPair.PrivateKey);
+                return (publicKey, privateKey);
+            }
+        }
+
         public static char[] ConvertUserInput(bool encryption, char[] base64Key, char[] password)
         {
             try
@@ -93,7 +103,7 @@ namespace Kryptor
             string errorMessage;
             if (ex is CryptographicException)
             {
-                errorMessage = $"{operation} failed - check that your key/password are correct.";
+                errorMessage = $"{operation} failed - incorrect key/password.";
             }
             else if (ex is OverflowException)
             {
@@ -105,7 +115,7 @@ namespace Kryptor
             }
             else
             {
-                errorMessage = $"{operation} failed due to an invalid key length.";
+                errorMessage = $"{operation} failed - invalid key length.";
             }
             DisplayMessage.ErrorMessageBox(ex.GetType().Name, errorMessage);
         }

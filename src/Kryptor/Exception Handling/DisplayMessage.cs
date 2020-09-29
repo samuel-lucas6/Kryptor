@@ -24,21 +24,21 @@ namespace Kryptor
 {
     public static class DisplayMessage
     {
-        private const string _messageBoxCaption = "Error";
+        private const string _errorCaption = "Error";
 
         public static void ErrorMessageBox(string exceptionName, string errorMessage)
         {
-            MessageBox.Show($"{exceptionName}: {errorMessage}", _messageBoxCaption, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"{exceptionName}: {errorMessage}", _errorCaption, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         public static void ErrorMessageBox(string errorMessage)
         {
-            MessageBox.Show(errorMessage, _messageBoxCaption, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(errorMessage, _errorCaption, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         public static void InformationMessageBox(string errorMessage)
         {
-            MessageBox.Show(errorMessage, _messageBoxCaption, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(errorMessage, _errorCaption, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         public static void InformationMessageBox(string message, string caption)

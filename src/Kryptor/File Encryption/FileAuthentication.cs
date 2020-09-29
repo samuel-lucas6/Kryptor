@@ -23,54 +23,57 @@ namespace Kryptor
 {
     public static class FileAuthentication
     {
-        public static bool SignFile(string encryptedFilePath, byte[] hmacKey)
+        public static bool SignFile(string encryptedFilePath, byte[] macKey)
         {
-            byte[] fileHash = ComputeFileHash(encryptedFilePath, hmacKey);
+            byte[] fileHash = ComputeFileHash(encryptedFilePath, macKey);
             return AppendHash(encryptedFilePath, fileHash);
         }
 
-        private static byte[] ComputeFileHash(string encryptedFilePath, byte[] hmacKey)
+        private static byte[] ComputeFileHash(string encryptedFilePath, byte[] macKey)
         {
             try
             {
-                byte[] computedHash = new byte[Constants.HMACLength];
-                MemoryEncryption.DecryptByteArray(ref hmacKey);
-                using (var fileStream = new FileStream(encryptedFilePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read))
+                byte[] computedHash = new byte[Constants.HashLength];
+                using (var fileStream = new FileStream(encryptedFilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
-                    computedHash = HashingAlgorithms.HMAC(fileStream, hmacKey);
+                    MemoryEncryption.DecryptByteArray(ref macKey);
+                    computedHash = HashingAlgorithms.Blake2(fileStream, macKey);
+                    MemoryEncryption.EncryptByteArray(ref macKey);
                 }
-                MemoryEncryption.EncryptByteArray(ref hmacKey);
                 return computedHash;
             }
             catch (Exception ex) when (ExceptionFilters.FileAccessExceptions(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.High);
-                DisplayMessage.ErrorResultsText(encryptedFilePath, ex.GetType().Name, "Unable to compute HMAC.");
+                DisplayMessage.ErrorResultsText(encryptedFilePath, ex.GetType().Name, "Unable to compute MAC.");
                 return null;
             }
         }
 
-        public static bool AuthenticateFile(string filePath, byte[] hmacKey)
+        public static bool AuthenticateFile(string filePath, byte[] macKey, out byte[] storedHash)
         {
             try
             {
                 bool tampered = true;
-                byte[] storedHash = ReadStoredHash(filePath);
-                byte[] computedHash = new byte[Constants.HMACLength];
+                storedHash = ReadStoredHash(filePath);
                 if (storedHash != null)
                 {
+                    byte[] computedHash = new byte[Constants.HashLength];
                     using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read))
                     {
-                        fileStream.Seek(0, SeekOrigin.Begin);
-                        // Remove the stored HMAC from the file before computing the HMAC
+                        // Remove the stored MAC from the file before computing the MAC
                         fileStream.SetLength(fileStream.Length - computedHash.Length);
-                        MemoryEncryption.DecryptByteArray(ref hmacKey);
-                        computedHash = HashingAlgorithms.HMAC(fileStream, hmacKey);
+                        MemoryEncryption.DecryptByteArray(ref macKey);
+                        computedHash = HashingAlgorithms.Blake2(fileStream, macKey);
+                        MemoryEncryption.EncryptByteArray(ref macKey);
                     }
-                    MemoryEncryption.EncryptByteArray(ref hmacKey);
+                    // Invert result
                     tampered = !Sodium.Utilities.Compare(storedHash, computedHash);
-                    // Restore the stored HMAC
-                    AppendHash(filePath, storedHash);
+                    if (tampered == true)
+                    {
+                        // Restore the stored MAC
+                        AppendHash(filePath, storedHash);
+                    }
                 }
                 return tampered;
             }
@@ -78,6 +81,7 @@ namespace Kryptor
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.High);
                 DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "Unable to authenticate the file.");
+                storedHash = null;
                 return true;
             }
         }
@@ -86,7 +90,7 @@ namespace Kryptor
         {
             try
             {
-                byte[] storedHash = new byte[Constants.HMACLength];
+                byte[] storedHash = new byte[Constants.HashLength];
                 using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
                     // Read the last 64 bytes of the file
@@ -98,26 +102,26 @@ namespace Kryptor
             catch (Exception ex) when (ExceptionFilters.FileAccessExceptions(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.High);
-                DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "Unable to read the HMAC stored in the file.");
+                DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "Unable to read the MAC stored in the file.");
                 return null;
             }
         }
 
-        private static bool AppendHash(string filePath, byte[] fileHash)
+        public static bool AppendHash(string filePath, byte[] fileHash)
         {
             try
             {
                 NullChecks.ByteArray(fileHash);
-                using (var fsAppend = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read))
+                using (var fileStream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read))
                 {
-                    fsAppend.Write(fileHash, 0, fileHash.Length);
+                    fileStream.Write(fileHash, 0, fileHash.Length);
                 }
                 return true;
             }
             catch (Exception ex) when (ExceptionFilters.FileAccessExceptions(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.High);
-                DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "Unable to append HMAC to the file. This data is required for decryption of the file. The original file will not be overwritten/deleted.");
+                DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "Unable to append the MAC to the file. This data is required for decryption of the file.");
                 return false;
             }
         }

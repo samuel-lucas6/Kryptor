@@ -25,7 +25,7 @@ namespace Kryptor
     {
         public static string AnonymiseDirectories(bool encryption, string folderPath)
         {
-            if (encryption == true & Globals.AnonymousRename == true)
+            if (encryption == true && Globals.AnonymousRename == true)
             {
                 string[] subdirectories = GetAllDirectories(folderPath);
                 if (subdirectories != null)
@@ -64,7 +64,7 @@ namespace Kryptor
                 string anonymisedPath = GetAnonymousFileName(folderPath);
                 Directory.Move(folderPath, anonymisedPath);
                 // Store the original directory name in a text file inside the directory
-                string storageFilePath = Path.Combine(anonymisedPath, Path.GetFileName(anonymisedPath) + ".txt");
+                string storageFilePath = Path.Combine(anonymisedPath, $"{Path.GetFileName(anonymisedPath)}.txt");
                 File.WriteAllText(storageFilePath, originalDirectoryName);
                 return anonymisedPath;
             }
@@ -78,7 +78,7 @@ namespace Kryptor
 
         public static void DeanonymiseDirectories(bool encryption, string folderPath)
         {
-            if (encryption == false & Globals.AnonymousRename == true)
+            if (encryption == false && Globals.AnonymousRename == true)
             {
                 string[] subdirectories = GetAllDirectories(folderPath);
                 if (subdirectories != null)
@@ -116,6 +116,29 @@ namespace Kryptor
             string randomFileName = Path.GetRandomFileName().Replace(".", string.Empty);
             randomFileName += Path.GetRandomFileName().Replace(".", string.Empty);
             return randomFileName;
+        }
+
+        public static string MoveFile(string filePath, bool file)
+        {
+            try
+            {
+                string anonymisedFilePath = GetAnonymousFileName(filePath);
+                if (file == true)
+                {
+                    File.Move(filePath, anonymisedFilePath);
+                }
+                else
+                {
+                    Directory.Move(filePath, anonymisedFilePath);
+                }
+                return anonymisedFilePath;
+            }
+            catch (Exception ex) when (ExceptionFilters.FileAccessExceptions(ex))
+            {
+                Logging.LogException(ex.ToString(), Logging.Severity.Medium);
+                DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "Unable to anonymously rename file/folder.");
+                return filePath;
+            }
         }
     }
 }

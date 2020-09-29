@@ -35,7 +35,7 @@ namespace Kryptor
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             RunKryptor();
-            ClearClipboardOnExit();
+            ExitClearClipboard();
         }
 
         private static void CheckArguments(string[] args)
@@ -53,18 +53,17 @@ namespace Kryptor
         private static void RunKryptor()
         {
             // Perform Argon2 benchmark if first run 
-            const string firstRunFile = "first run.tmp";
-            string firstRunPath = Path.Combine(Constants.KryptorDirectory, firstRunFile);
+            string firstRunPath = Path.Combine(Constants.KryptorDirectory, "first run.tmp");
             if (File.Exists(firstRunPath))
             {
                 Application.Run(new frmArgon2Benchmark());
             }
-            Application.Run(new frmKryptor());
+            Application.Run(new frmFileEncryption());
         }
 
-        private static void ClearClipboardOnExit()
+        private static void ExitClearClipboard()
         {
-            if (Globals.ClearClipboardOnExit == true)
+            if (Globals.ExitClearClipboard == true)
             {
                 EditClipboard.ClearClipboard();
             }

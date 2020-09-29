@@ -41,8 +41,8 @@
             this.cmbAutoClearPassword = new System.Windows.Forms.ComboBox();
             this.lblAnonymousRename = new System.Windows.Forms.Label();
             this.cmbAnonymousRename = new System.Windows.Forms.ComboBox();
-            this.lblExitClipboardClear = new System.Windows.Forms.Label();
-            this.cmbExitClipboardClear = new System.Windows.Forms.ComboBox();
+            this.lblExitClearClipboard = new System.Windows.Forms.Label();
+            this.cmbExitClearClipboard = new System.Windows.Forms.ComboBox();
             this.lblShowPassword = new System.Windows.Forms.Label();
             this.cmbShowPassword = new System.Windows.Forms.ComboBox();
             this.grbFileEncryption = new System.Windows.Forms.GroupBox();
@@ -50,12 +50,9 @@
             this.lblOverwriteFiles = new System.Windows.Forms.Label();
             this.grbKeyDerivation = new System.Windows.Forms.GroupBox();
             this.btnTestParameters = new System.Windows.Forms.Button();
-            this.lblArgon2Parallelism = new System.Windows.Forms.Label();
-            this.lblArgon2Warning = new System.Windows.Forms.Label();
             this.lblArgon2Iterations = new System.Windows.Forms.Label();
             this.btnArgon2Benchmark = new System.Windows.Forms.Button();
             this.nudArgon2MemorySize = new System.Windows.Forms.NumericUpDown();
-            this.nudArgon2Parallelism = new System.Windows.Forms.NumericUpDown();
             this.lblArgon2MemorySize = new System.Windows.Forms.Label();
             this.nudArgon2Iterations = new System.Windows.Forms.NumericUpDown();
             this.grbOtherSettings = new System.Windows.Forms.GroupBox();
@@ -67,7 +64,6 @@
             this.grbFileEncryption.SuspendLayout();
             this.grbKeyDerivation.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudArgon2MemorySize)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudArgon2Parallelism)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudArgon2Iterations)).BeginInit();
             this.grbOtherSettings.SuspendLayout();
             this.SuspendLayout();
@@ -94,9 +90,9 @@
             "16 KiB",
             "Zero fill",
             "1 Pass",
+            "Encryption",
             "HMG IS5",
-            "5 Passes",
-            "Encryption"});
+            "5 Passes"});
             this.cmbShredFilesMethod.Location = new System.Drawing.Point(188, 124);
             this.cmbShredFilesMethod.Name = "cmbShredFilesMethod";
             this.cmbShredFilesMethod.Size = new System.Drawing.Size(136, 29);
@@ -169,7 +165,7 @@
             // 
             this.lblEncryptionAlgorithm.AutoSize = true;
             this.lblEncryptionAlgorithm.ForeColor = System.Drawing.Color.Black;
-            this.lblEncryptionAlgorithm.Location = new System.Drawing.Point(12, 42);
+            this.lblEncryptionAlgorithm.Location = new System.Drawing.Point(12, 41);
             this.lblEncryptionAlgorithm.Name = "lblEncryptionAlgorithm";
             this.lblEncryptionAlgorithm.Size = new System.Drawing.Size(161, 21);
             this.lblEncryptionAlgorithm.TabIndex = 2;
@@ -185,8 +181,7 @@
             this.cmbEncryptionAlgorithm.Items.AddRange(new object[] {
             "XChaCha20",
             "XSalsa20",
-            "AES-CBC",
-            "AES-CTR"});
+            "AES-CBC"});
             this.cmbEncryptionAlgorithm.Location = new System.Drawing.Point(188, 38);
             this.cmbEncryptionAlgorithm.Name = "cmbEncryptionAlgorithm";
             this.cmbEncryptionAlgorithm.Size = new System.Drawing.Size(136, 29);
@@ -251,33 +246,33 @@
             this.cmbAnonymousRename.SelectedIndexChanged += new System.EventHandler(this.cmbAnonymousRename_SelectedIndexChanged);
             this.cmbAnonymousRename.DropDownClosed += new System.EventHandler(this.cmbAnonymousRename_DropDownClosed);
             // 
-            // lblExitClipboardClear
+            // lblExitClearClipboard
             // 
-            this.lblExitClipboardClear.AutoSize = true;
-            this.lblExitClipboardClear.ForeColor = System.Drawing.Color.Black;
-            this.lblExitClipboardClear.Location = new System.Drawing.Point(364, 84);
-            this.lblExitClipboardClear.Name = "lblExitClipboardClear";
-            this.lblExitClipboardClear.Size = new System.Drawing.Size(149, 21);
-            this.lblExitClipboardClear.TabIndex = 24;
-            this.lblExitClipboardClear.Text = "Exit Clipboard Clear:";
+            this.lblExitClearClipboard.AutoSize = true;
+            this.lblExitClearClipboard.ForeColor = System.Drawing.Color.Black;
+            this.lblExitClearClipboard.Location = new System.Drawing.Point(364, 84);
+            this.lblExitClearClipboard.Name = "lblExitClearClipboard";
+            this.lblExitClearClipboard.Size = new System.Drawing.Size(149, 21);
+            this.lblExitClearClipboard.TabIndex = 24;
+            this.lblExitClearClipboard.Text = "Exit Clear Clipboard:";
             // 
-            // cmbExitClipboardClear
+            // cmbExitClearClipboard
             // 
-            this.cmbExitClipboardClear.BackColor = System.Drawing.Color.Gainsboro;
-            this.cmbExitClipboardClear.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbExitClipboardClear.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cmbExitClipboardClear.ForeColor = System.Drawing.Color.Black;
-            this.cmbExitClipboardClear.FormattingEnabled = true;
-            this.cmbExitClipboardClear.Items.AddRange(new object[] {
+            this.cmbExitClearClipboard.BackColor = System.Drawing.Color.Gainsboro;
+            this.cmbExitClearClipboard.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbExitClearClipboard.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cmbExitClearClipboard.ForeColor = System.Drawing.Color.Black;
+            this.cmbExitClearClipboard.FormattingEnabled = true;
+            this.cmbExitClearClipboard.Items.AddRange(new object[] {
             "Enabled",
             "Disabled"});
-            this.cmbExitClipboardClear.Location = new System.Drawing.Point(540, 81);
-            this.cmbExitClipboardClear.Name = "cmbExitClipboardClear";
-            this.cmbExitClipboardClear.Size = new System.Drawing.Size(136, 29);
-            this.cmbExitClipboardClear.TabIndex = 12;
-            this.cmbExitClipboardClear.TabStop = false;
-            this.cmbExitClipboardClear.SelectedIndexChanged += new System.EventHandler(this.cmbExitClipboardClear_SelectedIndexChanged);
-            this.cmbExitClipboardClear.DropDownClosed += new System.EventHandler(this.cmbExitClipboardClear_DropDownClosed);
+            this.cmbExitClearClipboard.Location = new System.Drawing.Point(540, 81);
+            this.cmbExitClearClipboard.Name = "cmbExitClearClipboard";
+            this.cmbExitClearClipboard.Size = new System.Drawing.Size(136, 29);
+            this.cmbExitClearClipboard.TabIndex = 12;
+            this.cmbExitClearClipboard.TabStop = false;
+            this.cmbExitClearClipboard.SelectedIndexChanged += new System.EventHandler(this.cmbExitClearClipboard_SelectedIndexChanged);
+            this.cmbExitClearClipboard.DropDownClosed += new System.EventHandler(this.cmbExitClearClipboard_DropDownClosed);
             // 
             // lblShowPassword
             // 
@@ -358,12 +353,9 @@
             // 
             this.grbKeyDerivation.BackColor = System.Drawing.Color.Transparent;
             this.grbKeyDerivation.Controls.Add(this.btnTestParameters);
-            this.grbKeyDerivation.Controls.Add(this.lblArgon2Parallelism);
-            this.grbKeyDerivation.Controls.Add(this.lblArgon2Warning);
             this.grbKeyDerivation.Controls.Add(this.lblArgon2Iterations);
             this.grbKeyDerivation.Controls.Add(this.btnArgon2Benchmark);
             this.grbKeyDerivation.Controls.Add(this.nudArgon2MemorySize);
-            this.grbKeyDerivation.Controls.Add(this.nudArgon2Parallelism);
             this.grbKeyDerivation.Controls.Add(this.lblArgon2MemorySize);
             this.grbKeyDerivation.Controls.Add(this.nudArgon2Iterations);
             this.grbKeyDerivation.ForeColor = System.Drawing.Color.Black;
@@ -381,45 +373,24 @@
             this.btnTestParameters.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gainsboro;
             this.btnTestParameters.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnTestParameters.ForeColor = System.Drawing.Color.Black;
-            this.btnTestParameters.Location = new System.Drawing.Point(188, 168);
+            this.btnTestParameters.Location = new System.Drawing.Point(16, 168);
             this.btnTestParameters.Name = "btnTestParameters";
-            this.btnTestParameters.Size = new System.Drawing.Size(136, 29);
+            this.btnTestParameters.Size = new System.Drawing.Size(308, 29);
             this.btnTestParameters.TabIndex = 23;
             this.btnTestParameters.TabStop = false;
             this.btnTestParameters.Text = "Test Parameters";
             this.btnTestParameters.UseVisualStyleBackColor = true;
             this.btnTestParameters.Click += new System.EventHandler(this.btnTestParameters_Click);
             // 
-            // lblArgon2Parallelism
-            // 
-            this.lblArgon2Parallelism.AutoSize = true;
-            this.lblArgon2Parallelism.ForeColor = System.Drawing.Color.Black;
-            this.lblArgon2Parallelism.Location = new System.Drawing.Point(12, 42);
-            this.lblArgon2Parallelism.Name = "lblArgon2Parallelism";
-            this.lblArgon2Parallelism.Size = new System.Drawing.Size(88, 21);
-            this.lblArgon2Parallelism.TabIndex = 19;
-            this.lblArgon2Parallelism.Text = "Parallelism:";
-            // 
-            // lblArgon2Warning
-            // 
-            this.lblArgon2Warning.AutoSize = true;
-            this.lblArgon2Warning.ForeColor = System.Drawing.Color.Red;
-            this.lblArgon2Warning.Location = new System.Drawing.Point(51, 197);
-            this.lblArgon2Warning.Name = "lblArgon2Warning";
-            this.lblArgon2Warning.Size = new System.Drawing.Size(238, 21);
-            this.lblArgon2Warning.TabIndex = 22;
-            this.lblArgon2Warning.Text = "Warning: Encryption will be slow.";
-            this.lblArgon2Warning.Visible = false;
-            // 
             // lblArgon2Iterations
             // 
             this.lblArgon2Iterations.AutoSize = true;
             this.lblArgon2Iterations.ForeColor = System.Drawing.Color.Black;
-            this.lblArgon2Iterations.Location = new System.Drawing.Point(12, 127);
+            this.lblArgon2Iterations.Location = new System.Drawing.Point(12, 85);
             this.lblArgon2Iterations.Name = "lblArgon2Iterations";
-            this.lblArgon2Iterations.Size = new System.Drawing.Size(78, 21);
+            this.lblArgon2Iterations.Size = new System.Drawing.Size(117, 21);
             this.lblArgon2Iterations.TabIndex = 21;
-            this.lblArgon2Iterations.Text = "Iterations:";
+            this.lblArgon2Iterations.Text = "Iteration Count:";
             // 
             // btnArgon2Benchmark
             // 
@@ -428,9 +399,9 @@
             this.btnArgon2Benchmark.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gainsboro;
             this.btnArgon2Benchmark.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnArgon2Benchmark.ForeColor = System.Drawing.Color.Black;
-            this.btnArgon2Benchmark.Location = new System.Drawing.Point(16, 168);
+            this.btnArgon2Benchmark.Location = new System.Drawing.Point(16, 124);
             this.btnArgon2Benchmark.Name = "btnArgon2Benchmark";
-            this.btnArgon2Benchmark.Size = new System.Drawing.Size(136, 29);
+            this.btnArgon2Benchmark.Size = new System.Drawing.Size(308, 29);
             this.btnArgon2Benchmark.TabIndex = 7;
             this.btnArgon2Benchmark.TabStop = false;
             this.btnArgon2Benchmark.Text = "Benchmark";
@@ -442,14 +413,14 @@
             this.nudArgon2MemorySize.BackColor = System.Drawing.Color.Gainsboro;
             this.nudArgon2MemorySize.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.nudArgon2MemorySize.ForeColor = System.Drawing.Color.Black;
-            this.nudArgon2MemorySize.Location = new System.Drawing.Point(188, 81);
+            this.nudArgon2MemorySize.Location = new System.Drawing.Point(188, 38);
             this.nudArgon2MemorySize.Maximum = new decimal(new int[] {
             300,
             0,
             0,
             0});
             this.nudArgon2MemorySize.Minimum = new decimal(new int[] {
-            1,
+            10,
             0,
             0,
             0});
@@ -460,44 +431,17 @@
             this.nudArgon2MemorySize.Tag = "";
             this.nudArgon2MemorySize.ThousandsSeparator = true;
             this.nudArgon2MemorySize.Value = new decimal(new int[] {
-            300,
+            100,
             0,
             0,
             0});
             this.nudArgon2MemorySize.ValueChanged += new System.EventHandler(this.nudArgon2MemorySize_ValueChanged);
             // 
-            // nudArgon2Parallelism
-            // 
-            this.nudArgon2Parallelism.BackColor = System.Drawing.Color.Gainsboro;
-            this.nudArgon2Parallelism.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.nudArgon2Parallelism.ForeColor = System.Drawing.Color.Black;
-            this.nudArgon2Parallelism.Location = new System.Drawing.Point(188, 38);
-            this.nudArgon2Parallelism.Maximum = new decimal(new int[] {
-            128,
-            0,
-            0,
-            0});
-            this.nudArgon2Parallelism.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.nudArgon2Parallelism.Name = "nudArgon2Parallelism";
-            this.nudArgon2Parallelism.Size = new System.Drawing.Size(136, 29);
-            this.nudArgon2Parallelism.TabIndex = 16;
-            this.nudArgon2Parallelism.TabStop = false;
-            this.nudArgon2Parallelism.Value = new decimal(new int[] {
-            8,
-            0,
-            0,
-            0});
-            this.nudArgon2Parallelism.ValueChanged += new System.EventHandler(this.nudArgon2Parallelism_ValueChanged);
-            // 
             // lblArgon2MemorySize
             // 
             this.lblArgon2MemorySize.AutoSize = true;
             this.lblArgon2MemorySize.ForeColor = System.Drawing.Color.Black;
-            this.lblArgon2MemorySize.Location = new System.Drawing.Point(12, 85);
+            this.lblArgon2MemorySize.Location = new System.Drawing.Point(12, 42);
             this.lblArgon2MemorySize.Name = "lblArgon2MemorySize";
             this.lblArgon2MemorySize.Size = new System.Drawing.Size(145, 21);
             this.lblArgon2MemorySize.TabIndex = 20;
@@ -508,9 +452,9 @@
             this.nudArgon2Iterations.BackColor = System.Drawing.Color.Gainsboro;
             this.nudArgon2Iterations.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.nudArgon2Iterations.ForeColor = System.Drawing.Color.Black;
-            this.nudArgon2Iterations.Location = new System.Drawing.Point(188, 124);
+            this.nudArgon2Iterations.Location = new System.Drawing.Point(188, 81);
             this.nudArgon2Iterations.Minimum = new decimal(new int[] {
-            1,
+            3,
             0,
             0,
             0});
@@ -519,7 +463,7 @@
             this.nudArgon2Iterations.TabIndex = 18;
             this.nudArgon2Iterations.TabStop = false;
             this.nudArgon2Iterations.Value = new decimal(new int[] {
-            1,
+            3,
             0,
             0,
             0});
@@ -536,8 +480,8 @@
             this.grbOtherSettings.Controls.Add(this.lblAutoClearClipboard);
             this.grbOtherSettings.Controls.Add(this.cmbAutoClearPassword);
             this.grbOtherSettings.Controls.Add(this.cmbShredFilesMethod);
-            this.grbOtherSettings.Controls.Add(this.lblExitClipboardClear);
-            this.grbOtherSettings.Controls.Add(this.cmbExitClipboardClear);
+            this.grbOtherSettings.Controls.Add(this.lblExitClearClipboard);
+            this.grbOtherSettings.Controls.Add(this.cmbExitClearClipboard);
             this.grbOtherSettings.Controls.Add(this.lblShredFilesMethod);
             this.grbOtherSettings.Controls.Add(this.lblShowPassword);
             this.grbOtherSettings.Controls.Add(this.cmbShowPassword);
@@ -608,6 +552,7 @@
             // 
             // bgwTestArgon2Parameters
             // 
+            this.bgwTestArgon2Parameters.WorkerReportsProgress = true;
             this.bgwTestArgon2Parameters.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bgwTestArgon2Parameters_DoWork);
             this.bgwTestArgon2Parameters.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bgwTestArgon2Parameters_RunWorkerCompleted);
             // 
@@ -637,7 +582,6 @@
             this.grbKeyDerivation.ResumeLayout(false);
             this.grbKeyDerivation.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudArgon2MemorySize)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudArgon2Parallelism)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudArgon2Iterations)).EndInit();
             this.grbOtherSettings.ResumeLayout(false);
             this.grbOtherSettings.PerformLayout();
@@ -658,8 +602,8 @@
         private System.Windows.Forms.ComboBox cmbAutoClearPassword;
         private System.Windows.Forms.Label lblAnonymousRename;
         private System.Windows.Forms.ComboBox cmbAnonymousRename;
-        private System.Windows.Forms.Label lblExitClipboardClear;
-        private System.Windows.Forms.ComboBox cmbExitClipboardClear;
+        private System.Windows.Forms.Label lblExitClearClipboard;
+        private System.Windows.Forms.ComboBox cmbExitClearClipboard;
         private System.Windows.Forms.Label lblShowPassword;
         private System.Windows.Forms.ComboBox cmbShowPassword;
         private System.Windows.Forms.GroupBox grbFileEncryption;
@@ -669,13 +613,10 @@
         private System.Windows.Forms.ComboBox cmbTheme;
         private System.Windows.Forms.Label lblCheckForUpdates;
         private System.Windows.Forms.ComboBox cmbCheckForUpdates;
-        private System.Windows.Forms.Label lblArgon2Warning;
         private System.Windows.Forms.Label lblArgon2Iterations;
         private System.Windows.Forms.NumericUpDown nudArgon2MemorySize;
         private System.Windows.Forms.Label lblArgon2MemorySize;
-        private System.Windows.Forms.Label lblArgon2Parallelism;
         private System.Windows.Forms.NumericUpDown nudArgon2Iterations;
-        private System.Windows.Forms.NumericUpDown nudArgon2Parallelism;
         private System.Windows.Forms.GroupBox grbKeyDerivation;
         private System.Windows.Forms.ComboBox cmbOverwriteFiles;
         private System.Windows.Forms.Label lblOverwriteFiles;

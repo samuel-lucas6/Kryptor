@@ -17,7 +17,7 @@ using System.Windows.Forms;
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program. If not, see https://www.gnu.org/licenses/. 
+    along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
 namespace Kryptor
@@ -31,6 +31,7 @@ namespace Kryptor
 
         private void frmArgon2Benchmark_Load(object sender, EventArgs e)
         {
+            RunningOnMono();
             this.Hide();
             bool? speedMode = GetBenchmarkMode();
             if (speedMode != null)
@@ -46,6 +47,14 @@ namespace Kryptor
             }
         }
 
+        private void RunningOnMono()
+        {
+            if (Constants.RunningOnMono == true)
+            {
+                DarkTheme.Labels(lblMessage);
+            }
+        }
+
         private static bool? GetBenchmarkMode()
         {
             using (var selectBenchmarkMode = new frmSelectBenchmarkMode())
@@ -53,12 +62,12 @@ namespace Kryptor
                 DialogResult dialogResult = selectBenchmarkMode.ShowDialog();
                 if (dialogResult == DialogResult.Yes)
                 {
-                    // 250 ms delay per file
+                    // 150 ms delay per file
                     return true;
                 }
                 else if (dialogResult == DialogResult.No)
                 {
-                    // 500 ms delay per file
+                    // 250 ms delay per file
                     return false;
                 }
                 else
@@ -89,11 +98,11 @@ namespace Kryptor
 
         private static void ShowOtherForms()
         {
-            foreach (Form frm in Application.OpenForms)
+            foreach (Form form in Application.OpenForms)
             {
-                if (frm.Name != "frmArgon2Benchmark")
+                if (form.Name != "frmArgon2Benchmark")
                 {
-                    frm.Show();
+                    form.Show();
                 }
             }
         }

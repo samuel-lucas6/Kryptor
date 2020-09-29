@@ -85,8 +85,10 @@
     <PlatformTarget>x64</PlatformTarget>
     <LangVersion>8.0</LangVersion>
     <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
@@ -126,12 +128,6 @@
     <Optimize>true</Optimize>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Konscious.Security.Cryptography.Argon2, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Konscious.Security.Cryptography.Argon2.1.2.1\lib\net46\Konscious.Security.Cryptography.Argon2.dll</HintPath>
-    </Reference>
-    <Reference Include="Konscious.Security.Cryptography.Blake2, Version=1.0.9.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Konscious.Security.Cryptography.Blake2.1.0.9\lib\net46\Konscious.Security.Cryptography.Blake2.dll</HintPath>
-    </Reference>
     <Reference Include="Ookii.Dialogs.WinForms, Version=1.0.0.0, Culture=neutral, PublicKeyToken=66aa232afad40158, processorArchitecture=MSIL">
       <HintPath>..\packages\Ookii.Dialogs.WinForms.1.1.0\lib\net45\Ookii.Dialogs.WinForms.dll</HintPath>
     </Reference>
@@ -142,9 +138,6 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Design" />
     <Reference Include="System.Numerics" />
-    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
-    </Reference>
     <Reference Include="System.Security" />
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
@@ -169,11 +162,12 @@
     <Compile Include="Anonymous Rename\AnonymousRename.cs" />
     <Compile Include="Exception Handling\ExceptionFilters.cs" />
     <Compile Include="Cryptography\HashingAlgorithms.cs" />
-    <Compile Include="File Encryption\DecryptionBackup.cs" />
-    <Compile Include="File Encryption\CheckIsDirectory.cs" />
+    <Compile Include="File Encryption\FileHandling.cs" />
     <Compile Include="Cryptography\StreamCiphers.cs" />
     <Compile Include="Cryptography\Utilities.cs" />
-    <Compile Include="File Encryption\ReadTrailers.cs" />
+    <Compile Include="File Encryption\ReadFileHeaders.cs" />
+    <Compile Include="GUI\DarkTheme.cs" />
+    <Compile Include="GUI\DisplaySettings.cs" />
     <Compile Include="Settings\Argon2Benchmark.cs" />
     <Compile Include="GUI\frmSelectBenchmarkMode.cs">
       <SubType>Form</SubType>
@@ -187,7 +181,7 @@
     <Compile Include="GUI\MonoGUI.cs" />
     <Compile Include="Other functionality\EditClipboard.cs" />
     <Compile Include="GUI\DarkColourTable.cs" />
-    <Compile Include="File Encryption\AppendTrailers.cs" />
+    <Compile Include="File Encryption\WriteFileHeaders.cs" />
     <Compile Include="File Encryption\FileAuthentication.cs" />
     <Compile Include="File Encryption\FileEncryption.cs" />
     <Compile Include="GUI\frmGenerateKeyPair.cs">
@@ -204,7 +198,7 @@
     </Compile>
     <Compile Include="File Encryption\Generate.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="File Encryption\KeyDerivation.cs" />
+    <Compile Include="Cryptography\KeyDerivation.cs" />
     <Compile Include="Code Analysis\Invariant.cs" />
     <Compile Include="Other functionality\Keyfiles.cs" />
     <Compile Include="Exception Handling\Logging.cs" />
@@ -216,9 +210,8 @@
     </Compile>
     <Compile Include="Settings\Constants.cs" />
     <Compile Include="Cryptography\MemoryEncryption.cs" />
-    <Compile Include="GUI\OpenURL.cs" />
+    <Compile Include="GUI\VisitLink.cs" />
     <Compile Include="Anonymous Rename\OriginalFileName.cs" />
-    <Compile Include="Cryptography\RandomNumberGenerator.cs" />
     <Compile Include="GUI\ReportProgress.cs" />
     <Compile Include="GUI\SelectFiles.cs" />
     <Compile Include="Settings\Settings.cs" />
@@ -237,11 +230,11 @@
       <DependentUpon>frmArgon2Benchmark.cs</DependentUpon>
     </Compile>
     <Compile Include="Settings\GlobalVariables.cs" />
-    <Compile Include="GUI\frmKryptor.cs">
+    <Compile Include="GUI\frmFileEncryption.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GUI\frmKryptor.Designer.cs">
-      <DependentUpon>frmKryptor.cs</DependentUpon>
+    <Compile Include="GUI\frmFileEncryption.Designer.cs">
+      <DependentUpon>frmFileEncryption.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\frmResults.cs">
       <SubType>Form</SubType>
@@ -278,8 +271,8 @@
       <DependentUpon>frmGenerateKeyPair.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\frmKryptor.resx">
-      <DependentUpon>frmKryptor.cs</DependentUpon>
+    <EmbeddedResource Include="GUI\frmFileEncryption.resx">
+      <DependentUpon>frmFileEncryption.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\frmResults.resx">
@@ -296,6 +289,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\frmSelectBenchmarkMode.resx">
       <DependentUpon>frmSelectBenchmarkMode.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -304,6 +298,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\frmSettings.resx">
       <DependentUpon>frmSettings.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="..\.editorconfig">
       <Link>.editorconfig</Link>

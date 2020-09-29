@@ -47,7 +47,7 @@
             this.btnSecurityMode.Size = new System.Drawing.Size(462, 50);
             this.btnSecurityMode.TabIndex = 71;
             this.btnSecurityMode.TabStop = false;
-            this.btnSecurityMode.Text = "I want file encryption to be more secure.";
+            this.btnSecurityMode.Text = "I want encryption to be more secure.";
             this.btnSecurityMode.UseVisualStyleBackColor = false;
             this.btnSecurityMode.Click += new System.EventHandler(this.btnSecurityMode_Click);
             // 
@@ -65,7 +65,7 @@
             this.btnSpeedMode.Size = new System.Drawing.Size(462, 50);
             this.btnSpeedMode.TabIndex = 70;
             this.btnSpeedMode.TabStop = false;
-            this.btnSpeedMode.Text = "I want file encryption to be faster.";
+            this.btnSpeedMode.Text = "I want encryption to be as fast as possible.";
             this.btnSpeedMode.UseVisualStyleBackColor = false;
             this.btnSpeedMode.Click += new System.EventHandler(this.btnSpeedMode_Click);
             // 

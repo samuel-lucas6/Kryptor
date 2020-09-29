@@ -34,15 +34,15 @@ namespace Kryptor
             {
                 if (File.Exists(_settingsFile))
                 {
-                    string[] settings = File.ReadAllLines(_settingsFile);
-                    var settingsList = new List<string>();
-                    foreach (string line in settings)
+                    string[] settingsLines = File.ReadAllLines(_settingsFile);
+                    var settings = new List<string>();
+                    foreach (string line in settingsLines)
                     {
                         string[] splitLine = line.Split(':');
-                        // Ignore the name of each setting - only store settings values
-                        settingsList.Add(splitLine[1]);
+                        // Ignore the name of each setting - only store values
+                        settings.Add(splitLine[1]);
                     }
-                    LoadSettings(settingsList);
+                    LoadSettings(settings);
                 }
                 else
                 {
@@ -53,214 +53,60 @@ namespace Kryptor
             catch (Exception ex) when (ExceptionFilters.FileAccessExceptions(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.High);
-                DisplayMessage.ErrorMessageBox(ex.GetType().Name, "Unable to read settings file.");
+                DisplayMessage.ErrorMessageBox(ex.GetType().Name, "Unable to read the settings file.");
             }
         }
 
-        private static void LoadSettings(List<string> settingsList)
+        private static void LoadSettings(List<string> settings)
         {
             try
             {
-                LoadEncryptionAlgorithm(settingsList[0]);
-                LoadMemoryEncryption(settingsList[1]);
-                LoadAnonymousRename(settingsList[2]);
-                LoadOverwriteFiles(settingsList[3]);
-                LoadParallelism(settingsList[4]);
-                LoadMemorySize(settingsList[5]);
-                LoadIterations(settingsList[6]);
-                LoadShowPasword(settingsList[7]);
-                LoadAutoClearPassword(settingsList[8]);
-                LoadClearClipboardInterval(settingsList[9]);
-                LoadClearClipboardOnExit(settingsList[10]);
-                LoadShredFilesMethod(settingsList[11]);
-                LoadCheckForUpdates(settingsList[12]);
-                LoadTheme(settingsList[13]);
+                Globals.EncryptionAlgorithm = LoadIntegerSetting(settings[0]) ?? Globals.EncryptionAlgorithm;
+                Globals.MemoryEncryption = LoadBooleanSetting(settings[1]) ?? Globals.MemoryEncryption;
+                Globals.AnonymousRename = LoadBooleanSetting(settings[2]) ?? Globals.AnonymousRename;
+                Globals.OverwriteFiles = LoadBooleanSetting(settings[3]) ?? Globals.OverwriteFiles;
+                Globals.MemorySize = LoadIntegerSetting(settings[4]) ?? Globals.MemorySize;
+                Globals.Iterations = LoadIntegerSetting(settings[5]) ?? Globals.Iterations;
+                Globals.ShowPasswordByDefault = LoadBooleanSetting(settings[6]) ?? Globals.ShowPasswordByDefault;
+                Globals.AutoClearPassword = LoadBooleanSetting(settings[7]) ?? Globals.AutoClearPassword;
+                Globals.ClearClipboardInterval = LoadIntegerSetting(settings[8]) ?? Globals.ClearClipboardInterval;
+                Globals.ExitClearClipboard = LoadBooleanSetting(settings[9]) ?? Globals.ExitClearClipboard;
+                Globals.ShredFilesMethod = LoadIntegerSetting(settings[10]) ?? Globals.ShredFilesMethod;
+                Globals.CheckForUpdates = LoadBooleanSetting(settings[11]) ?? Globals.CheckForUpdates;
+                Globals.DarkTheme = LoadBooleanSetting(settings[12]) ?? Globals.DarkTheme;
             }
             catch (IndexOutOfRangeException ex)
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.Bug);
-                DisplayMessage.ErrorMessageBox(ex.GetType().Name, "Unable to load some settings.");
+                DisplayMessage.ErrorMessageBox(ex.GetType().Name, "Error loading settings.");
             }
         }
 
-        private static void LoadEncryptionAlgorithm(string setting)
+        private static int? LoadIntegerSetting(string setting)
         {
             try
             {
-                Globals.EncryptionAlgorithm = Invariant.ToInt(setting);
+                return Invariant.ToInt(setting);
             }
             catch (Exception ex) when (ExceptionFilters.SettingsExceptions(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.Low);
-                DisplayMessage.ErrorMessageBox(ex.GetType().Name, "Unable to load encryption algorithm setting. The default encryption algorithm will be used.");
+                DisplayMessage.ErrorMessageBox(ex.GetType().Name, $"Unable to load {setting} setting. The default setting will be used.");
+                return null;
             }
         }
 
-        private static void LoadMemoryEncryption(string setting)
+        private static bool? LoadBooleanSetting(string setting)
         {
             try
             {
-                Globals.MemoryEncryption = Invariant.ToBoolean(setting);
+                return Invariant.ToBoolean(setting);
             }
             catch (Exception ex) when (ExceptionFilters.SettingsExceptions(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.Low);
-                DisplayMessage.ErrorMessageBox(ex.GetType().Name, "Unable to load memory encryption setting. The default setting will be used.");
-            }
-        }
-
-        private static void LoadAnonymousRename(string setting)
-        {
-            try
-            {
-                Globals.AnonymousRename = Invariant.ToBoolean(setting);
-            }
-            catch (Exception ex) when (ExceptionFilters.SettingsExceptions(ex))
-            {
-                Logging.LogException(ex.ToString(), Logging.Severity.Low);
-                DisplayMessage.ErrorMessageBox(ex.GetType().Name, "Unable to load anonymous rename setting. The default setting will be used.");
-            }
-        }
-
-        private static void LoadOverwriteFiles(string setting)
-        {
-            try
-            {
-                Globals.OverwriteFiles = Invariant.ToBoolean(setting);
-            }
-            catch (Exception ex) when (ExceptionFilters.SettingsExceptions(ex))
-            {
-                Logging.LogException(ex.ToString(), Logging.Severity.Low);
-                DisplayMessage.ErrorMessageBox(ex.GetType().Name, "Unable to load overwrite original files setting. The default setting will be used.");
-            }
-        }
-        private static void LoadParallelism(string setting)
-        {
-            try
-            {
-                Globals.Parallelism = Invariant.ToInt(setting);
-            }
-            catch (Exception ex) when (ExceptionFilters.SettingsExceptions(ex))
-            {
-                Logging.LogException(ex.ToString(), Logging.Severity.Low);
-                DisplayMessage.ErrorMessageBox(ex.GetType().Name, "Unable to load Argon2 parallelism setting. The default setting will be used.");
-            }
-        }
-
-        private static void LoadMemorySize(string setting)
-        {
-            try
-            {
-                Globals.MemorySize = Invariant.ToInt(setting);
-            }
-            catch (Exception ex) when (ExceptionFilters.SettingsExceptions(ex))
-            {
-                Logging.LogException(ex.ToString(), Logging.Severity.Low);
-                DisplayMessage.ErrorMessageBox(ex.GetType().Name, "Unable to load Argon2 memory size setting. The default setting will be used.");
-            }
-        }
-
-        private static void LoadIterations(string setting)
-        {
-            try
-            {
-                Globals.Iterations = Invariant.ToInt(setting);
-            }
-            catch (Exception ex) when (ExceptionFilters.SettingsExceptions(ex))
-            {
-                Logging.LogException(ex.ToString(), Logging.Severity.Low);
-                DisplayMessage.ErrorMessageBox(ex.GetType().Name, "Unable to load Argon2 iterations setting. The default setting will be used.");
-            }
-        }
-
-        private static void LoadShowPasword(string setting)
-        {
-            try
-            {
-                Globals.ShowPasswordByDefault = Invariant.ToBoolean(setting);
-            }
-            catch (Exception ex) when (ExceptionFilters.SettingsExceptions(ex))
-            {
-                Logging.LogException(ex.ToString(), Logging.Severity.Low);
-                DisplayMessage.ErrorMessageBox(ex.GetType().Name, "Unable to load show password setting. The default setting will be used.");
-            }
-        }
-
-        private static void LoadAutoClearPassword(string setting)
-        {
-            try
-            {
-                Globals.AutoClearPassword = Invariant.ToBoolean(setting);
-            }
-            catch (Exception ex) when (ExceptionFilters.SettingsExceptions(ex))
-            {
-                Logging.LogException(ex.ToString(), Logging.Severity.Low);
-                DisplayMessage.ErrorMessageBox(ex.GetType().Name, "Unable to load auto clear password setting. The default setting will be used.");
-            }
-        }
-
-        private static void LoadClearClipboardInterval(string setting)
-        {
-            try
-            {
-                Globals.ClearClipboardInterval = Invariant.ToInt(setting);
-            }
-            catch (Exception ex) when (ExceptionFilters.SettingsExceptions(ex))
-            {
-                Logging.LogException(ex.ToString(), Logging.Severity.Low);
-                DisplayMessage.ErrorMessageBox(ex.GetType().Name, "Unable to load clear clipboard setting. The default setting will be used.");
-            }
-        }
-
-        private static void LoadClearClipboardOnExit(string setting)
-        {
-            try
-            {
-                Globals.ClearClipboardOnExit = Invariant.ToBoolean(setting);
-            }
-            catch (Exception ex) when (ExceptionFilters.SettingsExceptions(ex))
-            {
-                Logging.LogException(ex.ToString(), Logging.Severity.Low);
-                DisplayMessage.ErrorMessageBox(ex.GetType().Name, "Unable to load clear clipboard on exit setting. The default setting will be used.");
-            }
-        }
-
-        private static void LoadShredFilesMethod(string setting)
-        {
-            try
-            {
-                Globals.ShredFilesMethod = Invariant.ToInt(setting);
-            }
-            catch (Exception ex) when (ExceptionFilters.SettingsExceptions(ex))
-            {
-                Logging.LogException(ex.ToString(), Logging.Severity.Low);
-                DisplayMessage.ErrorMessageBox(ex.GetType().Name, "Unable to load shred files method setting. The default setting will be used.");
-            }
-        }
-
-        private static void LoadCheckForUpdates(string setting)
-        {
-            try
-            {
-                Globals.CheckForUpdates = Invariant.ToBoolean(setting);
-            }
-            catch (Exception ex) when (ExceptionFilters.SettingsExceptions(ex))
-            {
-                Logging.LogException(ex.ToString(), Logging.Severity.Low);
-                DisplayMessage.ErrorMessageBox(ex.GetType().Name, "Unable to load check for updates setting. The default setting will be used.");
-            }
-        }
-
-        private static void LoadTheme(string setting)
-        {
-            try
-            {
-                Globals.DarkTheme = Invariant.ToBoolean(setting);
-            }
-            catch (Exception ex) when (ExceptionFilters.SettingsExceptions(ex))
-            {
-                Logging.LogException(ex.ToString(), Logging.Severity.Low);
-                DisplayMessage.ErrorMessageBox(ex.GetType().Name, "Unable to load theme setting. The default setting will be used.");
+                DisplayMessage.ErrorMessageBox(ex.GetType().Name, $"Unable to load {setting} setting. The default setting will be used.");
+                return null;
             }
         }
 
@@ -276,13 +122,12 @@ namespace Kryptor
                         { "Memory Encryption", Globals.MemoryEncryption.ToString() },
                         { "Anonymous Rename", Globals.AnonymousRename.ToString() },
                         { "Overwrite Files", Globals.OverwriteFiles.ToString() },
-                        { "Argon2 Parallelism", Invariant.ToString(Globals.Parallelism) },
                         { "Argon2 Memory Size", Invariant.ToString(Globals.MemorySize) },
                         { "Argon2 Iterations", Invariant.ToString(Globals.Iterations) },
                         { "Show Password", Globals.ShowPasswordByDefault.ToString() },
                         { "Auto Clear Password", Globals.AutoClearPassword.ToString() },
                         { "Auto Clear Clipboard", Invariant.ToString(Globals.ClearClipboardInterval) },
-                        { "Exit Clipboard Clear", Globals.ClearClipboardOnExit.ToString() },
+                        { "Exit Clipboard Clear", Globals.ExitClearClipboard.ToString() },
                         { "Shred Files Method", Invariant.ToString(Globals.ShredFilesMethod) },
                         { "Check for Updates", Globals.CheckForUpdates.ToString() },
                         { "Dark Theme", Globals.DarkTheme.ToString() }
@@ -312,13 +157,13 @@ namespace Kryptor
         {
             try
             {
-                using (var settingsBackup = new VistaFolderBrowserDialog())
+                using (var selectFolderDialog = new VistaFolderBrowserDialog())
                 {
-                    settingsBackup.Description = "Settings Backup";
-                    if (settingsBackup.ShowDialog() == DialogResult.OK)
+                    selectFolderDialog.Description = "Settings Backup";
+                    if (selectFolderDialog.ShowDialog() == DialogResult.OK)
                     {
-                        string backupSettingsFile = Path.Combine(settingsBackup.SelectedPath, Path.GetFileName(_settingsFile));
-                        File.Copy(_settingsFile, backupSettingsFile, true);
+                        string backupFile = Path.Combine(selectFolderDialog.SelectedPath, Path.GetFileName(_settingsFile));
+                        File.Copy(_settingsFile, backupFile, true);
                     }
                 }
             }
@@ -333,14 +178,14 @@ namespace Kryptor
         {
             try
             {
-                using (var settingsRestore = new VistaOpenFileDialog())
+                using (var selectFileDialog = new VistaOpenFileDialog())
                 {
-                    settingsRestore.Title = "Settings Restore";
-                    if (settingsRestore.ShowDialog() == DialogResult.OK)
+                    selectFileDialog.Title = "Settings Restore";
+                    if (selectFileDialog.ShowDialog() == DialogResult.OK)
                     {
-                        if (settingsRestore.FileName.EndsWith(".ini", StringComparison.Ordinal))
+                        if (selectFileDialog.FileName.EndsWith(".ini", StringComparison.Ordinal))
                         {
-                            File.Copy(settingsRestore.FileName, _settingsFile, true);
+                            File.Copy(selectFileDialog.FileName, _settingsFile, true);
                             // Reload settings
                             ReadSettings();
                             DisplayMessage.InformationMessageBox("Your settings have been restored.", "Settings Restored");

@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Sodium;
 
 /*  
     Kryptor: Free and open source file encryption software.
@@ -37,21 +38,21 @@ namespace Kryptor
             while (password.Count < length)
             {
                 bool characterAdded = false;
-                byte[] characterByte = RandomNumberGenerator.GenerateRandomBytes(1);
+                byte[] characterByte = SodiumCore.GetRandomBytes(1);
                 char character = (char)characterByte[0];
                 if (lowercase == true)
                 {
                     CheckCharacter(lowercaseCharacters, character, ref password, ref characterAdded);
                 }
-                if (uppercase == true & characterAdded == false)
+                if (uppercase == true && characterAdded == false)
                 {
                     CheckCharacter(uppercaseCharacters, character, ref password, ref characterAdded);
                 }
-                if (numbers == true & characterAdded == false)
+                if (numbers == true && characterAdded == false)
                 {
                     CheckCharacter(numberCharacters, character, ref password, ref characterAdded);
                 }
-                if (symbols == true & characterAdded == false)
+                if (symbols == true && characterAdded == false)
                 {
                     CheckCharacter(symbolCharacters, character, ref password, ref characterAdded);
                 }
@@ -68,7 +69,7 @@ namespace Kryptor
             }
         }
 
-        public static char[] GenerateRandomPassphrase(int numberOfWords, bool uppercase, bool numbers)
+        public static char[] GenerateRandomPassphrase(int wordCount, bool uppercase, bool numbers)
         {
             try
             {
@@ -76,13 +77,13 @@ namespace Kryptor
                 if (File.Exists(wordlistFilePath))
                 {
                     List<char> passphrase = new List<char>();
-                    int wordlistLength = File.ReadAllLines(wordlistFilePath).Length;
-                    int[] lineNumbers = GenerateRandomNumbers(wordlistLength, numberOfWords);
-                    string[] words = GetRandomWords(wordlistFilePath, lineNumbers, numberOfWords, uppercase, numbers);
+                    int wordlistLength = File.ReadLines(wordlistFilePath).Count();
+                    int[] lineNumbers = GenerateLineNumbers(wordlistLength, wordCount);
+                    string[] words = GetRandomWords(wordlistFilePath, lineNumbers, wordCount, uppercase, numbers);
                     Array.Clear(lineNumbers, 0, lineNumbers.Length);
                     if (words != null)
                     {
-                        FormatPassphrase(words, ref passphrase, numberOfWords);
+                        FormatPassphrase(words, ref passphrase, wordCount);
                         Array.Clear(words, 0, words.Length);
                     }
                     return passphrase.ToArray();
@@ -90,7 +91,7 @@ namespace Kryptor
                 else
                 {
                     File.WriteAllText(wordlistFilePath, Properties.Resources.wordlist);
-                    return GenerateRandomPassphrase(numberOfWords, uppercase, numbers);
+                    return GenerateRandomPassphrase(wordCount, uppercase, numbers);
                 }
             }
             catch (Exception ex) when (ExceptionFilters.FileAccessExceptions(ex))
@@ -101,24 +102,24 @@ namespace Kryptor
             }
         }
 
-        private static int[] GenerateRandomNumbers(int wordlistLength, int numberOfWords)
+        private static int[] GenerateLineNumbers(int wordlistLength, int wordCount)
         {
-            int[] lineNumbers = new int[numberOfWords];
-            for (int i = 0; i < numberOfWords; i++)
+            int[] lineNumbers = new int[wordCount];
+            for (int i = 0; i < wordCount; i++)
             {
-                byte[] randomBytes = RandomNumberGenerator.GenerateRandomBytes(4);
+                byte[] randomBytes = SodiumCore.GetRandomBytes(4);
                 uint max = BitConverter.ToUInt32(randomBytes, 0);
                 lineNumbers[i] = (int)(wordlistLength * (max / (double)uint.MaxValue));
             }
             return lineNumbers;
         }
 
-        private static string[] GetRandomWords(string wordListFilePath, int[] lineNumbers, int numberOfWords, bool upperCase, bool numbers)
+        private static string[] GetRandomWords(string wordListFilePath, int[] lineNumbers, int wordCount, bool upperCase, bool numbers)
         {
             try
             {
-                string[] words = new string[numberOfWords];
-                for (int i = 0; i < numberOfWords; i++)
+                string[] words = new string[wordCount];
+                for (int i = 0; i < wordCount; i++)
                 {
                     words[i] = File.ReadLines(wordListFilePath).Skip(lineNumbers[i]).Take(1).First();
                     // Remove any numbers/spaces on the line
@@ -142,21 +143,18 @@ namespace Kryptor
             }
         }
 
-        private static void FormatPassphrase(string[] words, ref List<char> passphrase, int numberOfWords)
+        private static void FormatPassphrase(string[] words, ref List<char> passphrase, int wordCount)
         {
-            if (words != null)
+            for (int i = 0; i < wordCount; i++)
             {
-                for (int i = 0; i < numberOfWords; i++)
+                foreach (char character in words[i])
                 {
-                    foreach (char character in words[i])
-                    {
-                        passphrase.Add(character);
-                    }
-                    // Add word separator symbol
-                    if (i != numberOfWords - 1)
-                    {
-                        passphrase.Add('-');
-                    }
+                    passphrase.Add(character);
+                }
+                // Add word separator symbol
+                if (i != wordCount - 1)
+                {
+                    passphrase.Add('-');
                 }
             }
         }

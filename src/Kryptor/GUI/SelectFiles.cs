@@ -27,13 +27,13 @@ namespace Kryptor
     {
         public static bool SelectFilesDialog()
         {
-            using (var selectFiles = new VistaOpenFileDialog())
+            using (var selectFilesDialog = new VistaOpenFileDialog())
             {
-                selectFiles.Title = "Select Files";
-                selectFiles.Multiselect = true;
-                if (selectFiles.ShowDialog() == DialogResult.OK)
+                selectFilesDialog.Title = "Select Files";
+                selectFilesDialog.Multiselect = true;
+                if (selectFilesDialog.ShowDialog() == DialogResult.OK)
                 {
-                    Globals.SetSelectedFiles(selectFiles.FileNames.ToList());
+                    Globals.SetSelectedFiles(selectFilesDialog.FileNames.ToList());
                     return true;
                 }
                 else
@@ -45,12 +45,12 @@ namespace Kryptor
 
         public static bool SelectFolderDialog()
         {
-            using (var selectFolder = new VistaFolderBrowserDialog())
+            using (var selectFolderDialog = new VistaFolderBrowserDialog())
             {
-                selectFolder.Description = "Select Folder";
-                if (selectFolder.ShowDialog() == DialogResult.OK)
+                selectFolderDialog.Description = "Select Folder";
+                if (selectFolderDialog.ShowDialog() == DialogResult.OK)
                 {
-                    Globals.SetSelectedFiles(new List<string> { selectFolder.SelectedPath });
+                    Globals.SetSelectedFiles(new List<string> { selectFolderDialog.SelectedPath });
                     return true;
                 }
                 else

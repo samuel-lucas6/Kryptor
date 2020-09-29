@@ -79,13 +79,13 @@
             // 
             this.cmsKeyPairMenu.BackColor = System.Drawing.Color.White;
             this.cmsKeyPairMenu.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.cmsKeyPairMenu.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cmsKeyPairMenu.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cmsKeyPairMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsmiCopyTextbox,
             this.tsmiClearClipboard});
             this.cmsKeyPairMenu.Name = "passwordContextMenu";
             this.cmsKeyPairMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.cmsKeyPairMenu.Size = new System.Drawing.Size(179, 52);
+            this.cmsKeyPairMenu.Size = new System.Drawing.Size(189, 78);
             // 
             // tsmiCopyTextbox
             // 
@@ -93,7 +93,7 @@
             this.tsmiCopyTextbox.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.tsmiCopyTextbox.ImageTransparentColor = System.Drawing.Color.Transparent;
             this.tsmiCopyTextbox.Name = "tsmiCopyTextbox";
-            this.tsmiCopyTextbox.Size = new System.Drawing.Size(178, 24);
+            this.tsmiCopyTextbox.Size = new System.Drawing.Size(188, 26);
             this.tsmiCopyTextbox.Text = "Copy Textbox";
             this.tsmiCopyTextbox.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
             this.tsmiCopyTextbox.Click += new System.EventHandler(this.tsmiCopyTextbox_Click);
@@ -104,7 +104,7 @@
             this.tsmiClearClipboard.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.tsmiClearClipboard.ImageTransparentColor = System.Drawing.Color.Transparent;
             this.tsmiClearClipboard.Name = "tsmiClearClipboard";
-            this.tsmiClearClipboard.Size = new System.Drawing.Size(178, 24);
+            this.tsmiClearClipboard.Size = new System.Drawing.Size(188, 26);
             this.tsmiClearClipboard.Text = "Clear Clipboard";
             this.tsmiClearClipboard.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
             this.tsmiClearClipboard.Click += new System.EventHandler(this.tsmiClearClipboard_Click);

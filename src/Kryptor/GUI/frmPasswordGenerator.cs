@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using System.Windows.Forms;
 
 /*  
@@ -38,53 +37,49 @@ namespace Kryptor
 
         private void frmPasswordGenerator_Load(object sender, EventArgs e)
         {
-            cmbGenerateType.SelectedIndex = (int)Generate.Password;
             if (Globals.DarkTheme == true)
             {
                 ApplyDarkTheme();
             }
-            // Fix label alignment on Linux & macOS
-            MonoGUI.AlignLabels(lblPassword, lblEntropy, null, null);
+            RunningOnMono();
             GeneratePasswordOnLoad();
         }
 
         private void ApplyDarkTheme()
         {
-            // Main form 
-            this.BackColor = Color.FromArgb(Constants.Red, Constants.Green, Constants.Blue);
-            grbOptions.ForeColor = Color.White;
+            this.BackColor = DarkTheme.BackgroundColour();
+            DarkTheme.GroupBoxes(grbOptions);
+            DarkTheme.Labels(lblEntropy);
+            DarkTheme.Labels(lblPassword);
+            DarkTheme.Labels(lblLength);
+            DarkTheme.TextBoxes(txtGeneratedPassword);
+            DarkTheme.Buttons(btnRegeneratePassword);
+            DarkTheme.Buttons(btnCopyPassword);
+            DarkTheme.ComboBoxes(cmbGenerateType);
+            DarkTheme.NumericUpDown(nudLength);
+            DarkTheme.CheckBoxes(chkLowercase);
+            DarkTheme.CheckBoxes(chkUppercase); 
+            DarkTheme.CheckBoxes(chkNumbers);
+            DarkTheme.CheckBoxes(chkSymbols);
+        }
 
-            // Controls outside group box
-            txtGeneratedPassword.BackColor = Color.DimGray;
-            txtGeneratedPassword.ForeColor = Color.White;
-            lblEntropy.ForeColor = Color.White;
-            lblPassword.ForeColor = Color.White;
-            btnRegeneratePassword.BackColor = Color.FromArgb(Constants.Red, Constants.Green, Constants.Blue);
-            btnRegeneratePassword.ForeColor = Color.White;
-            btnRegeneratePassword.FlatAppearance.MouseDownBackColor = Color.Transparent;
-            btnCopyPassword.BackColor = Color.FromArgb(Constants.Red, Constants.Green, Constants.Blue);
-            btnCopyPassword.ForeColor = Color.White;
-            btnCopyPassword.FlatAppearance.MouseDownBackColor = Color.Transparent;
-
-            // Options group box
-            cmbGenerateType.ForeColor = Color.White;
-            cmbGenerateType.BackColor = Color.DimGray;
-            lblLength.ForeColor = Color.White;
-            nudLength.ForeColor = Color.White;
-            nudLength.BackColor = Color.DimGray;
-            chkLowercase.ForeColor = Color.White;
-            chkLowercase.BackColor = Color.FromArgb(Constants.Red, Constants.Green, Constants.Blue);
-            chkUppercase.ForeColor = Color.White;
-            chkUppercase.BackColor = Color.FromArgb(Constants.Red, Constants.Green, Constants.Blue);
-            chkNumbers.ForeColor = Color.White;
-            chkNumbers.BackColor = Color.FromArgb(Constants.Red, Constants.Green, Constants.Blue);
-            chkSymbols.ForeColor = Color.White;
-            chkSymbols.BackColor = Color.FromArgb(Constants.Red, Constants.Green, Constants.Blue);
+        private void RunningOnMono()
+        {
+            if (Constants.RunningOnMono == true)
+            {
+                MonoGUI.MoveLabelRight(lblPassword);
+                MonoGUI.MoveLabelRight(lblEntropy);
+                MonoGUI.MoveCheckBoxLeft(chkLowercase);
+                MonoGUI.MoveCheckBoxLeft(chkUppercase);
+                MonoGUI.MoveCheckBoxLeft(chkNumbers);
+                MonoGUI.MoveCheckBoxLeft(chkSymbols);
+            }
         }
 
         private void GeneratePasswordOnLoad()
         {
             int length = 30;
+            cmbGenerateType.SelectedIndex = (int)Generate.Password;
             // Use all character types
             char[] password = PasswordGenerator.GenerateRandomPassword(length, true, true, true, true);
             DisplayGeneratedPassword(password);
@@ -141,8 +136,8 @@ namespace Kryptor
 
         private static void SetPasswordTextbox(string password)
         {
-            frmKryptor mainForm = (frmKryptor)Application.OpenForms["frmKryptor"];
-            TextBox txtPassword = (TextBox)mainForm.Controls["txtPassword"];
+            frmFileEncryption fileEncryption = (frmFileEncryption)Application.OpenForms["frmFileEncryption"];
+            TextBox txtPassword = (TextBox)fileEncryption.Controls["txtPassword"];
             txtPassword.Text = password;
             txtPassword.SelectionStart = txtPassword.Text.Length;
         }
@@ -151,15 +146,17 @@ namespace Kryptor
         {
             if (cmbGenerateType.SelectedIndex == (int)Generate.Password)
             {
-                // Password
                 lblLength.Text = "Length:";
                 nudLength.Maximum = 128;
                 nudLength.Minimum = 12;
                 nudLength.Value = 30;
+                chkLowercase.Checked = true;
+                chkUppercase.Checked = true;
+                chkNumbers.Checked = true;
+                chkSymbols.Checked = true;
             }
             else
             {
-                // Passphrase
                 lblLength.Text = "Words:";
                 nudLength.Maximum = 20;
                 nudLength.Minimum = 4;
@@ -167,7 +164,6 @@ namespace Kryptor
                 chkLowercase.Checked = true;
                 chkSymbols.Checked = true;
             }
-            cmbGenerateType.Select(0, 0);
             RegeneratePassword();
         }
 
@@ -185,7 +181,7 @@ namespace Kryptor
         private void chkLowercase_CheckedChanged(object sender, EventArgs e)
         {
             // Prevent unchecking
-            if (cmbGenerateType.SelectedIndex == (int)Generate.Passphrase | chkUppercase.Checked == false & chkNumbers.Checked == false & chkSymbols.Checked == false)
+            if (cmbGenerateType.SelectedIndex == (int)Generate.Passphrase || chkUppercase.Checked == false && chkNumbers.Checked == false && chkSymbols.Checked == false)
             {
                 chkLowercase.Checked = true;
             }
@@ -194,7 +190,7 @@ namespace Kryptor
 
         private void chkUppercase_CheckedChanged(object sender, EventArgs e)
         {
-            if (chkLowercase.Checked == false & chkNumbers.Checked == false & chkSymbols.Checked == false)
+            if (chkLowercase.Checked == false && chkNumbers.Checked == false && chkSymbols.Checked == false)
             {
                 chkUppercase.Checked = true;
             }
@@ -203,7 +199,7 @@ namespace Kryptor
 
         private void chkNumbers_CheckedChanged(object sender, EventArgs e)
         {
-            if (chkLowercase.Checked == false & chkUppercase.Checked == false & chkSymbols.Checked == false)
+            if (chkLowercase.Checked == false && chkUppercase.Checked == false && chkSymbols.Checked == false)
             {
                 chkNumbers.Checked = true;
             }
@@ -212,7 +208,7 @@ namespace Kryptor
 
         private void chkSymbols_CheckedChanged(object sender, EventArgs e)
         {
-            if (cmbGenerateType.SelectedIndex == (int)Generate.Passphrase | chkLowercase.Checked == false & chkUppercase.Checked == false & chkNumbers.Checked == false)
+            if (cmbGenerateType.SelectedIndex == (int)Generate.Passphrase || chkLowercase.Checked == false && chkUppercase.Checked == false && chkNumbers.Checked == false)
             {
                 chkSymbols.Checked = true;
             }

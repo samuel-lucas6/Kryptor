@@ -30,30 +30,23 @@ namespace Kryptor
         public static readonly string KryptorDirectory = Application.StartupPath;
 
         // Key derivation
-        public static readonly int DefaultParallelism = Environment.ProcessorCount;
-        public static readonly int Mebibyte = 1024;
-        public static readonly int DefaultMemorySize = 100 * Mebibyte;
-        public static readonly int DefaultIterations = 1;
+        public static readonly int Mebibyte = 1048576;
+        public static readonly int DefaultMemorySize = 104857600; //100 MiB
+        public static readonly int DefaultIterations = 3;
 
         // File encryption
         public const string EncryptedExtension = ".kryptor";
         public const int EncryptionKeySize = 32;
-        public const int HMACKeySize = 128;
-        public const int SaltLength = 32;
+        public const int MACKeySize = 64;
+        public const int SaltLength = 16;
         public const int XChaChaNonceLength = 24;
         public const int AesNonceLength = 16;
-        public const int HMACLength = 64;
+        public const int HashLength = 64;
 
         // Storing Argon2 parameters in encrypted files
-        public const string ParallelismFlag = "|p=";
         public const string MemorySizeFlag = "|m=";
         public const string IterationsFlag = "|t=";
-        public const string EndFlag = "|END|";
-
-        // Dark theme Color.FromArgb
-        public const int Red = 44;
-        public const int Green = 47;
-        public const int Blue = 51;
+        public const string EndFlag = "|end|";
     }
 
     // For code readability rather than specifying numbers
@@ -61,7 +54,6 @@ namespace Kryptor
     {
         XChaCha20,
         XSalsa20,
-        AesCBC,
-        AesCTR
+        AesCBC
     }
 }

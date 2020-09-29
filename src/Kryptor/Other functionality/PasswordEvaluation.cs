@@ -26,12 +26,6 @@ namespace Kryptor
     {
         private static readonly Zxcvbn.Zxcvbn _zxcvbn = new Zxcvbn.Zxcvbn();
 
-        public static int CalculateEntropy(string password)
-        {
-            var passwordEvaluation = _zxcvbn.EvaluatePassword(password);
-            int entropy = (int)Math.Round(passwordEvaluation.Entropy);
-            return entropy;
-        }
 
         public static void DisplayPasswordEntropy(string password, Label lblEntropy)
         {
@@ -44,7 +38,7 @@ namespace Kryptor
                     {
                         lblEntropy.ForeColor = Color.Red;
                     }
-                    else if (entropy >= 80 & entropy < 112)
+                    else if (entropy >= 80 && entropy < 112)
                     {
                         lblEntropy.ForeColor = Color.Orange;
                     }
@@ -60,6 +54,13 @@ namespace Kryptor
                     lblEntropy.Visible = false;
                 }
             }
+        }
+
+        private static int CalculateEntropy(string password)
+        {
+            var passwordEvaluation = _zxcvbn.EvaluatePassword(password);
+            int entropy = (int)Math.Round(passwordEvaluation.Entropy);
+            return entropy;
         }
     }
 }

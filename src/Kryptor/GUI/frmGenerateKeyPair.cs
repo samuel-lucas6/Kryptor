@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
-using Sodium;
 using Ookii.Dialogs.WinForms;
 
 /*  
@@ -38,44 +36,36 @@ namespace Kryptor
             {
                 ApplyDarkTheme();
             }
-            // Fix label alignment on Linux & macOS
-            MonoGUI.AlignLabels(lblPublicKey, lblPrivateKey, null, null);
+            RunningOnMono();
             DisplayKeyPair();
         }
 
         private void ApplyDarkTheme()
         {
-            this.BackColor = Color.FromArgb(Constants.Red, Constants.Green, Constants.Blue);
-            lblPublicKey.ForeColor = Color.White;
-            lblPrivateKey.ForeColor = Color.White;
-            txtPublicKey.BackColor = Color.DimGray;
-            txtPublicKey.ForeColor = Color.White;
-            txtPrivateKey.BackColor = Color.DimGray;
-            txtPrivateKey.ForeColor = Color.White;
-            btnExportPublicKey.BackColor = Color.FromArgb(Constants.Red, Constants.Green, Constants.Blue);
-            btnExportPublicKey.ForeColor = Color.White;
-            btnExportPublicKey.FlatAppearance.MouseDownBackColor = Color.Transparent;
-            btnStoredKeys.BackColor = Color.FromArgb(Constants.Red, Constants.Green, Constants.Blue);
-            btnStoredKeys.ForeColor = Color.White;
-            btnStoredKeys.FlatAppearance.MouseDownBackColor = Color.Transparent;
-            SharedContextMenu.DarkContextMenu(cmsKeyPairMenu);
+            this.BackColor = DarkTheme.BackgroundColour();
+            DarkTheme.Labels(lblPublicKey);
+            DarkTheme.Labels(lblPrivateKey);
+            DarkTheme.TextBoxes(txtPublicKey);
+            DarkTheme.TextBoxes(txtPrivateKey);
+            DarkTheme.Buttons(btnExportPublicKey);
+            DarkTheme.Buttons(btnStoredKeys);
+            DarkTheme.ContextMenu(cmsKeyPairMenu);
+        }
+
+        private void RunningOnMono()
+        {
+            if (Constants.RunningOnMono == true)
+            {
+                MonoGUI.MoveLabelRight(lblPublicKey);
+                MonoGUI.MoveLabelRight(lblPrivateKey);
+            }
         }
 
         private void DisplayKeyPair()
         {
-            var keyPair = GenerateKeyPair();
+            var keyPair = PasswordSharing.GenerateKeyPair();
             txtPublicKey.Text = keyPair.Item1;
             txtPrivateKey.Text = keyPair.Item2;
-        }
-
-        private static (string, string) GenerateKeyPair()
-        {
-            using (var keyPair = PublicKeyBox.GenerateKeyPair())
-            {
-                string publicKey = Convert.ToBase64String(keyPair.PublicKey);
-                string privateKey = Convert.ToBase64String(keyPair.PrivateKey);
-                return (publicKey, privateKey);
-            }
         }
 
         private void tsmiCopyTextbox_Click(object sender, EventArgs e)
@@ -86,6 +76,12 @@ namespace Kryptor
         private void tsmiClearClipboard_Click(object sender, EventArgs e)
         {
             EditClipboard.ClearClipboard();
+        }
+
+        private void picHelp_Click(object sender, EventArgs e)
+        {
+            const string passwordSharingLink = "https://kryptor.co.uk/Password%20Sharing.html";
+            VisitLink.OpenLink(passwordSharingLink);
         }
 
         private void btnExportPublicKey_Click(object sender, EventArgs e)
@@ -100,14 +96,15 @@ namespace Kryptor
             {
                 if (!string.IsNullOrEmpty(publicKey))
                 {
-                    using (var saveFile = new VistaSaveFileDialog())
+                    using (var saveFileDialog = new VistaSaveFileDialog())
                     {
-                        saveFile.DefaultExt = ".txt";
-                        saveFile.FileName = "KRYPTOR PUBLIC KEY";
-                        if (saveFile.ShowDialog() == DialogResult.OK)
+                        saveFileDialog.Title = "Export Public Key";
+                        saveFileDialog.DefaultExt = ".txt";
+                        saveFileDialog.FileName = "KRYPTOR PUBLIC KEY";
+                        if (saveFileDialog.ShowDialog() == DialogResult.OK)
                         {
-                            File.WriteAllText(saveFile.FileName, publicKey);
-                            File.SetAttributes(saveFile.FileName, FileAttributes.ReadOnly);
+                            File.WriteAllText(saveFileDialog.FileName, publicKey);
+                            File.SetAttributes(saveFileDialog.FileName, FileAttributes.ReadOnly);
                         }
                     }
                 }
@@ -122,12 +119,6 @@ namespace Kryptor
         private void btnStoredKeys_Click(object sender, EventArgs e)
         {
             this.Close();
-        }
-
-        private void picHelp_Click(object sender, EventArgs e)
-        {
-            const string passwordSharingLink = "https://kryptor.co.uk/Password%20Sharing.html";
-            OpenURL.OpenLink(passwordSharingLink);
         }
     }
 }

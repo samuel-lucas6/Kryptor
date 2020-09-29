@@ -5,6 +5,6 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-// This will be disposed when the form is closed
+// These will be disposed when the form is closed
 [assembly: SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "<Pending>", Scope = "member", Target = "~M:Kryptor.Program.Main(System.String[])")]
 [assembly: SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "<Pending>", Scope = "member", Target = "~M:Kryptor.Program.RunKryptor")]

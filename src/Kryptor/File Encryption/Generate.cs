@@ -1,4 +1,5 @@
 ﻿using System;
+using Sodium;
 
 /*  
     Kryptor: Free and open source file encryption software.
@@ -26,28 +27,23 @@ namespace Kryptor
         {
             Enum cipher = (Cipher)Globals.EncryptionAlgorithm;
             string cipherName = Enum.GetName(cipher.GetType(), cipher);
-            byte[] associatedData = HashingAlgorithms.Blake2(cipherName);
-            return associatedData;
+            return HashingAlgorithms.Blake2(cipherName);
         }
 
         public static byte[] Salt()
         {
-            return RandomNumberGenerator.GenerateRandomBytes(Constants.SaltLength);
+            return SodiumCore.GetRandomBytes(Constants.SaltLength);
         }
 
         public static byte[] Nonce()
         {
-            if (Globals.EncryptionAlgorithm == (int)Cipher.XChaCha20 | Globals.EncryptionAlgorithm == (int)Cipher.XSalsa20)
+            if (Globals.EncryptionAlgorithm == (int)Cipher.XChaCha20 || Globals.EncryptionAlgorithm == (int)Cipher.XSalsa20)
             {
-                return RandomNumberGenerator.GenerateRandomBytes(Constants.XChaChaNonceLength);
-            }
-            else if (Globals.EncryptionAlgorithm == (int)Cipher.AesCBC | Globals.EncryptionAlgorithm == (int)Cipher.AesCTR)
-            {
-                return RandomNumberGenerator.GenerateRandomBytes(Constants.AesNonceLength);
+                return SodiumCore.GetRandomBytes(Constants.XChaChaNonceLength);
             }
             else
             {
-                return null;
+                return SodiumCore.GetRandomBytes(Constants.AesNonceLength);
             }
         }
     }

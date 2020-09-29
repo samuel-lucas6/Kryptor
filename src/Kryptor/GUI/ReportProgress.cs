@@ -25,31 +25,28 @@ namespace Kryptor
     {
         private static int _previousPercentage;
 
-        public static void IncrementProgress(ref int progress, BackgroundWorker backgroundWorker)
-        {
-            if (Globals.TotalCount > 1)
-            {
-                ReportBackgroundWorkerProgress(progress, Globals.TotalCount, backgroundWorker);
-                progress++;
-            }
-        }
-
         public static void ReportEncryptionProgress(long bytesWritten, long fileSize, BackgroundWorker backgroundWorker)
         {
             if (Globals.TotalCount == 1)
             {
-                ReportBackgroundWorkerProgress(bytesWritten, fileSize, backgroundWorker);
+                BackgroundWorkerReportProgress(bytesWritten, fileSize, backgroundWorker);
             }
         }
 
-        public static void ReportBackgroundWorkerProgress(long progress, long total, BackgroundWorker backgroundWorker)
+        public static void IncrementProgress(ref int progress, BackgroundWorker backgroundWorker)
+        {
+            if (Globals.TotalCount > 1)
+            {
+                BackgroundWorkerReportProgress(progress, Globals.TotalCount, backgroundWorker);
+                progress++;
+            }
+        }
+
+        public static void BackgroundWorkerReportProgress(long progress, long total, BackgroundWorker backgroundWorker)
         {
             try
             {
-                if (backgroundWorker == null)
-                {
-                    throw new ArgumentNullException(nameof(backgroundWorker));
-                }
+                NullChecks.BackgroundWorkers(backgroundWorker);
                 int percentage = (int)Math.Round((double)((double)progress / total) * 100);
                 // Prevent unnecessary calls
                 if (percentage != 0 && percentage != _previousPercentage)
@@ -58,7 +55,7 @@ namespace Kryptor
                 }
                 _previousPercentage = percentage;
             }
-            catch (Exception ex) when (ex is InvalidOperationException || ex is OverflowException || ex is DivideByZeroException)
+            catch (Exception ex) when (ExceptionFilters.ReportProgressExceptions(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.Bug);
                 DisplayMessage.ErrorResultsText(string.Empty, ex.GetType().Name, "Background worker report progress exception. This is a bug - please report it.");

@@ -21,7 +21,7 @@ using System.Windows.Forms;
 
 namespace Kryptor
 {
-    public class DarkMenu : ProfessionalColorTable
+    public class DarkColourTable : ProfessionalColorTable
     {
         public override Color MenuBorder
         {

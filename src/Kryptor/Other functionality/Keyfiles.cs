@@ -2,6 +2,7 @@
 using System.IO;
 using System.Windows.Forms;
 using Ookii.Dialogs.WinForms;
+using Sodium;
 
 /*  
     Kryptor: Free and open source file encryption software.
@@ -27,15 +28,15 @@ namespace Kryptor
     {
         public static bool CreateKeyfile()
         {
-            using (var createKeyfile = new VistaSaveFileDialog())
+            using (var saveFileDialog = new VistaSaveFileDialog())
             {
-                createKeyfile.Title = "Generate Keyfile";
-                createKeyfile.DefaultExt = ".key";
-                createKeyfile.AddExtension = true;
-                createKeyfile.FileName = AnonymousRename.GenerateRandomFileName();
-                if (createKeyfile.ShowDialog() == DialogResult.OK)
+                saveFileDialog.Title = "Create Keyfile";
+                saveFileDialog.DefaultExt = ".key";
+                saveFileDialog.AddExtension = true;
+                saveFileDialog.FileName = AnonymousRename.GenerateRandomFileName();
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    Globals.KeyfilePath = createKeyfile.FileName;
+                    Globals.KeyfilePath = saveFileDialog.FileName;
                     bool success = GenerateKeyfile(Globals.KeyfilePath);
                     return success;
                 }
@@ -50,7 +51,7 @@ namespace Kryptor
         {
             try
             {
-                byte[] keyfileBytes = RandomNumberGenerator.GenerateRandomBytes(Constants.HMACKeySize);
+                byte[] keyfileBytes = SodiumCore.GetRandomBytes(Constants.MACKeySize);
                 File.WriteAllBytes(filePath, keyfileBytes);
                 File.SetAttributes(filePath, FileAttributes.ReadOnly);
                 Utilities.ZeroArray(keyfileBytes);
@@ -66,12 +67,12 @@ namespace Kryptor
 
         public static bool SelectKeyfile()
         {
-            using (var selectKeyfile = new VistaOpenFileDialog())
+            using (var selectFileDialog = new VistaOpenFileDialog())
             {
-                selectKeyfile.Title = "Select Keyfile";
-                if (selectKeyfile.ShowDialog() == DialogResult.OK)
+                selectFileDialog.Title = "Select Keyfile";
+                if (selectFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    Globals.KeyfilePath = selectKeyfile.FileName;
+                    Globals.KeyfilePath = selectFileDialog.FileName;
                     return true;
                 }
                 else
@@ -86,11 +87,11 @@ namespace Kryptor
             try
             {
                 File.SetAttributes(keyfilePath, FileAttributes.Normal);
-                byte[] keyfileBytes = new byte[Constants.HMACKeySize];
-                // Read the first 128 bytes of a keyfile
-                using (var keyfile = new FileStream(keyfilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                byte[] keyfileBytes = new byte[Constants.MACKeySize];
+                // Read the first 64 bytes of a keyfile
+                using (var fileStream = new FileStream(keyfilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
-                    keyfile.Read(keyfileBytes, 0, keyfileBytes.Length);
+                    fileStream.Read(keyfileBytes, 0, keyfileBytes.Length);
                 }
                 File.SetAttributes(keyfilePath, FileAttributes.ReadOnly);
                 return keyfileBytes;

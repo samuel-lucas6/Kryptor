@@ -1,5 +1,6 @@
 ﻿using System;
-using System.IO;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 /*  
     Kryptor: Free and open source file encryption software.
@@ -21,28 +22,28 @@ using System.IO;
 
 namespace Kryptor
 {
-    public static class Logging
+    public static class VisitLink
     {
-        public enum Severity
-        {
-            Low, // User error or unimportant
-            Medium, // Minor impact
-            High, // Critical impact
-            Bug // Shouldn't happen
-        }
-
-        public static void LogException(string exceptionMessage, Severity severity)
+        public static void OpenLink(string link)
         {
             try
             {
-                const string logFileName = "error log.txt";
-                string logFilePath = Path.Combine(Constants.KryptorDirectory, logFileName);
-                string logMessage = $"[Error] Severity = {severity}" + Environment.NewLine + exceptionMessage + Environment.NewLine;
-                File.AppendAllText(logFilePath, logMessage);    
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    Process.Start(link);
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    Process.Start("xdg-open", link);
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                {
+                    Process.Start("open", link);
+                }
             }
-            catch (Exception ex) when (ExceptionFilters.FileAccessExceptions(ex))
+            catch (Exception ex) when (ExceptionFilters.OpenLinkExceptions(ex))
             {
-                DisplayMessage.ErrorMessageBox(ex.GetType().Name, "Unable to log exception.");
+                DisplayMessage.ErrorMessageBox(ex.GetType().Name, $"Unable to automatically open link. Please visit {link} manually using your browser.");
             }
         }
     }

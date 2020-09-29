@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.IO;
 using System.Security.Cryptography;
+using Sodium;
 
 /*  
     Kryptor: Free and open source file encryption software.
@@ -30,23 +31,23 @@ namespace Kryptor
             try
             {
                 const int sixteenKiB = 16384;
-                byte[] first16KiB = RandomNumberGenerator.GenerateRandomBytes(sixteenKiB);
-                byte[] last16KiB = RandomNumberGenerator.GenerateRandomBytes(sixteenKiB);
-                using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read))
+                byte[] first16KiB = SodiumCore.GetRandomBytes(sixteenKiB);
+                byte[] last16KiB = SodiumCore.GetRandomBytes(sixteenKiB);
+                using (var firstFileStream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read))
                 {
-                    fileStream.Write(first16KiB, 0, first16KiB.Length);
+                    firstFileStream.Write(first16KiB, 0, first16KiB.Length);
                     // Remove the last 16 KiB
-                    fileStream.SetLength(fileStream.Length - last16KiB.Length);
+                    firstFileStream.SetLength(firstFileStream.Length - last16KiB.Length);
                 }
-                using (var fsAppend = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read))
+                using (var lastFileStream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read))
                 {
-                    fsAppend.Write(last16KiB, 0, last16KiB.Length);
+                    lastFileStream.Write(last16KiB, 0, last16KiB.Length);
                 }
             }
             catch (Exception ex) when (ExceptionFilters.FileAccessExceptions(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.High);
-                DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "First/Last 16KiB erasure failed.");
+                DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "'First/Last 16KiB' erasure failed.");
             }
         }
 
@@ -56,9 +57,10 @@ namespace Kryptor
             {
                 using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read))
                 {
+                    byte[] randomBytes = FileHandling.GetBufferSize(fileStream);
                     while (fileStream.Position < fileStream.Length)
                     {
-                        byte[] randomBytes = RandomNumberGenerator.GenerateRandomBytes(4096);
+                        randomBytes = SodiumCore.GetRandomBytes(randomBytes.Length);
                         fileStream.Write(randomBytes, 0, randomBytes.Length);
                         ReportProgress.ReportEncryptionProgress(fileStream.Position, fileStream.Length, bgwShredFiles);
                     }
@@ -67,7 +69,7 @@ namespace Kryptor
             catch (Exception ex) when (ExceptionFilters.FileAccessExceptions(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.High);
-                DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "Pseudorandom data erasure failed.");
+                DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "'1 Pass' erasure failed.");
             }
         }
 
@@ -77,10 +79,10 @@ namespace Kryptor
             {
                 using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read))
                 {
-                    byte[] zeroes = new byte[4096];
+                    byte[] zeroes = FileHandling.GetBufferSize(fileStream);
                     if (useOnes == true)
                     {
-                        zeroes = ConvertToOnes(zeroes);
+                        zeroes = FillArrayWithOnes(zeroes);
                     }
                     while (fileStream.Position < fileStream.Length)
                     {
@@ -92,11 +94,11 @@ namespace Kryptor
             catch (Exception ex) when (ExceptionFilters.FileAccessExceptions(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.High);
-                DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "Zero fill erasure failed.");
+                DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "'Zero fill' erasure failed.");
             }
         }
 
-        private static byte[] ConvertToOnes(byte[] zeroes)
+        private static byte[] FillArrayWithOnes(byte[] zeroes)
         {
             // Convert array of zeros to an array of ones
             byte one = Convert.ToByte(1);
@@ -109,10 +111,10 @@ namespace Kryptor
 
         public static void InfosecStandard5Enhanced(string filePath, BackgroundWorker bgwShredFiles)
         {
-            // First pass with ones
-            ZeroFill(filePath, true, bgwShredFiles);
-            // Second pass with zeros
+            // First pass with zeros
             ZeroFill(filePath, false, bgwShredFiles);
+            // Second pass with ones
+            ZeroFill(filePath, true, bgwShredFiles);
             // Third pass with random data
             PseudorandomData(filePath, bgwShredFiles);
         }
@@ -133,10 +135,10 @@ namespace Kryptor
                 using (var ciphertext = new FileStream(encryptedFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read))
                 using (var plaintext = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read))
                 {
-                    byte[] fileBytes = new byte[4096];
-                    byte[] key = RandomNumberGenerator.GenerateRandomBytes(Constants.EncryptionKeySize);
-                    byte[] nonce = RandomNumberGenerator.GenerateRandomBytes(16);
-                    AesAlgorithms.EncryptAesCBC(plaintext, ciphertext, fileBytes, nonce, key, bgwShredFiles);
+                    byte[] fileBytes = FileHandling.GetBufferSize(plaintext);
+                    byte[] key = SodiumCore.GetRandomBytes(Constants.EncryptionKeySize);
+                    byte[] nonce = SodiumCore.GetRandomBytes(Constants.XChaChaNonceLength);
+                    StreamCiphers.Encrypt(plaintext, ciphertext, 0, fileBytes, nonce, key, bgwShredFiles);
                     Utilities.ZeroArray(key);
                     Utilities.ZeroArray(nonce);
                 }
@@ -148,7 +150,7 @@ namespace Kryptor
             catch (Exception ex) when (ex is CryptographicException || ExceptionFilters.FileAccessExceptions(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.High);
-                DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "Encryption erasure failed.");
+                DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "'Encryption' erasure failed.");
             }
         }
     }

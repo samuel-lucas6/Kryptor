@@ -42,7 +42,7 @@
             this.lblProgramDescription.AutoSize = true;
             this.lblProgramDescription.BackColor = System.Drawing.Color.Transparent;
             this.lblProgramDescription.ForeColor = System.Drawing.Color.Black;
-            this.lblProgramDescription.Location = new System.Drawing.Point(101, 54);
+            this.lblProgramDescription.Location = new System.Drawing.Point(103, 54);
             this.lblProgramDescription.Name = "lblProgramDescription";
             this.lblProgramDescription.Size = new System.Drawing.Size(329, 21);
             this.lblProgramDescription.TabIndex = 74;
@@ -75,7 +75,7 @@
             // 
             this.txtAbout.BackColor = System.Drawing.Color.White;
             this.txtAbout.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtAbout.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.txtAbout.Cursor = System.Windows.Forms.Cursors.Default;
             this.txtAbout.ForeColor = System.Drawing.Color.Black;
             this.txtAbout.Location = new System.Drawing.Point(12, 97);
             this.txtAbout.Multiline = true;
@@ -95,11 +95,11 @@
             this.lblVersion.BackColor = System.Drawing.Color.Transparent;
             this.lblVersion.Font = new System.Drawing.Font("Segoe UI", 12F);
             this.lblVersion.ForeColor = System.Drawing.Color.Black;
-            this.lblVersion.Location = new System.Drawing.Point(387, 9);
+            this.lblVersion.Location = new System.Drawing.Point(399, 9);
             this.lblVersion.Name = "lblVersion";
-            this.lblVersion.Size = new System.Drawing.Size(145, 21);
+            this.lblVersion.Size = new System.Drawing.Size(133, 21);
             this.lblVersion.TabIndex = 76;
-            this.lblVersion.Text = "Version 1.0.0.0 Beta";
+            this.lblVersion.Text = "Version 1.1.0 Beta";
             // 
             // frmAboutKryptor
             // 

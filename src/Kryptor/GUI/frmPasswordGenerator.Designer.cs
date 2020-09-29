@@ -43,6 +43,7 @@
             this.cmbGenerateType = new System.Windows.Forms.ComboBox();
             this.lblEntropy = new System.Windows.Forms.Label();
             this.lblPassword = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             this.grbOptions.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudLength)).BeginInit();
             this.SuspendLayout();
@@ -99,6 +100,7 @@
             // grbOptions
             // 
             this.grbOptions.BackColor = System.Drawing.Color.Transparent;
+            this.grbOptions.Controls.Add(this.label1);
             this.grbOptions.Controls.Add(this.lblType);
             this.grbOptions.Controls.Add(this.chkSymbols);
             this.grbOptions.Controls.Add(this.chkNumbers);
@@ -118,7 +120,7 @@
             // lblType
             // 
             this.lblType.AutoSize = true;
-            this.lblType.Location = new System.Drawing.Point(9, 32);
+            this.lblType.Location = new System.Drawing.Point(13, 33);
             this.lblType.Name = "lblType";
             this.lblType.Size = new System.Drawing.Size(45, 21);
             this.lblType.TabIndex = 78;
@@ -129,7 +131,7 @@
             this.chkSymbols.AutoSize = true;
             this.chkSymbols.Checked = true;
             this.chkSymbols.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkSymbols.Location = new System.Drawing.Point(397, 65);
+            this.chkSymbols.Location = new System.Drawing.Point(405, 66);
             this.chkSymbols.Name = "chkSymbols";
             this.chkSymbols.Size = new System.Drawing.Size(89, 25);
             this.chkSymbols.TabIndex = 10;
@@ -143,7 +145,7 @@
             this.chkNumbers.AutoSize = true;
             this.chkNumbers.Checked = true;
             this.chkNumbers.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkNumbers.Location = new System.Drawing.Point(275, 66);
+            this.chkNumbers.Location = new System.Drawing.Point(299, 66);
             this.chkNumbers.Name = "chkNumbers";
             this.chkNumbers.Size = new System.Drawing.Size(94, 25);
             this.chkNumbers.TabIndex = 9;
@@ -157,7 +159,7 @@
             this.chkUppercase.AutoSize = true;
             this.chkUppercase.Checked = true;
             this.chkUppercase.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkUppercase.Location = new System.Drawing.Point(145, 65);
+            this.chkUppercase.Location = new System.Drawing.Point(185, 66);
             this.chkUppercase.Name = "chkUppercase";
             this.chkUppercase.Size = new System.Drawing.Size(102, 25);
             this.chkUppercase.TabIndex = 8;
@@ -171,7 +173,7 @@
             this.chkLowercase.AutoSize = true;
             this.chkLowercase.Checked = true;
             this.chkLowercase.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkLowercase.Location = new System.Drawing.Point(16, 65);
+            this.chkLowercase.Location = new System.Drawing.Point(72, 66);
             this.chkLowercase.Name = "chkLowercase";
             this.chkLowercase.Size = new System.Drawing.Size(102, 25);
             this.chkLowercase.TabIndex = 7;
@@ -196,7 +198,7 @@
             0,
             0});
             this.nudLength.Name = "nudLength";
-            this.nudLength.Size = new System.Drawing.Size(60, 29);
+            this.nudLength.Size = new System.Drawing.Size(69, 29);
             this.nudLength.TabIndex = 5;
             this.nudLength.TabStop = false;
             this.nudLength.Value = new decimal(new int[] {
@@ -255,6 +257,15 @@
             this.lblPassword.TabIndex = 76;
             this.lblPassword.Text = "Password:";
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(13, 65);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(53, 21);
+            this.label1.TabIndex = 79;
+            this.label1.Text = "Chars:";
+            // 
             // frmPasswordGenerator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 21F);
@@ -304,5 +315,6 @@
         private System.Windows.Forms.Label lblEntropy;
         private System.Windows.Forms.Label lblPassword;
         private System.Windows.Forms.Label lblType;
+        private System.Windows.Forms.Label label1;
     }
 }

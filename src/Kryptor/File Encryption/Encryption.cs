@@ -24,27 +24,26 @@ namespace Kryptor
 {
     public static class Encryption
     {
-        public static void InitializeEncryption(string filePath, byte[] passwordBytes, byte[] keyfileBytes, byte[] associatedData, BackgroundWorker bgwEncryption)
+        public static void InitializeEncryption(string filePath, byte[] passwordBytes, BackgroundWorker bgwEncryption)
         {
             string encryptedFilePath = GetEncryptedFilePath(filePath);
             byte[] salt = Generate.Salt();
             byte[] nonce = Generate.Nonce();
-            var keys = KeyDerivation.DeriveKeys(passwordBytes, keyfileBytes, salt, associatedData, Globals.Parallelism, Globals.MemorySize, Globals.Iterations);
+            var keys = KeyDerivation.DeriveKeys(passwordBytes, salt, Globals.Iterations, Globals.MemorySize);
             EncryptFile(filePath, encryptedFilePath, salt, nonce, keys, bgwEncryption);        
         }
 
         private static string GetEncryptedFilePath(string filePath)
         {
-            string encryptedFilePath = filePath + Constants.EncryptedExtension;
             if (Globals.AnonymousRename == true)
             {
                 bool success = OriginalFileName.AppendOriginalFileName(filePath);
                 if (success == true)
                 {
-                    encryptedFilePath = AnonymousRename.GetAnonymousFileName(filePath) + Constants.EncryptedExtension;
+                    return AnonymousRename.GetAnonymousFileName(filePath) + Constants.EncryptedExtension;
                 }
             }
-            return encryptedFilePath;
+            return filePath + Constants.EncryptedExtension;
         }
 
         private static void EncryptFile(string filePath, string encryptedFilePath, byte[] salt, byte[] nonce, (byte[], byte[]) keys, BackgroundWorker bgwEncryption)
@@ -54,90 +53,50 @@ namespace Kryptor
                 using (var ciphertext = new FileStream(encryptedFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read))
                 using (var plaintext = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read))
                 {
-                    byte[] fileBytes = new byte[4096];
-                    if (fileBytes.Length > plaintext.Length)
-                    {
-                        fileBytes = new byte[plaintext.Length];
-                    }
+                    WriteFileHeaders.WriteHeaders(ciphertext, salt, nonce);
+                    // Store headers length to correct percentage calculation
+                    long headersLength = ciphertext.Position;
+                    byte[] fileBytes = FileHandling.GetBufferSize(plaintext);
                     MemoryEncryption.DecryptByteArray(ref keys.Item1);
-                    if (Globals.EncryptionAlgorithm == (int)Cipher.XChaCha20 | Globals.EncryptionAlgorithm == (int)Cipher.XSalsa20)
+                    if (Globals.EncryptionAlgorithm == (int)Cipher.XChaCha20 || Globals.EncryptionAlgorithm == (int)Cipher.XSalsa20)
                     {
-                        StreamCiphers.Encrypt(plaintext, ciphertext, fileBytes, nonce, keys.Item1, bgwEncryption);
+                        StreamCiphers.Encrypt(plaintext, ciphertext, headersLength, fileBytes, nonce, keys.Item1, bgwEncryption);
                     }
                     else if (Globals.EncryptionAlgorithm == (int)Cipher.AesCBC)
                     {
-                        AesAlgorithms.EncryptAesCBC(plaintext, ciphertext, fileBytes, nonce, keys.Item1, bgwEncryption);
-                    }
-                    else if (Globals.EncryptionAlgorithm == (int)Cipher.AesCTR)
-                    {
-                        AesAlgorithms.AesCTR(plaintext, ciphertext, fileBytes, nonce, keys.Item1, bgwEncryption);
+                        AesAlgorithms.EncryptAesCBC(plaintext, ciphertext, headersLength, fileBytes, nonce, keys.Item1, bgwEncryption);
                     }
                 }
                 Utilities.ZeroArray(keys.Item1);
-                CompleteEncryption(filePath, encryptedFilePath, salt, nonce, keys.Item2);
+                CompleteEncryption(filePath, encryptedFilePath, keys.Item2);
             }
             catch (Exception ex) when (ExceptionFilters.FileEncryptionExceptions(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.High);
                 DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "Unable to encrypt the file.");
-                FileEncryption.EncryptionDecryptionFailed(keys.Item1, keys.Item2, encryptedFilePath);
+                FileHandling.DeleteFile(encryptedFilePath);
+                Utilities.ZeroArray(keys.Item1);
+                Utilities.ZeroArray(keys.Item2);
             }
         }
 
-        private static void CompleteEncryption(string filePath, string encryptedFilePath, byte[] salt, byte[] nonce, byte[] hmacKey)
+        private static void CompleteEncryption(string filePath, string encryptedFilePath, byte[] macKey)
         {
-            // Append salt/nonce
-            bool trailersAppended = AppendTrailers.WriteTrailers(encryptedFilePath, salt, nonce);
-            bool fileSigned = false;
-            if (trailersAppended == true)
+            // Calculate and append MAC
+            bool fileSigned = FileAuthentication.SignFile(encryptedFilePath, macKey);
+            Utilities.ZeroArray(macKey);
+            if (fileSigned == true && Globals.OverwriteFiles == true)
             {
-                // Calculate and append HMAC
-                fileSigned = FileAuthentication.SignFile(encryptedFilePath, hmacKey);
-                if (fileSigned == true)
-                {
-                    OverwriteOriginalFile(filePath, encryptedFilePath);
-                }
+                FileHandling.OverwriteFile(filePath, encryptedFilePath);
             }
-            Utilities.ZeroArray(hmacKey);
-            MakeFileReadOnly(encryptedFilePath);
-            GetEncryptionResult(filePath, trailersAppended, fileSigned);
+            FileHandling.MakeFileReadOnly(encryptedFilePath);
+            GetEncryptionResult(filePath, fileSigned);
         }
 
-        private static void OverwriteOriginalFile(string filePath, string encryptedFilePath)
-        {
-            try
-            {
-                if (Globals.OverwriteFiles == true)
-                {
-                    // Overwrite the original, unencrypted file
-                    File.Copy(encryptedFilePath, filePath, true);
-                    File.Delete(filePath);
-                }
-            }
-            catch (Exception ex) when (ExceptionFilters.FileAccessExceptions(ex))
-            {
-                Logging.LogException(ex.ToString(), Logging.Severity.Medium);
-                DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "Unable to overwrite and/or delete the original file.");
-            }
-        }
-
-        private static void MakeFileReadOnly(string encryptedFilePath)
-        {
-            try
-            {
-                File.SetAttributes(encryptedFilePath, FileAttributes.ReadOnly);
-            }
-            catch (Exception ex) when (ExceptionFilters.FileAccessExceptions(ex))
-            {
-                Logging.LogException(ex.ToString(), Logging.Severity.Medium);
-                DisplayMessage.ErrorResultsText(encryptedFilePath, ex.GetType().Name, "Unable to make the file read-only.");
-            }
-        }
-
-        private static void GetEncryptionResult(string filePath, bool trailersAppended, bool fileSigned)
+        private static void GetEncryptionResult(string filePath, bool fileSigned)
         {
             string fileName = Path.GetFileName(filePath);
-            if (trailersAppended == true & fileSigned == true)
+            if (fileSigned == true)
             {
                 Globals.ResultsText += $"{fileName}: File encryption successful.{Environment.NewLine}";
                 Globals.SuccessfulCount += 1;
