@@ -1,6 +1,6 @@
 #define MyAppName "Kryptor"
-#define MyAppVersion "1.0.0.0 Beta"
-#define VersionInfoVersion "1.0.0.0"
+#define MyAppVersion "2.0.0 Beta"
+#define VersionInfoVersion "2.0.0.0"
 #define MyAppPublisher "Kryptor-Software"
 #define Copyright "Copyright (C) 2020 Samuel Lucas"
 #define MyAppURL "https://kryptor.co.uk"
@@ -51,27 +51,23 @@ Source: "C:\Users\Developer\Desktop\Programming\Kryptor Inno Setup\Kryptor Files
 Source: "C:\Users\Developer\Desktop\Programming\Kryptor Inno Setup\Kryptor Files\Kryptor (x64)\Kryptor.exe"; DestDir: "{#KryptorDirectory}"; Flags: ignoreversion; Check: IsWin64
 
 // DLLs
-Source: "C:\Users\Developer\Desktop\Programming\Kryptor Inno Setup\Kryptor Files\Konscious.Security.Cryptography.Argon2.dll"; DestDir: "{#KryptorDirectory}"; Flags: ignoreversion
-Source: "C:\Users\Developer\Desktop\Programming\Kryptor Inno Setup\Kryptor Files\Konscious.Security.Cryptography.Blake2.dll"; DestDir: "{#KryptorDirectory}"; Flags: ignoreversion
 Source: "C:\Users\Developer\Desktop\Programming\Kryptor Inno Setup\Kryptor Files\libsodium (x86)\libsodium.dll"; DestDir: "{#KryptorDirectory}"; Flags: ignoreversion; Check: "not IsWin64" 
 Source: "C:\Users\Developer\Desktop\Programming\Kryptor Inno Setup\Kryptor Files\libsodium (x64)\libsodium.dll"; DestDir: "{#KryptorDirectory}"; Flags: ignoreversion; Check: IsWin64
 Source: "C:\Users\Developer\Desktop\Programming\Kryptor Inno Setup\Kryptor Files\Sodium.Core.dll"; DestDir: "{#KryptorDirectory}"; Flags: ignoreversion
-Source: "C:\Users\Developer\Desktop\Programming\Kryptor Inno Setup\Kryptor Files\System.Numerics.Vectors.dll"; DestDir: "{#KryptorDirectory}"; Flags: ignoreversion
+Source: "C:\Users\Developer\Desktop\Programming\Kryptor Inno Setup\Kryptor Files\System.ValueTuple.dll"; DestDir: "{#KryptorDirectory}"; Flags: ignoreversion
 Source: "C:\Users\Developer\Desktop\Programming\Kryptor Inno Setup\Kryptor Files\zxcvbn-core.dll"; DestDir: "{#KryptorDirectory}"; Flags: ignoreversion
 Source: "C:\Users\Developer\Desktop\Programming\Kryptor Inno Setup\Kryptor Files\Ookii.Dialogs.WinForms.dll"; DestDir: "{#KryptorDirectory}"; Flags: ignoreversion
 
 // Other files
 Source: "C:\Users\Developer\Desktop\Programming\Kryptor Inno Setup\Kryptor Files\wordlist.txt"; DestDir: "{#KryptorDirectory}"; Flags: ignoreversion
+Source: "C:\Users\Developer\Desktop\Programming\Kryptor Inno Setup\Kryptor Files\settings.ini"; DestDir: "{#KryptorDirectory}"; Flags: ignoreversion
 
 // License files
 Source: "C:\Users\Developer\Desktop\Programming\Kryptor Inno Setup\Kryptor Files\LICENSE.txt"; DestDir: "{#KryptorDirectory}"; Flags: ignoreversion
 Source: "C:\Users\Developer\Desktop\Programming\Kryptor Inno Setup\Kryptor Files\libsodium LICENSE.txt"; DestDir: "{#KryptorDirectory}\Licenses"; Flags: ignoreversion
 Source: "C:\Users\Developer\Desktop\Programming\Kryptor Inno Setup\Kryptor Files\libsodium-net LICENSE.txt"; DestDir: "{#KryptorDirectory}\Licenses"; Flags: ignoreversion
-Source: "C:\Users\Developer\Desktop\Programming\Kryptor Inno Setup\Kryptor Files\System.Numerics.Vectors LICENSE.txt"; DestDir: "{#KryptorDirectory}\Licenses"; Flags: ignoreversion
-Source: "C:\Users\Developer\Desktop\Programming\Kryptor Inno Setup\Kryptor Files\libsodium-net LICENSE.txt"; DestDir: "{#KryptorDirectory}\Licenses"; Flags: ignoreversion
 Source: "C:\Users\Developer\Desktop\Programming\Kryptor Inno Setup\Kryptor Files\zxcvbn LICENSE.txt"; DestDir: "{#KryptorDirectory}\Licenses"; Flags: ignoreversion
 Source: "C:\Users\Developer\Desktop\Programming\Kryptor Inno Setup\Kryptor Files\Ookii-Dialogs-Winforms LICENSE.txt"; DestDir: "{#KryptorDirectory}\Licenses"; Flags: ignoreversion
-Source: "C:\Users\Developer\Desktop\Programming\Kryptor Inno Setup\Kryptor Files\Konscious.Security.Cryptography LICENSE.txt"; DestDir: "{#KryptorDirectory}\Licenses"; Flags: ignoreversion
 
 // Visual C++ Redistributable
 Source: "C:\Users\Developer\Desktop\Programming\Kryptor Inno Setup\Kryptor Files\vcruntime (x86)\vcruntime140.dll"; DestDir: "{#KryptorDirectory}"; Flags: ignoreversion; Check: "not IsWin64"
