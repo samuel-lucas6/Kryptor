@@ -26,7 +26,6 @@ namespace Kryptor
     {
         private static readonly Zxcvbn.Zxcvbn _zxcvbn = new Zxcvbn.Zxcvbn();
 
-
         public static void DisplayPasswordEntropy(string password, Label lblEntropy)
         {
             if (lblEntropy != null)
