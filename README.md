@@ -2,7 +2,7 @@
 
 # Kryptor
 
-Kryptor is free and open source file encryption software for Windows, Linux, and macOS. Kryptor is licensed under GPLv3.
+Kryptor is free and open source file encryption software for Windows, Linux, and macOS. Kryptor is licensed under [GPLv3](https://github.com/Kryptor-Software/Kryptor/blob/master/LICENSE).
 
 ![Screenshot](https://kryptor.co.uk/Screenshots/Settings.gif)
 
