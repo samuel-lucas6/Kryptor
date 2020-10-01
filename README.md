@@ -32,7 +32,7 @@ Before you do anything with the source code, make sure you understand the [GPLv3
 
 #### Requirements
 - Windows: If you encounter any unhandled exceptions due to 'Sodium.Core' or 'libsodium', then you will need to either install the [Visual C++ Redistributable for Visual Studio 2015-2019](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) or copy the 'vcruntime140.dll' from 'Kryptor/src/Kryptor/bin/(x86 or x64 depending on your build)/Release/' to the folder containing the 'Kryptor.exe' file. This runtime is required for libsodium to work - this '.dll' file must stay with the executable on Windows.
-- Linux & macOS: You will want to download the latest Kryptor [release](https://kryptor.co.uk/Downloads.html) for your platform. For Linux, you'll need to copy the 'libsodium.so' file to the same folder as the 'Kryptor.exe' file you've built. For macOS, you need to do the same but with the 'libsodium.dylib' file.
+- Linux & macOS: You will want to download the latest Kryptor [release](https://kryptor.co.uk/Downloads.html) for your platform. For Linux, you'll need to copy the 'libsodium.so' file to the same folder as the 'Kryptor.exe' file you've built. For macOS, you'll need to do the same but with the 'libsodium.dylib' file.
 
 #### Notes
 - [Visual Studio 2019 Community](https://visualstudio.microsoft.com/vs/community/) is the IDE I recommend building with, but be aware that it isn't open source, and you have to sign into a Microsoft account after 30 days ([solution](https://github.com/beatcracker/VSCELicense)). If you just want to view the code, then you can use [VSCodium](https://vscodium.com/), which is the open source version of VSCode. However, this won't allow you to view the Windows Forms Designer.
