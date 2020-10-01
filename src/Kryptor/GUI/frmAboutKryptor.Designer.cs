@@ -1,6 +1,6 @@
 ﻿namespace Kryptor
 {
-    partial class frmAboutKryptor
+    partial class FrmAboutKryptor
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmAboutKryptor));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmAboutKryptor));
             this.lblProgramDescription = new System.Windows.Forms.Label();
             this.lblTitle = new System.Windows.Forms.Label();
             this.picKryptorLogo = new System.Windows.Forms.PictureBox();
@@ -87,7 +87,7 @@
             this.txtAbout.TabStop = false;
             this.txtAbout.Text = resources.GetString("txtAbout.Text");
             this.txtAbout.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.txtAbout.GotFocus += new System.EventHandler(this.txtAbout_GotFocus);
+            this.txtAbout.GotFocus += new System.EventHandler(this.TxtAbout_GotFocus);
             // 
             // lblVersion
             // 
@@ -99,7 +99,7 @@
             this.lblVersion.Name = "lblVersion";
             this.lblVersion.Size = new System.Drawing.Size(133, 21);
             this.lblVersion.TabIndex = 76;
-            this.lblVersion.Text = "Version 1.1.0 Beta";
+            this.lblVersion.Text = "Version 2.1.0 Beta";
             // 
             // frmAboutKryptor
             // 
@@ -123,7 +123,7 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "About Kryptor";
-            this.Load += new System.EventHandler(this.frmAboutKryptor_Load);
+            this.Load += new System.EventHandler(this.FrmAboutKryptor_Load);
             ((System.ComponentModel.ISupportInitialize)(this.picKryptorLogo)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

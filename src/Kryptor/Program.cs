@@ -56,9 +56,9 @@ namespace Kryptor
             string firstRunPath = Path.Combine(Constants.KryptorDirectory, "first run.tmp");
             if (File.Exists(firstRunPath))
             {
-                Application.Run(new frmArgon2Benchmark());
+                Application.Run(new FrmArgon2Benchmark());
             }
-            Application.Run(new frmFileEncryption());
+            Application.Run(new FrmFileEncryption());
         }
 
         private static void ExitClearClipboard()

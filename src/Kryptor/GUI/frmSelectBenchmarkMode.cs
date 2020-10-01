@@ -28,7 +28,7 @@ namespace Kryptor
             InitializeComponent();
         }
 
-        private void frmSelectBenchmarkMode_Load(object sender, EventArgs e)
+        private void FrmSelectBenchmarkMode_Load(object sender, EventArgs e)
         {
             if (Globals.DarkTheme == true)
             {
@@ -43,13 +43,13 @@ namespace Kryptor
             DarkTheme.Buttons(btnSecurityMode);
         }
 
-        private void btnSpeedMode_Click(object sender, EventArgs e)
+        private void BtnSpeedMode_Click(object sender, EventArgs e)
         {
             this.DialogResult = DialogResult.Yes;
             CloseForm();
         }
 
-        private void btnSecurityMode_Click(object sender, EventArgs e)
+        private void BtnSecurityMode_Click(object sender, EventArgs e)
         {
             this.DialogResult = DialogResult.No;
             CloseForm();
@@ -60,7 +60,7 @@ namespace Kryptor
             this.Close();
         }
 
-        private void frmSelectBenchmarkMode_FormClosing(object sender, EventArgs e)
+        private void FrmSelectBenchmarkMode_FormClosing(object sender, EventArgs e)
         {
             if (this.DialogResult != DialogResult.Yes || this.DialogResult != DialogResult.No)
             {

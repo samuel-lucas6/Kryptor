@@ -27,24 +27,26 @@ namespace Kryptor
     {
         public static void RunBenchmark(bool speedMode)
         {
-            // Benchmark up to 250 MiB
-            const int testCount = 49;
+            // Benchmark up to 300 MiB
+            const int testCount = 51;
             int[] benchmarkTimes = new int[testCount];
             GetBenchmarkInputs(out byte[] passwordBytes, out byte[] salt);
             Globals.Iterations = Constants.DefaultIterations;
+            // Start benchmark at 50 MiB
+            int initialMemorySize = 50 * Constants.Mebibyte;
             var memorySize = new List<int>
             {
-                // Start benchmark at 10 MiB
-                10485760,
+                initialMemorySize,
             };
+            // Increment memory size by 5 MiB
+            int incrementMemorySize = 5 * Constants.Mebibyte;
             for (int i = 0; i < testCount; i++)
             {
                 var stopwatch = Stopwatch.StartNew();
                 KeyDerivation.DeriveKeys(passwordBytes, salt, Globals.Iterations, memorySize[i]);
                 stopwatch.Stop();
                 benchmarkTimes[i] = Convert.ToInt32(stopwatch.ElapsedMilliseconds);
-                // Increment memory size by 5 MiB
-                memorySize.Add(memorySize[i] + 5242880);
+                memorySize.Add(memorySize[i] + incrementMemorySize);
             }
             CalculateMemorySize(benchmarkTimes, memorySize, speedMode);
         }
@@ -68,7 +70,7 @@ namespace Kryptor
             foreach (int timeElapsed in benchmarkTimes)
             {
                 // Recommended memory size is the closest to the selected delay in ms
-                if (timeElapsed <= delayPerFile)
+                if (timeElapsed < delayPerFile)
                 {
                     recommendedMemorySize = memorySize[i];
                 }

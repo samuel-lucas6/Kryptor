@@ -1,4 +1,5 @@
 ﻿using Sodium;
+using System;
 
 /*  
     Kryptor: Free and open source file encryption software.
@@ -26,10 +27,15 @@ namespace Kryptor
         {
             var argon2id = PasswordHash.ArgonAlgorithm.Argon_2ID13;
             MemoryEncryption.DecryptByteArray(ref passwordBytes);
+            // Derive a 96 byte key
+            byte[] derivedKey = PasswordHash.ArgonHashBinary(passwordBytes, salt, iterations, memorySize, Constants.Argon2KeySize, argon2id);
             // 256-bit encryption key
-            byte[] encryptionKey = PasswordHash.ArgonHashBinary(passwordBytes, salt, iterations, memorySize, Constants.EncryptionKeySize, argon2id);
+            byte[] encryptionKey = new byte[Constants.EncryptionKeySize];
+            Array.Copy(derivedKey, encryptionKey, encryptionKey.Length);
             // 512-bit MAC key
-            byte[] macKey = PasswordHash.ArgonHashBinary(passwordBytes, salt, iterations, memorySize, Constants.MACKeySize, argon2id);
+            byte[] macKey = new byte[Constants.MACKeySize];
+            Array.Copy(derivedKey, encryptionKey.Length, macKey, 0, macKey.Length);
+            Utilities.ZeroArray(derivedKey);
             MemoryEncryption.EncryptByteArray(ref passwordBytes);
             MemoryEncryption.EncryptByteArray(ref encryptionKey);
             MemoryEncryption.EncryptByteArray(ref macKey);

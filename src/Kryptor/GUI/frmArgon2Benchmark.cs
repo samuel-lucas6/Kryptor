@@ -22,14 +22,14 @@ using System.Windows.Forms;
 
 namespace Kryptor
 {
-    public partial class frmArgon2Benchmark : Form
+    public partial class FrmArgon2Benchmark : Form
     {
-        public frmArgon2Benchmark()
+        public FrmArgon2Benchmark()
         {
             InitializeComponent();
         }
 
-        private void frmArgon2Benchmark_Load(object sender, EventArgs e)
+        private void FrmArgon2Benchmark_Load(object sender, EventArgs e)
         {
             RunningOnMono();
             this.Hide();
@@ -78,13 +78,13 @@ namespace Kryptor
             }
         }
 
-        private void bgwArgon2Benchmark_DoWork(object sender, DoWorkEventArgs e)
+        private void BgwArgon2Benchmark_DoWork(object sender, DoWorkEventArgs e)
         {
             bool speedMode = (bool)e.Argument;
             Argon2Benchmark.RunBenchmark(speedMode);
         }
 
-        private void bgwArgon2Benchmark_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void BgwArgon2Benchmark_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             Settings.SaveSettings();
             // Deallocate RAM for Argon2

@@ -77,7 +77,7 @@
             this.btnRegeneratePassword.TabStop = false;
             this.btnRegeneratePassword.Text = "Regenerate Password";
             this.btnRegeneratePassword.UseVisualStyleBackColor = false;
-            this.btnRegeneratePassword.Click += new System.EventHandler(this.btnRegeneratePassword_Click);
+            this.btnRegeneratePassword.Click += new System.EventHandler(this.BtnRegeneratePassword_Click);
             // 
             // btnCopyPassword
             // 
@@ -95,7 +95,7 @@
             this.btnCopyPassword.TabStop = false;
             this.btnCopyPassword.Text = "Copy Password";
             this.btnCopyPassword.UseVisualStyleBackColor = false;
-            this.btnCopyPassword.Click += new System.EventHandler(this.btnCopyPassword_Click);
+            this.btnCopyPassword.Click += new System.EventHandler(this.BtnCopyPassword_Click);
             // 
             // grbOptions
             // 
@@ -138,7 +138,7 @@
             this.chkSymbols.TabStop = false;
             this.chkSymbols.Text = "Symbols";
             this.chkSymbols.UseVisualStyleBackColor = true;
-            this.chkSymbols.CheckedChanged += new System.EventHandler(this.chkSymbols_CheckedChanged);
+            this.chkSymbols.CheckedChanged += new System.EventHandler(this.ChkSymbols_CheckedChanged);
             // 
             // chkNumbers
             // 
@@ -152,7 +152,7 @@
             this.chkNumbers.TabStop = false;
             this.chkNumbers.Text = "Numbers";
             this.chkNumbers.UseVisualStyleBackColor = true;
-            this.chkNumbers.CheckedChanged += new System.EventHandler(this.chkNumbers_CheckedChanged);
+            this.chkNumbers.CheckedChanged += new System.EventHandler(this.ChkNumbers_CheckedChanged);
             // 
             // chkUppercase
             // 
@@ -166,7 +166,7 @@
             this.chkUppercase.TabStop = false;
             this.chkUppercase.Text = "Uppercase";
             this.chkUppercase.UseVisualStyleBackColor = true;
-            this.chkUppercase.CheckedChanged += new System.EventHandler(this.chkUppercase_CheckedChanged);
+            this.chkUppercase.CheckedChanged += new System.EventHandler(this.ChkUppercase_CheckedChanged);
             // 
             // chkLowercase
             // 
@@ -180,7 +180,7 @@
             this.chkLowercase.TabStop = false;
             this.chkLowercase.Text = "Lowercase";
             this.chkLowercase.UseVisualStyleBackColor = true;
-            this.chkLowercase.CheckedChanged += new System.EventHandler(this.chkLowercase_CheckedChanged);
+            this.chkLowercase.CheckedChanged += new System.EventHandler(this.ChkLowercase_CheckedChanged);
             // 
             // nudLength
             // 
@@ -206,7 +206,7 @@
             0,
             0,
             0});
-            this.nudLength.ValueChanged += new System.EventHandler(this.nudLength_ValueChanged);
+            this.nudLength.ValueChanged += new System.EventHandler(this.NudLength_ValueChanged);
             // 
             // lblLength
             // 
@@ -232,8 +232,8 @@
             this.cmbGenerateType.Size = new System.Drawing.Size(273, 29);
             this.cmbGenerateType.TabIndex = 2;
             this.cmbGenerateType.TabStop = false;
-            this.cmbGenerateType.SelectedIndexChanged += new System.EventHandler(this.cmbGenerateType_SelectedIndexChanged);
-            this.cmbGenerateType.DropDownClosed += new System.EventHandler(this.cmbGenerateType_DropDownClosed);
+            this.cmbGenerateType.SelectedIndexChanged += new System.EventHandler(this.CmbGenerateType_SelectedIndexChanged);
+            this.cmbGenerateType.DropDownClosed += new System.EventHandler(this.CmbGenerateType_DropDownClosed);
             // 
             // lblEntropy
             // 
@@ -290,7 +290,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Password Generator";
             this.TopMost = true;
-            this.Load += new System.EventHandler(this.frmPasswordGenerator_Load);
+            this.Load += new System.EventHandler(this.FrmPasswordGenerator_Load);
             this.grbOptions.ResumeLayout(false);
             this.grbOptions.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudLength)).EndInit();

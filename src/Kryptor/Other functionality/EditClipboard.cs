@@ -52,7 +52,7 @@ namespace Kryptor
 
         public static void AutoClearClipboard()
         {
-            frmFileEncryption fileEncryption = (frmFileEncryption)Application.OpenForms["frmFileEncryption"];
+            FrmFileEncryption fileEncryption = (FrmFileEncryption)Application.OpenForms["frmFileEncryption"];
             if (Globals.ClearClipboardInterval != 1)
             {
                 fileEncryption.tmrClearClipboard.Start();

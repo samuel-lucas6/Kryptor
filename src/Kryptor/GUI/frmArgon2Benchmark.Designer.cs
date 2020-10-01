@@ -1,6 +1,6 @@
 ﻿namespace Kryptor
 {
-    partial class frmArgon2Benchmark
+    partial class FrmArgon2Benchmark
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmArgon2Benchmark));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmArgon2Benchmark));
             this.lblMessage = new System.Windows.Forms.Label();
             this.bgwArgon2Benchmark = new System.ComponentModel.BackgroundWorker();
             this.SuspendLayout();
@@ -47,8 +47,8 @@
             // 
             // bgwArgon2Benchmark
             // 
-            this.bgwArgon2Benchmark.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bgwArgon2Benchmark_DoWork);
-            this.bgwArgon2Benchmark.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bgwArgon2Benchmark_RunWorkerCompleted);
+            this.bgwArgon2Benchmark.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BgwArgon2Benchmark_DoWork);
+            this.bgwArgon2Benchmark.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.BgwArgon2Benchmark_RunWorkerCompleted);
             // 
             // frmArgon2Benchmark
             // 
@@ -72,7 +72,7 @@
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.TopMost = true;
-            this.Load += new System.EventHandler(this.frmArgon2Benchmark_Load);
+            this.Load += new System.EventHandler(this.FrmArgon2Benchmark_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

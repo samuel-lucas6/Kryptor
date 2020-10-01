@@ -1,6 +1,6 @@
 ﻿namespace Kryptor
 {
-    partial class frmPasswordSharing
+    partial class FrmPasswordSharing
     {
         /// <summary>
         /// Required designer variable.
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmPasswordSharing));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmPasswordSharing));
             this.btnEncryptPassword = new System.Windows.Forms.Button();
             this.lblAsymmetricKey = new System.Windows.Forms.Label();
             this.txtKey = new System.Windows.Forms.TextBox();
@@ -62,7 +62,7 @@
             this.btnEncryptPassword.TabStop = false;
             this.btnEncryptPassword.Text = "Encrypt Password";
             this.btnEncryptPassword.UseVisualStyleBackColor = false;
-            this.btnEncryptPassword.Click += new System.EventHandler(this.btnEncryptPassword_Click);
+            this.btnEncryptPassword.Click += new System.EventHandler(this.BtnEncryptPassword_Click);
             // 
             // lblAsymmetricKey
             // 
@@ -109,7 +109,7 @@
             this.tsmiCopyTextbox.Size = new System.Drawing.Size(188, 26);
             this.tsmiCopyTextbox.Text = "Copy Textbox";
             this.tsmiCopyTextbox.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
-            this.tsmiCopyTextbox.Click += new System.EventHandler(this.tsmiCopyTextbox_Click);
+            this.tsmiCopyTextbox.Click += new System.EventHandler(this.TsmiCopyTextbox_Click);
             // 
             // tsmiClearTextbox
             // 
@@ -120,7 +120,7 @@
             this.tsmiClearTextbox.Size = new System.Drawing.Size(188, 26);
             this.tsmiClearTextbox.Text = "Clear Textbox";
             this.tsmiClearTextbox.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
-            this.tsmiClearTextbox.Click += new System.EventHandler(this.tsmiClearTextbox_Click);
+            this.tsmiClearTextbox.Click += new System.EventHandler(this.TsmiClearTextbox_Click);
             // 
             // tsmiClearClipboard
             // 
@@ -131,7 +131,7 @@
             this.tsmiClearClipboard.Size = new System.Drawing.Size(188, 26);
             this.tsmiClearClipboard.Text = "Clear Clipboard";
             this.tsmiClearClipboard.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
-            this.tsmiClearClipboard.Click += new System.EventHandler(this.tsmiClearClipboard_Click);
+            this.tsmiClearClipboard.Click += new System.EventHandler(this.TsmiClearClipboard_Click);
             // 
             // lblPassword
             // 
@@ -172,7 +172,7 @@
             this.btnDecryptPassword.TabStop = false;
             this.btnDecryptPassword.Text = "Decrypt Password";
             this.btnDecryptPassword.UseVisualStyleBackColor = false;
-            this.btnDecryptPassword.Click += new System.EventHandler(this.btnDecryptPassword_Click);
+            this.btnDecryptPassword.Click += new System.EventHandler(this.BtnDecryptPassword_Click);
             // 
             // llbGenerateKeyPair
             // 
@@ -189,7 +189,7 @@
             this.llbGenerateKeyPair.TabStop = true;
             this.llbGenerateKeyPair.Text = "Recipient: Generate Key Pair";
             this.llbGenerateKeyPair.VisitedLinkColor = System.Drawing.Color.DimGray;
-            this.llbGenerateKeyPair.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.llbGenerateKeyPair_LinkClicked);
+            this.llbGenerateKeyPair.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LlbGenerateKeyPair_LinkClicked);
             // 
             // picHelp
             // 
@@ -202,7 +202,7 @@
             this.picHelp.Size = new System.Drawing.Size(25, 22);
             this.picHelp.TabIndex = 82;
             this.picHelp.TabStop = false;
-            this.picHelp.Click += new System.EventHandler(this.picHelp_Click);
+            this.picHelp.Click += new System.EventHandler(this.PicHelp_Click);
             // 
             // frmPasswordSharing
             // 
@@ -227,7 +227,7 @@
             this.Name = "frmPasswordSharing";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Password Sharing";
-            this.Load += new System.EventHandler(this.frmPasswordSharing_Load);
+            this.Load += new System.EventHandler(this.FrmPasswordSharing_Load);
             this.cmsTextboxMenu.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.picHelp)).EndInit();
             this.ResumeLayout(false);

@@ -21,14 +21,14 @@ using System.Windows.Forms;
 
 namespace Kryptor
 {
-    public partial class frmPasswordSharing : Form
+    public partial class FrmPasswordSharing : Form
     {
-        public frmPasswordSharing()
+        public FrmPasswordSharing()
         {
             InitializeComponent();
         }
 
-        private void frmPasswordSharing_Load(object sender, EventArgs e)
+        private void FrmPasswordSharing_Load(object sender, EventArgs e)
         {
             if (Globals.DarkTheme == true)
             {
@@ -61,28 +61,28 @@ namespace Kryptor
             }
         }
 
-        private void tsmiCopyTextbox_Click(object sender, EventArgs e)
+        private void TsmiCopyTextbox_Click(object sender, EventArgs e)
         {
             SharedContextMenu.CopyTextbox(sender);
         }
 
-        private void tsmiClearTextbox_Click(object sender, EventArgs e)
+        private void TsmiClearTextbox_Click(object sender, EventArgs e)
         {
             SharedContextMenu.ClearTextbox(sender);
         }
 
-        private void tsmiClearClipboard_Click(object sender, EventArgs e)
+        private void TsmiClearClipboard_Click(object sender, EventArgs e)
         {
             EditClipboard.ClearClipboard();
         }
 
-        private void picHelp_Click(object sender, EventArgs e)
+        private void PicHelp_Click(object sender, EventArgs e)
         {
             const string passwordSharingLink = "https://kryptor.co.uk/Password%20Sharing.html";
             VisitLink.OpenLink(passwordSharingLink);
         }
 
-        private void llbGenerateKeyPair_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void LlbGenerateKeyPair_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             lblAsymmetricKey.Focus();
             using (var generateKeyPair = new frmGenerateKeyPair())
@@ -91,14 +91,14 @@ namespace Kryptor
             }
         }
 
-        private void btnEncryptPassword_Click(object sender, EventArgs e)
+        private void BtnEncryptPassword_Click(object sender, EventArgs e)
         {
             lblAsymmetricKey.Focus();
             bool encryption = true;
             GetUserInput(encryption);
         }
 
-        private void btnDecryptPassword_Click(object sender, EventArgs e)
+        private void BtnDecryptPassword_Click(object sender, EventArgs e)
         {
             lblPassword.Focus();
             bool encryption = false;

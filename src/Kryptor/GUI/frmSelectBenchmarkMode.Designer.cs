@@ -49,7 +49,7 @@
             this.btnSecurityMode.TabStop = false;
             this.btnSecurityMode.Text = "I want encryption to be more secure.";
             this.btnSecurityMode.UseVisualStyleBackColor = false;
-            this.btnSecurityMode.Click += new System.EventHandler(this.btnSecurityMode_Click);
+            this.btnSecurityMode.Click += new System.EventHandler(this.BtnSecurityMode_Click);
             // 
             // btnSpeedMode
             // 
@@ -67,7 +67,7 @@
             this.btnSpeedMode.TabStop = false;
             this.btnSpeedMode.Text = "I want encryption to be as fast as possible.";
             this.btnSpeedMode.UseVisualStyleBackColor = false;
-            this.btnSpeedMode.Click += new System.EventHandler(this.btnSpeedMode_Click);
+            this.btnSpeedMode.Click += new System.EventHandler(this.BtnSpeedMode_Click);
             // 
             // frmSelectBenchmarkMode
             // 
@@ -88,7 +88,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Select Benchmark Mode";
             this.TopMost = true;
-            this.Load += new System.EventHandler(this.frmSelectBenchmarkMode_Load);
+            this.Load += new System.EventHandler(this.FrmSelectBenchmarkMode_Load);
             this.ResumeLayout(false);
 
         }

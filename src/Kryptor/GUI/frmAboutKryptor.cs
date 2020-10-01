@@ -22,14 +22,14 @@ using System.Windows.Forms;
 
 namespace Kryptor
 {
-    public partial class frmAboutKryptor : Form
+    public partial class FrmAboutKryptor : Form
     {
-        public frmAboutKryptor()
+        public FrmAboutKryptor()
         {
             InitializeComponent();
         }
 
-        private void frmAboutKryptor_Load(object sender, EventArgs e)
+        private void FrmAboutKryptor_Load(object sender, EventArgs e)
         {
             if (Globals.DarkTheme == true)
             {
@@ -64,7 +64,7 @@ namespace Kryptor
             }
         }
 
-        private void txtAbout_GotFocus(object sender, EventArgs e)
+        private void TxtAbout_GotFocus(object sender, EventArgs e)
         {
             // Hide the cursor
             lblTitle.Focus();

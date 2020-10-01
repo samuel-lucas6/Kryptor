@@ -1,6 +1,6 @@
 ﻿namespace Kryptor
 {
-    partial class frmSettings
+    partial class FrmSettings
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmSettings));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmSettings));
             this.lblShredFilesMethod = new System.Windows.Forms.Label();
             this.cmbShredFilesMethod = new System.Windows.Forms.ComboBox();
             this.lblAutoClearClipboard = new System.Windows.Forms.Label();
@@ -98,8 +98,8 @@
             this.cmbShredFilesMethod.Size = new System.Drawing.Size(136, 29);
             this.cmbShredFilesMethod.TabIndex = 8;
             this.cmbShredFilesMethod.TabStop = false;
-            this.cmbShredFilesMethod.SelectedIndexChanged += new System.EventHandler(this.cmbShredFilesMethod_SelectedIndexChanged);
-            this.cmbShredFilesMethod.DropDownClosed += new System.EventHandler(this.cmbShredFilesMethod_DropDownClosed);
+            this.cmbShredFilesMethod.SelectedIndexChanged += new System.EventHandler(this.CmbShredFilesMethod_SelectedIndexChanged);
+            this.cmbShredFilesMethod.DropDownClosed += new System.EventHandler(this.CmbShredFilesMethod_DropDownClosed);
             // 
             // lblAutoClearClipboard
             // 
@@ -130,8 +130,8 @@
             this.cmbAutoClearClipboard.Size = new System.Drawing.Size(136, 29);
             this.cmbAutoClearClipboard.TabIndex = 9;
             this.cmbAutoClearClipboard.TabStop = false;
-            this.cmbAutoClearClipboard.SelectedIndexChanged += new System.EventHandler(this.cmbAutoClearClipboard_SelectedIndexChanged);
-            this.cmbAutoClearClipboard.DropDownClosed += new System.EventHandler(this.cmbAutoClearClipboard_DropDownClosed);
+            this.cmbAutoClearClipboard.SelectedIndexChanged += new System.EventHandler(this.CmbAutoClearClipboard_SelectedIndexChanged);
+            this.cmbAutoClearClipboard.DropDownClosed += new System.EventHandler(this.CmbAutoClearClipboard_DropDownClosed);
             // 
             // lblMemoryEncryption
             // 
@@ -158,8 +158,8 @@
             this.cmbMemoryEncryption.Size = new System.Drawing.Size(136, 29);
             this.cmbMemoryEncryption.TabIndex = 2;
             this.cmbMemoryEncryption.TabStop = false;
-            this.cmbMemoryEncryption.SelectedIndexChanged += new System.EventHandler(this.cmbMemoryEncryption_SelectedIndexChanged);
-            this.cmbMemoryEncryption.DropDownClosed += new System.EventHandler(this.cmbMemoryEncryption_DropDownClosed);
+            this.cmbMemoryEncryption.SelectedIndexChanged += new System.EventHandler(this.CmbMemoryEncryption_SelectedIndexChanged);
+            this.cmbMemoryEncryption.DropDownClosed += new System.EventHandler(this.CmbMemoryEncryption_DropDownClosed);
             // 
             // lblEncryptionAlgorithm
             // 
@@ -187,8 +187,8 @@
             this.cmbEncryptionAlgorithm.Size = new System.Drawing.Size(136, 29);
             this.cmbEncryptionAlgorithm.TabIndex = 1;
             this.cmbEncryptionAlgorithm.TabStop = false;
-            this.cmbEncryptionAlgorithm.SelectedIndexChanged += new System.EventHandler(this.cmbEncryptionAlgorithm_SelectedIndexChanged);
-            this.cmbEncryptionAlgorithm.DropDownClosed += new System.EventHandler(this.cmbEncryptionAlgorithm_DropDownClosed);
+            this.cmbEncryptionAlgorithm.SelectedIndexChanged += new System.EventHandler(this.CmbEncryptionAlgorithm_SelectedIndexChanged);
+            this.cmbEncryptionAlgorithm.DropDownClosed += new System.EventHandler(this.CmbEncryptionAlgorithm_DropDownClosed);
             // 
             // lblAutoClearPassword
             // 
@@ -215,8 +215,8 @@
             this.cmbAutoClearPassword.Size = new System.Drawing.Size(136, 29);
             this.cmbAutoClearPassword.TabIndex = 10;
             this.cmbAutoClearPassword.TabStop = false;
-            this.cmbAutoClearPassword.SelectedIndexChanged += new System.EventHandler(this.cmbAutoClearPassword_SelectedIndexChanged);
-            this.cmbAutoClearPassword.DropDownClosed += new System.EventHandler(this.cmbAutoClearPassword_DropDownClosed);
+            this.cmbAutoClearPassword.SelectedIndexChanged += new System.EventHandler(this.CmbAutoClearPassword_SelectedIndexChanged);
+            this.cmbAutoClearPassword.DropDownClosed += new System.EventHandler(this.CmbAutoClearPassword_DropDownClosed);
             // 
             // lblAnonymousRename
             // 
@@ -243,8 +243,8 @@
             this.cmbAnonymousRename.Size = new System.Drawing.Size(136, 29);
             this.cmbAnonymousRename.TabIndex = 7;
             this.cmbAnonymousRename.TabStop = false;
-            this.cmbAnonymousRename.SelectedIndexChanged += new System.EventHandler(this.cmbAnonymousRename_SelectedIndexChanged);
-            this.cmbAnonymousRename.DropDownClosed += new System.EventHandler(this.cmbAnonymousRename_DropDownClosed);
+            this.cmbAnonymousRename.SelectedIndexChanged += new System.EventHandler(this.CmbAnonymousRename_SelectedIndexChanged);
+            this.cmbAnonymousRename.DropDownClosed += new System.EventHandler(this.CmbAnonymousRename_DropDownClosed);
             // 
             // lblExitClearClipboard
             // 
@@ -271,8 +271,8 @@
             this.cmbExitClearClipboard.Size = new System.Drawing.Size(136, 29);
             this.cmbExitClearClipboard.TabIndex = 12;
             this.cmbExitClearClipboard.TabStop = false;
-            this.cmbExitClearClipboard.SelectedIndexChanged += new System.EventHandler(this.cmbExitClearClipboard_SelectedIndexChanged);
-            this.cmbExitClearClipboard.DropDownClosed += new System.EventHandler(this.cmbExitClearClipboard_DropDownClosed);
+            this.cmbExitClearClipboard.SelectedIndexChanged += new System.EventHandler(this.CmbExitClearClipboard_SelectedIndexChanged);
+            this.cmbExitClearClipboard.DropDownClosed += new System.EventHandler(this.CmbExitClearClipboard_DropDownClosed);
             // 
             // lblShowPassword
             // 
@@ -299,8 +299,8 @@
             this.cmbShowPassword.Size = new System.Drawing.Size(136, 29);
             this.cmbShowPassword.TabIndex = 11;
             this.cmbShowPassword.TabStop = false;
-            this.cmbShowPassword.SelectedIndexChanged += new System.EventHandler(this.cmbShowPassword_SelectedIndexChanged);
-            this.cmbShowPassword.DropDownClosed += new System.EventHandler(this.cmbShowPassword_DropDownClosed);
+            this.cmbShowPassword.SelectedIndexChanged += new System.EventHandler(this.CmbShowPassword_SelectedIndexChanged);
+            this.cmbShowPassword.DropDownClosed += new System.EventHandler(this.CmbShowPassword_DropDownClosed);
             // 
             // grbFileEncryption
             // 
@@ -336,8 +336,8 @@
             this.cmbOverwriteFiles.Size = new System.Drawing.Size(136, 29);
             this.cmbOverwriteFiles.TabIndex = 30;
             this.cmbOverwriteFiles.TabStop = false;
-            this.cmbOverwriteFiles.SelectedIndexChanged += new System.EventHandler(this.cmbOverwriteFiles_SelectedIndexChanged);
-            this.cmbOverwriteFiles.DropDownClosed += new System.EventHandler(this.cmbOverwriteFiles_DropDownClosed);
+            this.cmbOverwriteFiles.SelectedIndexChanged += new System.EventHandler(this.CmbOverwriteFiles_SelectedIndexChanged);
+            this.cmbOverwriteFiles.DropDownClosed += new System.EventHandler(this.CmbOverwriteFiles_DropDownClosed);
             // 
             // lblOverwriteFiles
             // 
@@ -380,7 +380,7 @@
             this.btnTestParameters.TabStop = false;
             this.btnTestParameters.Text = "Test Parameters";
             this.btnTestParameters.UseVisualStyleBackColor = true;
-            this.btnTestParameters.Click += new System.EventHandler(this.btnTestParameters_Click);
+            this.btnTestParameters.Click += new System.EventHandler(this.BtnTestParameters_Click);
             // 
             // lblArgon2Iterations
             // 
@@ -406,7 +406,7 @@
             this.btnArgon2Benchmark.TabStop = false;
             this.btnArgon2Benchmark.Text = "Benchmark";
             this.btnArgon2Benchmark.UseVisualStyleBackColor = true;
-            this.btnArgon2Benchmark.Click += new System.EventHandler(this.btnArgon2Benchmark_Click);
+            this.btnArgon2Benchmark.Click += new System.EventHandler(this.BtnArgon2Benchmark_Click);
             // 
             // nudArgon2MemorySize
             // 
@@ -415,12 +415,12 @@
             this.nudArgon2MemorySize.ForeColor = System.Drawing.Color.Black;
             this.nudArgon2MemorySize.Location = new System.Drawing.Point(188, 38);
             this.nudArgon2MemorySize.Maximum = new decimal(new int[] {
-            300,
+            500,
             0,
             0,
             0});
             this.nudArgon2MemorySize.Minimum = new decimal(new int[] {
-            10,
+            32,
             0,
             0,
             0});
@@ -431,11 +431,11 @@
             this.nudArgon2MemorySize.Tag = "";
             this.nudArgon2MemorySize.ThousandsSeparator = true;
             this.nudArgon2MemorySize.Value = new decimal(new int[] {
-            100,
+            128,
             0,
             0,
             0});
-            this.nudArgon2MemorySize.ValueChanged += new System.EventHandler(this.nudArgon2MemorySize_ValueChanged);
+            this.nudArgon2MemorySize.ValueChanged += new System.EventHandler(this.NudArgon2MemorySize_ValueChanged);
             // 
             // lblArgon2MemorySize
             // 
@@ -453,6 +453,11 @@
             this.nudArgon2Iterations.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.nudArgon2Iterations.ForeColor = System.Drawing.Color.Black;
             this.nudArgon2Iterations.Location = new System.Drawing.Point(188, 81);
+            this.nudArgon2Iterations.Maximum = new decimal(new int[] {
+            128,
+            0,
+            0,
+            0});
             this.nudArgon2Iterations.Minimum = new decimal(new int[] {
             3,
             0,
@@ -467,7 +472,7 @@
             0,
             0,
             0});
-            this.nudArgon2Iterations.ValueChanged += new System.EventHandler(this.nudArgon2Iterations_ValueChanged);
+            this.nudArgon2Iterations.ValueChanged += new System.EventHandler(this.NudArgon2Iterations_ValueChanged);
             // 
             // grbOtherSettings
             // 
@@ -519,8 +524,8 @@
             this.cmbTheme.Size = new System.Drawing.Size(136, 29);
             this.cmbTheme.TabIndex = 26;
             this.cmbTheme.TabStop = false;
-            this.cmbTheme.SelectedIndexChanged += new System.EventHandler(this.cmbTheme_SelectedIndexChanged);
-            this.cmbTheme.DropDownClosed += new System.EventHandler(this.cmbTheme_DropDownClosed);
+            this.cmbTheme.SelectedIndexChanged += new System.EventHandler(this.CmbTheme_SelectedIndexChanged);
+            this.cmbTheme.DropDownClosed += new System.EventHandler(this.CmbTheme_DropDownClosed);
             // 
             // lblCheckForUpdates
             // 
@@ -547,16 +552,16 @@
             this.cmbCheckForUpdates.Size = new System.Drawing.Size(136, 29);
             this.cmbCheckForUpdates.TabIndex = 25;
             this.cmbCheckForUpdates.TabStop = false;
-            this.cmbCheckForUpdates.SelectedIndexChanged += new System.EventHandler(this.cmbCheckForUpdates_SelectedIndexChanged);
-            this.cmbCheckForUpdates.DropDownClosed += new System.EventHandler(this.cmbCheckForUpdates_DropDownClosed);
+            this.cmbCheckForUpdates.SelectedIndexChanged += new System.EventHandler(this.CmbCheckForUpdates_SelectedIndexChanged);
+            this.cmbCheckForUpdates.DropDownClosed += new System.EventHandler(this.CmbCheckForUpdates_DropDownClosed);
             // 
             // bgwTestArgon2Parameters
             // 
             this.bgwTestArgon2Parameters.WorkerReportsProgress = true;
-            this.bgwTestArgon2Parameters.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bgwTestArgon2Parameters_DoWork);
-            this.bgwTestArgon2Parameters.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bgwTestArgon2Parameters_RunWorkerCompleted);
+            this.bgwTestArgon2Parameters.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BgwTestArgon2Parameters_DoWork);
+            this.bgwTestArgon2Parameters.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.BgwTestArgon2Parameters_RunWorkerCompleted);
             // 
-            // frmSettings
+            // FrmSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 21F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -572,11 +577,11 @@
             this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "frmSettings";
+            this.Name = "FrmSettings";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Settings";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmSettings_FormClosing);
-            this.Load += new System.EventHandler(this.frmSettings_Load);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrmSettings_FormClosing);
+            this.Load += new System.EventHandler(this.FrmSettings_Load);
             this.grbFileEncryption.ResumeLayout(false);
             this.grbFileEncryption.PerformLayout();
             this.grbKeyDerivation.ResumeLayout(false);

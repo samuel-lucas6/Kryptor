@@ -22,16 +22,16 @@ using System.Windows.Forms;
 
 namespace Kryptor
 {
-    public partial class frmSettings : Form
+    public partial class FrmSettings : Form
     {
         private static bool FormLoad { get; set; } = true;
 
-        public frmSettings()
+        public FrmSettings()
         {
             InitializeComponent();
         }
 
-        private void frmSettings_Load(object sender, EventArgs e)
+        private void FrmSettings_Load(object sender, EventArgs e)
         {
             if (Globals.DarkTheme == true)
             {
@@ -96,7 +96,7 @@ namespace Kryptor
             FormLoad = false;
         }
 
-        private void cmbEncryptionAlgorithm_SelectedIndexChanged(object sender, EventArgs e)
+        private void CmbEncryptionAlgorithm_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (FormLoad == false)
             {
@@ -105,12 +105,12 @@ namespace Kryptor
             }
         }
 
-        private void cmbEncryptionAlgorithm_DropDownClosed(object sender, EventArgs e)
+        private void CmbEncryptionAlgorithm_DropDownClosed(object sender, EventArgs e)
         {
             lblEncryptionAlgorithm.Focus();
         }
 
-        private void cmbMemoryEncryption_SelectedIndexChanged(object sender, EventArgs e)
+        private void CmbMemoryEncryption_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (FormLoad == false)
             {
@@ -125,12 +125,12 @@ namespace Kryptor
             }
         }
 
-        private void cmbMemoryEncryption_DropDownClosed(object sender, EventArgs e)
+        private void CmbMemoryEncryption_DropDownClosed(object sender, EventArgs e)
         {
             lblMemoryEncryption.Focus();
         }
 
-        private void cmbAnonymousRename_SelectedIndexChanged(object sender, EventArgs e)
+        private void CmbAnonymousRename_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (FormLoad == false)
             {
@@ -145,12 +145,12 @@ namespace Kryptor
             }
         }
 
-        private void cmbAnonymousRename_DropDownClosed(object sender, EventArgs e)
+        private void CmbAnonymousRename_DropDownClosed(object sender, EventArgs e)
         {
             lblAnonymousRename.Focus();
         }
 
-        private void cmbOverwriteFiles_SelectedIndexChanged(object sender, EventArgs e)
+        private void CmbOverwriteFiles_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (FormLoad == false)
             {
@@ -165,12 +165,12 @@ namespace Kryptor
             }
         }
 
-        private void cmbOverwriteFiles_DropDownClosed(object sender, EventArgs e)
+        private void CmbOverwriteFiles_DropDownClosed(object sender, EventArgs e)
         {
             lblOverwriteFiles.Focus();
         }
 
-        private void btnArgon2Benchmark_Click(object sender, EventArgs e)
+        private void BtnArgon2Benchmark_Click(object sender, EventArgs e)
         {
             lblArgon2MemorySize.Focus();
             RunArgon2Benchmark();
@@ -182,14 +182,14 @@ namespace Kryptor
             {
                 form.Hide();
             }
-            using (var argon2Benchmark = new frmArgon2Benchmark())
+            using (var argon2Benchmark = new FrmArgon2Benchmark())
             {
                 argon2Benchmark.ShowDialog();
             }
             nudArgon2MemorySize.Value = Globals.MemorySize / Constants.Mebibyte;
         }
 
-        private void btnTestParameters_Click(object sender, EventArgs e)
+        private void BtnTestParameters_Click(object sender, EventArgs e)
         {
             lblArgon2MemorySize.Focus();
             if (!bgwTestArgon2Parameters.IsBusy)
@@ -198,19 +198,19 @@ namespace Kryptor
             }
         }
 
-        private void bgwTestArgon2Parameters_DoWork(object sender, DoWorkEventArgs e)
+        private void BgwTestArgon2Parameters_DoWork(object sender, DoWorkEventArgs e)
         {
             e.Result = Argon2Benchmark.TestArgon2Parameters();
         }
 
-        private void bgwTestArgon2Parameters_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void BgwTestArgon2Parameters_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             DisplayMessage.InformationMessageBox($"{e.Result} ms delay per file.", "Argon2 Parameter Results");
             // Deallocate RAM for Argon2
             GC.Collect();
         }
 
-        private void nudArgon2MemorySize_ValueChanged(object sender, EventArgs e)
+        private void NudArgon2MemorySize_ValueChanged(object sender, EventArgs e)
         {
             if (FormLoad == false)
             {
@@ -218,7 +218,7 @@ namespace Kryptor
             }
         }
 
-        private void nudArgon2Iterations_ValueChanged(object sender, EventArgs e)
+        private void NudArgon2Iterations_ValueChanged(object sender, EventArgs e)
         {
             if (FormLoad == false)
             {
@@ -226,7 +226,7 @@ namespace Kryptor
             }
         }
 
-        private void cmbShredFilesMethod_SelectedIndexChanged(object sender, EventArgs e)
+        private void CmbShredFilesMethod_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (FormLoad == false)
             {
@@ -234,12 +234,12 @@ namespace Kryptor
             }
         }
 
-        private void cmbShredFilesMethod_DropDownClosed(object sender, EventArgs e)
+        private void CmbShredFilesMethod_DropDownClosed(object sender, EventArgs e)
         {
             lblShredFilesMethod.Focus();
         }
 
-        private void cmbShowPassword_SelectedIndexChanged(object sender, EventArgs e)
+        private void CmbShowPassword_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (FormLoad == false)
             {
@@ -255,18 +255,18 @@ namespace Kryptor
             }
         }
 
-        private void cmbShowPassword_DropDownClosed(object sender, EventArgs e)
+        private void CmbShowPassword_DropDownClosed(object sender, EventArgs e)
         {
             lblShowPassword.Focus();
         }
 
         private static void ApplyShowPassword()
         {
-            frmFileEncryption fileEncryption = (frmFileEncryption)Application.OpenForms["frmFileEncryption"];
+            FrmFileEncryption fileEncryption = (FrmFileEncryption)Application.OpenForms["frmFileEncryption"];
             fileEncryption.chkShowPassword.Checked = Globals.ShowPasswordByDefault;
         }
 
-        private void cmbAutoClearPassword_SelectedIndexChanged(object sender, EventArgs e)
+        private void CmbAutoClearPassword_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (FormLoad == false)
             {
@@ -281,12 +281,12 @@ namespace Kryptor
             }
         }
 
-        private void cmbAutoClearPassword_DropDownClosed(object sender, EventArgs e)
+        private void CmbAutoClearPassword_DropDownClosed(object sender, EventArgs e)
         {
             lblAutoClearPassword.Focus();
         }
 
-        private void cmbAutoClearClipboard_SelectedIndexChanged(object sender, EventArgs e)
+        private void CmbAutoClearClipboard_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (FormLoad == false)
             {
@@ -315,18 +315,18 @@ namespace Kryptor
             }
         }
 
-        private void cmbAutoClearClipboard_DropDownClosed(object sender, EventArgs e)
+        private void CmbAutoClearClipboard_DropDownClosed(object sender, EventArgs e)
         {
             lblAutoClearClipboard.Focus();
         }
 
         private static void ApplyClearClipboardInterval()
         {
-            frmFileEncryption mainForm = (frmFileEncryption)Application.OpenForms["frmFileEncryption"];
+            FrmFileEncryption mainForm = (FrmFileEncryption)Application.OpenForms["frmFileEncryption"];
             mainForm.tmrClearClipboard.Interval = Globals.ClearClipboardInterval;
         }
 
-        private void cmbExitClearClipboard_SelectedIndexChanged(object sender, EventArgs e)
+        private void CmbExitClearClipboard_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (FormLoad == false)
             {
@@ -341,12 +341,12 @@ namespace Kryptor
             }
         }
 
-        private void cmbExitClearClipboard_DropDownClosed(object sender, EventArgs e)
+        private void CmbExitClearClipboard_DropDownClosed(object sender, EventArgs e)
         {
             lblExitClearClipboard.Focus();
         }
 
-        private void cmbCheckForUpdates_SelectedIndexChanged(object sender, EventArgs e)
+        private void CmbCheckForUpdates_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (FormLoad == false)
             {
@@ -361,12 +361,12 @@ namespace Kryptor
             }
         }
 
-        private void cmbCheckForUpdates_DropDownClosed(object sender, EventArgs e)
+        private void CmbCheckForUpdates_DropDownClosed(object sender, EventArgs e)
         {
             lblCheckForUpdates.Focus();
         }
 
-        private void cmbTheme_SelectedIndexChanged(object sender, EventArgs e)
+        private void CmbTheme_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (FormLoad == false)
             {
@@ -386,12 +386,12 @@ namespace Kryptor
             }
         }
 
-        private void cmbTheme_DropDownClosed(object sender, EventArgs e)
+        private void CmbTheme_DropDownClosed(object sender, EventArgs e)
         {
             lblTheme.Focus();
         }
 
-        private void frmSettings_FormClosing(object sender, EventArgs e)
+        private void FrmSettings_FormClosing(object sender, EventArgs e)
         {
             // Write settings to file on close
             Settings.SaveSettings();

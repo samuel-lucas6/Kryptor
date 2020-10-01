@@ -35,7 +35,7 @@ namespace Kryptor
             Passphrase
         }
 
-        private void frmPasswordGenerator_Load(object sender, EventArgs e)
+        private void FrmPasswordGenerator_Load(object sender, EventArgs e)
         {
             if (Globals.DarkTheme == true)
             {
@@ -94,7 +94,7 @@ namespace Kryptor
             }
         }
 
-        private void btnRegeneratePassword_Click(object sender, EventArgs e)
+        private void BtnRegeneratePassword_Click(object sender, EventArgs e)
         {
             lblPassword.Focus();
             RegeneratePassword();
@@ -120,7 +120,7 @@ namespace Kryptor
             Utilities.ZeroArray(password);
         }
 
-        private void btnCopyPassword_Click(object sender, EventArgs e)
+        private void BtnCopyPassword_Click(object sender, EventArgs e)
         {
             lblPassword.Focus();
             CopyPassword(txtGeneratedPassword.Text);
@@ -136,13 +136,13 @@ namespace Kryptor
 
         private static void SetPasswordTextbox(string password)
         {
-            frmFileEncryption fileEncryption = (frmFileEncryption)Application.OpenForms["frmFileEncryption"];
+            FrmFileEncryption fileEncryption = (FrmFileEncryption)Application.OpenForms["frmFileEncryption"];
             TextBox txtPassword = (TextBox)fileEncryption.Controls["txtPassword"];
             txtPassword.Text = password;
             txtPassword.SelectionStart = txtPassword.Text.Length;
         }
 
-        private void cmbGenerateType_SelectedIndexChanged(object sender, EventArgs e)
+        private void CmbGenerateType_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cmbGenerateType.SelectedIndex == (int)Generate.Password)
             {
@@ -167,18 +167,18 @@ namespace Kryptor
             RegeneratePassword();
         }
 
-        private void cmbGenerateType_DropDownClosed(object sender, EventArgs e)
+        private void CmbGenerateType_DropDownClosed(object sender, EventArgs e)
         {
             // Remove highlight
             lblEntropy.Focus();
         }
 
-        private void nudLength_ValueChanged(object sender, EventArgs e)
+        private void NudLength_ValueChanged(object sender, EventArgs e)
         {
             RegeneratePassword();
         }
 
-        private void chkLowercase_CheckedChanged(object sender, EventArgs e)
+        private void ChkLowercase_CheckedChanged(object sender, EventArgs e)
         {
             // Prevent unchecking
             if (cmbGenerateType.SelectedIndex == (int)Generate.Passphrase || (chkUppercase.Checked == false && chkNumbers.Checked == false && chkSymbols.Checked == false))
@@ -188,7 +188,7 @@ namespace Kryptor
             RegeneratePassword();
         }
 
-        private void chkUppercase_CheckedChanged(object sender, EventArgs e)
+        private void ChkUppercase_CheckedChanged(object sender, EventArgs e)
         {
             if (chkLowercase.Checked == false && chkNumbers.Checked == false && chkSymbols.Checked == false)
             {
@@ -197,7 +197,7 @@ namespace Kryptor
             RegeneratePassword();
         }
 
-        private void chkNumbers_CheckedChanged(object sender, EventArgs e)
+        private void ChkNumbers_CheckedChanged(object sender, EventArgs e)
         {
             if (chkLowercase.Checked == false && chkUppercase.Checked == false && chkSymbols.Checked == false)
             {
@@ -206,7 +206,7 @@ namespace Kryptor
             RegeneratePassword();
         }
 
-        private void chkSymbols_CheckedChanged(object sender, EventArgs e)
+        private void ChkSymbols_CheckedChanged(object sender, EventArgs e)
         {
             if (cmbGenerateType.SelectedIndex == (int)Generate.Passphrase || (chkLowercase.Checked == false && chkUppercase.Checked == false && chkNumbers.Checked == false))
             {

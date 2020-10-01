@@ -28,7 +28,7 @@ namespace Kryptor
             InitializeComponent();
         }
 
-        private void frmResults_Load(object sender, EventArgs e)
+        private void FrmResults_Load(object sender, EventArgs e)
         {
             if (Globals.DarkTheme == true)
             {
@@ -53,7 +53,7 @@ namespace Kryptor
             txtResults.SelectionStart = txtResults.Text.Length;
         }
 
-        private void frmResults_FormClosing(object sender, EventArgs e)
+        private void FrmResults_FormClosing(object sender, EventArgs e)
         {
             Globals.ResultsText = string.Empty;
             Globals.SuccessfulCount = 0;

@@ -30,8 +30,9 @@ namespace Kryptor
         public static readonly string KryptorDirectory = Application.StartupPath;
 
         // Key derivation
+        public static readonly int Argon2KeySize = EncryptionKeySize + MACKeySize;
         public static readonly int Mebibyte = 1048576;
-        public static readonly int DefaultMemorySize = 104857600; //100 MiB
+        public static readonly int DefaultMemorySize = 128 * Mebibyte; //128 MiB
         public static readonly int DefaultIterations = 3;
 
         // File encryption

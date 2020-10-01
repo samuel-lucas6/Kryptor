@@ -65,8 +65,8 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Results";
             this.TopMost = true;
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmResults_FormClosing);
-            this.Load += new System.EventHandler(this.frmResults_Load);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrmResults_FormClosing);
+            this.Load += new System.EventHandler(this.FrmResults_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

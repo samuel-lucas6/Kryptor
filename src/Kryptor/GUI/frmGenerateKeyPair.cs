@@ -30,7 +30,7 @@ namespace Kryptor
             InitializeComponent();
         }
 
-        private void frmGenerateKeyPair_Load(object sender, EventArgs e)
+        private void FrmGenerateKeyPair_Load(object sender, EventArgs e)
         {
             if (Globals.DarkTheme == true)
             {
@@ -68,23 +68,23 @@ namespace Kryptor
             txtPrivateKey.Text = keyPair.Item2;
         }
 
-        private void tsmiCopyTextbox_Click(object sender, EventArgs e)
+        private void TsmiCopyTextbox_Click(object sender, EventArgs e)
         {
             SharedContextMenu.CopyTextbox(sender);
         }
 
-        private void tsmiClearClipboard_Click(object sender, EventArgs e)
+        private void TsmiClearClipboard_Click(object sender, EventArgs e)
         {
             EditClipboard.ClearClipboard();
         }
 
-        private void picHelp_Click(object sender, EventArgs e)
+        private void PicHelp_Click(object sender, EventArgs e)
         {
             const string passwordSharingLink = "https://kryptor.co.uk/Password%20Sharing.html";
             VisitLink.OpenLink(passwordSharingLink);
         }
 
-        private void btnExportPublicKey_Click(object sender, EventArgs e)
+        private void BtnExportPublicKey_Click(object sender, EventArgs e)
         {
             lblPublicKey.Focus();
             ExportPublicKey(txtPublicKey.Text);
@@ -116,7 +116,7 @@ namespace Kryptor
             }
         }
 
-        private void btnStoredKeys_Click(object sender, EventArgs e)
+        private void BtnStoredKeys_Click(object sender, EventArgs e)
         {
             this.Close();
         }

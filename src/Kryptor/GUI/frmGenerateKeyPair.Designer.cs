@@ -60,7 +60,7 @@
             this.btnStoredKeys.TabStop = false;
             this.btnStoredKeys.Text = "I have stored my keys";
             this.btnStoredKeys.UseVisualStyleBackColor = false;
-            this.btnStoredKeys.Click += new System.EventHandler(this.btnStoredKeys_Click);
+            this.btnStoredKeys.Click += new System.EventHandler(this.BtnStoredKeys_Click);
             // 
             // txtPrivateKey
             // 
@@ -96,7 +96,7 @@
             this.tsmiCopyTextbox.Size = new System.Drawing.Size(188, 26);
             this.tsmiCopyTextbox.Text = "Copy Textbox";
             this.tsmiCopyTextbox.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
-            this.tsmiCopyTextbox.Click += new System.EventHandler(this.tsmiCopyTextbox_Click);
+            this.tsmiCopyTextbox.Click += new System.EventHandler(this.TsmiCopyTextbox_Click);
             // 
             // tsmiClearClipboard
             // 
@@ -107,7 +107,7 @@
             this.tsmiClearClipboard.Size = new System.Drawing.Size(188, 26);
             this.tsmiClearClipboard.Text = "Clear Clipboard";
             this.tsmiClearClipboard.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
-            this.tsmiClearClipboard.Click += new System.EventHandler(this.tsmiClearClipboard_Click);
+            this.tsmiClearClipboard.Click += new System.EventHandler(this.TsmiClearClipboard_Click);
             // 
             // btnExportPublicKey
             // 
@@ -125,7 +125,7 @@
             this.btnExportPublicKey.TabStop = false;
             this.btnExportPublicKey.Text = "Export Public Key";
             this.btnExportPublicKey.UseVisualStyleBackColor = false;
-            this.btnExportPublicKey.Click += new System.EventHandler(this.btnExportPublicKey_Click);
+            this.btnExportPublicKey.Click += new System.EventHandler(this.BtnExportPublicKey_Click);
             // 
             // lblPublicKey
             // 
@@ -173,7 +173,7 @@
             this.picHelp.Size = new System.Drawing.Size(25, 22);
             this.picHelp.TabIndex = 87;
             this.picHelp.TabStop = false;
-            this.picHelp.Click += new System.EventHandler(this.picHelp_Click);
+            this.picHelp.Click += new System.EventHandler(this.PicHelp_Click);
             // 
             // frmGenerateKeyPair
             // 
@@ -197,7 +197,7 @@
             this.Name = "frmGenerateKeyPair";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Generate Key Pair";
-            this.Load += new System.EventHandler(this.frmGenerateKeyPair_Load);
+            this.Load += new System.EventHandler(this.FrmGenerateKeyPair_Load);
             this.cmsKeyPairMenu.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.picHelp)).EndInit();
             this.ResumeLayout(false);

@@ -1,6 +1,6 @@
 ﻿namespace Kryptor
 {
-    partial class frmFileEncryption
+    partial class FrmFileEncryption
     {
         /// <summary>
         /// Required designer variable.
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmFileEncryption));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmFileEncryption));
             this.txtPassword = new System.Windows.Forms.TextBox();
             this.cmsPasswordMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.tsmiCopyPassword = new System.Windows.Forms.ToolStripMenuItem();
@@ -92,7 +92,7 @@
             this.txtPassword.TabIndex = 49;
             this.txtPassword.TabStop = false;
             this.txtPassword.UseSystemPasswordChar = true;
-            this.txtPassword.TextChanged += new System.EventHandler(this.txtPassword_TextChanged);
+            this.txtPassword.TextChanged += new System.EventHandler(this.TxtPassword_TextChanged);
             // 
             // cmsPasswordMenu
             // 
@@ -118,7 +118,7 @@
             this.tsmiCopyPassword.Size = new System.Drawing.Size(257, 26);
             this.tsmiCopyPassword.Text = "Copy Password";
             this.tsmiCopyPassword.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
-            this.tsmiCopyPassword.Click += new System.EventHandler(this.tsmiCopyPassword_Click);
+            this.tsmiCopyPassword.Click += new System.EventHandler(this.TsmiCopyPassword_Click);
             // 
             // tsmiClearPassword
             // 
@@ -131,7 +131,7 @@
             this.tsmiClearPassword.Size = new System.Drawing.Size(257, 26);
             this.tsmiClearPassword.Text = "Clear Password";
             this.tsmiClearPassword.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
-            this.tsmiClearPassword.Click += new System.EventHandler(this.tsmiClearPassword_Click);
+            this.tsmiClearPassword.Click += new System.EventHandler(this.TsmiClearPassword_Click);
             // 
             // tsmiClearClipboard
             // 
@@ -144,7 +144,7 @@
             this.tsmiClearClipboard.Size = new System.Drawing.Size(257, 26);
             this.tsmiClearClipboard.Text = "Clear Clipboard";
             this.tsmiClearClipboard.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
-            this.tsmiClearClipboard.Click += new System.EventHandler(this.tsmiClearClipboard_Click);
+            this.tsmiClearClipboard.Click += new System.EventHandler(this.TsmiClearClipboard_Click);
             // 
             // lblPassword
             // 
@@ -173,7 +173,7 @@
             this.btnEncrypt.TabStop = false;
             this.btnEncrypt.Text = "Encrypt";
             this.btnEncrypt.UseVisualStyleBackColor = false;
-            this.btnEncrypt.Click += new System.EventHandler(this.btnEncrypt_Click);
+            this.btnEncrypt.Click += new System.EventHandler(this.BtnEncrypt_Click);
             // 
             // btnDecrypt
             // 
@@ -191,7 +191,7 @@
             this.btnDecrypt.TabStop = false;
             this.btnDecrypt.Text = "Decrypt";
             this.btnDecrypt.UseVisualStyleBackColor = false;
-            this.btnDecrypt.Click += new System.EventHandler(this.btnDecrypt_Click);
+            this.btnDecrypt.Click += new System.EventHandler(this.BtnDecrypt_Click);
             // 
             // picFilesSelected
             // 
@@ -226,7 +226,7 @@
             this.tsmiClearSelectedFiles.Size = new System.Drawing.Size(213, 26);
             this.tsmiClearSelectedFiles.Text = "Clear Selected Files";
             this.tsmiClearSelectedFiles.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
-            this.tsmiClearSelectedFiles.Click += new System.EventHandler(this.tsmiClearSelectedFiles_Click);
+            this.tsmiClearSelectedFiles.Click += new System.EventHandler(this.TsmiClearSelectedFiles_Click);
             // 
             // lblFilesSelected
             // 
@@ -309,7 +309,7 @@
             this.tsmiSelectFiles.Name = "tsmiSelectFiles";
             this.tsmiSelectFiles.Size = new System.Drawing.Size(180, 26);
             this.tsmiSelectFiles.Text = "Select Files";
-            this.tsmiSelectFiles.Click += new System.EventHandler(this.tsmiSelectFiles_Click);
+            this.tsmiSelectFiles.Click += new System.EventHandler(this.TsmiSelectFiles_Click);
             // 
             // tsmiSelectFolder
             // 
@@ -318,7 +318,7 @@
             this.tsmiSelectFolder.Name = "tsmiSelectFolder";
             this.tsmiSelectFolder.Size = new System.Drawing.Size(180, 26);
             this.tsmiSelectFolder.Text = "Select Folder";
-            this.tsmiSelectFolder.Click += new System.EventHandler(this.tsmiSelectFolder_Click);
+            this.tsmiSelectFolder.Click += new System.EventHandler(this.TsmiSelectFolder_Click);
             // 
             // tsmiCreateKeyfile
             // 
@@ -327,7 +327,7 @@
             this.tsmiCreateKeyfile.Name = "tsmiCreateKeyfile";
             this.tsmiCreateKeyfile.Size = new System.Drawing.Size(180, 26);
             this.tsmiCreateKeyfile.Text = "Create Keyfile";
-            this.tsmiCreateKeyfile.Click += new System.EventHandler(this.tsmiCreateKeyFile_Click);
+            this.tsmiCreateKeyfile.Click += new System.EventHandler(this.TsmiCreateKeyFile_Click);
             // 
             // tsmiSelectKeyfile
             // 
@@ -336,7 +336,7 @@
             this.tsmiSelectKeyfile.Name = "tsmiSelectKeyfile";
             this.tsmiSelectKeyfile.Size = new System.Drawing.Size(180, 26);
             this.tsmiSelectKeyfile.Text = "Select Keyfile";
-            this.tsmiSelectKeyfile.Click += new System.EventHandler(this.tsmiSelectKeyfile_Click);
+            this.tsmiSelectKeyfile.Click += new System.EventHandler(this.TsmiSelectKeyfile_Click);
             // 
             // tsmiSettings
             // 
@@ -345,7 +345,7 @@
             this.tsmiSettings.Name = "tsmiSettings";
             this.tsmiSettings.Size = new System.Drawing.Size(180, 26);
             this.tsmiSettings.Text = "Settings";
-            this.tsmiSettings.Click += new System.EventHandler(this.tsmiSettings_Click);
+            this.tsmiSettings.Click += new System.EventHandler(this.TsmiSettings_Click);
             // 
             // tsmiQuit
             // 
@@ -354,7 +354,7 @@
             this.tsmiQuit.Name = "tsmiQuit";
             this.tsmiQuit.Size = new System.Drawing.Size(180, 26);
             this.tsmiQuit.Text = "Quit Kryptor";
-            this.tsmiQuit.Click += new System.EventHandler(this.tsmiQuit_Click);
+            this.tsmiQuit.Click += new System.EventHandler(this.TsmiQuit_Click);
             // 
             // tsmiTools
             // 
@@ -377,7 +377,7 @@
             this.tsmiPasswordGenerator.Name = "tsmiPasswordGenerator";
             this.tsmiPasswordGenerator.Size = new System.Drawing.Size(220, 26);
             this.tsmiPasswordGenerator.Text = "Password Generator";
-            this.tsmiPasswordGenerator.Click += new System.EventHandler(this.tsmiPasswordGenerator_Click);
+            this.tsmiPasswordGenerator.Click += new System.EventHandler(this.TsmiPasswordGenerator_Click);
             // 
             // tsmiPasswordSharing
             // 
@@ -386,7 +386,7 @@
             this.tsmiPasswordSharing.Name = "tsmiPasswordSharing";
             this.tsmiPasswordSharing.Size = new System.Drawing.Size(220, 26);
             this.tsmiPasswordSharing.Text = "Password Sharing";
-            this.tsmiPasswordSharing.Click += new System.EventHandler(this.tsmiPasswordSharing_Click);
+            this.tsmiPasswordSharing.Click += new System.EventHandler(this.TsmiPasswordSharing_Click);
             // 
             // tsmiShredFiles
             // 
@@ -395,7 +395,7 @@
             this.tsmiShredFiles.Name = "tsmiShredFiles";
             this.tsmiShredFiles.Size = new System.Drawing.Size(220, 26);
             this.tsmiShredFiles.Text = "Shred Files";
-            this.tsmiShredFiles.Click += new System.EventHandler(this.tsmiShredFiles_Click);
+            this.tsmiShredFiles.Click += new System.EventHandler(this.TsmiShredFiles_Click);
             // 
             // tsmiShredFolder
             // 
@@ -404,7 +404,7 @@
             this.tsmiShredFolder.Name = "tsmiShredFolder";
             this.tsmiShredFolder.Size = new System.Drawing.Size(220, 26);
             this.tsmiShredFolder.Text = "Shred Folder";
-            this.tsmiShredFolder.Click += new System.EventHandler(this.tsmiShredFolder_Click);
+            this.tsmiShredFolder.Click += new System.EventHandler(this.TsmiShredFolder_Click);
             // 
             // tsmiBackupSettings
             // 
@@ -413,7 +413,7 @@
             this.tsmiBackupSettings.Name = "tsmiBackupSettings";
             this.tsmiBackupSettings.Size = new System.Drawing.Size(220, 26);
             this.tsmiBackupSettings.Text = "Backup Settings";
-            this.tsmiBackupSettings.Click += new System.EventHandler(this.tsmiBackupSettings_Click);
+            this.tsmiBackupSettings.Click += new System.EventHandler(this.TsmiBackupSettings_Click);
             // 
             // tsmiRestoreSettings
             // 
@@ -422,7 +422,7 @@
             this.tsmiRestoreSettings.Name = "tsmiRestoreSettings";
             this.tsmiRestoreSettings.Size = new System.Drawing.Size(220, 26);
             this.tsmiRestoreSettings.Text = "Restore Settings";
-            this.tsmiRestoreSettings.Click += new System.EventHandler(this.tsmiRestoreSettings_Click);
+            this.tsmiRestoreSettings.Click += new System.EventHandler(this.TsmiRestoreSettings_Click);
             // 
             // tsmiHelp
             // 
@@ -444,7 +444,7 @@
             this.tsmiDocumentation.Name = "tsmiDocumentation";
             this.tsmiDocumentation.Size = new System.Drawing.Size(207, 26);
             this.tsmiDocumentation.Text = "Documentation";
-            this.tsmiDocumentation.Click += new System.EventHandler(this.tsmiDocumentation_Click);
+            this.tsmiDocumentation.Click += new System.EventHandler(this.TsmiDocumentation_Click);
             // 
             // tsmiSourceCode
             // 
@@ -453,7 +453,7 @@
             this.tsmiSourceCode.Name = "tsmiSourceCode";
             this.tsmiSourceCode.Size = new System.Drawing.Size(207, 26);
             this.tsmiSourceCode.Text = "Source Code";
-            this.tsmiSourceCode.Click += new System.EventHandler(this.tsmiSourceCode_Click);
+            this.tsmiSourceCode.Click += new System.EventHandler(this.TsmiSourceCode_Click);
             // 
             // tsmiDonate
             // 
@@ -462,7 +462,7 @@
             this.tsmiDonate.Name = "tsmiDonate";
             this.tsmiDonate.Size = new System.Drawing.Size(207, 26);
             this.tsmiDonate.Text = "Donate";
-            this.tsmiDonate.Click += new System.EventHandler(this.tsmiDonate_Click);
+            this.tsmiDonate.Click += new System.EventHandler(this.TsmiDonate_Click);
             // 
             // tsmiCheckForUpdates
             // 
@@ -471,7 +471,7 @@
             this.tsmiCheckForUpdates.Name = "tsmiCheckForUpdates";
             this.tsmiCheckForUpdates.Size = new System.Drawing.Size(207, 26);
             this.tsmiCheckForUpdates.Text = "Check for Updates";
-            this.tsmiCheckForUpdates.Click += new System.EventHandler(this.tsmiCheckForUpdates_Click);
+            this.tsmiCheckForUpdates.Click += new System.EventHandler(this.TsmiCheckForUpdates_Click);
             // 
             // tsmiAbout
             // 
@@ -480,12 +480,12 @@
             this.tsmiAbout.Name = "tsmiAbout";
             this.tsmiAbout.Size = new System.Drawing.Size(207, 26);
             this.tsmiAbout.Text = "About";
-            this.tsmiAbout.Click += new System.EventHandler(this.tsmiAbout_Click);
+            this.tsmiAbout.Click += new System.EventHandler(this.TsmiAbout_Click);
             // 
             // tmrClearClipboard
             // 
             this.tmrClearClipboard.Interval = 30000;
-            this.tmrClearClipboard.Tick += new System.EventHandler(this.tmrClearClipboard_Tick);
+            this.tmrClearClipboard.Tick += new System.EventHandler(this.TmrClearClipboard_Tick);
             // 
             // masterPasswordOffToolStripMenuItem
             // 
@@ -500,16 +500,16 @@
             // bgwEncryption
             // 
             this.bgwEncryption.WorkerReportsProgress = true;
-            this.bgwEncryption.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bgwEncryption_DoWork);
-            this.bgwEncryption.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.bgwEncryption_ProgressChanged);
-            this.bgwEncryption.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bgwEncryption_RunWorkerCompleted);
+            this.bgwEncryption.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BgwEncryption_DoWork);
+            this.bgwEncryption.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BgwEncryption_ProgressChanged);
+            this.bgwEncryption.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.BgwEncryption_RunWorkerCompleted);
             // 
             // bgwDecryption
             // 
             this.bgwDecryption.WorkerReportsProgress = true;
-            this.bgwDecryption.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bgwDecryption_DoWork);
-            this.bgwDecryption.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.bgwDecryption_ProgressChanged);
-            this.bgwDecryption.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bgwDecryption_RunWorkerCompleted);
+            this.bgwDecryption.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BgwDecryption_DoWork);
+            this.bgwDecryption.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BgwDecryption_ProgressChanged);
+            this.bgwDecryption.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.BgwDecryption_RunWorkerCompleted);
             // 
             // prgProgress
             // 
@@ -526,9 +526,9 @@
             // bgwShredFiles
             // 
             this.bgwShredFiles.WorkerReportsProgress = true;
-            this.bgwShredFiles.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bgwShredFiles_DoWork);
-            this.bgwShredFiles.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.bgwShredFiles_ProgressChanged);
-            this.bgwShredFiles.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bgwShredFiles_RunWorkerCompleted);
+            this.bgwShredFiles.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BgwShredFiles_DoWork);
+            this.bgwShredFiles.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BgwShredFiles_ProgressChanged);
+            this.bgwShredFiles.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.BgwShredFiles_RunWorkerCompleted);
             // 
             // lblEntropy
             // 

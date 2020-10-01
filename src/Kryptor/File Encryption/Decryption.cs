@@ -87,8 +87,8 @@ namespace Kryptor
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.High);
                 DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "Unable to decrypt the file.");
-                RestoreMAC(filePath, macBackup);
                 Utilities.ZeroArray(key);
+                RestoreMAC(filePath, macBackup);
             }
         }
 
@@ -104,7 +104,7 @@ namespace Kryptor
                 catch (Exception ex) when (ExceptionFilters.FileAccessExceptions(ex))
                 {
                     Logging.LogException(ex.ToString(), Logging.Severity.High);
-                    DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "Failed to backup file MAC.");
+                    DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "Failed to backup the MAC. This data is required for decryption.");
                 }
             }
             Utilities.ZeroArray(macBackup);

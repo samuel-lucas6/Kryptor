@@ -24,9 +24,9 @@ using System.Windows.Forms;
 
 namespace Kryptor
 {
-    public partial class frmFileEncryption : Form
+    public partial class FrmFileEncryption : Form
     {
-        public frmFileEncryption()
+        public FrmFileEncryption()
         {
             InitializeComponent();
         }
@@ -137,7 +137,7 @@ namespace Kryptor
             }
         }
 
-        private void tsmiCopyPassword_Click(object sender, EventArgs e)
+        private void TsmiCopyPassword_Click(object sender, EventArgs e)
         {
             if (!string.IsNullOrEmpty(txtPassword.Text))
             {
@@ -146,33 +146,33 @@ namespace Kryptor
             }
         }
 
-        private void tsmiClearPassword_Click(object sender, EventArgs e)
+        private void TsmiClearPassword_Click(object sender, EventArgs e)
         {
             ClearPasswordTextbox();
         }
 
-        private void tsmiClearClipboard_Click(object sender, EventArgs e)
+        private void TsmiClearClipboard_Click(object sender, EventArgs e)
         {
             EditClipboard.ClearClipboard();
         }
 
-        private void tsmiClearSelectedFiles_Click(object sender, EventArgs e)
+        private void TsmiClearSelectedFiles_Click(object sender, EventArgs e)
         {
             ClearSelectedFiles();
         }
 
-        private void tmrClearClipboard_Tick(object sender, EventArgs e)
+        private void TmrClearClipboard_Tick(object sender, EventArgs e)
         {
             EditClipboard.ClearClipboard();
             tmrClearClipboard.Stop();
         }
 
-        private void txtPassword_TextChanged(object sender, EventArgs e)
+        private void TxtPassword_TextChanged(object sender, EventArgs e)
         {
             PasswordEvaluation.DisplayPasswordEntropy(txtPassword.Text, lblEntropy);
         }
 
-        private void btnEncrypt_Click(object sender, EventArgs e)
+        private void BtnEncrypt_Click(object sender, EventArgs e)
         {
             lblPassword.Focus();
             bool encryption = true;
@@ -260,14 +260,14 @@ namespace Kryptor
             cmsClearFilesMenu.Enabled = false;
         }
 
-        private void bgwEncryption_DoWork(object sender, DoWorkEventArgs e)
+        private void BgwEncryption_DoWork(object sender, DoWorkEventArgs e)
         {
             bool encryption = true;
             byte[] passwordBytes = (byte[])e.Argument;
             FileEncryption.StartEncryption(encryption, passwordBytes, bgwEncryption);
         }
 
-        private void bgwEncryption_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        private void BgwEncryption_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             UpdateProgressBar(e.ProgressPercentage);
         }
@@ -288,7 +288,7 @@ namespace Kryptor
             }
         }
 
-        private void bgwEncryption_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void BgwEncryption_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             const string outputMessage = "encrypted";
             FileEncryptionCompleted(outputMessage);
@@ -335,32 +335,32 @@ namespace Kryptor
             cmsClearFilesMenu.Enabled = true;
         }
 
-        private void btnDecrypt_Click(object sender, EventArgs e)
+        private void BtnDecrypt_Click(object sender, EventArgs e)
         {
             lblPassword.Focus();
             bool encryption = false;
             GetPasswordInput(encryption);
         }
 
-        private void bgwDecryption_DoWork(object sender, DoWorkEventArgs e)
+        private void BgwDecryption_DoWork(object sender, DoWorkEventArgs e)
         {
             bool encryption = false;
             byte[] passwordBytes = (byte[])e.Argument;
             FileEncryption.StartEncryption(encryption, passwordBytes, bgwDecryption);
         }
 
-        private void bgwDecryption_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        private void BgwDecryption_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             UpdateProgressBar(e.ProgressPercentage);
         }
 
-        private void bgwDecryption_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void BgwDecryption_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             const string outputMessage = "decrypted";
             FileEncryptionCompleted(outputMessage);
         }
 
-        private void tsmiSelectFiles_Click(object sender, EventArgs e)
+        private void TsmiSelectFiles_Click(object sender, EventArgs e)
         {
             bool filesSelected = SelectFiles.SelectFilesDialog();
             FilesSelected(filesSelected);
@@ -376,7 +376,7 @@ namespace Kryptor
             }
         }
 
-        private void tsmiSelectFolder_Click(object sender, EventArgs e)
+        private void TsmiSelectFolder_Click(object sender, EventArgs e)
         {
             bool folderSelected = SelectFiles.SelectFolderDialog();
             FolderSelected(folderSelected);
@@ -392,13 +392,13 @@ namespace Kryptor
             }
         }
 
-        private void tsmiCreateKeyFile_Click(object sender, EventArgs e)
+        private void TsmiCreateKeyFile_Click(object sender, EventArgs e)
         {
             bool keyfileGenerated = Keyfiles.CreateKeyfile();
             KeyfileSelected(keyfileGenerated);
         }
 
-        private void tsmiSelectKeyfile_Click(object sender, EventArgs e)
+        private void TsmiSelectKeyfile_Click(object sender, EventArgs e)
         {
             bool keyfileSelected = Keyfiles.SelectKeyfile();
             KeyfileSelected(keyfileSelected);
@@ -412,15 +412,15 @@ namespace Kryptor
             }
         }
 
-        private void tsmiSettings_Click(object sender, EventArgs e)
+        private void TsmiSettings_Click(object sender, EventArgs e)
         {
-            using (var settings = new frmSettings())
+            using (var settings = new FrmSettings())
             {
                 settings.ShowDialog();
             }
         }
 
-        private void tsmiQuit_Click(object sender, EventArgs e)
+        private void TsmiQuit_Click(object sender, EventArgs e)
         {
             if (!bgwEncryption.IsBusy && !bgwDecryption.IsBusy && !bgwShredFiles.IsBusy)
             {
@@ -432,7 +432,7 @@ namespace Kryptor
             }
         }
 
-        private void tsmiPasswordGenerator_Click(object sender, EventArgs e)
+        private void TsmiPasswordGenerator_Click(object sender, EventArgs e)
         {
             using (var passwordGenerator = new frmPasswordGenerator())
             {
@@ -440,21 +440,21 @@ namespace Kryptor
             }
         }
 
-        private void tsmiPasswordSharing_Click(object sender, EventArgs e)
+        private void TsmiPasswordSharing_Click(object sender, EventArgs e)
         {
-            using (var passwordSharing = new frmPasswordSharing())
+            using (var passwordSharing = new FrmPasswordSharing())
             {
                 passwordSharing.ShowDialog();
             }
         }
 
-        private void tsmiShredFiles_Click(object sender, EventArgs e)
+        private void TsmiShredFiles_Click(object sender, EventArgs e)
         {
             bool filesSelected = SelectFiles.SelectFilesDialog();
             CallShredFiles(filesSelected);
         }
 
-        private void tsmiShredFolder_Click(object sender, EventArgs e)
+        private void TsmiShredFolder_Click(object sender, EventArgs e)
         {
             bool folderSelected = SelectFiles.SelectFolderDialog();
             CallShredFiles(folderSelected);
@@ -469,59 +469,59 @@ namespace Kryptor
             }
         }
 
-        private void bgwShredFiles_DoWork(object sender, DoWorkEventArgs e)
+        private void BgwShredFiles_DoWork(object sender, DoWorkEventArgs e)
         {
             ShredFiles.ShredSelectedFiles(bgwShredFiles);
         }
 
-        private void bgwShredFiles_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        private void BgwShredFiles_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             UpdateProgressBar(e.ProgressPercentage);
         }
 
-        private void bgwShredFiles_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void BgwShredFiles_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             const string outputMessage = "shredded";
             BackgroundWorkerCompleted(outputMessage);
         }
 
-        private void tsmiBackupSettings_Click(object sender, EventArgs e)
+        private void TsmiBackupSettings_Click(object sender, EventArgs e)
         {
             Settings.BackupSettings();
         }
 
-        private void tsmiRestoreSettings_Click(object sender, EventArgs e)
+        private void TsmiRestoreSettings_Click(object sender, EventArgs e)
         {
             Settings.RestoreSettings();
         }
 
-        private void tsmiDocumentation_Click(object sender, EventArgs e)
+        private void TsmiDocumentation_Click(object sender, EventArgs e)
         {
             const string documentationLink = "https://kryptor.co.uk/Documentation.html";
             VisitLink.OpenLink(documentationLink);
         }
 
-        private void tsmiSourceCode_Click(object sender, EventArgs e)
+        private void TsmiSourceCode_Click(object sender, EventArgs e)
         {
             const string sourceCodeLink = "https://github.com/Kryptor-Software/Kryptor";
             VisitLink.OpenLink(sourceCodeLink);
         }
 
-        private void tsmiDonate_Click(object sender, EventArgs e)
+        private void TsmiDonate_Click(object sender, EventArgs e)
         {
             const string donateLink = "https://kryptor.co.uk/Donate.html";
             VisitLink.OpenLink(donateLink);
         }
 
-        private void tsmiCheckForUpdates_Click(object sender, EventArgs e)
+        private void TsmiCheckForUpdates_Click(object sender, EventArgs e)
         {
             bool displayUpToDate = true;
             Updates.UpdateKryptor(displayUpToDate);
         }
 
-        private void tsmiAbout_Click(object sender, EventArgs e)
+        private void TsmiAbout_Click(object sender, EventArgs e)
         {
-            using (var about = new frmAboutKryptor())
+            using (var about = new FrmAboutKryptor())
             {
                 about.ShowDialog();
             }
