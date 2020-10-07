@@ -15,7 +15,7 @@ Kryptor is free and open source file encryption software for Windows, Linux, and
 - Optional anonymous renaming of encrypted files and folders.
 - Memory encryption to protect sensitive data in memory.
 - Password sharing support using libsodium Sealed Boxes (Curve25519, XSalsa20-Poly1305).
-- Built in password and passphrase generator. Auto clear clipboard after copying passwords.
+- Built-in password and passphrase generator. Auto clear clipboard after copying passwords.
 - Customisation of settings such as encryption algorithm, Argon2 parameters, light/dark theme, etc.
 - Can be run offline and no account is needed. By default, there are automatic checks for updates, but this can be disabled.
 
