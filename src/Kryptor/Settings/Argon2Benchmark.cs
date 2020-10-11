@@ -42,13 +42,24 @@ namespace Kryptor
             int incrementMemorySize = 5 * Constants.Mebibyte;
             for (int i = 0; i < testCount; i++)
             {
-                var stopwatch = Stopwatch.StartNew();
-                KeyDerivation.DeriveKeys(passwordBytes, salt, Globals.Iterations, memorySize[i]);
-                stopwatch.Stop();
-                benchmarkTimes[i] = Convert.ToInt32(stopwatch.ElapsedMilliseconds);
+                int elapsedTime = GetMemorySizeDelay(passwordBytes, salt, Globals.Iterations, memorySize[i]);
+                // Run first memory size twice due to timer issues
+                if (i == 0)
+                {
+                    elapsedTime = GetMemorySizeDelay(passwordBytes, salt, Globals.Iterations, memorySize[i]);
+                }
+                benchmarkTimes[i] = elapsedTime;
                 memorySize.Add(memorySize[i] + incrementMemorySize);
             }
             CalculateMemorySize(benchmarkTimes, memorySize, speedMode);
+        }
+
+        private static int GetMemorySizeDelay(byte[] passwordBytes, byte[] salt, int iterations, int memorySize)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            KeyDerivation.DeriveKeys(passwordBytes, salt, iterations, memorySize);
+            stopwatch.Stop();
+            return Convert.ToInt32(stopwatch.ElapsedMilliseconds);
         }
 
         private static void GetBenchmarkInputs(out byte[] passwordBytes, out byte[] salt)
@@ -124,10 +135,13 @@ namespace Kryptor
         public static int TestArgon2Parameters()
         {
             GetBenchmarkInputs(out byte[] passwordBytes, out byte[] salt);
-            var stopwatch = Stopwatch.StartNew();
-            KeyDerivation.DeriveKeys(passwordBytes, salt, Globals.Iterations, Globals.MemorySize);
-            stopwatch.Stop();
-            return Convert.ToInt32(stopwatch.ElapsedMilliseconds);
+            int elapsedTime = 0;
+            // Discard first benchmark time due to timer issues
+            for (int i = 0; i < 2; i++)
+            {
+                elapsedTime = GetMemorySizeDelay(passwordBytes, salt, Globals.Iterations, Globals.MemorySize);
+            }
+            return elapsedTime;
         }
     }
 }

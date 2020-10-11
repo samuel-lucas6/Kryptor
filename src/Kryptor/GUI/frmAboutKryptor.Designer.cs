@@ -99,9 +99,9 @@
             this.lblVersion.Name = "lblVersion";
             this.lblVersion.Size = new System.Drawing.Size(133, 21);
             this.lblVersion.TabIndex = 76;
-            this.lblVersion.Text = "Version 2.1.0 Beta";
+            this.lblVersion.Text = "Version 2.1.1 Beta";
             // 
-            // frmAboutKryptor
+            // FrmAboutKryptor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 21F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -119,7 +119,7 @@
             this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "frmAboutKryptor";
+            this.Name = "FrmAboutKryptor";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "About Kryptor";
