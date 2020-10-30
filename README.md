@@ -1,4 +1,4 @@
-[![CodeFactor](https://www.codefactor.io/repository/github/kryptor-software/kryptor/badge)](https://www.codefactor.io/repository/github/kryptor-software/kryptor)
+[![CodeFactor](https://www.codefactor.io/repository/github/samuel-lucas6/kryptor/badge)](https://www.codefactor.io/repository/github/samuel-lucas6/kryptor)
 
 # Kryptor
 
