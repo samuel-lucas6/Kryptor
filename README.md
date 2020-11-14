@@ -40,7 +40,7 @@ Before you do anything with the source code, make sure you understand the [GPLv3
 
 ## Donate
 
-You can support the developer of Kryptor by donating through Paypal, GitHub, Bitcoin, or Monero. **Every donation helps no matter how big or small**.
+You can support the developer of Kryptor by donating through Paypal, GitHub, Bitcoin, or Monero. Every donation helps no matter how big or small.
 
 Donate today to help me afford a code signing certificate (£65/yr), website hosting (£50/yr), and the website domain (£8/yr). Thank you for the support!
 
