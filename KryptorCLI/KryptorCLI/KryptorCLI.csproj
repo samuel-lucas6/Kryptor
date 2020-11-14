@@ -1,0 +1,69 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <StartupObject></StartupObject>
+    <ApplicationIcon>Kryptor Icon.ico</ApplicationIcon>
+    <Platforms>AnyCPU;x64</Platforms>
+    <PackageId>Kryptor</PackageId>
+    <Version>2.2.0</Version>
+    <Authors>Samuel Lucas</Authors>
+    <Company />
+    <Product>Kryptor</Product>
+    <Copyright>Copyright © 2020 Samuel Lucas</Copyright>
+    <Description>Free and open source file encryption software.</Description>
+    <PackageLicenseFile></PackageLicenseFile>
+    <PackageLicenseExpression>GPLv3</PackageLicenseExpression>
+    <PackageProjectUrl>https://kryptor.co.uk/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/samuel-lucas6/Kryptor</RepositoryUrl>
+    <PackageIcon>Kryptor Logo.png</PackageIcon>
+    <NeutralLanguage>en-GB</NeutralLanguage>
+    <AssemblyName>kryptor</AssemblyName>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>x64</PlatformTarget>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PlatformTarget>x64</PlatformTarget>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+    <None Include="..\Kryptor Logo.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Sodium.Core" Version="1.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>
