@@ -1,6 +1,6 @@
 ﻿namespace Kryptor
 {
-    partial class frmResults
+    partial class FrmResults
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmResults));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmResults));
             this.txtResults = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 

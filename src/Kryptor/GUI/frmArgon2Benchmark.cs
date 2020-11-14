@@ -57,7 +57,7 @@ namespace Kryptor
 
         private static bool? GetBenchmarkMode()
         {
-            using (var selectBenchmarkMode = new frmSelectBenchmarkMode())
+            using (var selectBenchmarkMode = new FrmSelectBenchmarkMode())
             {
                 DialogResult dialogResult = selectBenchmarkMode.ShowDialog();
                 if (dialogResult == DialogResult.Yes)

@@ -21,9 +21,9 @@ using System.Windows.Forms;
 
 namespace Kryptor
 {
-    public partial class frmResults : Form
+    public partial class FrmResults : Form
     {
-        public frmResults()
+        public FrmResults()
         {
             InitializeComponent();
         }

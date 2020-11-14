@@ -33,10 +33,11 @@ namespace Kryptor
         public static readonly int Argon2KeySize = EncryptionKeySize + MACKeySize;
         public static readonly int Mebibyte = 1048576;
         public static readonly int DefaultMemorySize = 128 * Mebibyte; //128 MiB
-        public static readonly int DefaultIterations = 3;
+        public static readonly int DefaultIterations = 4;
 
         // File encryption
         public const string EncryptedExtension = ".kryptor";
+        public const int FileBufferSize = 131072;
         public const int EncryptionKeySize = 32;
         public const int MACKeySize = 64;
         public const int SaltLength = 16;

@@ -32,7 +32,7 @@ namespace Kryptor
             {
                 string fileName = Path.GetFileName(filePath);
                 EncodeFileName(filePath, fileName, out byte[] newLineBytes, out byte[] fileNameBytes);
-                using (var fileStream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read))
+                using (var fileStream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read, Constants.FileBufferSize, FileOptions.RandomAccess))
                 {
                     fileStream.Write(newLineBytes, 0, newLineBytes.Length);
                     fileStream.Write(fileNameBytes, 0, fileNameBytes.Length);
@@ -106,12 +106,12 @@ namespace Kryptor
         {
             try
             {
-                int removeLength = GetFileNameLength(filePath, originalFileName);
-                if (removeLength != 0)
+                int fileNameLength = GetFileNameLength(filePath, originalFileName);
+                if (fileNameLength != 0)
                 {
-                    using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read))
+                    using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, Constants.FileBufferSize, FileOptions.RandomAccess))
                     {
-                        fileStream.SetLength(fileStream.Length - removeLength);
+                        fileStream.SetLength(fileStream.Length - fileNameLength);
                     }
                 }
             }

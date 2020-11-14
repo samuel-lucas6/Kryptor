@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 
 /*  
     Kryptor: Free and open source file encryption software.
@@ -87,12 +88,30 @@ namespace Kryptor
         private static int GetParametersLength(string memorySize, string iterations)
         {
             int parametersLength = 0;
-            var parameters = WriteFileHeaders.GetParametersBytes(memorySize, iterations);
+            var parameters = GetParametersBytes(memorySize, iterations);
             if (parameters.Item1 != null && parameters.Item2 != null && parameters.Item3 != null)
             {
                 parametersLength = parameters.Item1.Length + parameters.Item2.Length + parameters.Item3.Length;
             }
             return parametersLength;
+        }
+
+        private static (byte[], byte[], byte[]) GetParametersBytes(string memorySize, string iterations)
+        {
+            try
+            {
+                Encoding encoding = Encoding.UTF8;
+                byte[] memorySizeBytes = encoding.GetBytes(memorySize);
+                byte[] iterationsBytes = encoding.GetBytes(iterations);
+                byte[] endFlagBytes = encoding.GetBytes(Constants.EndFlag);
+                return (memorySizeBytes, iterationsBytes, endFlagBytes);
+            }
+            catch (Exception ex) when (ExceptionFilters.CharacterEncodingExceptions(ex))
+            {
+                Logging.LogException(ex.ToString(), Logging.Severity.High);
+                DisplayMessage.ErrorResultsText(string.Empty, ex.GetType().Name, "Unable to convert Argon2 parameters to bytes.");
+                return (null, null, null);
+            }
         }
 
         private static string RemoveParameterFlag(string parameter)
@@ -128,7 +147,7 @@ namespace Kryptor
             try
             {
                 byte[] header = new byte[headerLength];
-                using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileBufferSize, FileOptions.RandomAccess))
                 {
                     fileStream.Seek(offset, SeekOrigin.Begin);
                     fileStream.Read(header, 0, header.Length);

@@ -81,7 +81,7 @@ namespace Kryptor
             foreach (int timeElapsed in benchmarkTimes)
             {
                 // Recommended memory size is the closest to the selected delay in ms
-                if (timeElapsed < delayPerFile)
+                if (timeElapsed <= delayPerFile)
                 {
                     recommendedMemorySize = memorySize[i];
                 }
@@ -100,9 +100,9 @@ namespace Kryptor
                 {
                     benchmarkResults.Add($"{memorySize[i] / Constants.Mebibyte} MiB = {benchmarkTimes[i]} ms");
                 }
-                benchmarkResults.Add(Environment.NewLine);
+                benchmarkResults.Add(string.Empty);
                 benchmarkResults.Add($"Recommended Memory Size: {Invariant.ToString(recommendedMemorySize / Constants.Mebibyte)} MiB");
-                benchmarkResults.Add($"This memory size was chosen because it was <= {delayPerFile} ms. This is the delay per file that it takes for Argon2 to derive an encryption key and MAC key. You can speed up key derivation by lowering the memory size, but this will decrease your security. For more information about Argon2, please read the documentation: https://kryptor.co.uk/Key Derivation.html.");
+                benchmarkResults.Add($"This memory size was chosen because it was <= {delayPerFile} ms. This is the delay per file that it takes for Argon2 to derive an encryption key and MAC key. You can speed up key derivation by lowering the memory size, but this will decrease your security. For more information about Argon2, please read the documentation (https://kryptor.co.uk/Key Derivation.html).");
                 string benchmarkFilePath = Path.Combine(Constants.KryptorDirectory, "benchmark.txt");   
                 File.WriteAllLines(benchmarkFilePath, benchmarkResults);
             }

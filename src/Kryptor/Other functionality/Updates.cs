@@ -75,7 +75,7 @@ namespace Kryptor
         {
             using (var webClient = new WebClient())
             {
-                const string versionLink = "https://raw.githubusercontent.com/Kryptor-Software/Kryptor/master/version.txt";
+                const string versionLink = "https://raw.githubusercontent.com/samuel-lucas6/Kryptor/master/version.txt";
                 webClient.DownloadFile(versionLink, downloadFilePath);
             }
         }
@@ -84,7 +84,7 @@ namespace Kryptor
         {
             if (MessageBox.Show("An update is available for Kryptor. Would you like to download it now?", "Update Available", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
             {
-                const string downloadLink = "https://github.com/Kryptor-Software/Kryptor/releases";
+                const string downloadLink = "https://github.com/samuel-lucas6/Kryptor/releases";
                 VisitLink.OpenLink(downloadLink);
             }
         }

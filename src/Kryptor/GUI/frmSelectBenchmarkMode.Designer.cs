@@ -1,6 +1,6 @@
 ﻿namespace Kryptor
 {
-    partial class frmSelectBenchmarkMode
+    partial class FrmSelectBenchmarkMode
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmSelectBenchmarkMode));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmSelectBenchmarkMode));
             this.btnSecurityMode = new System.Windows.Forms.Button();
             this.btnSpeedMode = new System.Windows.Forms.Button();
             this.SuspendLayout();

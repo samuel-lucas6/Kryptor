@@ -321,7 +321,7 @@ namespace Kryptor
             prgProgress.Visible = false;
             prgProgress.Value = 0;
             Globals.ResultsText += Environment.NewLine + $"Successfully {outputMessage}: {Invariant.ToString(Globals.SuccessfulCount)}/{Invariant.ToString(Globals.TotalCount)}";
-            using (var results = new frmResults())
+            using (var results = new FrmResults())
             {
                 results.ShowDialog();
             }
@@ -503,7 +503,7 @@ namespace Kryptor
 
         private void TsmiSourceCode_Click(object sender, EventArgs e)
         {
-            const string sourceCodeLink = "https://github.com/Kryptor-Software/Kryptor";
+            const string sourceCodeLink = "https://github.com/samuel-lucas6/Kryptor";
             VisitLink.OpenLink(sourceCodeLink);
         }
 

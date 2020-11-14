@@ -34,7 +34,7 @@ namespace Kryptor
             try
             {
                 byte[] computedHash = new byte[Constants.HashLength];
-                using (var fileStream = new FileStream(encryptedFilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (var fileStream = new FileStream(encryptedFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileBufferSize, FileOptions.SequentialScan))
                 {
                     MemoryEncryption.DecryptByteArray(ref macKey);
                     computedHash = HashingAlgorithms.Blake2(fileStream, macKey);
@@ -59,7 +59,7 @@ namespace Kryptor
                 if (storedHash != null)
                 {
                     byte[] computedHash = new byte[Constants.HashLength];
-                    using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read))
+                    using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, Constants.FileBufferSize, FileOptions.SequentialScan))
                     {
                         // Remove the stored MAC from the file before computing the MAC
                         fileStream.SetLength(fileStream.Length - computedHash.Length);
@@ -91,7 +91,7 @@ namespace Kryptor
             try
             {
                 byte[] storedHash = new byte[Constants.HashLength];
-                using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileBufferSize, FileOptions.RandomAccess))
                 {
                     // Read the last 64 bytes of the file
                     fileStream.Seek(fileStream.Length - storedHash.Length, SeekOrigin.Begin);
@@ -112,7 +112,7 @@ namespace Kryptor
             try
             {
                 NullChecks.ByteArray(fileHash);
-                using (var fileStream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read))
+                using (var fileStream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read, Constants.FileBufferSize, FileOptions.RandomAccess))
                 {
                     fileStream.Write(fileHash, 0, fileHash.Length);
                 }

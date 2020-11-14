@@ -33,13 +33,13 @@ namespace Kryptor
                 const int sixteenKiB = 16384;
                 byte[] first16KiB = SodiumCore.GetRandomBytes(sixteenKiB);
                 byte[] last16KiB = SodiumCore.GetRandomBytes(sixteenKiB);
-                using (var firstFileStream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read))
+                using (var firstFileStream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, Constants.FileBufferSize, FileOptions.RandomAccess))
                 {
                     firstFileStream.Write(first16KiB, 0, first16KiB.Length);
                     // Remove the last 16 KiB
                     firstFileStream.SetLength(firstFileStream.Length - last16KiB.Length);
                 }
-                using (var lastFileStream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read))
+                using (var lastFileStream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read, Constants.FileBufferSize, FileOptions.RandomAccess))
                 {
                     lastFileStream.Write(last16KiB, 0, last16KiB.Length);
                 }
@@ -55,7 +55,7 @@ namespace Kryptor
         {
             try
             {
-                using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read))
+                using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, Constants.FileBufferSize, FileOptions.SequentialScan))
                 {
                     byte[] randomBytes = FileHandling.GetBufferSize(fileStream);
                     while (fileStream.Position < fileStream.Length)
@@ -77,7 +77,7 @@ namespace Kryptor
         {
             try
             {
-                using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read))
+                using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, Constants.FileBufferSize, FileOptions.SequentialScan))
                 {
                     byte[] zeroes = FileHandling.GetBufferSize(fileStream);
                     if (useOnes == true)
@@ -132,8 +132,8 @@ namespace Kryptor
             try
             {
                 string encryptedFilePath = AnonymousRename.GetAnonymousFileName(filePath);
-                using (var ciphertext = new FileStream(encryptedFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read))
-                using (var plaintext = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read))
+                using (var ciphertext = new FileStream(encryptedFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileBufferSize, FileOptions.SequentialScan))
+                using (var plaintext = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, Constants.FileBufferSize, FileOptions.SequentialScan))
                 {
                     byte[] fileBytes = FileHandling.GetBufferSize(plaintext);
                     byte[] key = SodiumCore.GetRandomBytes(Constants.EncryptionKeySize);

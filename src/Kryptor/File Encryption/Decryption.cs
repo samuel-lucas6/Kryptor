@@ -64,11 +64,11 @@ namespace Kryptor
                 string decryptedFilePath = Regex.Replace(filePath, Constants.EncryptedExtension, string.Empty);
                 // Get length of headers bytes (parameters, salt, nonce)
                 int headersLength = ReadFileHeaders.GetHeadersLength(nonce.Length, parametersLength);
-                using (var plaintext = new FileStream(decryptedFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read))
-                using (var ciphertext = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read))
+                using (var plaintext = new FileStream(decryptedFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileBufferSize, FileOptions.SequentialScan))
+                using (var ciphertext = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, Constants.FileBufferSize, FileOptions.SequentialScan))
                 {
                     // Skip the header bytes
-                    ciphertext.Position = headersLength;
+                    ciphertext.Seek(headersLength, SeekOrigin.Begin);
                     byte[] fileBytes = FileHandling.GetBufferSize(ciphertext);
                     MemoryEncryption.DecryptByteArray(ref key);
                     if (Globals.EncryptionAlgorithm == (int)Cipher.XChaCha20 || Globals.EncryptionAlgorithm == (int)Cipher.XSalsa20)

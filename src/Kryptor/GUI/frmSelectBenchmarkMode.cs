@@ -21,9 +21,9 @@ using System.Windows.Forms;
 
 namespace Kryptor
 {
-    public partial class frmSelectBenchmarkMode : Form
+    public partial class FrmSelectBenchmarkMode : Form
     {
-        public frmSelectBenchmarkMode()
+        public FrmSelectBenchmarkMode()
         {
             InitializeComponent();
         }

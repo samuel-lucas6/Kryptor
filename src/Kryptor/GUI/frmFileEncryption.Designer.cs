@@ -307,7 +307,7 @@
             this.tsmiSelectFiles.BackColor = System.Drawing.Color.White;
             this.tsmiSelectFiles.ForeColor = System.Drawing.Color.Black;
             this.tsmiSelectFiles.Name = "tsmiSelectFiles";
-            this.tsmiSelectFiles.Size = new System.Drawing.Size(180, 26);
+            this.tsmiSelectFiles.Size = new System.Drawing.Size(175, 26);
             this.tsmiSelectFiles.Text = "Select Files";
             this.tsmiSelectFiles.Click += new System.EventHandler(this.TsmiSelectFiles_Click);
             // 
@@ -316,7 +316,7 @@
             this.tsmiSelectFolder.BackColor = System.Drawing.Color.White;
             this.tsmiSelectFolder.ForeColor = System.Drawing.Color.Black;
             this.tsmiSelectFolder.Name = "tsmiSelectFolder";
-            this.tsmiSelectFolder.Size = new System.Drawing.Size(180, 26);
+            this.tsmiSelectFolder.Size = new System.Drawing.Size(175, 26);
             this.tsmiSelectFolder.Text = "Select Folder";
             this.tsmiSelectFolder.Click += new System.EventHandler(this.TsmiSelectFolder_Click);
             // 
@@ -325,7 +325,7 @@
             this.tsmiCreateKeyfile.BackColor = System.Drawing.Color.White;
             this.tsmiCreateKeyfile.ForeColor = System.Drawing.Color.Black;
             this.tsmiCreateKeyfile.Name = "tsmiCreateKeyfile";
-            this.tsmiCreateKeyfile.Size = new System.Drawing.Size(180, 26);
+            this.tsmiCreateKeyfile.Size = new System.Drawing.Size(175, 26);
             this.tsmiCreateKeyfile.Text = "Create Keyfile";
             this.tsmiCreateKeyfile.Click += new System.EventHandler(this.TsmiCreateKeyFile_Click);
             // 
@@ -334,7 +334,7 @@
             this.tsmiSelectKeyfile.BackColor = System.Drawing.Color.White;
             this.tsmiSelectKeyfile.ForeColor = System.Drawing.Color.Black;
             this.tsmiSelectKeyfile.Name = "tsmiSelectKeyfile";
-            this.tsmiSelectKeyfile.Size = new System.Drawing.Size(180, 26);
+            this.tsmiSelectKeyfile.Size = new System.Drawing.Size(175, 26);
             this.tsmiSelectKeyfile.Text = "Select Keyfile";
             this.tsmiSelectKeyfile.Click += new System.EventHandler(this.TsmiSelectKeyfile_Click);
             // 
@@ -343,7 +343,7 @@
             this.tsmiSettings.BackColor = System.Drawing.Color.White;
             this.tsmiSettings.ForeColor = System.Drawing.Color.Black;
             this.tsmiSettings.Name = "tsmiSettings";
-            this.tsmiSettings.Size = new System.Drawing.Size(180, 26);
+            this.tsmiSettings.Size = new System.Drawing.Size(175, 26);
             this.tsmiSettings.Text = "Settings";
             this.tsmiSettings.Click += new System.EventHandler(this.TsmiSettings_Click);
             // 
@@ -352,7 +352,7 @@
             this.tsmiQuit.BackColor = System.Drawing.Color.White;
             this.tsmiQuit.ForeColor = System.Drawing.Color.Black;
             this.tsmiQuit.Name = "tsmiQuit";
-            this.tsmiQuit.Size = new System.Drawing.Size(180, 26);
+            this.tsmiQuit.Size = new System.Drawing.Size(175, 26);
             this.tsmiQuit.Text = "Quit Kryptor";
             this.tsmiQuit.Click += new System.EventHandler(this.TsmiQuit_Click);
             // 
@@ -542,7 +542,7 @@
             this.lblEntropy.Text = "0 bits";
             this.lblEntropy.Visible = false;
             // 
-            // frmFileEncryption
+            // FrmFileEncryption
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 21F);
@@ -570,7 +570,7 @@
             this.MainMenuStrip = this.msMenus;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
-            this.Name = "frmFileEncryption";
+            this.Name = "FrmFileEncryption";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Kryptor";
             this.Load += new System.EventHandler(this.Kryptor_Load);
