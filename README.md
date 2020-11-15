@@ -75,7 +75,7 @@ Before you do anything with the source code, make sure you understand the [GPLv3
 
 #### GUI Requirements
 
-- Windows: If you encounter any unhandled exceptions due to 'Sodium.Core' or 'libsodium', then you will need to copy the 'vcruntime140.dll' from 'Kryptor/src/Kryptor/bin/(x86 or x64 depending on your build)/Release/' to the folder containing the 'Kryptor.exe' file. 'vcruntime140.dll' is required for libsodium to work and must stay with the executable on Windows. Alternatively, you can install the [Visual C++ Redistributable for Visual Studio 2015-2019](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads), but this will mean that your Kryptor build won't be portable.
+- Windows: The <a href="https://libsodium.org">libsodium</a> library requires the [Visual C++ Redistributable for Visual Studio 2015-2019](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) to work. Therefore, you must keep the 'vcruntime140.dll' file in the same folder as 'Kryptor.exe' on Windows.
 - Linux: You must build Kryptor as x64. To retrieve the libsodium library for Linux, download the latest Kryptor GUI [release](https://kryptor.co.uk/Downloads.html) for Linux, extract 'KryptorGUI-Linux.zip', and copy the 'libsodium.so' file to the same folder as the 'Kryptor.exe' file you've built.
 - macOS: You must build Kryptor as x64. To retrieve the libsodium library for macOS, download the latest Kryptor GUI [release](https://kryptor.co.uk/Downloads.html) for macOS, extract 'KryptorGUI-macOS.zip', and copy the 'libsodium.dylib' file to the same folder as the 'Kryptor.exe' file you've built.
 
