@@ -21,27 +21,66 @@ Kryptor is free and open source file encryption software for Windows, Linux, and
 
 For more information, head over to the [Kryptor website](https://kryptor.co.uk).
 
+## CLI Usage
+```
+Usage: kryptor [options] <Arguments>
+            
+Options:
+  -e|--encrypt           encrypt files/folders
+  -d|--decrypt           decrypt files/folders
+  -p|--password          specify a password for file encryption/decryption
+  -k|--keyfile           specify a keyfile for file encryption/decryption
+  --generate-keyfile     generate a random keyfile at the specified path
+  --generate-password    generate a random password of a specified length
+  --generate-passphrase  generate a random passphrase of a specified length
+  --generate-keys        generate a recipient key pair for password sharing
+  --encrypt-password     encrypt a password using the recipient's public key
+  --decrypt-password     decrypt a ciphertext password using your private key
+  --shred                shred files/folders
+  --settings             view/edit your settings
+  --benchmark            perform the Argon2 benchmark
+  --documentation        view the documentation
+  --source               view the source code
+  --donate               find out how to donate
+  --about                view the program version and license
+  -h|--help              show help information
+
+Examples:
+  -e -p [password] [filepath]
+  -e -k [keyfile path] [filepath]
+  -e -p [password] -k [keyfile path] [filepath]
+  --generate-password [length]
+  --encrypt-password [public key] [password]
+  --settings encryption-algorithm [value]
+  ```
+
 ## Building Kryptor
 
 Before you do anything with the source code, make sure you understand the [GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html) license used by Kryptor. Click [here](https://tldrlegal.com/license/gnu-general-public-license-v3-(gpl-3)) for a summary of GPLv3.
 
 #### CLI
 
-Instructions for building the CLI version are currently being written. Note that it is a completely different process to the GUI version.
+1. Click the green 'Code' button and 'Download ZIP'.
+2. Extract the ZIP, navigate to the 'Kryptor/KryptorCLI' folder, and open the 'Kryptor.sln' file in [Visual Studio 2019 Community](https://visualstudio.microsoft.com/vs/community/).
+3. Right click on 'KryptorCLI' in the Solution Explorer and choose 'Publish...'.
+4. Choose to publish Kryptor as either win-x64, linux-x64, or osx-x64. Then click 'Publish'. You can find the published program at the path listed next to 'Target location'.
+5. I don't recommend changing the profile settings, but you can publish the application as x86, Framework-dependent, change the target location, etc by changing the profile settings via 'Edit' or the pencil icons.
 
 #### GUI
 
 1. Click the green 'Code' button and 'Download ZIP'.
-2. Extract the ZIP, navigate to the 'Kryptor/src' folder, then open the 'Kryptor.sln' file in [Visual Studio 2019 Community](https://visualstudio.microsoft.com/vs/community/).
+2. Extract the ZIP, navigate to the 'Kryptor/src' folder, and open the 'Kryptor.sln' file in [Visual Studio 2019 Community](https://visualstudio.microsoft.com/vs/community/).
 3. You may be presented with lots of errors, but don't worry. You can go to Build => [Clean Solution](https://docs.microsoft.com/en-us/visualstudio/ide/building-and-cleaning-projects-and-solutions-in-visual-studio?view=vs-2019), select [Release and x64](https://docs.microsoft.com/en-us/cpp/build/working-with-project-properties?view=vs-2019) for the build options, and then click Build => Build Kryptor. Next, run the program by clicking the [green play button](https://tutorials.visualstudio.com/vs-get-started/creating-and-running) in Visual Studio. This should resolve all of the errors.
 4. The [libsodium-core](https://github.com/tabrath/libsodium-core/issues/44) library used by Kryptor does not support building to AnyCPU in Visual Studio - you must either build to x86 or x64. Build to x64 when possible.
 
 #### GUI Requirements
+
 - Windows: If you encounter any unhandled exceptions due to 'Sodium.Core' or 'libsodium', then you will need to copy the 'vcruntime140.dll' from 'Kryptor/src/Kryptor/bin/(x86 or x64 depending on your build)/Release/' to the folder containing the 'Kryptor.exe' file. 'vcruntime140.dll' is required for libsodium to work and must stay with the executable on Windows. Alternatively, you can install the [Visual C++ Redistributable for Visual Studio 2015-2019](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads), but this will mean that your Kryptor build won't be portable.
 - Linux: You must build Kryptor as x64. To retrieve the libsodium library for Linux, download the latest Kryptor GUI [release](https://kryptor.co.uk/Downloads.html) for Linux, extract 'KryptorGUI-Linux.zip', and copy the 'libsodium.so' file to the same folder as the 'Kryptor.exe' file you've built.
 - macOS: You must build Kryptor as x64. To retrieve the libsodium library for macOS, download the latest Kryptor GUI [release](https://kryptor.co.uk/Downloads.html) for macOS, extract 'KryptorGUI-macOS.zip', and copy the 'libsodium.dylib' file to the same folder as the 'Kryptor.exe' file you've built.
 
 #### Notes
+
 [Visual Studio 2019 Community](https://visualstudio.microsoft.com/vs/community/) is the IDE I recommend building with, but be aware that it isn't open source. Furthermore, you have to sign into a Microsoft account after 30 days, although this can be bypassed. 
 
 If you just want to view the code, then you can use a text editor like [Atom](https://atom.io/) or a source code editor like [VSCodium](https://vscodium.com), which is the open source version of VSCode. However, you must use [Visual Studio 2019 Community](https://visualstudio.microsoft.com/vs/community/) to view the Windows Forms Designer.
