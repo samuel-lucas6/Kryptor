@@ -63,7 +63,7 @@ Before you do anything with the source code, make sure you understand the [GPLv3
 1. Click the green 'Code' button and 'Download ZIP'.
 2. Extract the ZIP, navigate to the 'Kryptor/KryptorCLI' folder, and open the 'Kryptor.sln' file in [Visual Studio 2019 Community](https://visualstudio.microsoft.com/vs/community/).
 3. Right click on 'KryptorCLI' in the Solution Explorer and choose 'Publish...'.
-4. Choose to publish Kryptor as either win-x64, linux-x64, or osx-x64. Then click 'Publish'. You can find the published program at the path listed next to 'Target location'.
+4. Choose to publish Kryptor as either win-x64, linux-x64, or osx-x64. Then click 'Publish'. You will find the published program at the path listed next to 'Target location'.
 5. I don't recommend changing the profile settings, but you can publish the application as x86, Framework-dependent, change the target location, etc by changing the profile settings via 'Edit' or the pencil icons.
 
 #### GUI
