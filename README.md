@@ -53,6 +53,14 @@ Examples:
   --encrypt-password [public key] [password]
   --settings encryption-algorithm [value]
   ```
+When referencing file paths/names with spaces in them, you must surround the file path/name with ' ' on Linux/macOS and " " on Windows:
+```
+./kryptor -e -p -q4d_ndTEW-JE2b8 'This is an image.jpg'
+./kryptor -e -p -q4d_ndTEW-JE2b8 '/home/samuel/Downloads/This is an image.jpg'
+  
+kryptor -e -p -q4d_ndTEW-JE2b8 "This is an image.jpg"
+kryptor -e -p -q4d_ndTEW-JE2b8 "C:\Users\Samuel\Downloads\This is an image.jpg"
+```
 
 ## Building Kryptor
 
