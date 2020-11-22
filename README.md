@@ -46,20 +46,20 @@ Options:
   -h|--help              show help information
 
 Examples:
-  -e -p [password] [filepath]
-  -e -k [keyfile path] [filepath]
-  -e -p [password] -k [keyfile path] [filepath]
+  -e -p [password] [file]
+  -e -k [keyfile] [file]
+  -e -p [password] -k [keyfile] [file]
   --generate-password [length]
-  --encrypt-password [public key] [password]
+  --encrypt-password [publickey] [password]
   --settings encryption-algorithm [value]
   ```
 When referencing file paths/names with spaces in them, you must surround the file path/name with ' ' on Linux/macOS and " " on Windows:
 ```
-./kryptor -e -p -q4d_ndTEW-JE2b8 'This is an image.jpg'
-./kryptor -e -p -q4d_ndTEW-JE2b8 '/home/samuel/Downloads/This is an image.jpg'
+./kryptor -e -p Stumbling-Sixfold0-Disband-Riverboat-Alias-Eccentric 'This is an image.jpg'
+./kryptor -e -p Stumbling-Sixfold0-Disband-Riverboat-Alias-Eccentric '/home/samuel/Downloads/This is an image.jpg'
   
-kryptor -e -p -q4d_ndTEW-JE2b8 "This is an image.jpg"
-kryptor -e -p -q4d_ndTEW-JE2b8 "C:\Users\Samuel\Downloads\This is an image.jpg"
+kryptor -e -p Stumbling-Sixfold0-Disband-Riverboat-Alias-Eccentric "This is an image.jpg"
+kryptor -e -p Stumbling-Sixfold0-Disband-Riverboat-Alias-Eccentric "C:\Users\Samuel\Downloads\This is an image.jpg"
 ```
 
 ## Building Kryptor
@@ -91,12 +91,10 @@ Before you do anything with the source code, make sure you understand the [GPLv3
 
 [Visual Studio 2019 Community](https://visualstudio.microsoft.com/vs/community/) is the IDE I recommend building with, but be aware that it isn't open source. Furthermore, you have to sign into a Microsoft account after 30 days, although this can be bypassed. 
 
-If you just want to view the code, then you can use a text editor like [Atom](https://atom.io/) or a source code editor like [VSCodium](https://vscodium.com), which is the open source version of VSCode. However, you must use [Visual Studio 2019 Community](https://visualstudio.microsoft.com/vs/community/) to view the Windows Forms Designer.
+If you just want to view the code, then you can use a text editor like [Atom](https://atom.io/) or a source code editor like [VSCodium](https://vscodium.com), which is the open source version of VSCode. However, you must use [Visual Studio 2019 Community](https://visualstudio.microsoft.com/vs/community/) to view the Windows Forms Designer for the GUI version.
 
 ## Donate
 
-You can support the developer of Kryptor by donating through Paypal, GitHub, Bitcoin, or Monero. Every donation helps no matter how big or small.
-
-Donate today to help me afford a code signing certificate (£65/yr), website hosting (£50/yr), and the website domain (£8/yr). Thank you for the support!
+You can support the developer of Kryptor by donating through Paypal, GitHub, Bitcoin, or Monero. Every donation helps no matter how big or small. Please donate to help me afford a code signing certificate (£65/yr), website hosting (£50/yr), and the website domain (£8/yr). Thank you for the support!
 
 Find out how to donate [here](https://kryptor.co.uk/Donate.html).
