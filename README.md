@@ -55,11 +55,11 @@ Examples:
   ```
 When referencing file paths/names with spaces in them, you must surround the file path/name with ' ' on Linux/macOS and " " on Windows:
 ```
-./kryptor -e -p Stumbling-Sixfold0-Disband-Riverboat-Alias-Eccentric 'This is an image.jpg'
-./kryptor -e -p Stumbling-Sixfold0-Disband-Riverboat-Alias-Eccentric '/home/samuel/Downloads/This is an image.jpg'
+./kryptor -e -p Stumbling-Sixfold7-Disband-Riverboat 'This is an image.jpg'
+./kryptor -e -p Stumbling-Sixfold7-Disband-Riverboat '/home/samuel/Downloads/This is an image.jpg'
   
-kryptor -e -p Stumbling-Sixfold0-Disband-Riverboat-Alias-Eccentric "This is an image.jpg"
-kryptor -e -p Stumbling-Sixfold0-Disband-Riverboat-Alias-Eccentric "C:\Users\Samuel\Downloads\This is an image.jpg"
+kryptor -e -p Stumbling-Sixfold7-Disband-Riverboat "This is an image.jpg"
+kryptor -e -p Stumbling-Sixfold7-Disband-Riverboat "C:\Users\Samuel\Downloads\This is an image.jpg"
 ```
 
 ## Building Kryptor
