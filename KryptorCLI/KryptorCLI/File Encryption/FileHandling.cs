@@ -41,17 +41,16 @@ namespace KryptorCLI
         public static byte[] GetBufferSize(long fileStreamLength)
         {
             int bufferSize = 4096;
-            int fileLength = Convert.ToInt32(fileStreamLength);
             // Use a larger buffer for bigger files
-            if (fileLength >= Constants.Mebibyte)
+            if (fileStreamLength >= Constants.Mebibyte)
             {
                 // 128 KiB
                 bufferSize = Constants.FileBufferSize;
             }
-            else if (bufferSize > fileLength)
+            else if (bufferSize > fileStreamLength)
             {
                 // Use file size as buffer for small files
-                bufferSize = fileLength;
+                bufferSize = Convert.ToInt32(fileStreamLength);
             }
             return new byte[bufferSize];
         }
