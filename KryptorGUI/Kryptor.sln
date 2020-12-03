@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29418.71
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kryptor", "Kryptor\Kryptor.csproj", "{375E70E7-99B5-494D-B149-054A7578C038}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kryptor", "KryptorGUI\Kryptor.csproj", "{375E70E7-99B5-494D-B149-054A7578C038}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{01139A3F-629B-400C-AF5A-F14AE6312785}"
 	ProjectSection(SolutionItems) = preProject
