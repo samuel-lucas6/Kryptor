@@ -2,10 +2,7 @@
 
 # Kryptor
 
-Kryptor is free and open source file encryption software for Windows, Linux, and macOS.
-
-- KryptorCLI is the portable, cross-platform command line version.
-- KryptorGUI is the graphical user interface application designed for Windows.
+Kryptor is free and open source file encryption software for Windows, Linux, and macOS. Kryptor is licensed under [GPLv3](https://github.com/Kryptor-Software/Kryptor/blob/master/LICENSE).
 
 ![Screenshot](https://kryptor.co.uk/Screenshots/File%20Encryption.gif)
 
@@ -21,6 +18,10 @@ Kryptor is free and open source file encryption software for Windows, Linux, and
 - Can be run offline. No account needed.
 
 For more information, head over to the [Kryptor website](https://kryptor.co.uk).
+
+## Versions
+- KryptorCLI is the portable, cross-platform command line version. **(Recommended for Linux & macOS)**
+- KryptorGUI is the graphical user interface application designed for Windows. **(Recommended for Windows)**
 
 ## CLI Usage
 ```
