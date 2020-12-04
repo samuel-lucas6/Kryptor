@@ -3,8 +3,7 @@ name: Bug report
 about: Create a bug report to help us improve the software
 title: ''
 labels: bug
-assignees: Kryptor-Software
-
+assignees: samuel-lucas6
 ---
 
 **Describe the bug**
@@ -23,11 +22,12 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Error log**
-If you're using the GUI version of Kryptor, please upload your error log file to the GitHub issue so I can understand what is causing the problem.
+Please upload your error log file to the GitHub issue so I can understand what is causing the problem. Here's where you can find the log file:
 
 GUI Installed: %APPDATA%\Kryptor\error log.txt 
-GUI Portable: Kryptor/error log.txt 
+GUI Portable: Kryptor/error log.txt
+CLI: Run the --error-log command and upload the 'error log.txt' file.
 
 **Desktop (please complete the following information):**
  - OS: [e.g. Windows]
- - Version: [e.g. CLI v2.2.0 Beta]
+ - Version: [e.g. CLI v2.2.1 Beta]
