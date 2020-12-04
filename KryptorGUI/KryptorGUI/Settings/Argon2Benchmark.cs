@@ -21,11 +21,11 @@ using System.IO;
     along with this program. If not, see https://www.gnu.org/licenses/. 
 */
 
-namespace Kryptor
+namespace KryptorGUI
 {
     public static class Argon2Benchmark
     {
-        public static void RunBenchmark(bool speedMode)
+        public static void RunBenchmark(int delayPerFile)
         {
             // Benchmark up to 300 MiB
             const int testCount = 51;
@@ -51,7 +51,7 @@ namespace Kryptor
                 benchmarkTimes[i] = elapsedTime;
                 memorySize.Add(memorySize[i] + incrementMemorySize);
             }
-            CalculateMemorySize(benchmarkTimes, memorySize, speedMode);
+            CalculateMemorySize(benchmarkTimes, memorySize, delayPerFile);
         }
 
         private static int GetMemorySizeDelay(byte[] passwordBytes, byte[] salt, int iterations, int memorySize)
@@ -69,15 +69,10 @@ namespace Kryptor
             salt = Generate.Salt();
         }
 
-        private static void CalculateMemorySize(int[] benchmarkTimes, List<int> memorySize, bool speedMode)
+        private static void CalculateMemorySize(int[] benchmarkTimes, List<int> memorySize, int delayPerFile)
         {
             int i = 0;
             int recommendedMemorySize = Constants.DefaultMemorySize;
-            int delayPerFile = 250;
-            if (speedMode == true)
-            {
-                delayPerFile = 150;
-            }
             foreach (int timeElapsed in benchmarkTimes)
             {
                 // Recommended memory size is the closest to the selected delay in ms

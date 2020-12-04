@@ -1,6 +1,6 @@
 #define MyAppName "Kryptor"
-#define MyAppVersion "2.2.0 Beta"
-#define VersionInfoVersion "2.2.0.0"
+#define MyAppVersion "2.2.1 Beta"
+#define VersionInfoVersion "2.2.1.0"
 #define MyAppPublisher "Samuel Lucas"
 #define Copyright "Copyright (C) 2020 Samuel Lucas"
 #define MyAppURL "https://kryptor.co.uk"

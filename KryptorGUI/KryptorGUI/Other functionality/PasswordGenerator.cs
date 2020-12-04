@@ -24,7 +24,7 @@ using Sodium;
     along with this program. If not, see https://www.gnu.org/licenses/. 
 */
 
-namespace Kryptor
+namespace KryptorGUI
 {
     public static class PasswordGenerator
     {
@@ -90,7 +90,7 @@ namespace Kryptor
                 }
                 else
                 {
-                    File.WriteAllText(wordlistFilePath, Properties.Resources.wordlist);
+                    File.WriteAllText(wordlistFilePath, KryptorGUI.Properties.Resources.wordlist);
                     return GenerateRandomPassphrase(wordCount, uppercase, numbers);
                 }
             }

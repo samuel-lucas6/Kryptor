@@ -1,0 +1,367 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{375E70E7-99B5-494D-B149-054A7578C038}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>KryptorGUI</RootNamespace>
+    <AssemblyName>Kryptor</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <PublishUrl>D:\Documents\Programming\Kryptor\Publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ProductName>Kryptor</ProductName>
+    <PublisherName>Samuel Lucas</PublisherName>
+    <ApplicationRevision>1</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Kryptor Icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>8.0</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>8.0</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>false</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>CDF028D2782658C92C5ABA46ECFA62E5D36C0AC6</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>Kryptor Signature.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetZone>LocalIntranet</TargetZone>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>false</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>KryptorGUI.Program</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <PlatformTarget>x86</PlatformTarget>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <PlatformTarget>x86</PlatformTarget>
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Code Analysis\NullChecks.cs" />
+    <Compile Include="Exception Handling\DisplayMessage.cs" />
+    <Compile Include="Cryptography\AesAlgorithms.cs" />
+    <Compile Include="Anonymous Rename\AnonymousRename.cs" />
+    <Compile Include="Exception Handling\ExceptionFilters.cs" />
+    <Compile Include="Cryptography\HashingAlgorithms.cs" />
+    <Compile Include="File Encryption\FileHandling.cs" />
+    <Compile Include="Cryptography\StreamCiphers.cs" />
+    <Compile Include="Cryptography\Utilities.cs" />
+    <Compile Include="File Encryption\ReadFileHeaders.cs" />
+    <Compile Include="GUI\DarkTheme.cs" />
+    <Compile Include="GUI\DisplaySettings.cs" />
+    <Compile Include="Settings\Argon2Benchmark.cs" />
+    <Compile Include="GUI\frmSelectBenchmarkMode.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\frmSelectBenchmarkMode.Designer.cs">
+      <DependentUpon>frmSelectBenchmarkMode.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Other functionality\PasswordSharing.cs" />
+    <Compile Include="Other functionality\PasswordGenerator.cs" />
+    <Compile Include="GUI\SharedContextMenu.cs" />
+    <Compile Include="GUI\MonoGUI.cs" />
+    <Compile Include="Other functionality\EditClipboard.cs" />
+    <Compile Include="GUI\DarkColourTable.cs" />
+    <Compile Include="File Encryption\WriteFileHeaders.cs" />
+    <Compile Include="File Encryption\FileAuthentication.cs" />
+    <Compile Include="File Encryption\FileEncryption.cs" />
+    <Compile Include="GUI\frmGenerateKeyPair.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\frmGenerateKeyPair.Designer.cs">
+      <DependentUpon>frmGenerateKeyPair.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\frmPasswordGenerator.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\frmPasswordGenerator.Designer.cs">
+      <DependentUpon>frmPasswordGenerator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="File Encryption\Generate.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Cryptography\KeyDerivation.cs" />
+    <Compile Include="Code Analysis\Invariant.cs" />
+    <Compile Include="Other functionality\Keyfiles.cs" />
+    <Compile Include="Exception Handling\Logging.cs" />
+    <Compile Include="Other functionality\PasswordEvaluation.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Settings\Constants.cs" />
+    <Compile Include="Cryptography\MemoryEncryption.cs" />
+    <Compile Include="GUI\VisitLink.cs" />
+    <Compile Include="Anonymous Rename\OriginalFileName.cs" />
+    <Compile Include="GUI\ReportProgress.cs" />
+    <Compile Include="GUI\SelectFiles.cs" />
+    <Compile Include="Settings\Settings.cs" />
+    <Compile Include="File Encryption\Decryption.cs" />
+    <Compile Include="File Encryption\Encryption.cs" />
+    <Compile Include="GUI\frmAboutKryptor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\frmAboutKryptor.Designer.cs">
+      <DependentUpon>frmAboutKryptor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\frmArgon2Benchmark.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\frmArgon2Benchmark.Designer.cs">
+      <DependentUpon>frmArgon2Benchmark.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Settings\GlobalVariables.cs" />
+    <Compile Include="GUI\frmFileEncryption.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\frmFileEncryption.Designer.cs">
+      <DependentUpon>frmFileEncryption.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\frmResults.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\frmResults.Designer.cs">
+      <DependentUpon>frmResults.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\frmPasswordSharing.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\frmPasswordSharing.Designer.cs">
+      <DependentUpon>frmPasswordSharing.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="GUI\frmSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\frmSettings.Designer.cs">
+      <DependentUpon>frmSettings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Shred Files\ShredFiles.cs" />
+    <Compile Include="Other functionality\Updates.cs" />
+    <Compile Include="Shred Files\ShredFilesMethods.cs" />
+    <EmbeddedResource Include="GUI\frmAboutKryptor.resx">
+      <DependentUpon>frmAboutKryptor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\frmArgon2Benchmark.resx">
+      <DependentUpon>frmArgon2Benchmark.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\frmGenerateKeyPair.resx">
+      <DependentUpon>frmGenerateKeyPair.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\frmFileEncryption.resx">
+      <DependentUpon>frmFileEncryption.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\frmResults.resx">
+      <DependentUpon>frmResults.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\frmPasswordSharing.resx">
+      <DependentUpon>frmPasswordSharing.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\frmPasswordGenerator.resx">
+      <DependentUpon>frmPasswordGenerator.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\frmSelectBenchmarkMode.resx">
+      <DependentUpon>frmSelectBenchmarkMode.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\frmSettings.resx">
+      <DependentUpon>frmSettings.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <None Include="..\.editorconfig">
+      <Link>.editorconfig</Link>
+    </None>
+    <None Include="Properties\app.manifest" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\x64\Debug\eff large wordlist.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.6.1 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <FileAssociation Include=".kryptor">
+      <Visible>False</Visible>
+      <Description>Kryptor file encryption</Description>
+      <Progid>462735235696</Progid>
+      <DefaultIcon>Kryptor Icon.ico</DefaultIcon>
+    </FileAssociation>
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="IWshRuntimeLibrary">
+      <Guid>{F935DC20-1CF0-11D0-ADB9-00C04FD58A0B}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Kryptor Icon.ico" />
+    <None Include="Resources\wordlist.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="libsodium">
+      <Version>1.0.18</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers">
+      <Version>3.3.1</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NETCore.Platforms">
+      <Version>5.0.0</Version>
+    </PackageReference>
+    <PackageReference Include="Ookii.Dialogs.WinForms">
+      <Version>1.2.0</Version>
+    </PackageReference>
+    <PackageReference Include="Sodium.Core">
+      <Version>1.2.3</Version>
+    </PackageReference>
+    <PackageReference Include="System.ValueTuple">
+      <Version>4.5.0</Version>
+    </PackageReference>
+    <PackageReference Include="zxcvbn-core">
+      <Version>2.1.44</Version>
+    </PackageReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

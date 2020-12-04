@@ -20,7 +20,7 @@ using System.Windows.Forms;
     along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
-namespace Kryptor
+namespace KryptorGUI
 {
     public partial class FrmArgon2Benchmark : Form
     {
@@ -33,11 +33,11 @@ namespace Kryptor
         {
             RunningOnMono();
             this.Hide();
-            bool? speedMode = GetBenchmarkMode();
-            if (speedMode != null)
+            int delayPerFile = GetBenchmarkMode();
+            if (delayPerFile != 0)
             {
                 this.Show();
-                bgwArgon2Benchmark.RunWorkerAsync(speedMode);
+                bgwArgon2Benchmark.RunWorkerAsync(delayPerFile);
             }
             else
             {
@@ -55,33 +55,30 @@ namespace Kryptor
             }
         }
 
-        private static bool? GetBenchmarkMode()
+        private static int GetBenchmarkMode()
         {
             using (var selectBenchmarkMode = new FrmSelectBenchmarkMode())
             {
                 DialogResult dialogResult = selectBenchmarkMode.ShowDialog();
+                int delayPerFile = 0;
                 if (dialogResult == DialogResult.Yes)
                 {
-                    // 150 ms delay per file
-                    return true;
+                    // 150 ms
+                    delayPerFile = 150;
                 }
                 else if (dialogResult == DialogResult.No)
                 {
-                    // 250 ms delay per file
-                    return false;
+                    // 250 ms
+                    delayPerFile = 250;
                 }
-                else
-                {
-                    // Cancel if the user closes the form
-                    return null;
-                }
+                return delayPerFile;
             }
         }
 
         private void BgwArgon2Benchmark_DoWork(object sender, DoWorkEventArgs e)
         {
-            bool speedMode = (bool)e.Argument;
-            Argon2Benchmark.RunBenchmark(speedMode);
+            int delayPerFile = (int)e.Argument;
+            Argon2Benchmark.RunBenchmark(delayPerFile);
         }
 
         private void BgwArgon2Benchmark_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)

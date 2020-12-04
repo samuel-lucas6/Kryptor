@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Kryptor.Properties {
+namespace KryptorGUI.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Kryptor.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Kryptor.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("KryptorGUI.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,43 +61,70 @@ namespace Kryptor.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 11111	abacus
-        ///11112	abdomen
-        ///11113	abdominal
-        ///11114	abide
-        ///11115	abiding
-        ///11116	ability
-        ///11121	ablaze
-        ///11122	able
-        ///11123	abnormal
-        ///11124	abrasion
-        ///11125	abrasive
-        ///11126	abreast
-        ///11131	abridge
-        ///11132	abroad
-        ///11133	abruptly
-        ///11134	absence
-        ///11135	absentee
-        ///11136	absently
-        ///11141	absinthe
-        ///11142	absolute
-        ///11143	absolve
-        ///11144	abstain
-        ///11145	abstract
-        ///11146	absurd
-        ///11151	accent
-        ///11152	acclaim
-        ///11153	acclimate
-        ///11154	accompany
-        ///11155	account
-        ///11156	accuracy
-        ///11161	accurate
-        ///11162	accustom
-        ///11163	acetone
-        ///11164	achiness
-        ///11165	aching
-        ///11166	acid
-        ///112 [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to abacus
+        ///abdomen
+        ///abdominal
+        ///abide
+        ///abiding
+        ///ability
+        ///ablaze
+        ///able
+        ///abnormal
+        ///abrasion
+        ///abrasive
+        ///abreast
+        ///abridge
+        ///abroad
+        ///abruptly
+        ///absence
+        ///absentee
+        ///absently
+        ///absinthe
+        ///absolute
+        ///absolve
+        ///abstain
+        ///abstract
+        ///absurd
+        ///accent
+        ///acclaim
+        ///acclimate
+        ///accompany
+        ///account
+        ///accuracy
+        ///accurate
+        ///accustom
+        ///acetone
+        ///achiness
+        ///aching
+        ///acid
+        ///acorn
+        ///acquaint
+        ///acquire
+        ///acre
+        ///acrobat
+        ///acronym
+        ///acting
+        ///action
+        ///activate
+        ///activator
+        ///active
+        ///activism
+        ///activist
+        ///activity
+        ///actress
+        ///acts
+        ///acutely
+        ///acuteness
+        ///aeration
+        ///aerobics
+        ///aerosol
+        ///aerospace
+        ///afar
+        ///affair
+        ///affected
+        ///affecting
+        ///affection
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string wordlist {
             get {

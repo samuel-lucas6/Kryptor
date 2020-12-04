@@ -1,4 +1,4 @@
-﻿namespace Kryptor
+﻿namespace KryptorGUI
 {
     partial class FrmPasswordSharing
     {

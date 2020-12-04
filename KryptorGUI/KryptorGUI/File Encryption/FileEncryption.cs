@@ -21,7 +21,7 @@ using System.Text;
     along with this program. If not, see https://www.gnu.org/licenses/. 
 */
 
-namespace Kryptor
+namespace KryptorGUI
 {
     public static class FileEncryption
     {

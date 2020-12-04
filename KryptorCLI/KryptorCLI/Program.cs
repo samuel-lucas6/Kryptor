@@ -82,13 +82,15 @@ Please report bugs to <https://github.com/samuel-lucas6/Kryptor/issues>.")]
 
         [Option("--donate", "find out how to donate", CommandOptionType.NoValue)]
         public bool Donate { get; }
-        
-        // Checking for updates seems to be broken when the program is published
-        //[Option("--update", "check for updates", CommandOptionType.NoValue)]
-        //public bool CheckForUpdates { get; }
+
+        [Option("--update", "check for updates", CommandOptionType.NoValue)]
+        public bool CheckForUpdates { get; }
 
         [Option("--about", "view the program version and license", CommandOptionType.NoValue)]
         public bool About { get; }
+
+        [Option("--error-log", CommandOptionType.NoValue, ShowInHelpText = false)]
+        public bool ErrorLog { get; }
 
         [Option("--easter-egg", CommandOptionType.NoValue, ShowInHelpText = false)]
         public bool EasterEgg { get; }
@@ -164,14 +166,17 @@ Please report bugs to <https://github.com/samuel-lucas6/Kryptor/issues>.")]
             {
                 CommandLine.OpenDonate();
             }
-            //else if (CheckForUpdates)
-            //{
-            //    bool displayUpToDate = true;
-            //    CommandLine.UpdateCheck(displayUpToDate);
-            //}
+            else if (CheckForUpdates)
+            {
+                CommandLine.UpdateCheck(displayUpToDate:true);
+            }
             else if (About)
             {
                 CommandLine.DisplayAbout();
+            }
+            else if (ErrorLog)
+            {
+                CommandLine.OpenKryptorDirectory();
             }
             else if (EasterEgg)
             {

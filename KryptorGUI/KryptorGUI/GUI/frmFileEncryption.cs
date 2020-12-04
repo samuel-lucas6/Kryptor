@@ -22,7 +22,7 @@ using System.Windows.Forms;
     along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
-namespace Kryptor
+namespace KryptorGUI
 {
     public partial class FrmFileEncryption : Form
     {

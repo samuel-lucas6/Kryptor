@@ -1,4 +1,4 @@
-﻿namespace Kryptor
+﻿namespace KryptorGUI
 {
     partial class FrmAboutKryptor
     {
@@ -99,7 +99,7 @@
             this.lblVersion.Name = "lblVersion";
             this.lblVersion.Size = new System.Drawing.Size(133, 21);
             this.lblVersion.TabIndex = 76;
-            this.lblVersion.Text = "Version 2.2.0 Beta";
+            this.lblVersion.Text = "Version 2.2.1 Beta";
             // 
             // FrmAboutKryptor
             // 

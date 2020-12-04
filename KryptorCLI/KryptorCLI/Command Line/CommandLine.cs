@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
@@ -263,6 +264,15 @@ namespace KryptorCLI
             Console.WriteLine("License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>");
             Console.WriteLine("This is free software: you are free to change and redistribute it.");
             Console.WriteLine("There is NO WARRANTY, to the extent permitted by law.");
+        }
+
+        public static void OpenKryptorDirectory()
+        {
+            ProcessStartInfo kryptorDirectory = new ProcessStartInfo(Constants.KryptorDirectory)
+            {
+                UseShellExecute = true
+            };
+            Process.Start(kryptorDirectory);
         }
 
         public static void DisplayEasterEgg()
