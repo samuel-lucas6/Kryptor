@@ -4,7 +4,7 @@
 
 Kryptor is free and open source file encryption software for Windows, Linux, and macOS. Kryptor is licensed under [GPLv3](https://github.com/Kryptor-Software/Kryptor/blob/master/LICENSE).
 
-![Screenshot](https://kryptor.co.uk/Screenshots/File%20Encryption.gif)
+![Screenshot](https://kryptor.co.uk/screenshots/file-encryption.gif)
 
 ## Main Features
 
@@ -58,11 +58,11 @@ Examples:
   ```
 When referencing file paths/file names that contain spaces, you must surround them with ' ' on Linux/macOS and " " on Windows.
 ```
-./kryptor -e -p Stumbling-Sixfold7-Disband-Riverboat 'This is an image.jpg'
-./kryptor -e -p Stumbling-Sixfold7-Disband-Riverboat '/home/samuel/Downloads/This is an image.jpg'
+$ ./kryptor -e -p Stumbling-Sixfold7-Disband-Riverboat 'This is an image.jpg'
+$ ./kryptor -e -p Stumbling-Sixfold7-Disband-Riverboat '/home/samuel/Downloads/This is an image.jpg'
 
-kryptor -e -p Stumbling-Sixfold7-Disband-Riverboat "This is an image.jpg"
-kryptor -e -p Stumbling-Sixfold7-Disband-Riverboat "C:\Users\Samuel\Downloads\This is an image.jpg"
+$ kryptor -e -p Stumbling-Sixfold7-Disband-Riverboat "This is an image.jpg"
+$ kryptor -e -p Stumbling-Sixfold7-Disband-Riverboat "C:\Users\Samuel\Downloads\This is an image.jpg"
 ```
 
 ## Building Kryptor
@@ -87,8 +87,8 @@ Before you do anything with the source code, make sure you understand the [GPLv3
 #### GUI Requirements
 
 - Windows: The [libsodium](https://libsodium.org) library requires the [Visual C++ Redistributable for Visual Studio 2015-2019](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) to work. Therefore, you must keep the 'vcruntime140.dll' file in the same folder as 'Kryptor.exe' on Windows.
-- Linux: You must build Kryptor as x64. To retrieve the libsodium library for Linux, download the latest KryptorGUI portable [release](https://kryptor.co.uk/Downloads.html), extract 'KryptorGUI-Portable.zip', and copy the 'libsodium.so' file to the same folder as the 'Kryptor.exe' file you've built.
-- macOS: You must build Kryptor as x64. To retrieve the libsodium library for macOS, download the latest KryptorGUI portable [release](https://kryptor.co.uk/Downloads.html), extract 'KryptorGUI-Portable.zip', and copy the 'libsodium.dylib' file to the same folder as the 'Kryptor.exe' file you've built.
+- Linux: You must build Kryptor as x64. To retrieve the libsodium library for Linux, download the latest KryptorGUI portable [release](https://kryptor.co.uk/downloads.html), extract 'KryptorGUI-Portable.zip', and copy the 'libsodium.so' file to the same folder as the 'Kryptor.exe' file you've built.
+- macOS: You must build Kryptor as x64. To retrieve the libsodium library for macOS, download the latest KryptorGUI portable [release](https://kryptor.co.uk/downloads.html), extract 'KryptorGUI-Portable.zip', and copy the 'libsodium.dylib' file to the same folder as the 'Kryptor.exe' file you've built.
 
 #### Notes
 
@@ -100,4 +100,4 @@ If you just want to view the code, then you can use a text editor like [Atom](ht
 
 You can support the developer of Kryptor by donating through Paypal, GitHub, Bitcoin, or Monero. Every donation helps no matter how big or small. Please donate to help me afford a code signing certificate (£65/yr), website hosting (£50/yr), and the website domain (£8/yr). Thank you for the support!
 
-Find out how to donate [here](https://kryptor.co.uk/Donate.html).
+Find out how to donate [here](https://kryptor.co.uk/donate.html).
