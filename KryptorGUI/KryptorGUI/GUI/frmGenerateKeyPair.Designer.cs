@@ -1,6 +1,6 @@
 ﻿namespace KryptorGUI
 {
-    partial class frmGenerateKeyPair
+    partial class FrmGenerateKeyPair
     {
         /// <summary>
         /// Required designer variable.
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmGenerateKeyPair));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmGenerateKeyPair));
             this.btnStoredKeys = new System.Windows.Forms.Button();
             this.txtPrivateKey = new System.Windows.Forms.TextBox();
             this.cmsKeyPairMenu = new System.Windows.Forms.ContextMenuStrip(this.components);

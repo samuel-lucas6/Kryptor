@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-/*  
+/*
     Kryptor: Free and open source file encryption software.
     Copyright(C) 2020 Samuel Lucas
 
@@ -12,7 +12,7 @@ using System.IO;
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
@@ -23,30 +23,6 @@ namespace KryptorCLI
 {
     public static class NullChecks
     { 
-        public static void FileEncryption(FileStream plaintext, FileStream ciphertext, byte[] fileBytes, byte[] nonce, byte[] key)
-        {
-            if (plaintext == null)
-            {
-                throw new ArgumentNullException(nameof(plaintext));
-            }
-            if (ciphertext == null)
-            {
-                throw new ArgumentNullException(nameof(ciphertext));
-            }
-            if (fileBytes == null)
-            {
-                throw new ArgumentNullException(nameof(fileBytes));
-            }
-            if (nonce == null)
-            {
-                throw new ArgumentNullException(nameof(nonce));
-            }
-            if (key == null)
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
-        }
-
         public static void StringArray(string[] array)
         {
             if (array == null)
@@ -79,7 +55,7 @@ namespace KryptorCLI
             }
         }
 
-        public static void FileHeaders(FileStream ciphertext, byte[] salt, byte[] nonce)
+        public static void FileHeaders(FileStream ciphertext, byte[] salt)
         {
             if (ciphertext == null)
             {
@@ -88,10 +64,6 @@ namespace KryptorCLI
             if (salt == null)
             {
                 throw new ArgumentNullException(nameof(salt));
-            }
-            if (nonce == null)
-            {
-                throw new ArgumentNullException(nameof(nonce));
             }
         }
     }

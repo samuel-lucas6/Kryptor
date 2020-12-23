@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
-/*  
+/*
     Kryptor: Free and open source file encryption software.
     Copyright(C) 2020 Samuel Lucas
 
@@ -14,7 +14,7 @@ using System.Reflection;
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
@@ -170,29 +170,15 @@ namespace KryptorCLI
             }
         }
 
-        public static void CallShredFiles(string[] filePaths)
-        {
-            if (filePaths != null)
-            {
-                ShredFiles.ShredSelectedFiles(filePaths);
-            }
-            else
-            {
-                Console.WriteLine("Error: Please select files/folders to shred.");
-            }
-        }
-
         public static void DisplaySettings(string[] arguments)
         {
             if (arguments == null)
             {
-                Console.WriteLine($"encryption-algorithm: {KryptorSettings.GetCipherName()}");
                 Console.WriteLine($"memory-encryption: {Globals.MemoryEncryption}");
                 Console.WriteLine($"anonymous-rename: {Globals.AnonymousRename}");
                 Console.WriteLine($"overwrite-files: {Globals.OverwriteFiles}");
                 Console.WriteLine($"memory-size: {Globals.MemorySize / Constants.Mebibyte} MiB");
                 Console.WriteLine($"iterations: {Globals.Iterations}");
-                Console.WriteLine($"shred-files-method: {KryptorSettings.GetShredFilesMethod()}");
                 Console.WriteLine();
                 Console.WriteLine("Use --settings [setting name] [value] to change a setting.");
             }
@@ -234,7 +220,7 @@ namespace KryptorCLI
 
         public static void OpenDocumentation()
         {
-            const string documentationLink = "https://kryptor.co.uk/Documentation.html";
+            const string documentationLink = "https://kryptor.co.uk/documentation.html";
             VisitLink.OpenLink(documentationLink);
         }
 
@@ -242,12 +228,6 @@ namespace KryptorCLI
         {
             const string sourceCodeLink = "https://github.com/samuel-lucas6/Kryptor";
             VisitLink.OpenLink(sourceCodeLink);
-        }
-
-        public static void OpenDonate()
-        {
-            const string donateLink = "https://kryptor.co.uk/Donate.html";
-            VisitLink.OpenLink(donateLink);
         }
 
         public static void UpdateCheck(bool displayUpToDate)
@@ -273,11 +253,6 @@ namespace KryptorCLI
                 UseShellExecute = true
             };
             Process.Start(kryptorDirectory);
-        }
-
-        public static void DisplayEasterEgg()
-        {
-            Console.WriteLine("Mjc1OTZtNzUyMDc3NjU3MjY1MjA2MjZtNzI2bDIwNjE3NDIwNjEyMDcwNzI2NTc0NzQ3OTIwNjM3MjYxNzA3MDc5MjA3NDY5Nms2NTIwNjk2bDIwNjg2OTczNzQ2bTcyNzkybDIwNDE2bDY0MjA2OTc0MjA2ajZtNm02aTczMjA2ajY5Nmk2NTIwNzQ2ODY5Nmw2NzczMjA2MTcyNjUyMDZtNmw2ajc5MjA2NzZtNmw2bDYxMjA2NzY1NzQyMDc3Nm03MjczNjUyMDY2NzI2bTZrMjA2ODY1NzI2NTIwNm02bDIwNm03NTc0MmwyNzBrMGgyazIwNTA2MTcyN2g2OTc2NjE2ajJqMjA1MjY1NjE2NDc5MjA1MDZqNjE3OTY1NzIyMDRtNmw2NQ==");
         }
     }
 }

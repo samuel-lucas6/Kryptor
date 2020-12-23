@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Windows.Forms;
 
-/*  
+/*
     Kryptor: Free and open source file encryption software.
     Copyright(C) 2020 Samuel Lucas
 
@@ -13,7 +13,7 @@ using System.Windows.Forms;
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
@@ -56,7 +56,6 @@ namespace KryptorGUI
             DarkTheme.Labels(lblAutoClearPassword);
             DarkTheme.Labels(lblAutoClearClipboard);
             DarkTheme.Labels(lblExitClearClipboard);
-            DarkTheme.Labels(lblShredFilesMethod);
             DarkTheme.Labels(lblCheckForUpdates);
             DarkTheme.Labels(lblTheme);
             DarkTheme.ComboBoxes(cmbEncryptionAlgorithm);
@@ -68,7 +67,6 @@ namespace KryptorGUI
             DarkTheme.ComboBoxes(cmbAutoClearPassword);
             DarkTheme.ComboBoxes(cmbAutoClearClipboard);
             DarkTheme.ComboBoxes(cmbExitClearClipboard);
-            DarkTheme.ComboBoxes(cmbShredFilesMethod);
             DarkTheme.ComboBoxes(cmbCheckForUpdates);
             DarkTheme.ComboBoxes(cmbTheme);
             DarkTheme.NumericUpDown(nudArgon2MemorySize);
@@ -90,19 +88,9 @@ namespace KryptorGUI
             DisplaySettings.SetAutoClearPassword(cmbAutoClearPassword);
             DisplaySettings.SetAutoClearClipboard(cmbAutoClearClipboard);
             DisplaySettings.SetExitClearClipboard(cmbExitClearClipboard);
-            DisplaySettings.SetShredFilesMethod(cmbShredFilesMethod);
             DisplaySettings.SetCheckForUpdates(cmbCheckForUpdates);
             DisplaySettings.SetTheme(cmbTheme);
             FormLoad = false;
-        }
-
-        private void CmbEncryptionAlgorithm_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (FormLoad == false)
-            {
-                lblEncryptionAlgorithm.Focus();
-                Globals.EncryptionAlgorithm = cmbEncryptionAlgorithm.SelectedIndex;
-            }
         }
 
         private void CmbEncryptionAlgorithm_DropDownClosed(object sender, EventArgs e)
@@ -224,19 +212,6 @@ namespace KryptorGUI
             {
                 Globals.Iterations = (int)nudArgon2Iterations.Value;
             }
-        }
-
-        private void CmbShredFilesMethod_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (FormLoad == false)
-            {
-                Globals.ShredFilesMethod = cmbShredFilesMethod.SelectedIndex;
-            }
-        }
-
-        private void CmbShredFilesMethod_DropDownClosed(object sender, EventArgs e)
-        {
-            lblShredFilesMethod.Focus();
         }
 
         private void CmbShowPassword_SelectedIndexChanged(object sender, EventArgs e)

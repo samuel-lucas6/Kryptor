@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Text;
 
-/*  
+/*
     Kryptor: Free and open source file encryption software.
     Copyright(C) 2020 Samuel Lucas
 
@@ -14,7 +14,7 @@ using System.Text;
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
@@ -38,9 +38,7 @@ namespace KryptorGUI
 
         private static byte[] HashPasswordBytes(byte[] passwordBytes)
         {
-            byte[] associatedData = Generate.AssociatedData();
-            // Combine associated data and password bytes
-            passwordBytes = HashingAlgorithms.Blake2(passwordBytes, associatedData);
+            passwordBytes = HashingAlgorithms.Blake2(passwordBytes);
             MemoryEncryption.EncryptByteArray(ref passwordBytes);
             return passwordBytes;
         }

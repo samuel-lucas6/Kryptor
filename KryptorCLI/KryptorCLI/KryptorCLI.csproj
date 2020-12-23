@@ -7,7 +7,7 @@
     <ApplicationIcon>Kryptor Icon.ico</ApplicationIcon>
     <Platforms>AnyCPU;x64</Platforms>
     <PackageId>Kryptor</PackageId>
-    <Version>2.2.1</Version>
+    <Version>2.2.2</Version>
     <Authors>Samuel Lucas</Authors>
     <Company />
     <Product>Kryptor</Product>

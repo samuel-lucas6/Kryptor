@@ -99,7 +99,7 @@
             this.lblVersion.Name = "lblVersion";
             this.lblVersion.Size = new System.Drawing.Size(133, 21);
             this.lblVersion.TabIndex = 76;
-            this.lblVersion.Text = "Version 2.2.1 Beta";
+            this.lblVersion.Text = "Version 2.2.2 Beta";
             // 
             // FrmAboutKryptor
             // 

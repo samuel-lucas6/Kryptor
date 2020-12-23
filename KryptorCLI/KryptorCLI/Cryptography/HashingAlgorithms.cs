@@ -1,7 +1,7 @@
 ﻿using Sodium;
 using System.IO;
 
-/*  
+/*
     Kryptor: Free and open source file encryption software.
     Copyright(C) 2020 Samuel Lucas
 
@@ -12,7 +12,7 @@ using System.IO;
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
@@ -28,17 +28,15 @@ namespace KryptorCLI
             return GenericHash.Hash(message, key, Constants.HashLength);
         }
 
-        public static byte[] Blake2(FileStream fileStream, byte[] key)
+        public static byte[] Blake2(byte[] message)
         {
-            using (var blake2 = new GenericHash.GenericHashAlgorithm(key, Constants.HashLength))
-            {
-                return blake2.ComputeHash(fileStream);
-            }
+            return GenericHash.Hash(message, key:(byte[])null, Constants.HashLength);
         }
 
-        public static byte[] Blake2(string message)
+        public static byte[] Blake2(FileStream fileStream, byte[] key)
         {
-            return GenericHash.Hash(message, (byte[])null, Constants.HashLength);
+            using var blake2 = new GenericHash.GenericHashAlgorithm(key, Constants.HashLength);
+            return blake2.ComputeHash(fileStream);
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
-/*  
+/*
     Kryptor: Free and open source file encryption software.
     Copyright(C) 2020 Samuel Lucas
 
@@ -15,7 +15,7 @@ using System.Windows.Forms;
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
@@ -187,7 +187,7 @@ namespace KryptorGUI
 
         private void ValidateUserInput(bool encryption, char[] password)
         {
-            if (!bgwEncryption.IsBusy && !bgwDecryption.IsBusy && !bgwShredFiles.IsBusy)
+            if (!bgwEncryption.IsBusy && !bgwDecryption.IsBusy)
             {
                 if (Globals.GetSelectedFiles() != null)
                 {
@@ -422,7 +422,7 @@ namespace KryptorGUI
 
         private void TsmiQuit_Click(object sender, EventArgs e)
         {
-            if (!bgwEncryption.IsBusy && !bgwDecryption.IsBusy && !bgwShredFiles.IsBusy)
+            if (!bgwEncryption.IsBusy && !bgwDecryption.IsBusy)
             {
                 Application.Exit();
             }
@@ -448,43 +448,6 @@ namespace KryptorGUI
             }
         }
 
-        private void TsmiShredFiles_Click(object sender, EventArgs e)
-        {
-            bool filesSelected = SelectFiles.SelectFilesDialog();
-            CallShredFiles(filesSelected);
-        }
-
-        private void TsmiShredFolder_Click(object sender, EventArgs e)
-        {
-            bool folderSelected = SelectFiles.SelectFolderDialog();
-            CallShredFiles(folderSelected);
-        }
-
-        private void CallShredFiles(bool filesSelected)
-        {
-            if (filesSelected == true)
-            {
-                BeforeBackgroundWorker();
-                bgwShredFiles.RunWorkerAsync();
-            }
-        }
-
-        private void BgwShredFiles_DoWork(object sender, DoWorkEventArgs e)
-        {
-            ShredFiles.ShredSelectedFiles(bgwShredFiles);
-        }
-
-        private void BgwShredFiles_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            UpdateProgressBar(e.ProgressPercentage);
-        }
-
-        private void BgwShredFiles_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            const string outputMessage = "shredded";
-            BackgroundWorkerCompleted(outputMessage);
-        }
-
         private void TsmiBackupSettings_Click(object sender, EventArgs e)
         {
             Settings.BackupSettings();
@@ -497,7 +460,7 @@ namespace KryptorGUI
 
         private void TsmiDocumentation_Click(object sender, EventArgs e)
         {
-            const string documentationLink = "https://kryptor.co.uk/Documentation.html";
+            const string documentationLink = "https://kryptor.co.uk/documentation.html";
             VisitLink.OpenLink(documentationLink);
         }
 
@@ -509,7 +472,7 @@ namespace KryptorGUI
 
         private void TsmiDonate_Click(object sender, EventArgs e)
         {
-            const string donateLink = "https://kryptor.co.uk/Donate.html";
+            const string donateLink = "https://kryptor.co.uk/donate.html";
             VisitLink.OpenLink(donateLink);
         }
 
@@ -529,7 +492,7 @@ namespace KryptorGUI
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
-            if (bgwEncryption.IsBusy || bgwDecryption.IsBusy || bgwShredFiles.IsBusy)
+            if (bgwEncryption.IsBusy || bgwDecryption.IsBusy)
             {
                 if (e != null)
                 {

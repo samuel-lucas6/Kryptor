@@ -29,8 +29,6 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmSettings));
-            this.lblShredFilesMethod = new System.Windows.Forms.Label();
-            this.cmbShredFilesMethod = new System.Windows.Forms.ComboBox();
             this.lblAutoClearClipboard = new System.Windows.Forms.Label();
             this.cmbAutoClearClipboard = new System.Windows.Forms.ComboBox();
             this.lblMemoryEncryption = new System.Windows.Forms.Label();
@@ -67,39 +65,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudArgon2Iterations)).BeginInit();
             this.grbOtherSettings.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // lblShredFilesMethod
-            // 
-            this.lblShredFilesMethod.AutoSize = true;
-            this.lblShredFilesMethod.ForeColor = System.Drawing.Color.Black;
-            this.lblShredFilesMethod.Location = new System.Drawing.Point(12, 127);
-            this.lblShredFilesMethod.Name = "lblShredFilesMethod";
-            this.lblShredFilesMethod.Size = new System.Drawing.Size(147, 21);
-            this.lblShredFilesMethod.TabIndex = 16;
-            this.lblShredFilesMethod.Text = "Shred Files Method:";
-            // 
-            // cmbShredFilesMethod
-            // 
-            this.cmbShredFilesMethod.BackColor = System.Drawing.Color.Gainsboro;
-            this.cmbShredFilesMethod.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbShredFilesMethod.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cmbShredFilesMethod.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cmbShredFilesMethod.ForeColor = System.Drawing.Color.Black;
-            this.cmbShredFilesMethod.FormattingEnabled = true;
-            this.cmbShredFilesMethod.Items.AddRange(new object[] {
-            "16 KiB",
-            "Zero fill",
-            "1 Pass",
-            "Encryption",
-            "HMG IS5",
-            "5 Passes"});
-            this.cmbShredFilesMethod.Location = new System.Drawing.Point(188, 124);
-            this.cmbShredFilesMethod.Name = "cmbShredFilesMethod";
-            this.cmbShredFilesMethod.Size = new System.Drawing.Size(136, 29);
-            this.cmbShredFilesMethod.TabIndex = 8;
-            this.cmbShredFilesMethod.TabStop = false;
-            this.cmbShredFilesMethod.SelectedIndexChanged += new System.EventHandler(this.CmbShredFilesMethod_SelectedIndexChanged);
-            this.cmbShredFilesMethod.DropDownClosed += new System.EventHandler(this.CmbShredFilesMethod_DropDownClosed);
             // 
             // lblAutoClearClipboard
             // 
@@ -179,15 +144,12 @@
             this.cmbEncryptionAlgorithm.ForeColor = System.Drawing.Color.Black;
             this.cmbEncryptionAlgorithm.FormattingEnabled = true;
             this.cmbEncryptionAlgorithm.Items.AddRange(new object[] {
-            "XChaCha20",
-            "XSalsa20",
-            "AES-CBC"});
+            "XChaCha20"});
             this.cmbEncryptionAlgorithm.Location = new System.Drawing.Point(188, 38);
             this.cmbEncryptionAlgorithm.Name = "cmbEncryptionAlgorithm";
             this.cmbEncryptionAlgorithm.Size = new System.Drawing.Size(136, 29);
             this.cmbEncryptionAlgorithm.TabIndex = 1;
             this.cmbEncryptionAlgorithm.TabStop = false;
-            this.cmbEncryptionAlgorithm.SelectedIndexChanged += new System.EventHandler(this.CmbEncryptionAlgorithm_SelectedIndexChanged);
             this.cmbEncryptionAlgorithm.DropDownClosed += new System.EventHandler(this.CmbEncryptionAlgorithm_DropDownClosed);
             // 
             // lblAutoClearPassword
@@ -484,17 +446,15 @@
             this.grbOtherSettings.Controls.Add(this.cmbCheckForUpdates);
             this.grbOtherSettings.Controls.Add(this.lblAutoClearClipboard);
             this.grbOtherSettings.Controls.Add(this.cmbAutoClearPassword);
-            this.grbOtherSettings.Controls.Add(this.cmbShredFilesMethod);
             this.grbOtherSettings.Controls.Add(this.lblExitClearClipboard);
             this.grbOtherSettings.Controls.Add(this.cmbExitClearClipboard);
-            this.grbOtherSettings.Controls.Add(this.lblShredFilesMethod);
             this.grbOtherSettings.Controls.Add(this.lblShowPassword);
             this.grbOtherSettings.Controls.Add(this.cmbShowPassword);
             this.grbOtherSettings.Controls.Add(this.lblAutoClearPassword);
             this.grbOtherSettings.ForeColor = System.Drawing.Color.Black;
             this.grbOtherSettings.Location = new System.Drawing.Point(12, 238);
             this.grbOtherSettings.Name = "grbOtherSettings";
-            this.grbOtherSettings.Size = new System.Drawing.Size(693, 221);
+            this.grbOtherSettings.Size = new System.Drawing.Size(693, 180);
             this.grbOtherSettings.TabIndex = 27;
             this.grbOtherSettings.TabStop = false;
             this.grbOtherSettings.Text = "Other Settings";
@@ -503,7 +463,7 @@
             // 
             this.lblTheme.AutoSize = true;
             this.lblTheme.ForeColor = System.Drawing.Color.Black;
-            this.lblTheme.Location = new System.Drawing.Point(12, 170);
+            this.lblTheme.Location = new System.Drawing.Point(364, 127);
             this.lblTheme.Name = "lblTheme";
             this.lblTheme.Size = new System.Drawing.Size(116, 21);
             this.lblTheme.TabIndex = 28;
@@ -519,7 +479,7 @@
             this.cmbTheme.Items.AddRange(new object[] {
             "Dark",
             "Light"});
-            this.cmbTheme.Location = new System.Drawing.Point(188, 167);
+            this.cmbTheme.Location = new System.Drawing.Point(540, 127);
             this.cmbTheme.Name = "cmbTheme";
             this.cmbTheme.Size = new System.Drawing.Size(136, 29);
             this.cmbTheme.TabIndex = 26;
@@ -531,7 +491,7 @@
             // 
             this.lblCheckForUpdates.AutoSize = true;
             this.lblCheckForUpdates.ForeColor = System.Drawing.Color.Black;
-            this.lblCheckForUpdates.Location = new System.Drawing.Point(364, 127);
+            this.lblCheckForUpdates.Location = new System.Drawing.Point(12, 127);
             this.lblCheckForUpdates.Name = "lblCheckForUpdates";
             this.lblCheckForUpdates.Size = new System.Drawing.Size(140, 21);
             this.lblCheckForUpdates.TabIndex = 27;
@@ -547,7 +507,7 @@
             this.cmbCheckForUpdates.Items.AddRange(new object[] {
             "Enabled",
             "Disabled"});
-            this.cmbCheckForUpdates.Location = new System.Drawing.Point(540, 124);
+            this.cmbCheckForUpdates.Location = new System.Drawing.Point(188, 124);
             this.cmbCheckForUpdates.Name = "cmbCheckForUpdates";
             this.cmbCheckForUpdates.Size = new System.Drawing.Size(136, 29);
             this.cmbCheckForUpdates.TabIndex = 25;
@@ -566,7 +526,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 21F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(717, 471);
+            this.ClientSize = new System.Drawing.Size(717, 429);
             this.Controls.Add(this.grbKeyDerivation);
             this.Controls.Add(this.grbOtherSettings);
             this.Controls.Add(this.grbFileEncryption);
@@ -601,8 +561,6 @@
         private System.Windows.Forms.ComboBox cmbMemoryEncryption;
         private System.Windows.Forms.Label lblAutoClearClipboard;
         private System.Windows.Forms.ComboBox cmbAutoClearClipboard;
-        private System.Windows.Forms.Label lblShredFilesMethod;
-        private System.Windows.Forms.ComboBox cmbShredFilesMethod;
         private System.Windows.Forms.Label lblAutoClearPassword;
         private System.Windows.Forms.ComboBox cmbAutoClearPassword;
         private System.Windows.Forms.Label lblAnonymousRename;

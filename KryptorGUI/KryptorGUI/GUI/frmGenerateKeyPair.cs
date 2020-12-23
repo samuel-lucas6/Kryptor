@@ -3,7 +3,7 @@ using System.IO;
 using System.Windows.Forms;
 using Ookii.Dialogs.WinForms;
 
-/*  
+/*
     Kryptor: Free and open source file encryption software.
     Copyright(C) 2020 Samuel Lucas
 
@@ -14,7 +14,7 @@ using Ookii.Dialogs.WinForms;
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
@@ -23,9 +23,9 @@ using Ookii.Dialogs.WinForms;
 
 namespace KryptorGUI
 {
-    public partial class frmGenerateKeyPair : Form
+    public partial class FrmGenerateKeyPair : Form
     {
-        public frmGenerateKeyPair()
+        public FrmGenerateKeyPair()
         {
             InitializeComponent();
         }
@@ -80,7 +80,7 @@ namespace KryptorGUI
 
         private void PicHelp_Click(object sender, EventArgs e)
         {
-            const string passwordSharingLink = "https://kryptor.co.uk/Password%20Sharing.html";
+            const string passwordSharingLink = "https://kryptor.co.uk/password-sharing.html";
             VisitLink.OpenLink(passwordSharingLink);
         }
 

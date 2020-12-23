@@ -56,8 +56,6 @@
             this.tsmiTools = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiPasswordGenerator = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiPasswordSharing = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiShredFiles = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiShredFolder = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiBackupSettings = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiRestoreSettings = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiHelp = new System.Windows.Forms.ToolStripMenuItem();
@@ -72,7 +70,6 @@
             this.bgwEncryption = new System.ComponentModel.BackgroundWorker();
             this.bgwDecryption = new System.ComponentModel.BackgroundWorker();
             this.prgProgress = new System.Windows.Forms.ProgressBar();
-            this.bgwShredFiles = new System.ComponentModel.BackgroundWorker();
             this.lblEntropy = new System.Windows.Forms.Label();
             this.cmsPasswordMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picFilesSelected)).BeginInit();
@@ -361,8 +358,6 @@
             this.tsmiTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsmiPasswordGenerator,
             this.tsmiPasswordSharing,
-            this.tsmiShredFiles,
-            this.tsmiShredFolder,
             this.tsmiBackupSettings,
             this.tsmiRestoreSettings});
             this.tsmiTools.ForeColor = System.Drawing.Color.Black;
@@ -387,24 +382,6 @@
             this.tsmiPasswordSharing.Size = new System.Drawing.Size(220, 26);
             this.tsmiPasswordSharing.Text = "Password Sharing";
             this.tsmiPasswordSharing.Click += new System.EventHandler(this.TsmiPasswordSharing_Click);
-            // 
-            // tsmiShredFiles
-            // 
-            this.tsmiShredFiles.BackColor = System.Drawing.Color.White;
-            this.tsmiShredFiles.ForeColor = System.Drawing.Color.Black;
-            this.tsmiShredFiles.Name = "tsmiShredFiles";
-            this.tsmiShredFiles.Size = new System.Drawing.Size(220, 26);
-            this.tsmiShredFiles.Text = "Shred Files";
-            this.tsmiShredFiles.Click += new System.EventHandler(this.TsmiShredFiles_Click);
-            // 
-            // tsmiShredFolder
-            // 
-            this.tsmiShredFolder.BackColor = System.Drawing.Color.White;
-            this.tsmiShredFolder.ForeColor = System.Drawing.Color.Black;
-            this.tsmiShredFolder.Name = "tsmiShredFolder";
-            this.tsmiShredFolder.Size = new System.Drawing.Size(220, 26);
-            this.tsmiShredFolder.Text = "Shred Folder";
-            this.tsmiShredFolder.Click += new System.EventHandler(this.TsmiShredFolder_Click);
             // 
             // tsmiBackupSettings
             // 
@@ -523,13 +500,6 @@
             this.prgProgress.TabIndex = 73;
             this.prgProgress.Visible = false;
             // 
-            // bgwShredFiles
-            // 
-            this.bgwShredFiles.WorkerReportsProgress = true;
-            this.bgwShredFiles.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BgwShredFiles_DoWork);
-            this.bgwShredFiles.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BgwShredFiles_ProgressChanged);
-            this.bgwShredFiles.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.BgwShredFiles_RunWorkerCompleted);
-            // 
             // lblEntropy
             // 
             this.lblEntropy.AutoSize = true;
@@ -610,8 +580,6 @@
         private System.Windows.Forms.ToolStripMenuItem tsmiCreateKeyfile;
         private System.Windows.Forms.ToolStripMenuItem tsmiSelectKeyfile;
         private System.Windows.Forms.ToolStripMenuItem tsmiDocumentation;
-        private System.Windows.Forms.ToolStripMenuItem tsmiShredFiles;
-        private System.Windows.Forms.ToolStripMenuItem tsmiShredFolder;
         private System.Windows.Forms.ToolStripMenuItem tsmiQuit;
         private System.Windows.Forms.ToolStripMenuItem tsmiSourceCode;
         private System.Windows.Forms.ContextMenuStrip cmsClearFilesMenu;
@@ -624,7 +592,6 @@
         private System.Windows.Forms.ToolStripMenuItem tsmiBackupSettings;
         private System.Windows.Forms.ToolStripMenuItem tsmiPasswordSharing;
         private System.ComponentModel.BackgroundWorker bgwDecryption;
-        private System.ComponentModel.BackgroundWorker bgwShredFiles;
         private System.ComponentModel.BackgroundWorker bgwEncryption;
         private System.Windows.Forms.Label lblEntropy;
         public System.Windows.Forms.Timer tmrClearClipboard;

@@ -8,20 +8,15 @@ Kryptor is free and open source file encryption software for Windows, Linux, and
 
 ## Main Features
 
-- File encryption using XChaCha20 (default), XSalsa20, or AES-CBC with 256-bit keys.
+- File encryption using XChaCha20 with 256-bit keys.
 - Key derivation using Argon2id.
 - A unique encryption key per file.
 - Supports passwords and/or keyfiles.
 - Optional file/folder name obfuscation.
 - Password sharing using libsodium Sealed Boxes (Curve25519, XSalsa20-Poly1305).
-- Customisation of settings - e.g. Argon2 parameters.
 - Can be run offline. No account needed.
 
 For more information, head over to the [Kryptor website](https://kryptor.co.uk).
-
-## Versions
-- KryptorCLI is the portable, cross-platform command line version. **(Recommended for Linux & macOS)**
-- KryptorGUI is the graphical user interface application designed for Windows. **(Recommended for Windows)**
 
 ## CLI Usage
 ```
@@ -38,12 +33,10 @@ Options:
   --generate-keys        generate a recipient key pair for password sharing
   --encrypt-password     encrypt a password using the recipient's public key
   --decrypt-password     decrypt a ciphertext password using your private key
-  --shred                shred files/folders
   --settings             view/edit your settings
   --benchmark            perform the Argon2 benchmark
   --documentation        view the documentation
   --source               view the source code
-  --donate               find out how to donate
   --about                view the program version and license
   --update               check for updates   
   -h|--help              show help information
@@ -54,15 +47,14 @@ Examples:
   -e -p [password] -k [keyfile] [file]
   --generate-password [length]
   --encrypt-password [publickey] [password]
-  --settings encryption-algorithm [value]
   ```
 When referencing file paths/file names that contain spaces, you must surround them with ' ' on Linux/macOS and " " on Windows.
 ```
-$ ./kryptor -e -p Stumbling-Sixfold7-Disband-Riverboat 'This is an image.jpg'
-$ ./kryptor -e -p Stumbling-Sixfold7-Disband-Riverboat '/home/samuel/Downloads/This is an image.jpg'
+$ ./kryptor -e -p Stumbling-Sixfold7-Disband-Riverboat 'GitHub Logo.png'
+$ ./kryptor -e -p Stumbling-Sixfold7-Disband-Riverboat '/home/samuel/Downloads/GitHub Logo.png'
 
-$ kryptor -e -p Stumbling-Sixfold7-Disband-Riverboat "This is an image.jpg"
-$ kryptor -e -p Stumbling-Sixfold7-Disband-Riverboat "C:\Users\Samuel\Downloads\This is an image.jpg"
+$ kryptor -e -p Stumbling-Sixfold7-Disband-Riverboat "GitHub Logo.png"
+$ kryptor -e -p Stumbling-Sixfold7-Disband-Riverboat "C:\Users\Samuel\Downloads\GitHub Logo.png"
 ```
 
 ## Building Kryptor

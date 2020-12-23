@@ -1,7 +1,7 @@
 ﻿using Sodium;
 using System;
 
-/*  
+/*
     Kryptor: Free and open source file encryption software.
     Copyright(C) 2020 Samuel Lucas
 
@@ -12,7 +12,7 @@ using System;
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
@@ -23,7 +23,7 @@ namespace KryptorGUI
 {
     public static class KeyDerivation
     {
-        public static (byte[], byte[]) DeriveKeys(byte[] passwordBytes, byte[] salt, int iterations, int memorySize)
+        public static (byte[] encryptionKey, byte[] macKey) DeriveKeys(byte[] passwordBytes, byte[] salt, int iterations, int memorySize)
         {
             var argon2id = PasswordHash.ArgonAlgorithm.Argon_2ID13;
             MemoryEncryption.DecryptByteArray(ref passwordBytes);

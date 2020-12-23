@@ -14,7 +14,7 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>", Scope = "member", Target = "~M:KryptorCLI.Program.OnExecute")]
 
 // Less readable
-[assembly: SuppressMessage("Style", "IDE0063:Use simple 'using' statement", Justification = "<Pending>", Scope = "member", Target = "~M:KryptorCLI.KryptorSettings.SaveSettings")]
-[assembly: SuppressMessage("Style", "IDE0063:Use simple 'using' statement", Justification = "<Pending>", Scope = "member", Target = "~M:KryptorCLI.Updates.DownloadVersionFile(System.String)")]
 [assembly: SuppressMessage("Style", "IDE0057:Use range operator", Justification = "<Pending>", Scope = "member", Target = "~M:KryptorCLI.CommandLine.DisplayAbout")]
 [assembly: SuppressMessage("Style", "IDE0057:Use range operator", Justification = "<Pending>", Scope = "member", Target = "~M:KryptorCLI.Updates.UpdateKryptor(System.Boolean)~System.String")]
+[assembly: SuppressMessage("Style", "IDE0057:Use range operator", Justification = "<Pending>", Scope = "member", Target = "~M:KryptorCLI.ReadFileHeaders.RetrieveArgon2Parameters(System.String,System.String@,System.String@)")]
+[assembly: SuppressMessage("Style", "IDE0057:Use range operator", Justification = "<Pending>", Scope = "member", Target = "~M:KryptorCLI.ReadFileHeaders.RemoveParameterFlag(System.String)~System.String")]

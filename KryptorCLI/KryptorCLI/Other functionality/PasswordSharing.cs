@@ -3,7 +3,7 @@ using System;
 using System.Security.Cryptography;
 using System.Text;
 
-/*  
+/*
     Kryptor: Free and open source file encryption software.
     Copyright(C) 2020 Samuel Lucas
 
@@ -14,7 +14,7 @@ using System.Text;
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
@@ -27,12 +27,10 @@ namespace KryptorCLI
     {
         public static (string, string) GenerateKeyPair()
         {
-            using (var keyPair = PublicKeyBox.GenerateKeyPair())
-            {
-                string publicKey = Convert.ToBase64String(keyPair.PublicKey);
-                string privateKey = Convert.ToBase64String(keyPair.PrivateKey);
-                return (publicKey, privateKey);
-            }
+            using var keyPair = PublicKeyBox.GenerateKeyPair();
+            string publicKey = Convert.ToBase64String(keyPair.PublicKey);
+            string privateKey = Convert.ToBase64String(keyPair.PrivateKey);
+            return (publicKey, privateKey);
         }
 
         public static char[] ConvertUserInput(bool encryption, char[] base64Key, char[] password)
@@ -84,11 +82,9 @@ namespace KryptorCLI
         {
             try
             {
-                using (var keyPair = PublicKeyBox.GenerateKeyPair(privateKey))
-                {
-                    byte[] plaintext = SealedPublicKeyBox.Open(ciphertext, keyPair);
-                    return Encoding.UTF8.GetChars(plaintext);
-                }
+                using var keyPair = PublicKeyBox.GenerateKeyPair(privateKey);
+                byte[] plaintext = SealedPublicKeyBox.Open(ciphertext, keyPair);
+                return Encoding.UTF8.GetChars(plaintext);
             }
             catch (Exception ex) when (ExceptionFilters.PasswordSharingExceptions(ex))
             {

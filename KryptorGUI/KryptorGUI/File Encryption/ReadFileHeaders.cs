@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-/*  
+/*
     Kryptor: Free and open source file encryption software.
     Copyright(C) 2020 Samuel Lucas
 
@@ -13,7 +13,7 @@ using System.Text;
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
@@ -30,7 +30,7 @@ namespace KryptorGUI
             return Constants.SaltLength + nonceLength + parametersLength;
         }
 
-        public static int[] ReadArgon2Parameters(string filePath)
+        public static (int memorySize, int iterations, int parametersLength) ReadArgon2Parameters(string filePath)
         {
             string memorySize = string.Empty, iterations = string.Empty;
             // Read the parameter strings from the file
@@ -41,7 +41,7 @@ namespace KryptorGUI
             }
             else
             {
-                return null;
+                return (0, 0, 0);
             }
         }
 
@@ -74,15 +74,14 @@ namespace KryptorGUI
             }
         }
 
-        private static int[] GetParameterValues(string memorySize, string iterations)
+        private static (int memorySize, int iterations, int parametersLength) GetParameterValues(string memorySize, string iterations)
         {
             // Get the number of bytes to skip when reading
             int parametersLength = GetParametersLength(memorySize, iterations);
             // Get parameter values - remove file flags (e.g. |m=value)
             memorySize = RemoveParameterFlag(memorySize);
             iterations = RemoveParameterFlag(iterations);
-            int[] parameters = new int[] { Invariant.ToInt(memorySize), Invariant.ToInt(iterations), parametersLength };
-            return parameters;
+            return (Invariant.ToInt(memorySize), Invariant.ToInt(iterations), parametersLength);
         }
 
         private static int GetParametersLength(string memorySize, string iterations)
@@ -126,22 +125,6 @@ namespace KryptorGUI
             return ReadHeader(filePath, Constants.SaltLength, parametersLength);
         }
 
-        public static byte[] ReadNonce(string filePath, byte[] salt, int parametersLength)
-        {
-            NullChecks.ByteArray(salt);
-            int headerLength = 0;
-            int offset = salt.Length + parametersLength;
-            if (Globals.EncryptionAlgorithm == (int)Cipher.XChaCha20 || Globals.EncryptionAlgorithm == (int)Cipher.XSalsa20)
-            {
-                headerLength = Constants.XChaChaNonceLength;
-            }
-            else if (Globals.EncryptionAlgorithm == (int)Cipher.AesCBC)
-            {
-                headerLength = Constants.AesNonceLength;
-            }
-            return ReadHeader(filePath, headerLength, offset);
-        }
-
         private static byte[] ReadHeader(string filePath, int headerLength, int offset)
         {
             try
@@ -157,7 +140,7 @@ namespace KryptorGUI
             catch (Exception ex) when (ExceptionFilters.FileAccessExceptions(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.High);
-                DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "Unable to read salt or nonce from the selected file.");
+                DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "Unable to read salt from the selected file.");
                 return null;
             }
         }

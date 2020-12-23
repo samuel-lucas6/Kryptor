@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-/*  
+/*
     Kryptor: Free and open source file encryption software.
     Copyright(C) 2020 Samuel Lucas
 
@@ -13,7 +13,7 @@ using System.IO;
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
@@ -59,13 +59,11 @@ namespace KryptorCLI
         {
             try
             {
-                Globals.EncryptionAlgorithm = LoadIntegerSetting(settings[0]) ?? Globals.EncryptionAlgorithm;
-                Globals.MemoryEncryption = LoadBooleanSetting(settings[1]) ?? Globals.MemoryEncryption;
-                Globals.AnonymousRename = LoadBooleanSetting(settings[2]) ?? Globals.AnonymousRename;
-                Globals.OverwriteFiles = LoadBooleanSetting(settings[3]) ?? Globals.OverwriteFiles;
-                Globals.MemorySize = LoadIntegerSetting(settings[4]) ?? Globals.MemorySize;
-                Globals.Iterations = LoadIntegerSetting(settings[5]) ?? Globals.Iterations;
-                Globals.ShredFilesMethod = LoadIntegerSetting(settings[6]) ?? Globals.ShredFilesMethod;
+                Globals.MemoryEncryption = LoadBooleanSetting(settings[0]) ?? Globals.MemoryEncryption;
+                Globals.AnonymousRename = LoadBooleanSetting(settings[1]) ?? Globals.AnonymousRename;
+                Globals.OverwriteFiles = LoadBooleanSetting(settings[2]) ?? Globals.OverwriteFiles;
+                Globals.MemorySize = LoadIntegerSetting(settings[3]) ?? Globals.MemorySize;
+                Globals.Iterations = LoadIntegerSetting(settings[4]) ?? Globals.Iterations;
             }
             catch (IndexOutOfRangeException ex)
             {
@@ -110,20 +108,16 @@ namespace KryptorCLI
                 {
                     var settings = new Dictionary<string, string>
                     {
-                        { "Encryption Algorithm", Invariant.ToString(Globals.EncryptionAlgorithm) },
                         { "Memory Encryption", Globals.MemoryEncryption.ToString() },
                         { "Anonymous Rename", Globals.AnonymousRename.ToString() },
                         { "Overwrite Files", Globals.OverwriteFiles.ToString() },
                         { "Argon2 Memory Size", Invariant.ToString(Globals.MemorySize) },
                         { "Argon2 Iterations", Invariant.ToString(Globals.Iterations) },
-                        { "Shred Files Method", Invariant.ToString(Globals.ShredFilesMethod) },
                     };
-                    using (var streamWriter = new StreamWriter(_settingsFile))
+                    using var streamWriter = new StreamWriter(_settingsFile);
+                    foreach (var keyValuePair in settings)
                     {
-                        foreach (var keyValuePair in settings)
-                        {
-                            streamWriter.WriteLine($"{keyValuePair.Key}: {keyValuePair.Value}");
-                        }
+                        streamWriter.WriteLine($"{keyValuePair.Key}: {keyValuePair.Value}");
                     }
                 }
                 else
@@ -145,13 +139,11 @@ namespace KryptorCLI
             {
                 if (!string.IsNullOrEmpty(arguments[1]))
                 {
-                    Globals.EncryptionAlgorithm = SetIntegerSetting("encryption-algorithm".ToUpperInvariant(), arguments, 0, 2) ?? Globals.EncryptionAlgorithm;
                     Globals.MemoryEncryption = SetBooleanSetting("memory-encryption".ToUpperInvariant(), arguments) ?? Globals.MemoryEncryption;
                     Globals.AnonymousRename = SetBooleanSetting("anonymous-rename".ToUpperInvariant(), arguments) ?? Globals.AnonymousRename;
                     Globals.OverwriteFiles = SetBooleanSetting("overwrite-files".ToUpperInvariant(), arguments) ?? Globals.OverwriteFiles;
                     Globals.MemorySize = SetIntegerSetting("memory-size".ToUpperInvariant(), arguments, 32, 500) * Constants.Mebibyte ?? Globals.MemorySize;
                     Globals.Iterations = SetIntegerSetting("iterations".ToUpperInvariant(), arguments, 3, 128) ?? Globals.Iterations;
-                    Globals.ShredFilesMethod = SetIntegerSetting("shred-files-method".ToUpperInvariant(), arguments, 0, 5) ?? Globals.ShredFilesMethod;
                     SaveSettings();
                 }
                 else
@@ -195,39 +187,6 @@ namespace KryptorCLI
                 }
             }
             return null;
-        }
-
-        public static string GetCipherName()
-        {
-            Enum cipher = (Cipher)Globals.EncryptionAlgorithm;
-            return Enum.GetName(cipher.GetType(), cipher);
-        }
-
-        public static string GetShredFilesMethod()
-        {
-            string shredFilesMethod = string.Empty;
-            switch (Globals.ShredFilesMethod)
-            {
-                case 0:
-                    shredFilesMethod = "16 KiB";
-                    break;
-                case 1:
-                    shredFilesMethod = "Zero Fill";
-                    break;
-                case 2:
-                    shredFilesMethod = "1 Pass";
-                    break;
-                case 3:
-                    shredFilesMethod = "Encryption";
-                    break;
-                case 4:
-                    shredFilesMethod = "HMG IS5";
-                    break;
-                case 5:
-                    shredFilesMethod = "5 Passes";
-                    break;
-            }
-            return shredFilesMethod;
         }
     }
 }

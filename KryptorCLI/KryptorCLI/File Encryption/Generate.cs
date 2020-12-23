@@ -1,6 +1,6 @@
 ﻿using Sodium;
 
-/*  
+/*
     Kryptor: Free and open source file encryption software.
     Copyright(C) 2020 Samuel Lucas
 
@@ -11,7 +11,7 @@
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
@@ -22,27 +22,14 @@ namespace KryptorCLI
 {
     public static class Generate
     {
-        public static byte[] AssociatedData()
-        {
-            string cipherName = KryptorSettings.GetCipherName();
-            return HashingAlgorithms.Blake2(cipherName);
-        }
-
         public static byte[] Salt()
         {
             return SodiumCore.GetRandomBytes(Constants.SaltLength);
         }
 
-        public static byte[] Nonce()
+        public static byte[] Counter()
         {
-            if (Globals.EncryptionAlgorithm == (int)Cipher.XChaCha20 || Globals.EncryptionAlgorithm == (int)Cipher.XSalsa20)
-            {
-                return SodiumCore.GetRandomBytes(Constants.XChaChaNonceLength);
-            }
-            else
-            {
-                return SodiumCore.GetRandomBytes(Constants.AesNonceLength);
-            }
+            return new byte[Constants.XChaChaNonceLength];
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
 using System;
 
-/*  
+/*
     Kryptor: Free and open source file encryption software.
     Copyright(C) 2020 Samuel Lucas
 
@@ -12,7 +12,7 @@ using System;
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
@@ -65,9 +65,6 @@ Please report bugs to <https://github.com/samuel-lucas6/Kryptor/issues>.")]
         [Option("--decrypt-password", "decrypt a ciphertext password using your private key", CommandOptionType.NoValue)]
         public bool DecryptPassword { get; }
 
-        [Option("--shred", "shred files/folders", CommandOptionType.NoValue)]
-        public bool Shred { get; }
-
         [Option("--settings", "view/edit your settings", CommandOptionType.NoValue)]
         public bool Settings { get; }
 
@@ -80,9 +77,6 @@ Please report bugs to <https://github.com/samuel-lucas6/Kryptor/issues>.")]
         [Option("--source", "view the source code", CommandOptionType.NoValue)]
         public bool SourceCode { get; }
 
-        [Option("--donate", "find out how to donate", CommandOptionType.NoValue)]
-        public bool Donate { get; }
-
         [Option("--update", "check for updates", CommandOptionType.NoValue)]
         public bool CheckForUpdates { get; }
 
@@ -91,9 +85,6 @@ Please report bugs to <https://github.com/samuel-lucas6/Kryptor/issues>.")]
 
         [Option("--error-log", CommandOptionType.NoValue, ShowInHelpText = false)]
         public bool ErrorLog { get; }
-
-        [Option("--easter-egg", CommandOptionType.NoValue, ShowInHelpText = false)]
-        public bool EasterEgg { get; }
 
         [Argument(0)]
         public string[] Arguments { get; }
@@ -142,10 +133,6 @@ Please report bugs to <https://github.com/samuel-lucas6/Kryptor/issues>.")]
                 bool encryption = false;
                 CommandLine.ValidatePasswordSharingInput(encryption, Arguments);
             }
-            else if (Shred)
-            {
-                CommandLine.CallShredFiles(Arguments);
-            }
             else if (Settings)
             {
                 CommandLine.DisplaySettings(Arguments);
@@ -162,10 +149,6 @@ Please report bugs to <https://github.com/samuel-lucas6/Kryptor/issues>.")]
             {
                 CommandLine.OpenSourceCode();
             }
-            else if (Donate)
-            {
-                CommandLine.OpenDonate();
-            }
             else if (CheckForUpdates)
             {
                 CommandLine.UpdateCheck(displayUpToDate:true);
@@ -177,10 +160,6 @@ Please report bugs to <https://github.com/samuel-lucas6/Kryptor/issues>.")]
             else if (ErrorLog)
             {
                 CommandLine.OpenKryptorDirectory();
-            }
-            else if (EasterEgg)
-            {
-                CommandLine.DisplayEasterEgg();
             }
             else
             {

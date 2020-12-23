@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Sodium;
+using System;
 using System.IO;
 using System.Text.RegularExpressions;
 
-/*  
+/*
     Kryptor: Free and open source file encryption software.
     Copyright(C) 2020 Samuel Lucas
 
@@ -13,7 +14,7 @@ using System.Text.RegularExpressions;
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
@@ -26,14 +27,12 @@ namespace KryptorCLI
     {
         public static void InitializeDecryption(string filePath, byte[] passwordBytes)
         {
-            int[] argon2Parameters = ReadFileHeaders.ReadArgon2Parameters(filePath);
-            if (argon2Parameters != null)
+            (int memorySize, int iterations, int parametersLength) = ReadFileHeaders.ReadArgon2Parameters(filePath);
+            if (memorySize != 0)
             {
-                int parametersLength = argon2Parameters[2];
                 byte[] salt = ReadFileHeaders.ReadSalt(filePath, parametersLength);
-                byte[] nonce = ReadFileHeaders.ReadNonce(filePath, salt, parametersLength);
-                var keys = KeyDerivation.DeriveKeys(passwordBytes, salt, argon2Parameters[1], argon2Parameters[0]);
-                CheckForTampering(filePath, parametersLength, nonce, keys);
+                (byte[] encryptionKey, byte[] macKey) = KeyDerivation.DeriveKeys(passwordBytes, salt, iterations, memorySize);
+                CheckForTampering(filePath, parametersLength, encryptionKey, macKey);
             }
             else
             {
@@ -41,52 +40,52 @@ namespace KryptorCLI
             }
         }
 
-        private static void CheckForTampering(string filePath, int parametersLength, byte[] nonce, (byte[], byte[]) keys)
+        private static void CheckForTampering(string filePath, int parametersLength, byte[] encryptionKey, byte[] macKey)
         {
-            bool fileTampered = FileAuthentication.AuthenticateFile(filePath, keys.Item2, out byte[] macBackup);
-            Utilities.ZeroArray(keys.Item2);
+            bool fileTampered = FileAuthentication.AuthenticateFile(filePath, macKey, out byte[] macBackup);
+            Utilities.ZeroArray(macKey);
             if (fileTampered == false)
             {
-                DecryptFile(filePath, parametersLength, macBackup, nonce, keys.Item1);
+                DecryptFile(filePath, parametersLength, macBackup, encryptionKey);
             }
             else
             {
                 Console.WriteLine($"{Path.GetFileName(filePath)}: Incorrect password/keyfile, wrong encryption algorithm, or this file has been tampered with.");
-                Utilities.ZeroArray(keys.Item1);
+                Utilities.ZeroArray(encryptionKey);
             }
         }
 
-        private static void DecryptFile(string filePath, int parametersLength, byte[] macBackup, byte[] nonce, byte[] key)
+        private static void DecryptFile(string filePath, int parametersLength, byte[] macBackup, byte[] encryptionKey)
         {
             try
             {
                 string decryptedFilePath = Regex.Replace(filePath, Constants.EncryptedExtension, string.Empty);
-                // Get length of headers bytes (parameters, salt, nonce)
-                int headersLength = ReadFileHeaders.GetHeadersLength(nonce.Length, parametersLength);
+                int headersLength = Constants.SaltLength + parametersLength;
                 using (var plaintext = new FileStream(decryptedFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileBufferSize, FileOptions.SequentialScan))
                 using (var ciphertext = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, Constants.FileBufferSize, FileOptions.SequentialScan))
                 {
                     // Skip the header bytes
                     ciphertext.Seek(headersLength, SeekOrigin.Begin);
                     byte[] fileBytes = FileHandling.GetBufferSize(ciphertext.Length);
-                    MemoryEncryption.DecryptByteArray(ref key);
-                    if (Globals.EncryptionAlgorithm == (int)Cipher.XChaCha20 || Globals.EncryptionAlgorithm == (int)Cipher.XSalsa20)
+                    // Generate a counter starting at 0
+                    byte[] counter = Generate.Counter();
+                    int bytesRead;
+                    MemoryEncryption.DecryptByteArray(ref encryptionKey);
+                    while ((bytesRead = ciphertext.Read(fileBytes, 0, fileBytes.Length)) > 0)
                     {
-                        StreamCiphers.Decrypt(plaintext, ciphertext, fileBytes, nonce, key);
+                        byte[] decryptedBytes = StreamEncryption.DecryptXChaCha20(fileBytes, counter, encryptionKey);
+                        plaintext.Write(decryptedBytes, 0, bytesRead);
+                        counter = Sodium.Utilities.Increment(counter);
                     }
-                    else if (Globals.EncryptionAlgorithm == (int)Cipher.AesCBC)
-                    {
-                        AesAlgorithms.DecryptAesCBC(plaintext, ciphertext, fileBytes, nonce, key);
-                    }
+                    Utilities.ZeroArray(encryptionKey);
                 }
-                Utilities.ZeroArray(key);
                 CompleteDecryption(filePath, decryptedFilePath);
             }
             catch (Exception ex) when (ExceptionFilters.FileEncryptionExceptions(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.High);
                 DisplayMessage.Error(filePath, ex.GetType().Name, "Unable to decrypt the file.");
-                Utilities.ZeroArray(key);
+                Utilities.ZeroArray(encryptionKey);
                 RestoreMAC(filePath, macBackup);
             }
         }

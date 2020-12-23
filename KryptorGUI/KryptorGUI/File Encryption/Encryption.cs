@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Sodium;
+using System;
 using System.ComponentModel;
 using System.IO;
 
-/*  
+/*
     Kryptor: Free and open source file encryption software.
     Copyright(C) 2020 Samuel Lucas
 
@@ -13,7 +14,7 @@ using System.IO;
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
@@ -28,9 +29,8 @@ namespace KryptorGUI
         {
             string encryptedFilePath = GetEncryptedFilePath(filePath);
             byte[] salt = Generate.Salt();
-            byte[] nonce = Generate.Nonce();
-            var keys = KeyDerivation.DeriveKeys(passwordBytes, salt, Globals.Iterations, Globals.MemorySize);
-            EncryptFile(filePath, encryptedFilePath, salt, nonce, keys, bgwEncryption);        
+            (byte[] encryptionKey, byte[] macKey) = KeyDerivation.DeriveKeys(passwordBytes, salt, Globals.Iterations, Globals.MemorySize);
+            EncryptFile(filePath, encryptedFilePath, salt, encryptionKey, macKey, bgwEncryption);
         }
 
         private static string GetEncryptedFilePath(string filePath)
@@ -46,37 +46,40 @@ namespace KryptorGUI
             return filePath + Constants.EncryptedExtension;
         }
 
-        private static void EncryptFile(string filePath, string encryptedFilePath, byte[] salt, byte[] nonce, (byte[], byte[]) keys, BackgroundWorker bgwEncryption)
+        private static void EncryptFile(string filePath, string encryptedFilePath, byte[] salt, byte[] encryptionKey, byte[] macKey, BackgroundWorker bgwEncryption)
         {
             try
             {
                 using (var ciphertext = new FileStream(encryptedFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileBufferSize, FileOptions.SequentialScan))
                 using (var plaintext = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, Constants.FileBufferSize, FileOptions.SequentialScan))
                 {
-                    WriteFileHeaders.WriteHeaders(ciphertext, salt, nonce);
+                    WriteFileHeaders.WriteHeaders(ciphertext, salt);
                     // Store headers length to correct percentage calculation
                     long headersLength = ciphertext.Position;
-                    byte[] fileBytes = FileHandling.GetBufferSize(plaintext);
-                    MemoryEncryption.DecryptByteArray(ref keys.Item1);
-                    if (Globals.EncryptionAlgorithm == (int)Cipher.XChaCha20 || Globals.EncryptionAlgorithm == (int)Cipher.XSalsa20)
+                    byte[] fileBytes = FileHandling.GetBufferSize(plaintext.Length);
+                    // Generate a counter starting at 0
+                    byte[] counter = Generate.Counter();
+                    int bytesRead;
+                    MemoryEncryption.DecryptByteArray(ref encryptionKey);
+                    while ((bytesRead = plaintext.Read(fileBytes, 0, fileBytes.Length)) > 0)
                     {
-                        StreamCiphers.Encrypt(plaintext, ciphertext, headersLength, fileBytes, nonce, keys.Item1, bgwEncryption);
-                    }
-                    else if (Globals.EncryptionAlgorithm == (int)Cipher.AesCBC)
-                    {
-                        AesAlgorithms.EncryptAesCBC(plaintext, ciphertext, headersLength, fileBytes, nonce, keys.Item1, bgwEncryption);
+                        byte[] encryptedBytes = StreamEncryption.EncryptXChaCha20(fileBytes, counter, encryptionKey);
+                        ciphertext.Write(encryptedBytes, 0, bytesRead);
+                        counter = Sodium.Utilities.Increment(counter);
+                        // Report progress if encrypting a single file
+                        ReportProgress.ReportEncryptionProgress(ciphertext.Position, plaintext.Length + headersLength, bgwEncryption);
                     }
                 }
-                Utilities.ZeroArray(keys.Item1);
-                CompleteEncryption(filePath, encryptedFilePath, keys.Item2);
+                Utilities.ZeroArray(encryptionKey);
+                CompleteEncryption(filePath, encryptedFilePath, macKey);
             }
             catch (Exception ex) when (ExceptionFilters.FileEncryptionExceptions(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.High);
                 DisplayMessage.ErrorResultsText(filePath, ex.GetType().Name, "Unable to encrypt the file.");
                 FileHandling.DeleteFile(encryptedFilePath);
-                Utilities.ZeroArray(keys.Item1);
-                Utilities.ZeroArray(keys.Item2);
+                Utilities.ZeroArray(encryptionKey);
+                Utilities.ZeroArray(macKey);
             }
         }
 

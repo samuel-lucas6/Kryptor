@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
-/*  
+/*
     Kryptor: Free and open source file encryption software.
     Copyright(C) 2020 Samuel Lucas
 
@@ -14,7 +14,7 @@ using System.IO;
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
@@ -97,7 +97,7 @@ namespace KryptorGUI
                 }
                 benchmarkResults.Add(string.Empty);
                 benchmarkResults.Add($"Recommended Memory Size: {Invariant.ToString(recommendedMemorySize / Constants.Mebibyte)} MiB");
-                benchmarkResults.Add($"This memory size was chosen because it was <= {delayPerFile} ms. This is the delay per file that it takes for Argon2 to derive an encryption key and MAC key. You can speed up key derivation by lowering the memory size, but this will decrease your security. For more information about Argon2, please read the documentation (https://kryptor.co.uk/Key Derivation.html).");
+                benchmarkResults.Add($"This memory size was chosen because it was <= {delayPerFile} ms. This is the delay per file that it takes for Argon2 to derive an encryption key and MAC key. You can speed up key derivation by lowering the memory size, but this will decrease your security. For more information about Argon2, please read the documentation (https://kryptor.co.uk/key-derivation.html).");
                 string benchmarkFilePath = Path.Combine(Constants.KryptorDirectory, "benchmark.txt");   
                 File.WriteAllLines(benchmarkFilePath, benchmarkResults);
             }

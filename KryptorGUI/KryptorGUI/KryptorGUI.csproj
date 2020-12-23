@@ -141,12 +141,10 @@
   <ItemGroup>
     <Compile Include="Code Analysis\NullChecks.cs" />
     <Compile Include="Exception Handling\DisplayMessage.cs" />
-    <Compile Include="Cryptography\AesAlgorithms.cs" />
     <Compile Include="Anonymous Rename\AnonymousRename.cs" />
     <Compile Include="Exception Handling\ExceptionFilters.cs" />
     <Compile Include="Cryptography\HashingAlgorithms.cs" />
     <Compile Include="File Encryption\FileHandling.cs" />
-    <Compile Include="Cryptography\StreamCiphers.cs" />
     <Compile Include="Cryptography\Utilities.cs" />
     <Compile Include="File Encryption\ReadFileHeaders.cs" />
     <Compile Include="GUI\DarkTheme.cs" />
@@ -239,9 +237,7 @@
     <Compile Include="GUI\frmSettings.Designer.cs">
       <DependentUpon>frmSettings.cs</DependentUpon>
     </Compile>
-    <Compile Include="Shred Files\ShredFiles.cs" />
     <Compile Include="Other functionality\Updates.cs" />
-    <Compile Include="Shred Files\ShredFilesMethods.cs" />
     <EmbeddedResource Include="GUI\frmAboutKryptor.resx">
       <DependentUpon>frmAboutKryptor.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -341,11 +337,6 @@
   <ItemGroup>
     <PackageReference Include="libsodium">
       <Version>1.0.18</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers">
-      <Version>3.3.1</Version>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.Platforms">
       <Version>5.0.0</Version>

@@ -3,7 +3,7 @@ using System.IO;
 using System.Net;
 using System.Reflection;
 
-/*  
+/*
     Kryptor: Free and open source file encryption software.
     Copyright(C) 2020 Samuel Lucas
 
@@ -14,7 +14,7 @@ using System.Reflection;
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
@@ -77,11 +77,9 @@ namespace KryptorCLI
 
         private static void DownloadVersionFile(string downloadFilePath)
         {
-            using (var webClient = new WebClient())
-            {
-                const string versionLink = "https://raw.githubusercontent.com/samuel-lucas6/Kryptor/master/version.txt";
-                webClient.DownloadFile(versionLink, downloadFilePath);
-            }
+            using var webClient = new WebClient();
+            const string versionLink = "https://raw.githubusercontent.com/samuel-lucas6/Kryptor/master/version.txt";
+            webClient.DownloadFile(versionLink, downloadFilePath);
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-/*  
+/*
     Kryptor: Free and open source file encryption software.
     Copyright(C) 2020 Samuel Lucas
 
@@ -12,7 +12,7 @@ using System.IO;
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
@@ -38,20 +38,19 @@ namespace KryptorGUI
             }
         }
 
-        public static byte[] GetBufferSize(FileStream fileStream)
+        public static byte[] GetBufferSize(long fileStreamLength)
         {
-            NullChecks.FileStreams(fileStream);
             int bufferSize = 4096;
             // Use a larger buffer for bigger files
-            if (fileStream.Length >= Constants.Mebibyte)
+            if (fileStreamLength >= Constants.Mebibyte)
             {
                 // 128 KiB
-                bufferSize = 131072;
+                bufferSize = Constants.FileBufferSize;
             }
-            else if (bufferSize > fileStream.Length)
+            else if (bufferSize > fileStreamLength)
             {
                 // Use file size as buffer for small files
-                return new byte[fileStream.Length];
+                bufferSize = Convert.ToInt32(fileStreamLength);
             }
             return new byte[bufferSize];
         }

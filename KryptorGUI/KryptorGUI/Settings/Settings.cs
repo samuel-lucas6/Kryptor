@@ -4,7 +4,7 @@ using System.IO;
 using System.Windows.Forms;
 using Ookii.Dialogs.WinForms;
 
-/*  
+/*
     Kryptor: Free and open source file encryption software.
     Copyright(C) 2020 Samuel Lucas
 
@@ -15,7 +15,7 @@ using Ookii.Dialogs.WinForms;
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
@@ -61,19 +61,17 @@ namespace KryptorGUI
         {
             try
             {
-                Globals.EncryptionAlgorithm = LoadIntegerSetting(settings[0]) ?? Globals.EncryptionAlgorithm;
-                Globals.MemoryEncryption = LoadBooleanSetting(settings[1]) ?? Globals.MemoryEncryption;
-                Globals.AnonymousRename = LoadBooleanSetting(settings[2]) ?? Globals.AnonymousRename;
-                Globals.OverwriteFiles = LoadBooleanSetting(settings[3]) ?? Globals.OverwriteFiles;
-                Globals.MemorySize = LoadIntegerSetting(settings[4]) ?? Globals.MemorySize;
-                Globals.Iterations = LoadIntegerSetting(settings[5]) ?? Globals.Iterations;
-                Globals.ShowPasswordByDefault = LoadBooleanSetting(settings[6]) ?? Globals.ShowPasswordByDefault;
-                Globals.AutoClearPassword = LoadBooleanSetting(settings[7]) ?? Globals.AutoClearPassword;
-                Globals.ClearClipboardInterval = LoadIntegerSetting(settings[8]) ?? Globals.ClearClipboardInterval;
-                Globals.ExitClearClipboard = LoadBooleanSetting(settings[9]) ?? Globals.ExitClearClipboard;
-                Globals.ShredFilesMethod = LoadIntegerSetting(settings[10]) ?? Globals.ShredFilesMethod;
-                Globals.CheckForUpdates = LoadBooleanSetting(settings[11]) ?? Globals.CheckForUpdates;
-                Globals.DarkTheme = LoadBooleanSetting(settings[12]) ?? Globals.DarkTheme;
+                Globals.MemoryEncryption = LoadBooleanSetting(settings[0]) ?? Globals.MemoryEncryption;
+                Globals.AnonymousRename = LoadBooleanSetting(settings[1]) ?? Globals.AnonymousRename;
+                Globals.OverwriteFiles = LoadBooleanSetting(settings[2]) ?? Globals.OverwriteFiles;
+                Globals.MemorySize = LoadIntegerSetting(settings[3]) ?? Globals.MemorySize;
+                Globals.Iterations = LoadIntegerSetting(settings[4]) ?? Globals.Iterations;
+                Globals.ShowPasswordByDefault = LoadBooleanSetting(settings[5]) ?? Globals.ShowPasswordByDefault;
+                Globals.AutoClearPassword = LoadBooleanSetting(settings[6]) ?? Globals.AutoClearPassword;
+                Globals.ClearClipboardInterval = LoadIntegerSetting(settings[7]) ?? Globals.ClearClipboardInterval;
+                Globals.ExitClearClipboard = LoadBooleanSetting(settings[8]) ?? Globals.ExitClearClipboard;
+                Globals.CheckForUpdates = LoadBooleanSetting(settings[9]) ?? Globals.CheckForUpdates;
+                Globals.DarkTheme = LoadBooleanSetting(settings[10]) ?? Globals.DarkTheme;
             }
             catch (IndexOutOfRangeException ex)
             {
@@ -118,7 +116,6 @@ namespace KryptorGUI
                 {
                     var settings = new Dictionary<string, string>
                     {
-                        { "Encryption Algorithm", Invariant.ToString(Globals.EncryptionAlgorithm) },
                         { "Memory Encryption", Globals.MemoryEncryption.ToString() },
                         { "Anonymous Rename", Globals.AnonymousRename.ToString() },
                         { "Overwrite Files", Globals.OverwriteFiles.ToString() },
@@ -128,7 +125,6 @@ namespace KryptorGUI
                         { "Auto Clear Password", Globals.AutoClearPassword.ToString() },
                         { "Auto Clear Clipboard", Invariant.ToString(Globals.ClearClipboardInterval) },
                         { "Exit Clipboard Clear", Globals.ExitClearClipboard.ToString() },
-                        { "Shred Files Method", Invariant.ToString(Globals.ShredFilesMethod) },
                         { "Check for Updates", Globals.CheckForUpdates.ToString() },
                         { "Dark Theme", Globals.DarkTheme.ToString() }
                     };

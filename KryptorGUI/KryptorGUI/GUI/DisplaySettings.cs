@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-/*  
+/*
     Kryptor: Free and open source file encryption software.
     Copyright(C) 2020 Samuel Lucas
 
@@ -12,7 +12,7 @@ using System.Windows.Forms;
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
@@ -25,18 +25,8 @@ namespace KryptorGUI
     {
         public static void SetEncryptionAlgorithm(ComboBox cmbEncryptionAlgorithm)
         {
-            try
-            {
-                NullChecks.ComboBoxes(cmbEncryptionAlgorithm);
-                cmbEncryptionAlgorithm.SelectedIndex = Globals.EncryptionAlgorithm;
-            }
-            catch (ArgumentOutOfRangeException ex)
-            {
-                DisplayMessage.ErrorMessageBox(ex.GetType().Name, "Invalid 'Encryption Algorithm' setting. The default setting will be used instead.");
-                Globals.EncryptionAlgorithm = (int)Cipher.XChaCha20;
-                Settings.SaveSettings();
-                SetEncryptionAlgorithm(cmbEncryptionAlgorithm);
-            }
+            NullChecks.ComboBoxes(cmbEncryptionAlgorithm);
+            cmbEncryptionAlgorithm.SelectedIndex = 0;
         }
 
         public static void SetMemoryEncryption(ComboBox cmbMemoryEncryption)
@@ -176,22 +166,6 @@ namespace KryptorGUI
             else
             {
                 cmbExitClearClipboard.SelectedIndex = 1;
-            }
-        }
-
-        public static void SetShredFilesMethod(ComboBox cmbShredFilesMethod)
-        {
-            try
-            {
-                NullChecks.ComboBoxes(cmbShredFilesMethod);
-                cmbShredFilesMethod.SelectedIndex = Globals.ShredFilesMethod;
-            }
-            catch (ArgumentOutOfRangeException ex)
-            {
-                DisplayMessage.ErrorMessageBox(ex.GetType().Name, "Invalid 'Shred Files Method' setting. The default setting will be used instead.");
-                Globals.ShredFilesMethod = 2;
-                Settings.SaveSettings();
-                SetShredFilesMethod(cmbShredFilesMethod);
             }
         }
 
