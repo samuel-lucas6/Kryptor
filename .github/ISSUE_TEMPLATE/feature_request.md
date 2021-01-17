@@ -1,17 +1,18 @@
 ---
 name: Feature request
 about: Suggest a new feature
-title: ''
+title: '🆕 Feature Request: '
 labels: feature request
-assignees: Kryptor-Software
-
+assignees: samuel-lucas6
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+**Is your feature request related to a problem? If so, please describe the problem.**
+<!-- A clear and concise description of what the problem is. -->
 
-**Describe the feature you'd like**
-A clear and concise description of what you'd like to see implemented.
+
+**Describe the feature you would like**
+<!-- A clear and concise description of what you'd like to see implemented. -->
+
 
 **Why should this feature be implemented?**
-Convince me why it's worth adding.
+<!-- Who does this help? Why is it useful? -->
