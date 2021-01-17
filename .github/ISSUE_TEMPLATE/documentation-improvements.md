@@ -1,14 +1,18 @@
 ---
-name: Documentation improvements
+name: Documentation feedback
 about: Highlight documentation errors or suggest improvements
-title: ''
+title: '📝 Documentation Feedback: '
 labels: documentation
-assignees: Kryptor-Software
-
+assignees: samuel-lucas6
 ---
 
-**Where is the mistake?**
-Please provide a link to the page and reference the heading/paragraph the mistake is in.
+**Description**
+<!-- Please explain the error/your suggestion. -->
 
-**How could the documentation be written better?**
-Please explain how you would rephrase/format the documentation.
+
+**Page Info**
+<!-- Please provide a link to the page. -->
+Page:
+
+<!-- Please provide the section heading. -->
+Heading:
