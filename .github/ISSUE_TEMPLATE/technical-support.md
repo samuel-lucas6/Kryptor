@@ -1,5 +1,5 @@
 ---
-name: Technical Support
+name: Technical support
 about: Troubleshooting hasn't helped me
 title: '💻 Technical Support: '
 labels: help wanted
