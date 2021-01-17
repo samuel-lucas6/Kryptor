@@ -1,10 +1,9 @@
 ---
 name: Technical Support
 about: Troubleshooting hasn't helped me
-title: ''
+title: '💻 Technical Support: '
 labels: help wanted
-assignees: Kryptor-Software
-
+assignees: samuel-lucas6
 ---
 
-**What's the problem?**
+### Description
