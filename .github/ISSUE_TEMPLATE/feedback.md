@@ -1,11 +1,10 @@
 ---
 name: Feedback
-about: Provide constructive criticism
-title: ''
+about: Provide constructive feedback
+title: '✨ Feedback: '
 labels: feedback
-assignees: Kryptor-Software
-
+assignees: samuel-lucas6
 ---
 
-**What do you think could be done better?**
-A clear and concise description of what could be improved.
+### Description
+<!-- A clear and concise description of what could be improved. -->
