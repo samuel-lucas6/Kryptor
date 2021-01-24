@@ -1,0 +1,10 @@
+﻿[*.cs]
+
+# CA1303: Do not pass literals as localized parameters
+dotnet_diagnostic.CA1303.severity = none
+
+# CA1307: Specify StringComparison
+dotnet_diagnostic.CA1307.severity = none
+
+# IDE0057: Use range operator
+csharp_style_prefer_range_operator = true:none

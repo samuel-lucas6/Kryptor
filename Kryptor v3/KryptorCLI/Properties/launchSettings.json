@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "KryptorCLI": {
+      "commandName": "Project",
+      "commandLineArgs": "-d -p hkliokd1zlvkl0qhvfus4z"
+    }
+  }
+}
