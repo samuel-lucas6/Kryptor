@@ -91,6 +91,5 @@ namespace KryptorCLI
             Console.WriteLine();
             return password.ToArray();
         }
-
     }
 }
