@@ -92,7 +92,7 @@ namespace KryptorCLI
         public static long RoundUp(long numerator, int denominator)
         {
             // More efficient than Math.Ceiling() that requires casting to decimal
-            return (numerator - 1) / denominator + 1;
+            return ((numerator - 1) / denominator) + 1;
         }
     }
 }
