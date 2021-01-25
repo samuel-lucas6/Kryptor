@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 
 /*
-    Kryptor: Modern and secure file encryption.
+    Kryptor: Free and open source file encryption.
     Copyright(C) 2020 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
@@ -29,32 +29,23 @@ namespace KryptorCLI
 
         public static bool FileEncryption(string inputFilePath)
         {
-            IEnumerable<string> errorMessages = GetFileEncryptionError(inputFilePath);
-            return DisplayMessage.AnyErrors(errorMessages);
+            string errorMessage = GetFileEncryptionError(inputFilePath);
+            if (string.IsNullOrEmpty(errorMessage)) { return true; }
+            DisplayMessage.Error(errorMessage);
+            return false;
         }
 
-        private static IEnumerable<string> GetFileEncryptionError(string inputFilePath)
+        private static string GetFileEncryptionError(string inputFilePath)
         {
-            if (Directory.Exists(inputFilePath))
+            if (Directory.Exists(inputFilePath)) { return null; }
+            if (!File.Exists(inputFilePath)) { return _fileDoesNotExist; }
+            bool? validMagicBytes = FileHandling.IsKryptorFile(inputFilePath);
+            if (validMagicBytes == null) { return _fileInaccessible; }
+            if (FileHandling.HasKryptorExtension(inputFilePath) || validMagicBytes == true)
             {
-                yield break;
+                return "This file is already encrypted.";
             }
-            if (!File.Exists(inputFilePath))
-            {
-                yield return _fileDoesNotExist;
-            }
-            else
-            {
-                bool? validMagicBytes = FileHandling.IsKryptorFile(inputFilePath);
-                if (validMagicBytes == null)
-                {
-                    yield return _fileInaccessible;
-                }
-                else if (FileHandling.HasKryptorExtension(inputFilePath) || validMagicBytes == true)
-                {
-                    yield return "This file is already encrypted.";
-                }
-            }
+            return null;
         }
 
         public static string KeyfilePath(string keyfilePath)
@@ -87,32 +78,24 @@ namespace KryptorCLI
 
         public static bool FileDecryption(string inputFilePath)
         {
-            IEnumerable<string> errorMessages = GetFileDecryptionError(inputFilePath);
-            return DisplayMessage.AnyErrors(errorMessages) || inputFilePath.Contains(Constants.SaltFile);
+            if (inputFilePath.Contains(Constants.SaltFile)) { return false; }
+            string errorMessage = GetFileDecryptionError(inputFilePath);
+            if (string.IsNullOrEmpty(errorMessage)) { return true; }
+            DisplayMessage.Error(errorMessage);
+            return false; ;
         }
 
-        private static IEnumerable<string> GetFileDecryptionError(string inputFilePath)
+        private static string GetFileDecryptionError(string inputFilePath)
         {
-            if (Directory.Exists(inputFilePath))
+            if (Directory.Exists(inputFilePath)) { return null; }
+            if (!File.Exists(inputFilePath)) { return _fileDoesNotExist; }
+            bool? validMagicBytes = FileHandling.IsKryptorFile(inputFilePath);
+            if (validMagicBytes == null) { return _fileInaccessible; }
+            if (!FileHandling.HasKryptorExtension(inputFilePath) || validMagicBytes == false)
             {
-                yield break;
+                return "This file hasn't been encrypted.";
             }
-            if (!File.Exists(inputFilePath))
-            {
-                yield return _fileDoesNotExist;
-            }
-            else
-            {
-                bool? validMagicBytes = FileHandling.IsKryptorFile(inputFilePath);
-                if (validMagicBytes == null)
-                {
-                    yield return _fileInaccessible;
-                }
-                else if (!FileHandling.HasKryptorExtension(inputFilePath) || validMagicBytes == false)
-                {
-                    yield return "This file hasn't been encrypted.";
-                }
-            }
+            return null;
         }
 
         public static bool GenerateKeyPair(string directoryPath, string keyPairName)
