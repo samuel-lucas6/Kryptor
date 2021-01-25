@@ -82,7 +82,7 @@ namespace KryptorCLI
             string errorMessage = GetFileDecryptionError(inputFilePath);
             if (string.IsNullOrEmpty(errorMessage)) { return true; }
             DisplayMessage.Error(errorMessage);
-            return false; ;
+            return false;
         }
 
         private static string GetFileDecryptionError(string inputFilePath)
