@@ -1,7 +1,5 @@
-﻿using System.Text;
-
-/*
-    Kryptor: Modern and secure file encryption.
+﻿/*
+    Kryptor: Free and open source file encryption.
     Copyright(C) 2020 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
@@ -37,8 +35,8 @@ namespace KryptorCLI
         public const int FileChunkSize = 16384;
         public const int KeyCommitmentBlockLength = 16;
         public const int BitConverterLength = 4;
-        public const int EncryptedHeaderLength = 92;
-        public static readonly int TotalChunkLength = KeyCommitmentBlockLength + BitConverterLength + FileChunkSize + Poly1305Length;
+        public const int EncryptedHeaderLength = 72;
+        public static readonly int TotalChunkLength = KeyCommitmentBlockLength + FileChunkSize + Poly1305Length;
 
         // Cryptography
         public const int EncryptionKeySize = 32;

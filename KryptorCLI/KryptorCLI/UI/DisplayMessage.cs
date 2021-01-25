@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 
 /*
-    Kryptor: Modern and secure file encryption.
+    Kryptor: Free and open source file encryption.
     Copyright(C) 2020 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
@@ -47,9 +47,9 @@ namespace KryptorCLI
             Console.WriteLine($"{Path.GetFileName(filePath)}: {message}");
         }
 
-        public static void MessageColonMessage(string beforeColon, string afterColon)
+        public static void Message(string message)
         {
-            Console.WriteLine($"{beforeColon}: {afterColon}");
+            Console.WriteLine(message);
         }
 
         public static void FileEncryptionResult(string inputFilePath, string outputFilePath)
@@ -59,7 +59,7 @@ namespace KryptorCLI
 
         public static void FileEncryptionResult(string inputFilePath)
         {
-            Console.WriteLine($"{Path.GetFileName(inputFilePath)}: Decrypted");
+            Console.WriteLine($"{Path.GetFileName(inputFilePath)}: Successfully decrypted.");
         }
 
         public static void SuccessfullyEncrypted()

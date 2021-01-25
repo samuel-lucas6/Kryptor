@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 using Sodium;
 
 /*
-    Kryptor: Modern and secure file encryption.
+    Kryptor: Free and open source file encryption.
     Copyright(C) 2020 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
@@ -26,11 +26,11 @@ namespace KryptorCLI
     {
         public static byte[] ComputeAdditionalData(long fileLength)
         {
+            byte[] magicBytes = FileHeaders.GetMagicBytes();
             byte[] fileFormatVersion = FileHeaders.GetFileFormatVersion();
             long chunkCount = Utilities.RoundUp(fileLength, Constants.FileChunkSize);
-            long ciphertextLength = chunkCount * Constants.TotalChunkLength;
-            byte[] ciphertextSize = BitConverter.GetBytes(ciphertextLength);
-            return Utilities.ConcatArrays(fileFormatVersion, ciphertextSize);
+            byte[] ciphertextLength = BitConverter.GetBytes(chunkCount * Constants.TotalChunkLength);
+            return Utilities.ConcatArrays(magicBytes, fileFormatVersion, ciphertextLength);
         }
 
         public static byte[] Encrypt(byte[] header, byte[] nonce, byte[] keyEncryptionKey, byte[] additionalData)
@@ -40,11 +40,14 @@ namespace KryptorCLI
 
         public static byte[] GetAdditionalData(string inputFilePath)
         {
-            long fileLength = FileHandling.GetFileLength(inputFilePath);
+            byte[] magicBytes = FileHeaders.ReadMagicBytes(inputFilePath);
             byte[] fileFormatVersion = FileHeaders.ReadFileFormatVersion(inputFilePath);
+            bool validFileFormat = Sodium.Utilities.Compare(fileFormatVersion, FileHeaders.GetFileFormatVersion());
+            if (!validFileFormat) { throw new ArgumentOutOfRangeException(inputFilePath, "Incorrect file format for this version of Kryptor."); }
+            long fileLength = FileHandling.GetFileLength(inputFilePath);
             int headersLength = FileHeaders.GetHeadersLength();
             byte[] ciphertextLength = BitConverter.GetBytes(fileLength - headersLength);
-            return Utilities.ConcatArrays(fileFormatVersion, ciphertextLength);
+            return Utilities.ConcatArrays(magicBytes, fileFormatVersion, ciphertextLength);
         }
 
         public static byte[] Decrypt(byte[] encryptedHeader, byte[] nonce, byte[] keyEncryptionKey, byte[] additionalData)

@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 
 /*
-    Kryptor: Modern and secure file encryption.
+    Kryptor: Free and open source file encryption.
     Copyright(C) 2020 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
@@ -96,7 +96,7 @@ namespace KryptorCLI
             return FileHandling.ReadFileHeader(inputFilePath, offset, Constants.SaltLength);
         }
 
-        public static byte[] ReadHeaderNonce(string inputFilePath)
+        public static byte[] ReadNonce(string inputFilePath)
         {
             int offset = _magicBytes.Length + _fileFormatVersion.Length + Constants.EphemeralPublicKeyLength + Constants.SaltLength;
             return FileHandling.ReadFileHeader(inputFilePath, offset, Constants.XChaChaNonceLength);
@@ -121,14 +121,6 @@ namespace KryptorCLI
             int sourceIndex = Constants.KeyCommitmentBlockLength + Constants.BitConverterLength;
             Array.Copy(header, sourceIndex, fileNameLength, destinationIndex: 0, fileNameLength.Length);
             return BitConverter.ToInt32(fileNameLength);
-        }
-
-        public static byte[] GetFileNonce(byte[] header)
-        {
-            byte[] nonce = new byte[Constants.XChaChaNonceLength];
-            int sourceIndex = Constants.KeyCommitmentBlockLength + (Constants.BitConverterLength * 2);
-            Array.Copy(header, sourceIndex, nonce, destinationIndex: 0, nonce.Length);
-            return nonce;
         }
 
         public static byte[] GetDataEncryptionKey(byte[] header)

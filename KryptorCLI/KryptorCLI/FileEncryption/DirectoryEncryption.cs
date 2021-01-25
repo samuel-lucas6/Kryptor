@@ -2,7 +2,7 @@
 using System.IO;
 
 /*
-    Kryptor: Modern and secure file encryption.
+    Kryptor: Free and open source file encryption.
     Copyright(C) 2020 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
@@ -111,7 +111,7 @@ namespace KryptorCLI
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.Error);
-                DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to encrypt directory.");
+                DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to encrypt the directory.");
             }
         }
 

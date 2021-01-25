@@ -1,7 +1,7 @@
 ﻿using System;
 
 /*
-    Kryptor: Modern and secure file encryption.
+    Kryptor: Free and open source file encryption.
     Copyright(C) 2020 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
@@ -57,7 +57,7 @@ namespace KryptorCLI
                 }
                 DisplayMessage.FilePathMessage(filePath, "Good signature.");
                 string comment = DigitalSignatures.GetComment();
-                DisplayMessage.MessageColonMessage("Authenticated comment", comment);
+                DisplayMessage.Message($"Authenticated comment: {comment}");
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {

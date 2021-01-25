@@ -3,7 +3,7 @@ using System.Reflection;
 using McMaster.Extensions.CommandLineUtils;
 
 /*
-    Kryptor: Modern and secure file encryption.
+    Kryptor: Free and open source file encryption.
     Copyright(C) 2020 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
@@ -56,10 +56,10 @@ Still need help? Check out the tutorial <https://kryptor.co.uk>.")]
         [Option("-y|--public", "specify a public key", CommandOptionType.SingleValue)]
         public string PublicKey { get; }
 
-        [Option("-f|--obfuscate", "obfuscate file names for file encryption", CommandOptionType.NoValue)]
+        [Option("-f|--obfuscate", "obfuscate file names", CommandOptionType.NoValue)]
         public bool ObfuscateFileNames { get; }
 
-        [Option("-o|--overwrite", "overwrite input files for file encryption", CommandOptionType.NoValue)]
+        [Option("-o|--overwrite", "overwrite input files", CommandOptionType.NoValue)]
         public bool Overwrite { get; }
 
         [Option("-g|--generate", "generate a new key pair", CommandOptionType.NoValue)]

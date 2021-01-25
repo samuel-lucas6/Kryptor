@@ -3,7 +3,7 @@ using Sodium;
 using System.IO;
 
 /*
-    Kryptor: Modern and secure file encryption.
+    Kryptor: Free and open source file encryption.
     Copyright(C) 2020 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
@@ -29,15 +29,16 @@ namespace KryptorCLI
             byte[] dataEncryptionKey = Generate.RandomDataEncryptionKey();
             try
             {
-                byte[] headerNonce = Generate.RandomNonce();
-                byte[] fileNonce = Generate.RandomNonce();
-                byte[] encryptedHeader = EncryptFileHeader(inputFilePath, fileNonce, dataEncryptionKey, headerNonce, keyEncryptionKey);
-                using var outputFile = new FileStream(outputFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileBufferSize, FileOptions.SequentialScan);
-                FileHeaders.WriteHeaders(outputFile, ephemeralPublicKey, salt, headerNonce, encryptedHeader);
-                byte[] additionalData = ChunkHandling.GetPreviousPoly1305Tag(encryptedHeader);
-                File.SetAttributes(inputFilePath, FileAttributes.Normal);
-                using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, Constants.FileBufferSize, FileOptions.SequentialScan);
-                Encrypt(inputFile, outputFile, fileNonce, dataEncryptionKey, additionalData);
+                using (var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileBufferSize, FileOptions.SequentialScan))
+                using (var outputFile = new FileStream(outputFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileBufferSize, FileOptions.SequentialScan))
+                {
+                    byte[] nonce = Generate.RandomNonce();
+                    byte[] encryptedHeader = EncryptFileHeader(inputFilePath, dataEncryptionKey, nonce, keyEncryptionKey);
+                    FileHeaders.WriteHeaders(outputFile, ephemeralPublicKey, salt, nonce, encryptedHeader);
+                    nonce = Sodium.Utilities.Increment(nonce);
+                    byte[] additionalData = ChunkHandling.GetPreviousPoly1305Tag(encryptedHeader);
+                    Encrypt(inputFile, outputFile, nonce, dataEncryptionKey, additionalData);
+                }
                 Finalize(inputFilePath, outputFilePath);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -48,15 +49,15 @@ namespace KryptorCLI
             }
         }
 
-        private static byte[] EncryptFileHeader(string inputFilePath, byte[] fileNonce, byte[] dataEncryptionKey, byte[] headerNonce, byte[] keyEncryptionKey)
+        private static byte[] EncryptFileHeader(string inputFilePath, byte[] dataEncryptionKey, byte[] nonce, byte[] keyEncryptionKey)
         {
             byte[] keyCommitmentBlock = ChunkHandling.GetKeyCommitmentBlock();
             long fileLength = FileHandling.GetFileLength(inputFilePath);
             byte[] lastChunkLength = BitConverter.GetBytes(Convert.ToInt32(fileLength % Constants.FileChunkSize));
             byte[] fileNameLength = FileHeaders.GetFileNameLength(inputFilePath);
-            byte[] fileHeader = Utilities.ConcatArrays(keyCommitmentBlock, lastChunkLength, fileNameLength, fileNonce, dataEncryptionKey);
+            byte[] fileHeader = Utilities.ConcatArrays(keyCommitmentBlock, lastChunkLength, fileNameLength, dataEncryptionKey);
             byte[] additionalData = HeaderEncryption.ComputeAdditionalData(fileLength);
-            return HeaderEncryption.Encrypt(fileHeader, headerNonce, keyEncryptionKey, additionalData);
+            return HeaderEncryption.Encrypt(fileHeader, nonce, keyEncryptionKey, additionalData);
         }
 
         private static void Encrypt(FileStream inputFile, FileStream outputFile, byte[] nonce, byte[] dataEncryptionKey, byte[] additionalData)

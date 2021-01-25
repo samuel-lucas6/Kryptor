@@ -1,7 +1,7 @@
 ﻿using System;
 
 /*
-    Kryptor: Modern and secure file encryption.
+    Kryptor: Free and open source file encryption.
     Copyright(C) 2020 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
@@ -48,7 +48,7 @@ namespace KryptorCLI
             return Sodium.Utilities.Compare(keyCommitmentBlock, _keyCommitmentBlock);
         }
 
-        public static byte[] RemovePrependedChunkData(byte[] plaintextChunk)
+        public static byte[] RemoveKeyCommitmentBlock(byte[] plaintextChunk)
         {
             byte[] plaintext = new byte[plaintextChunk.Length - Constants.KeyCommitmentBlockLength];
             Array.Copy(plaintextChunk, Constants.KeyCommitmentBlockLength, plaintext, destinationIndex: 0, plaintext.Length);
