@@ -4,7 +4,7 @@ using McMaster.Extensions.CommandLineUtils;
 
 /*
     Kryptor: Free and open source file encryption.
-    Copyright(C) 2020 Samuel Lucas
+    Copyright(C) 2020-2021 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -105,7 +105,9 @@ Still need help? Check out the tutorial <https://kryptor.co.uk>.")]
             }
             else if (GenerateKeys)
             {
-                CommandLine.GenerateNewKeyPair(FilePaths[0] ?? string.Empty);
+                string exportDirectoryPath = string.Empty;
+                if (FilePaths != null) { exportDirectoryPath = FilePaths[0]; }
+                CommandLine.GenerateNewKeyPair(exportDirectoryPath);
             }
             else if (RecoverPublicKey)
             {
