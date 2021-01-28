@@ -49,7 +49,7 @@ namespace KryptorCLI
 
         // Digital signatures/asymmetric encryption
         public const int PublicKeyLength = 44;
-        public const int PrivateKeyLength = 152;
+        public const int PrivateKeyLength = 192;
         public const string PublicKeyExtension = ".public";
         public const string PrivateKeyExtension = ".private";
         public const int EncryptedPrivateKeyLength = 96;
