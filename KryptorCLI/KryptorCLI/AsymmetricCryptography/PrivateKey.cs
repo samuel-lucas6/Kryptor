@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 
 /*
     Kryptor: Free and open source file encryption.
-    Copyright(C) 2020 Samuel Lucas
+    Copyright(C) 2020-2021 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -33,7 +33,9 @@ namespace KryptorCLI
             byte[] key = Argon2.DeriveKey(passwordBytes, salt);
             Utilities.ZeroArray(passwordBytes);
             byte[] nonce = Generate.RandomNonce();
-            byte[] encryptedPrivateKey = SecretAeadXChaCha20Poly1305.Encrypt(privateKey, nonce, key);
+            byte[] keyCommitmentBlock = ChunkHandling.GetKeyCommitmentBlock();
+            privateKey = Utilities.ConcatArrays(keyCommitmentBlock, privateKey);
+            byte[] encryptedPrivateKey = SecretAeadXChaCha20Poly1305.Encrypt(privateKey, nonce, key, argon2Parameters);
             Utilities.ZeroArray(privateKey);
             Utilities.ZeroArray(key);
             return Utilities.ConcatArrays(argon2Parameters, salt, nonce, encryptedPrivateKey);
@@ -45,7 +47,6 @@ namespace KryptorCLI
             {
                 char[] password = PasswordPrompt.EnterYourPassword();
                 byte[] passwordBytes = Password.Hash(password);
-                Utilities.ZeroArray(password);
                 return Decrypt(passwordBytes, privateKey);
             }
             catch (CryptographicException)
@@ -57,14 +58,23 @@ namespace KryptorCLI
 
         private static byte[] Decrypt(byte[] passwordBytes, byte[] privateKey)
         {
+            byte[] argon2Parameters = GetArgon2Parameters(privateKey);
             byte[] salt = GetSalt(privateKey);
             byte[] nonce = GetNonce(privateKey);
-            byte[] encryptedKey = GetEncryptedKey(privateKey);
+            byte[] encryptedPrivateKey = GetEncryptedPrivateKey(privateKey);
             byte[] key = Argon2.DeriveKey(passwordBytes, salt);
             Utilities.ZeroArray(passwordBytes);
-            byte[] decryptedKey = SecretAeadXChaCha20Poly1305.Decrypt(encryptedKey, nonce, key);
+            byte[] decryptedPrivateKey = SecretAeadXChaCha20Poly1305.Decrypt(encryptedPrivateKey, nonce, key, argon2Parameters);
             Utilities.ZeroArray(key);
-            return decryptedKey;
+            ChunkHandling.ValidateKeyCommitmentBlock(decryptedPrivateKey);
+            return ChunkHandling.RemoveKeyCommitmentBlock(decryptedPrivateKey);
+        }
+
+        private static byte[] GetArgon2Parameters(byte[] privateKey)
+        {
+            byte[] argon2Parameters = new byte[Constants.BitConverterLength * 2];
+            Array.Copy(privateKey, argon2Parameters, argon2Parameters.Length);
+            return argon2Parameters;
         }
 
         private static byte[] GetSalt(byte[] privateKey)
@@ -83,7 +93,7 @@ namespace KryptorCLI
             return nonce;
         }
 
-        private static byte[] GetEncryptedKey(byte[] privateKey)
+        private static byte[] GetEncryptedPrivateKey(byte[] privateKey)
         {
             byte[] encryptedKey = new byte[Constants.EncryptedPrivateKeyLength];
             int sourceIndex = (Constants.BitConverterLength * 2) + Constants.SaltLength + Constants.XChaChaNonceLength;

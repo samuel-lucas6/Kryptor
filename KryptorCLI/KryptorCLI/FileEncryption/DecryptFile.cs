@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 
 /*
     Kryptor: Free and open source file encryption.
-    Copyright(C) 2020 Samuel Lucas
+    Copyright(C) 2020-2021 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ namespace KryptorCLI
                 byte[] nonce = FileHeaders.ReadNonce(inputFilePath);
                 byte[] header = DecryptFileHeader(inputFilePath, encryptedHeader, nonce, keyEncryptionKey);
                 if (header == null) { throw new ArgumentException("Incorrect password/keyfile or this file has been tampered with."); }
-                ValidateRobustnessBlock(header);
+                ChunkHandling.ValidateKeyCommitmentBlock(header);
                 int lastChunkLength = FileHeaders.GetLastChunkLength(header);
                 int fileNameLength = FileHeaders.GetFileNameLength(header);
                 dataEncryptionKey = FileHeaders.GetDataEncryptionKey(header);
@@ -70,7 +70,7 @@ namespace KryptorCLI
             while (inputFile.Read(ciphertextChunk, offset, ciphertextChunk.Length) > 0)
             {
                 byte[] plaintextChunk = SecretAeadXChaCha20Poly1305.Decrypt(ciphertextChunk, nonce, dataEncryptionKey, additionalData);
-                ValidateRobustnessBlock(plaintextChunk);
+                ChunkHandling.ValidateKeyCommitmentBlock(plaintextChunk);
                 nonce = Sodium.Utilities.Increment(nonce);
                 additionalData = ChunkHandling.GetPreviousPoly1305Tag(ciphertextChunk);
                 plaintextChunk = ChunkHandling.RemoveKeyCommitmentBlock(plaintextChunk);
@@ -78,12 +78,6 @@ namespace KryptorCLI
             }
             outputFile.SetLength((outputFile.Length - Constants.FileChunkSize) + lastChunkLength);
             Utilities.ZeroArray(dataEncryptionKey);
-        }
-
-        private static void ValidateRobustnessBlock(byte[] plaintextChunk)
-        {
-            bool validRobustnessBlock = ChunkHandling.ValidateRobustnessBlock(plaintextChunk);
-            if (!validRobustnessBlock) { throw new CryptographicException("Invalid robustness block"); }
         }
 
         private static void Finalize(string inputFilePath, string outputFilePath, int fileNameLength)

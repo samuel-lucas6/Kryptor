@@ -1,6 +1,6 @@
 ﻿/*
     Kryptor: Free and open source file encryption.
-    Copyright(C) 2020 Samuel Lucas
+    Copyright(C) 2020-2021 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ namespace KryptorCLI
         public const int PrivateKeyLength = 152;
         public const string PublicKeyExtension = ".public";
         public const string PrivateKeyExtension = ".private";
-        public const int EncryptedPrivateKeyLength = 80;
+        public const int EncryptedPrivateKeyLength = 96;
         public const int SignatureLength = 64;
         public const string SignatureMagicBytes = "SIGNATURE";
         public const string SignatureExtension = ".signature";

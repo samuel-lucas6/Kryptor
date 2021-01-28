@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Security.Cryptography;
 
 /*
     Kryptor: Free and open source file encryption.
-    Copyright(C) 2020 Samuel Lucas
+    Copyright(C) 2020-2021 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,7 +42,13 @@ namespace KryptorCLI
             return previousTag;
         }
 
-        public static bool ValidateRobustnessBlock(byte[] plaintextChunk)
+        public static void ValidateKeyCommitmentBlock(byte[] plaintextChunk)
+        {
+            bool validKeyCommitmentBlock = CompareKeyCommitmentBlock(plaintextChunk);
+            if (!validKeyCommitmentBlock) { throw new CryptographicException("Invalid key commitment block."); }
+        }
+
+        private static bool CompareKeyCommitmentBlock(byte[] plaintextChunk)
         {
             byte[] keyCommitmentBlock = new byte[Constants.KeyCommitmentBlockLength];
             Array.Copy(plaintextChunk, keyCommitmentBlock, keyCommitmentBlock.Length);
