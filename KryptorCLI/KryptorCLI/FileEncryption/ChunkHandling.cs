@@ -45,7 +45,7 @@ namespace KryptorCLI
         public static void ValidateKeyCommitmentBlock(byte[] plaintextChunk)
         {
             bool validKeyCommitmentBlock = CompareKeyCommitmentBlock(plaintextChunk);
-            if (!validKeyCommitmentBlock) { throw new CryptographicException("Invalid key commitment block."); }
+            if (!validKeyCommitmentBlock) { throw new CryptographicException("Error decrypting message."); }
         }
 
         private static bool CompareKeyCommitmentBlock(byte[] plaintextChunk)

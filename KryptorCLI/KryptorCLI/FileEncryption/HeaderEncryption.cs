@@ -41,13 +41,12 @@ namespace KryptorCLI
         public static byte[] GetAdditionalData(string inputFilePath)
         {
             byte[] magicBytes = FileHeaders.ReadMagicBytes(inputFilePath);
-            byte[] fileFormatVersion = FileHeaders.ReadFileFormatVersion(inputFilePath);
-            bool validFileFormat = Sodium.Utilities.Compare(fileFormatVersion, FileHeaders.GetFileFormatVersion());
-            if (!validFileFormat) { throw new ArgumentOutOfRangeException(inputFilePath, "Incorrect file format for this version of Kryptor."); }
+            byte[] formatVersion = FileHeaders.ReadFileFormatVersion(inputFilePath);
+            FileHeaders.ValidateFormatVersion(inputFilePath, formatVersion, FileHeaders.GetFileFormatVersion());
             long fileLength = FileHandling.GetFileLength(inputFilePath);
             int headersLength = FileHeaders.GetHeadersLength();
             byte[] ciphertextLength = BitConverter.GetBytes(fileLength - headersLength);
-            return Utilities.ConcatArrays(magicBytes, fileFormatVersion, ciphertextLength);
+            return Utilities.ConcatArrays(magicBytes, formatVersion, ciphertextLength);
         }
 
         public static byte[] Decrypt(byte[] encryptedHeader, byte[] nonce, byte[] keyEncryptionKey, byte[] additionalData)
