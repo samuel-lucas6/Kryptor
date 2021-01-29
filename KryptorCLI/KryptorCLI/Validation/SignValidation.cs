@@ -35,7 +35,7 @@ namespace KryptorCLI
             {
                 yield return ValidationMessages.PrivateKeyFile;
             }
-            if (comment.Length > 500)
+            if (!string.IsNullOrEmpty(comment) && comment.Length > 500)
             {
                 yield return "Please enter a shorter comment.";
             }
