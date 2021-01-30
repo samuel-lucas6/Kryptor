@@ -84,5 +84,23 @@ namespace KryptorCLI
                 yield return ValidationMessages.FilePath;
             }
         }
+
+        public static bool FileEncryptionWithPrivateKey(string privateKeyPath, string[] filePaths)
+        {
+            IEnumerable<string> errorMessages = GetFileEncryptionErrors(privateKeyPath, filePaths);
+            return DisplayMessage.AnyErrors(errorMessages);
+        }
+
+        private static IEnumerable<string> GetFileEncryptionErrors(string privateKeyPath, string[] filePaths)
+        {
+            if (!privateKeyPath.EndsWith(Constants.PrivateKeyExtension) || !File.Exists(privateKeyPath))
+            {
+                yield return ValidationMessages.PrivateKeyFile;
+            }
+            if (filePaths == null)
+            {
+                yield return ValidationMessages.FilePath;
+            }
+        }
     }
 }

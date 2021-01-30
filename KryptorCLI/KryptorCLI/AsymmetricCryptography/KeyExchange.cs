@@ -41,12 +41,19 @@ namespace KryptorCLI
             return (ephemeralSharedSecret, ephemeralKeyPair.PublicKey);
         }
 
+        public static (byte[] ephemeralSharedSecret, byte[] ephemeralPublicKey) GetPrivateKeySharedSecret(byte[] privateKey)
+        {
+            using var ephemeralKeyPair = PublicKeyBox.GenerateKeyPair();
+            byte[] ephemeralSharedSecret = ScalarMult.Mult(privateKey, ephemeralKeyPair.PublicKey);
+            return (ephemeralSharedSecret, ephemeralKeyPair.PublicKey);
+        }
+
         private static byte[] ConvertPublicKeyToCurve25519(byte[] publicKey)
         {
             return PublicKeyAuth.ConvertEd25519PublicKeyToCurve25519PublicKey(publicKey);
         }
 
-        private static byte[] ConvertPrivateKeyToCurve25519(byte[] privateKey)
+        public static byte[] ConvertPrivateKeyToCurve25519(byte[] privateKey)
         {
             return PublicKeyAuth.ConvertEd25519SecretKeyToCurve25519SecretKey(privateKey);
         }

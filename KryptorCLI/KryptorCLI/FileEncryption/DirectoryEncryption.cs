@@ -134,5 +134,39 @@ namespace KryptorCLI
                 Utilities.ZeroArray(keyEncryptionKey);
             }
         }
+
+        public static void UsingPrivateKey(string directoryPath, byte[] privateKey)
+        {
+            try
+            {
+                string[] filePaths = GetFiles(ref directoryPath);
+                EncryptEachFileWithPrivateKey(filePaths, privateKey);
+            }
+            catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
+            {
+                Logging.LogException(ex.ToString(), Logging.Severity.Error);
+                DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to encrypt the directory.");
+            }
+        }
+
+        private static void EncryptEachFileWithPrivateKey(string[] filePaths, byte[] privateKey)
+        {
+            foreach (string inputFilePath in filePaths)
+            {
+                bool validFilePath = FilePathValidation.FileEncryption(inputFilePath);
+                if (!validFilePath)
+                {
+                    --Globals.TotalCount;
+                    continue;
+                }
+                // Derive a unique KEK per file
+                (byte[] ephemeralSharedSecret, byte[] ephemeralPublicKey) = KeyExchange.GetPrivateKeySharedSecret(privateKey);
+                byte[] salt = Generate.RandomSalt();
+                byte[] keyEncryptionKey = Generate.KeyEncryptionKey(ephemeralSharedSecret, salt);
+                string outputFilePath = FileEncryption.GetOutputFilePath(inputFilePath);
+                EncryptInputFile(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
+                Utilities.ZeroArray(keyEncryptionKey);
+            }
+        }
     }
 }

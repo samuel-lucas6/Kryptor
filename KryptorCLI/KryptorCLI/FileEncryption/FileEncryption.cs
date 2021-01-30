@@ -53,10 +53,11 @@ namespace KryptorCLI
                 // Derive a unique KEK per file
                 byte[] salt = Generate.RandomSalt();
                 byte[] keyEncryptionKey = Argon2.DeriveKey(passwordBytes, salt);
-                // Fill the ephemeral public key header with random bytes (since not in use)
+                // Fill the ephemeral public key header with random key (since not in use)
                 byte[] randomEphemeralPublicKeyHeader = Generate.RandomEphemeralPublicKeyHeader();
                 string outputFilePath = GetOutputFilePath(inputFilePath);
                 EncryptFile.Initialize(inputFilePath, outputFilePath, randomEphemeralPublicKeyHeader, salt, keyEncryptionKey);
+                Utilities.ZeroArray(keyEncryptionKey);
                 EncryptionSuccessful(inputFilePath, outputFilePath);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
@@ -103,6 +104,53 @@ namespace KryptorCLI
                 byte[] keyEncryptionKey = Generate.KeyEncryptionKey(sharedSecret, ephemeralSharedSecret, salt);
                 string outputFilePath = GetOutputFilePath(inputFilePath);
                 EncryptFile.Initialize(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
+                Utilities.ZeroArray(keyEncryptionKey);
+                EncryptionSuccessful(inputFilePath, outputFilePath);
+            }
+            catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
+            {
+                Logging.LogException(ex.ToString(), Logging.Severity.Error);
+                DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to encrypt the file.");
+            }
+        }
+
+        public static void EncryptEachFileWithPrivateKey(string[] filePaths, byte[] privateKey)
+        {
+            Globals.TotalCount = filePaths.Length;
+            privateKey = PrivateKey.Decrypt(privateKey);
+            if (privateKey == null) { return; }
+            privateKey = KeyExchange.ConvertPrivateKeyToCurve25519(privateKey);
+            foreach (string inputFilePath in filePaths)
+            {
+                bool validFilePath = FilePathValidation.FileEncryption(inputFilePath);
+                if (!validFilePath)
+                {
+                    --Globals.TotalCount;
+                    continue;
+                }
+                UsingPrivateKey(inputFilePath, privateKey);
+            }
+            Utilities.ZeroArray(privateKey);
+            DisplayMessage.SuccessfullyEncrypted();
+        }
+
+        private static void UsingPrivateKey(string inputFilePath, byte[] privateKey)
+        {
+            try
+            {
+                bool fileIsDirectory = FileHandling.IsDirectory(inputFilePath);
+                if (fileIsDirectory)
+                {
+                    DirectoryEncryption.UsingPrivateKey(inputFilePath, privateKey);
+                    return;
+                }
+                // Derive a unique KEK per file
+                (byte[] ephemeralSharedSecret, byte[] ephemeralPublicKey) = KeyExchange.GetPrivateKeySharedSecret(privateKey);
+                byte[] salt = Generate.RandomSalt();
+                byte[] keyEncryptionKey = Generate.KeyEncryptionKey(ephemeralSharedSecret, salt);
+                string outputFilePath = GetOutputFilePath(inputFilePath);
+                EncryptFile.Initialize(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
+                Utilities.ZeroArray(keyEncryptionKey);
                 EncryptionSuccessful(inputFilePath, outputFilePath);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))

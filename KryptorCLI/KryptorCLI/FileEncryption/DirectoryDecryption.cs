@@ -119,6 +119,40 @@ namespace KryptorCLI
             }
         }
 
+        public static void UsingPrivateKey(string directoryPath, byte[] privateKey)
+        {
+            try
+            {
+                string[] filePaths = GetFiles(directoryPath);
+                DecryptEachFileWithPrivateKey(filePaths, privateKey);
+                Finalize(directoryPath);
+            }
+            catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
+            {
+                Logging.LogException(ex.ToString(), Logging.Severity.Error);
+                DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to decrypt the directory.");
+            }
+        }
+
+        private static void DecryptEachFileWithPrivateKey(string[] filePaths, byte[] privateKey)
+        {
+            foreach (string inputFilePath in filePaths)
+            {
+                bool validFilePath = FilePathValidation.FileDecryption(inputFilePath);
+                if (!validFilePath)
+                {
+                    --Globals.TotalCount;
+                    continue;
+                }
+                byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFilePath);
+                byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecret(privateKey, ephemeralPublicKey);
+                byte[] salt = FileHeaders.ReadSalt(inputFilePath);
+                byte[] keyEncryptionKey = Generate.KeyEncryptionKey(ephemeralSharedSecret, salt);
+                DecryptInputFile(inputFilePath, keyEncryptionKey);
+                Utilities.ZeroArray(keyEncryptionKey);
+            }
+        }
+
         private static void Finalize(string directoryPath, string saltFilePath)
         {
             if (Globals.SuccessfulCount != 0 && Globals.SuccessfulCount == Globals.TotalCount)
