@@ -1,4 +1,7 @@
-﻿/*
+﻿using System;
+using System.Text;
+
+/*
     Kryptor: Free and open source file encryption.
     Copyright(C) 2020-2021 Samuel Lucas
 
@@ -26,8 +29,8 @@ namespace KryptorCLI
         public static readonly int Iterations = 12;
 
         // File encryption
-        public const string KryptorMagicBytes = "KRYPTOR";
-        public static readonly int FileFormatVersion = 3;
+        public static readonly byte[] KryptorMagicBytes = Encoding.UTF8.GetBytes("KRYPTOR");
+        public static readonly byte[] EncryptionVersion = BitConverter.GetBytes((short)3);
         public const string EncryptedExtension = ".kryptor";
         public const string SaltFile = "Kryptor.salt";
         public const int KeyfileSize = 64;
@@ -47,14 +50,18 @@ namespace KryptorCLI
         public const int BLAKE2Length = 64;
         public const string BLAKE2Personal = "Kryptor.Personal";
 
-        // Digital signatures/asymmetric encryption
-        public const int PublicKeyLength = 44;
-        public const int PrivateKeyLength = 192;
+        // Asymmetric keys
+        public const int PublicKeyLength = 48;
+        public const int PrivateKeyLength = 184;
         public const string PublicKeyExtension = ".public";
         public const string PrivateKeyExtension = ".private";
         public const int EncryptedPrivateKeyLength = 96;
+        public static readonly byte[] KeyVersion = BitConverter.GetBytes((short)1);
+
+        // File signing
         public const int SignatureLength = 64;
-        public const string SignatureMagicBytes = "SIGNATURE";
         public const string SignatureExtension = ".signature";
+        public static readonly byte[] SignatureMagicBytes = Encoding.UTF8.GetBytes("SIGNATURE");
+        public static readonly byte[] SignatureVersion = BitConverter.GetBytes((short)1);
     }
 }
