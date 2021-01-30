@@ -32,13 +32,14 @@ namespace KryptorCLI
 
         public static byte[] ReadKeyfile(string keyfilePath)
         {
-            File.SetAttributes(keyfilePath, FileAttributes.Normal);
-            byte[] keyfileBytes = new byte[Constants.KeyfileSize];
-            // Read the first 64 bytes of a keyfile
             using var fileStream = new FileStream(keyfilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-            fileStream.Read(keyfileBytes, offset: 0, keyfileBytes.Length);
-            File.SetAttributes(keyfilePath, FileAttributes.ReadOnly);
-            return keyfileBytes;
+            if (fileStream.Length == Constants.KeyfileSize)
+            {
+                byte[] keyfileBytes = new byte[Constants.KeyfileSize];
+                fileStream.Read(keyfileBytes, offset: 0, keyfileBytes.Length);
+                return keyfileBytes;
+            }
+            return Blake2.Hash(fileStream);
         }
     }
 }
