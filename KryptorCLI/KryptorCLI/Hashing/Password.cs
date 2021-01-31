@@ -82,8 +82,7 @@ namespace KryptorCLI
         {
             try
             {
-                byte[] passwordBytes = Keyfiles.ReadKeyfile(keyfilePath);
-                return GetPasswordHash(passwordBytes);
+                return Keyfiles.ReadKeyfile(keyfilePath);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
