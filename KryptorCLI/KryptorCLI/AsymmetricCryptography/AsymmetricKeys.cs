@@ -29,9 +29,8 @@ namespace KryptorCLI
             char[] password = PasswordPrompt.EnterNewPassword();
             byte[] passwordBytes = Password.Hash(password);
             using var keyPair = PublicKeyAuth.GenerateKeyPair();
-            byte[] publicKey = Utilities.ConcatArrays(Constants.KeyVersion, keyPair.PublicKey);
             byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, keyPair.PrivateKey);
-            return ConvertKeys(publicKey, encryptedPrivateKey);
+            return ConvertKeys(keyPair.PublicKey, encryptedPrivateKey);
         }
 
         private static (string publicKey, string privateKey) ConvertKeys(byte[] publicKey, byte[] encryptedPrivateKey)

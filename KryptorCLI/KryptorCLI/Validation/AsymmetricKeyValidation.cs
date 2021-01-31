@@ -33,17 +33,10 @@ namespace KryptorCLI
                     DisplayMessage.Error(ValidationMessages.PublicKeyString);
                     return null;
                 }
-                byte[] publicKey = Convert.FromBase64String(encodedPublicKey);
-                ValidateKeyVersion(publicKey);
-                return RemoveKeyVersion(publicKey);
+                return Convert.FromBase64String(encodedPublicKey);
             }
             catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
             {
-                if (ex is ArgumentOutOfRangeException)
-                {
-                    DisplayMessage.Exception(ex.GetType().Name, ex.Message);
-                    return null;
-                }
                 DisplayMessage.Exception(ex.GetType().Name, "Unable to retrieve public key.");
                 return null;
             }
@@ -79,41 +72,27 @@ namespace KryptorCLI
         {
             try
             {
-                byte[] publicKey = Convert.FromBase64CharArray(encodedPublicKey, offset: 0, encodedPublicKey.Length);
-                ValidateKeyVersion(publicKey);
-                return RemoveKeyVersion(publicKey);
+                return Convert.FromBase64CharArray(encodedPublicKey, offset: 0, encodedPublicKey.Length);
             }
             catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
             {
-                if (ex is ArgumentOutOfRangeException)
-                {
-                    DisplayMessage.Exception(ex.GetType().Name, ex.Message);
-                    return null;
-                }
                 DisplayMessage.Exception(ex.GetType().Name, "Invalid public key format.");
                 return null;
             }
         }
 
-        private static void ValidateKeyVersion(byte[] asymmetricKey)
+        private static void ValidateKeyVersion(byte[] privateKey)
         {
-            byte[] keyVersion = GetKeyVersion(asymmetricKey);
+            byte[] keyVersion = GetKeyVersion(privateKey);
             bool validKeyVersion = Sodium.Utilities.Compare(keyVersion, Constants.KeyVersion);
-            if (!validKeyVersion) { throw new ArgumentOutOfRangeException("Unsupported key version."); }
+            if (!validKeyVersion) { throw new ArgumentOutOfRangeException("Unsupported private key version."); }
         }
 
-        private static byte[] GetKeyVersion(byte[] asymmetricKey)
+        private static byte[] GetKeyVersion(byte[] privateKey)
         {
             byte[] keyVersion = new byte[Constants.KeyVersion.Length];
-            Array.Copy(asymmetricKey, keyVersion, keyVersion.Length);
+            Array.Copy(privateKey, keyVersion, keyVersion.Length);
             return keyVersion;
-        }
-
-        private static byte[] RemoveKeyVersion(byte[] asymmetricKey)
-        {
-            byte[] key = new byte[asymmetricKey.Length - Constants.KeyVersion.Length];
-            Array.Copy(asymmetricKey, Constants.KeyVersion.Length, key, destinationIndex: 0, key.Length);
-            return key;
         }
     }
 }

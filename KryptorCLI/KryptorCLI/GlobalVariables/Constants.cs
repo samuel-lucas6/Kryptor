@@ -33,7 +33,7 @@ namespace KryptorCLI
         public static readonly byte[] EncryptionVersion = BitConverter.GetBytes((short)3);
         public const string EncryptedExtension = ".kryptor";
         public const string SaltFile = "Kryptor.salt";
-        public const int KeyfileSize = 64;
+        public const int KeyfileLength = 64;
         public const int FileBufferSize = 131072;
         public const int FileChunkSize = 16384;
         public const int KeyCommitmentBlockLength = 16;
@@ -51,7 +51,7 @@ namespace KryptorCLI
         public const string BLAKE2Personal = "Kryptor.Personal";
 
         // Asymmetric keys
-        public const int PublicKeyLength = 48;
+        public const int PublicKeyLength = 44;
         public const int PrivateKeyLength = 184;
         public const string PublicKeyExtension = ".public";
         public const string PrivateKeyExtension = ".private";
