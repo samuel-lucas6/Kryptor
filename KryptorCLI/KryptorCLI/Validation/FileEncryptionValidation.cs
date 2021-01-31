@@ -35,6 +35,14 @@ namespace KryptorCLI
             {
                 yield return "Please specify whether to use a password and/or keyfile.";
             }
+            if (File.Exists(keyfilePath))
+            {
+                long keyfileLength = FileHandling.GetFileLength(keyfilePath);
+                if (keyfileLength < Constants.KeyfileLength)
+                {
+                    yield return "Please specify a keyfile that is at least 64 bytes in size.";
+                }
+            }
             if (filePaths == null)
             {
                 yield return ValidationMessages.FilePath;
