@@ -97,36 +97,22 @@ namespace KryptorCLI
             return null;
         }
 
-        public static bool GenerateKeyPair(string directoryPath, string keyPairName)
+        public static bool GenerateKeyPair(string directoryPath)
         {
-            IEnumerable<string> errorMessages = GetGenerateKeyPairError(directoryPath, keyPairName);
+            IEnumerable<string> errorMessages = GetGenerateKeyPairError(directoryPath);
             return DisplayMessage.AnyErrors(errorMessages);
         }
 
-        private static IEnumerable<string> GetGenerateKeyPairError(string directoryPath, string keyPairName)
+        private static IEnumerable<string> GetGenerateKeyPairError(string directoryPath)
         {
             if (!string.IsNullOrEmpty(directoryPath) && !Directory.Exists(directoryPath))
             {
                 yield return "This directory doesn't exist.";
             }
-            if (string.IsNullOrEmpty(keyPairName) || keyPairName.Length > 50 || ContainsIllegalCharacters(keyPairName))
+            else if (!Globals.Overwrite && (File.Exists(Constants.DefaultPrivateKeyPath) || File.Exists(Constants.DefaultPublicKeyPath)))
             {
-                yield return "Please enter a valid key pair name.";
+                yield return "A key pair already exists. Please back up your old keys and then use -o|--overwrite if you want to overwrite them.";
             }
-            else if (File.Exists(Path.Combine(directoryPath, keyPairName + Constants.PrivateKeyExtension)) || File.Exists(Path.Combine(directoryPath, keyPairName + Constants.PublicKeyExtension)))
-            {
-                yield return "This key pair name already exists. Please manually delete your old .public & .private key files if you want to overwrite them.";
-            }
-        }
-
-        private static bool ContainsIllegalCharacters(string fileName)
-        {
-            char[] invalidFileNameCharacters = Path.GetInvalidFileNameChars();
-            foreach (char character in invalidFileNameCharacters)
-            {
-                if (fileName.Contains(character)) { return true; }
-            }
-            return false;
         }
 
         public static bool RecoverPublicKey(string privateKeyPath)

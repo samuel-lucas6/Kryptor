@@ -23,9 +23,31 @@ using System.Linq;
 
 namespace KryptorCLI
 {
-    public static class VerifyValidation
+    public static class SigningValidation
     {
         private static readonly string _filePathError = "Please specify a file to verify.";
+
+        public static bool Sign(string privateKeyPath, string comment, string[] filePaths)
+        {
+            IEnumerable<string> errorMessages = GetSignErrors(privateKeyPath, comment, filePaths);
+            return DisplayMessage.AnyErrors(errorMessages);
+        }
+
+        private static IEnumerable<string> GetSignErrors(string privateKeyPath, string comment, string[] filePaths)
+        {
+            if (!File.Exists(privateKeyPath) || !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
+            {
+                yield return ValidationMessages.PrivateKeyFile;
+            }
+            if (!string.IsNullOrEmpty(comment) && comment.Length > 500)
+            {
+                yield return "Please enter a shorter comment.";
+            }
+            if (filePaths == null)
+            {
+                yield return "Please specify a file to sign.";
+            }
+        }
 
         public static bool Verify(char[] encodedPublicKey, string[] filePaths)
         {
@@ -53,7 +75,7 @@ namespace KryptorCLI
 
         private static IEnumerable<string> GetVerifyErrors(string publicKeyPath, string[] filePaths)
         {
-            if (!publicKeyPath.EndsWith(Constants.PublicKeyExtension) || !File.Exists(publicKeyPath))
+            if (!File.Exists(publicKeyPath) || !publicKeyPath.EndsWith(Constants.PublicKeyExtension))
             {
                 yield return ValidationMessages.PublicKeyFile;
             }

@@ -84,13 +84,13 @@ namespace KryptorCLI
         private static void ValidateKeyVersion(byte[] privateKey)
         {
             byte[] keyVersion = GetKeyVersion(privateKey);
-            bool validKeyVersion = Sodium.Utilities.Compare(keyVersion, Constants.KeyVersion);
+            bool validKeyVersion = Sodium.Utilities.Compare(keyVersion, Constants.PrivateKeyVersion);
             if (!validKeyVersion) { throw new ArgumentOutOfRangeException("Unsupported private key version."); }
         }
 
         private static byte[] GetKeyVersion(byte[] privateKey)
         {
-            byte[] keyVersion = new byte[Constants.KeyVersion.Length];
+            byte[] keyVersion = new byte[Constants.PrivateKeyVersion.Length];
             Array.Copy(privateKey, keyVersion, keyVersion.Length);
             return keyVersion;
         }

@@ -57,11 +57,18 @@ namespace KryptorCLI
 
         private static IEnumerable<string> GetFileEncryptionErrors(string privateKeyPath, string publicKeyPath, string[] filePaths)
         {
-            if (!privateKeyPath.EndsWith(Constants.PrivateKeyExtension) || !File.Exists(privateKeyPath))
+            if (!File.Exists(privateKeyPath) || !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
             {
                 yield return ValidationMessages.PrivateKeyFile;
             }
-            if (!publicKeyPath.EndsWith(Constants.PublicKeyExtension) || !File.Exists(publicKeyPath))
+            if (string.IsNullOrEmpty(publicKeyPath))
+            {
+                if (!File.Exists(Constants.DefaultPublicKeyPath))
+                {
+                    yield return ValidationMessages.PublicKeyFile;
+                }
+            }
+            else if (!publicKeyPath.EndsWith(Constants.PublicKeyExtension) || !File.Exists(publicKeyPath))
             {
                 yield return ValidationMessages.PublicKeyFile;
             }
@@ -79,7 +86,7 @@ namespace KryptorCLI
 
         private static IEnumerable<string> GetFileEncryptionErrors(string privateKeyPath, char[] encodedPublicKey, string[] filePaths)
         {
-            if (!privateKeyPath.EndsWith(Constants.PrivateKeyExtension) || !File.Exists(privateKeyPath))
+            if (!File.Exists(privateKeyPath) || !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
             {
                 yield return ValidationMessages.PrivateKeyFile;
             }
@@ -101,7 +108,7 @@ namespace KryptorCLI
 
         private static IEnumerable<string> GetFileEncryptionErrors(string privateKeyPath, string[] filePaths)
         {
-            if (!privateKeyPath.EndsWith(Constants.PrivateKeyExtension) || !File.Exists(privateKeyPath))
+            if (!File.Exists(privateKeyPath) || !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
             {
                 yield return ValidationMessages.PrivateKeyFile;
             }
