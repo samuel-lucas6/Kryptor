@@ -30,7 +30,7 @@ namespace KryptorCLI
             byte[] passwordBytes = Password.Hash(password);
             using var keyPair = PublicKeyBox.GenerateKeyPair();
             byte[] publicKey = Utilities.ConcatArrays(Constants.Curve25519KeyHeader, keyPair.PublicKey);
-            byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, keyPair.PrivateKey);
+            byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, keyPair.PrivateKey, Constants.KeyAlgorithm.Curve25519);
             encryptedPrivateKey = Utilities.ConcatArrays(Constants.Curve25519KeyHeader, encryptedPrivateKey);
             return ConvertKeys(publicKey, encryptedPrivateKey);
         }
@@ -41,7 +41,7 @@ namespace KryptorCLI
             byte[] passwordBytes = Password.Hash(password);
             using var keyPair = PublicKeyAuth.GenerateKeyPair();
             byte[] publicKey = Utilities.ConcatArrays(Constants.Ed25519KeyHeader, keyPair.PublicKey);
-            byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, keyPair.PrivateKey);
+            byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, keyPair.PrivateKey, Constants.KeyAlgorithm.Ed25519);
             encryptedPrivateKey = Utilities.ConcatArrays(Constants.Ed25519KeyHeader, encryptedPrivateKey);
             return ConvertKeys(publicKey, encryptedPrivateKey);
         }

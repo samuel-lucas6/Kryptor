@@ -170,7 +170,6 @@ namespace KryptorCLI
             try
             {
                 int keyPairType = GetKeyPairType();
-                Console.WriteLine();
                 bool validUserInput = FilePathValidation.GenerateKeyPair(exportDirectoryPath, keyPairType);
                 if (!validUserInput) { return; }
                 string publicKey, privateKey, publicKeyPath, privateKeyPath;
@@ -199,6 +198,7 @@ namespace KryptorCLI
             Console.WriteLine("1) Encryption");
             Console.WriteLine("2) Signing");
             string userInput = Console.ReadLine();
+            Console.WriteLine();
             _ = int.TryParse(userInput, out int keyPairType);
             return keyPairType;
         }
@@ -221,12 +221,11 @@ namespace KryptorCLI
             if (privateKey == null) { return; }
             byte[] publicKey = privateKey.Length switch
             {
-                Constants.EncryptionKeySize => AsymmetricKeys.ExtractCurve25519PublicKey(privateKey),
-                _ => AsymmetricKeys.ExtractEd25519PublicKey(privateKey),
+                Constants.EncryptionKeySize => AsymmetricKeys.GetCurve25519PublicKey(privateKey),
+                _ => AsymmetricKeys.GetEd25519PublicKey(privateKey),
             };
             Utilities.ZeroArray(privateKey);
-            string encodedPublicKey = Convert.ToBase64String(publicKey);
-            Console.WriteLine($"Public key: {encodedPublicKey}");
+            Console.WriteLine($"Public key: {Convert.ToBase64String(publicKey)}");
         }
 
         public static void Sign(string privateKeyPath, string comment, bool preHash, string[] filePaths)
