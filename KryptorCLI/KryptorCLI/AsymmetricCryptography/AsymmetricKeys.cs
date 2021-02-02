@@ -89,14 +89,16 @@ namespace KryptorCLI
             File.SetAttributes(filePath, FileAttributes.ReadOnly);
         }
 
-        public static byte[] ExtractCurve25519PublicKey(byte[] privateKey)
+        public static byte[] GetCurve25519PublicKey(byte[] privateKey)
         {
-            return ScalarMult.Base(privateKey);
+            byte[] publicKey = ScalarMult.Base(privateKey);
+            return Utilities.ConcatArrays(Constants.Curve25519KeyHeader, publicKey);
         }
 
-        public static byte[] ExtractEd25519PublicKey(byte[] privateKey)
+        public static byte[] GetEd25519PublicKey(byte[] privateKey)
         {
-            return PublicKeyAuth.ExtractEd25519PublicKeyFromEd25519SecretKey(privateKey);
+            byte[] publicKey = PublicKeyAuth.ExtractEd25519PublicKeyFromEd25519SecretKey(privateKey);
+            return Utilities.ConcatArrays(Constants.Ed25519KeyHeader, publicKey);
         }
     }
 }
