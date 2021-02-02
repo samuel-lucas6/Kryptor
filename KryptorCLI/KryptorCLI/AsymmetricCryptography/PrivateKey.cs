@@ -32,10 +32,10 @@ namespace KryptorCLI
             byte[] nonce = Generate.RandomNonce();
             byte[] keyCommitmentBlock = ChunkHandling.GetKeyCommitmentBlock();
             privateKey = Utilities.ConcatArrays(keyCommitmentBlock, privateKey);
-            byte[] encryptedPrivateKey = SecretAeadXChaCha20Poly1305.Encrypt(privateKey, nonce, key, Constants.KeyVersion);
+            byte[] encryptedPrivateKey = SecretAeadXChaCha20Poly1305.Encrypt(privateKey, nonce, key, Constants.PrivateKeyVersion);
             Utilities.ZeroArray(privateKey);
             Utilities.ZeroArray(key);
-            return Utilities.ConcatArrays(Constants.KeyVersion, salt, nonce, encryptedPrivateKey);
+            return Utilities.ConcatArrays(Constants.PrivateKeyVersion, salt, nonce, encryptedPrivateKey);
         }
 
         public static byte[] Decrypt(byte[] privateKey)
@@ -69,7 +69,7 @@ namespace KryptorCLI
 
         private static byte[] GetKeyVersion(byte[] privateKey)
         {
-            byte[] keyVersion = new byte[Constants.KeyVersion.Length];
+            byte[] keyVersion = new byte[Constants.PrivateKeyVersion.Length];
             Array.Copy(privateKey, keyVersion, keyVersion.Length);
             return keyVersion;
         }
@@ -77,24 +77,24 @@ namespace KryptorCLI
         private static byte[] GetSalt(byte[] privateKey)
         {
             byte[] salt = new byte[Constants.SaltLength];
-            Array.Copy(privateKey, Constants.KeyVersion.Length, salt, destinationIndex: 0, salt.Length);
+            Array.Copy(privateKey, Constants.PrivateKeyVersion.Length, salt, destinationIndex: 0, salt.Length);
             return salt;
         }
 
         private static byte[] GetNonce(byte[] privateKey)
         {
             byte[] nonce = new byte[Constants.XChaChaNonceLength];
-            int sourceIndex = Constants.KeyVersion.Length + Constants.SaltLength;
+            int sourceIndex = Constants.PrivateKeyVersion.Length + Constants.SaltLength;
             Array.Copy(privateKey, sourceIndex, nonce, destinationIndex: 0, nonce.Length);
             return nonce;
         }
 
         private static byte[] GetEncryptedPrivateKey(byte[] privateKey)
         {
-            byte[] encryptedKey = new byte[Constants.EncryptedPrivateKeyLength];
-            int sourceIndex = Constants.KeyVersion.Length + Constants.SaltLength + Constants.XChaChaNonceLength;
-            Array.Copy(privateKey, sourceIndex, encryptedKey, destinationIndex: 0, encryptedKey.Length);
-            return encryptedKey;
+            int sourceIndex = Constants.PrivateKeyVersion.Length + Constants.SaltLength + Constants.XChaChaNonceLength;
+            byte[] encryptedPrivateKey = new byte[privateKey.Length - sourceIndex];
+            Array.Copy(privateKey, sourceIndex, encryptedPrivateKey, destinationIndex: 0, encryptedPrivateKey.Length);
+            return encryptedPrivateKey;
         }
     }
 }

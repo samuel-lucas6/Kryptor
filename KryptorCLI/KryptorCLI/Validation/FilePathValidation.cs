@@ -97,21 +97,35 @@ namespace KryptorCLI
             return null;
         }
 
-        public static bool GenerateKeyPair(string directoryPath)
+        public static bool GenerateKeyPair(string directoryPath, int keyPairType)
         {
-            IEnumerable<string> errorMessages = GetGenerateKeyPairError(directoryPath);
+            IEnumerable<string> errorMessages = GetGenerateKeyPairError(directoryPath, keyPairType);
             return DisplayMessage.AnyErrors(errorMessages);
         }
 
-        private static IEnumerable<string> GetGenerateKeyPairError(string directoryPath)
+        private static IEnumerable<string> GetGenerateKeyPairError(string directoryPath, int keyPairType)
         {
-            if (!string.IsNullOrEmpty(directoryPath) && !Directory.Exists(directoryPath))
+            if (keyPairType < 1 || keyPairType > 2)
+            {
+                yield return "Please enter a valid number.";
+            }
+            if (!string.Equals(directoryPath, Constants.DefaultKeyDirectory) && !Directory.Exists(directoryPath))
             {
                 yield return "This directory doesn't exist.";
             }
-            else if (!Globals.Overwrite && (File.Exists(Constants.DefaultPrivateKeyPath) || File.Exists(Constants.DefaultPublicKeyPath)))
+            else if (!Globals.Overwrite && keyPairType == 1)
             {
-                yield return "A key pair already exists. Please back up your old keys and then use -o|--overwrite if you want to overwrite them.";
+                if (File.Exists(Constants.DefaultEncryptionPublicKeyPath) || File.Exists(Constants.DefaultEncryptionPrivateKeyPath))
+                {
+                    yield return "An encryption key pair already exists. Please use -o|--overwrite if you want to overwrite your key pair.";
+                }
+            }
+            else if (!Globals.Overwrite && keyPairType == 2)
+            {
+                if (File.Exists(Constants.DefaultSigningPublicKeyPath) || File.Exists(Constants.DefaultSigningPrivateKeyPath))
+                {   
+                    yield return "A signing key pair already exists. Please use -o|--overwrite if you want to overwrite your key pair.";
+                }
             }
         }
 

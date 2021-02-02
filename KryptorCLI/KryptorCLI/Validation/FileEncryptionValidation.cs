@@ -57,13 +57,20 @@ namespace KryptorCLI
 
         private static IEnumerable<string> GetFileEncryptionErrors(string privateKeyPath, string publicKeyPath, string[] filePaths)
         {
-            if (!File.Exists(privateKeyPath) || !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
+            if (string.IsNullOrEmpty(privateKeyPath))
+            {
+                if (!File.Exists(Constants.DefaultEncryptionPrivateKeyPath))
+                {
+                    yield return ValidationMessages.PrivateKeyFile;
+                }
+            }
+            else if (!File.Exists(privateKeyPath) || !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
             {
                 yield return ValidationMessages.PrivateKeyFile;
             }
             if (string.IsNullOrEmpty(publicKeyPath))
             {
-                if (!File.Exists(Constants.DefaultPublicKeyPath))
+                if (!File.Exists(Constants.DefaultEncryptionPublicKeyPath))
                 {
                     yield return ValidationMessages.PublicKeyFile;
                 }
@@ -86,7 +93,14 @@ namespace KryptorCLI
 
         private static IEnumerable<string> GetFileEncryptionErrors(string privateKeyPath, char[] encodedPublicKey, string[] filePaths)
         {
-            if (!File.Exists(privateKeyPath) || !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
+            if (string.IsNullOrEmpty(privateKeyPath))
+            {
+                if (!File.Exists(Constants.DefaultEncryptionPrivateKeyPath))
+                {
+                    yield return ValidationMessages.PrivateKeyFile;
+                }
+            }
+            else if (!File.Exists(privateKeyPath) || !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
             {
                 yield return ValidationMessages.PrivateKeyFile;
             }
@@ -108,7 +122,14 @@ namespace KryptorCLI
 
         private static IEnumerable<string> GetFileEncryptionErrors(string privateKeyPath, string[] filePaths)
         {
-            if (!File.Exists(privateKeyPath) || !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
+            if (string.IsNullOrEmpty(privateKeyPath))
+            {
+                if (!File.Exists(Constants.DefaultEncryptionPrivateKeyPath))
+                {
+                    yield return ValidationMessages.PrivateKeyFile;
+                }
+            }
+            else if (!File.Exists(privateKeyPath) || !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
             {
                 yield return ValidationMessages.PrivateKeyFile;
             }

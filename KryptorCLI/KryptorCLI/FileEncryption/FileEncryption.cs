@@ -72,7 +72,7 @@ namespace KryptorCLI
             Globals.TotalCount = filePaths.Length;
             senderPrivateKey = PrivateKey.Decrypt(senderPrivateKey);
             if (senderPrivateKey == null) { return; }
-            byte[] sharedSecret = KeyExchange.GetLongTermSharedSecret(senderPrivateKey, recipientPublicKey);
+            byte[] sharedSecret = KeyExchange.GetSharedSecret(senderPrivateKey, recipientPublicKey);
             Utilities.ZeroArray(senderPrivateKey);
             foreach (string inputFilePath in filePaths)
             {
@@ -119,7 +119,6 @@ namespace KryptorCLI
             Globals.TotalCount = filePaths.Length;
             privateKey = PrivateKey.Decrypt(privateKey);
             if (privateKey == null) { return; }
-            privateKey = KeyExchange.ConvertPrivateKeyToCurve25519(privateKey);
             foreach (string inputFilePath in filePaths)
             {
                 bool validFilePath = FilePathValidation.FileEncryption(inputFilePath);

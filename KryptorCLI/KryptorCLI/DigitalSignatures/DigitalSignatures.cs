@@ -25,8 +25,6 @@ namespace KryptorCLI
 {
     public static class DigitalSignatures
     {
-        private static readonly byte[] _magicBytes = Encoding.UTF8.GetBytes(Constants.SignatureMagicBytes);
-        private static readonly byte[] _formatVersion = BitConverter.GetBytes(Constants.SignatureFormatVersion);
         private const int _preHashedHeaderLength = 1;
         private static byte[] _commentBytes;
 
@@ -36,7 +34,7 @@ namespace KryptorCLI
             byte[] fileSignature = ComputeFileSignature(filePath, preHashed, privateKey);
             byte[] commentBytes = Encoding.UTF8.GetBytes(comment);
             // Sign the entire signature file
-            byte[] signatureFileBytes = Utilities.ConcatArrays(_magicBytes, _formatVersion, preHashedHeader, fileSignature, commentBytes);
+            byte[] signatureFileBytes = Utilities.ConcatArrays(Constants.SignatureMagicBytes, Constants.SignatureVersion, preHashedHeader, fileSignature, commentBytes);
             byte[] globalSignature = ComputeGlobalSignature(signatureFileBytes, privateKey);
             CreateSignatureFile(filePath, preHashedHeader, fileSignature, commentBytes, globalSignature);
         }
@@ -69,18 +67,13 @@ namespace KryptorCLI
             const int offset = 0;   
             string signatureFilePath = filePath + Constants.SignatureExtension;
             using var signatureFile = new FileStream(signatureFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileBufferSize, FileOptions.SequentialScan);
-            signatureFile.Write(_magicBytes, offset, _magicBytes.Length);
-            signatureFile.Write(_formatVersion, offset, _formatVersion.Length);
+            signatureFile.Write(Constants.SignatureMagicBytes, offset, Constants.SignatureMagicBytes.Length);
+            signatureFile.Write(Constants.SignatureVersion, offset, Constants.SignatureVersion.Length);
             signatureFile.Write(algorithmHeader, offset, algorithmHeader.Length);
             signatureFile.Write(fileSignature, offset, fileSignature.Length);
             signatureFile.Write(commentBytes, offset, commentBytes.Length);
             signatureFile.Write(globalSignature, offset, globalSignature.Length);
             File.SetAttributes(signatureFilePath, FileAttributes.ReadOnly);
-        }
-
-        public static byte[] GetSignatureMagicBytes()
-        {
-            return _magicBytes;
         }
 
         public static bool VerifySignature(string signatureFilePath, string filePath, byte[] publicKey)
@@ -89,8 +82,8 @@ namespace KryptorCLI
             // Verify the global signature
             byte[] magicBytes = GetMagicBytes(signatureFile);
             byte[] formatVersion = GetFormatVersion(signatureFile);
-            FileHeaders.ValidateFormatVersion(signatureFilePath, formatVersion, _formatVersion);
-            byte[] preHashedHeader = GetPreHashed(signatureFile);
+            FileHeaders.ValidateFormatVersion(signatureFilePath, formatVersion, Constants.SignatureVersion);
+            byte[] preHashedHeader = GetPreHashedHeader(signatureFile);
             byte[] fileSignature = GetFileSignature(signatureFile);
             _commentBytes = GetCommentBytes(signatureFile);
             byte[] signatureFileBytes = Utilities.ConcatArrays(magicBytes, formatVersion, preHashedHeader, fileSignature, _commentBytes);
@@ -116,29 +109,29 @@ namespace KryptorCLI
 
         private static byte[] GetMagicBytes(FileStream signatureFile)
         {
-            return FileHandling.ReadFileHeader(signatureFile, offset: 0, _magicBytes.Length);
+            return FileHandling.ReadFileHeader(signatureFile, offset: 0, Constants.SignatureMagicBytes.Length);
         }
 
         private static byte[] GetFormatVersion(FileStream signatureFile)
         {
-            return FileHandling.ReadFileHeader(signatureFile, _magicBytes.Length, _formatVersion.Length);
+            return FileHandling.ReadFileHeader(signatureFile, Constants.SignatureMagicBytes.Length, Constants.SignatureVersion.Length);
         }
 
-        private static byte[] GetPreHashed(FileStream signatureFile)
+        private static byte[] GetPreHashedHeader(FileStream signatureFile)
         {
-            int offset = _magicBytes.Length + _formatVersion.Length;
+            int offset = Constants.SignatureMagicBytes.Length + Constants.SignatureVersion.Length;
             return FileHandling.ReadFileHeader(signatureFile, offset, _preHashedHeaderLength);
         }
 
         private static byte[] GetFileSignature(FileStream signatureFile)
         {
-            int offset = _magicBytes.Length + _formatVersion.Length + _preHashedHeaderLength;
+            int offset = Constants.SignatureMagicBytes.Length + Constants.SignatureVersion.Length + _preHashedHeaderLength;
             return FileHandling.ReadFileHeader(signatureFile, offset, Constants.SignatureLength);
         }
 
         private static byte[] GetCommentBytes(FileStream signatureFile)
         {
-            int offset = _magicBytes.Length + _formatVersion.Length + _preHashedHeaderLength + Constants.SignatureLength;
+            int offset = Constants.SignatureMagicBytes.Length + Constants.SignatureVersion.Length + _preHashedHeaderLength + Constants.SignatureLength;
             int length = (int)(signatureFile.Length - offset - Constants.SignatureLength);
             return FileHandling.ReadFileHeader(signatureFile, offset, length);
         }

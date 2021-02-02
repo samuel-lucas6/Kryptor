@@ -34,7 +34,7 @@ namespace KryptorCLI
                 }
                 FileEncryptionWithPassword(password, keyfile, filePaths);
             }
-            else if (!string.IsNullOrEmpty(privateKey) && !string.IsNullOrEmpty(publicKey))
+            else if (!string.IsNullOrEmpty(publicKey) && !string.IsNullOrEmpty(privateKey))
             {
                 if (publicKey.EndsWith(Constants.PublicKeyExtension))
                 {
@@ -44,9 +44,13 @@ namespace KryptorCLI
                 // Use private key string
                 FileEncryptionWithPublicKey(privateKey, publicKey.ToCharArray(), filePaths);
             }
+            else if (!string.IsNullOrEmpty(privateKey))
+            {
+                FileEncryptionWithPrivateKey(privateKey, filePaths);
+            }
             else
             {
-                DisplayMessage.Error("Please either specify a (password and/or keyfile) or (private key and public key).");
+                DisplayMessage.Error("Please either specify a (password and/or keyfile), (private key and public key), or private key.");
             }
         }
 
@@ -54,8 +58,8 @@ namespace KryptorCLI
         {
             bool validUserInput = FileEncryptionValidation.FileEncryptionWithPassword(password, keyfilePath, filePaths);
             if (!validUserInput) { return; }
-            if (!string.IsNullOrEmpty(keyfilePath)) { keyfilePath = FilePathValidation.KeyfilePath(keyfilePath); }
-            byte[] passwordBytes = Password.GetFileEncryptionPassword(password, keyfilePath);
+            if (!File.Exists(keyfilePath)) { keyfilePath = FilePathValidation.KeyfilePath(keyfilePath); }
+            byte[] passwordBytes = Password.Hash(password, keyfilePath);
             FileEncryption.EncryptEachFileWithPassword(filePaths, passwordBytes);
         }
 
@@ -63,9 +67,9 @@ namespace KryptorCLI
         {
             bool validUserInput = FileEncryptionValidation.FileEncryptionWithPublicKey(senderPrivateKeyPath, recipientPublicKeyPath, filePaths);
             if (!validUserInput) { return; }
-            byte[] senderPrivateKey = AsymmetricKeyValidation.GetPrivateKeyFromFile(senderPrivateKeyPath);
+            byte[] senderPrivateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(senderPrivateKeyPath);
             if (senderPrivateKey == null) { return; }
-            byte[] recipientPublicKey = AsymmetricKeyValidation.GetPublicKeyFromFile(recipientPublicKeyPath);
+            byte[] recipientPublicKey = AsymmetricKeyValidation.EncryptionPublicKeyFile(recipientPublicKeyPath);
             if (recipientPublicKey == null) { return; }
             FileEncryption.EncryptEachFileWithPublicKey(filePaths, senderPrivateKey, recipientPublicKey);
         }
@@ -74,11 +78,20 @@ namespace KryptorCLI
         {
             bool validUserInput = FileEncryptionValidation.FileEncryptionWithPublicKey(senderPrivateKeyPath, recipientPublicKeyString, filePaths);
             if (!validUserInput) { return; }
-            byte[] senderPrivateKey = AsymmetricKeyValidation.GetPrivateKeyFromFile(senderPrivateKeyPath);
+            byte[] senderPrivateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(senderPrivateKeyPath);
             if (senderPrivateKey == null) { return; }
-            byte[] recipientPublicKey = AsymmetricKeyValidation.ConvertPublicKeyString(recipientPublicKeyString);
+            byte[] recipientPublicKey = AsymmetricKeyValidation.EncryptionPublicKeyString(recipientPublicKeyString);
             if (recipientPublicKey == null) { return; }
             FileEncryption.EncryptEachFileWithPublicKey(filePaths, senderPrivateKey, recipientPublicKey);
+        }
+
+        private static void FileEncryptionWithPrivateKey(string privateKeyPath, string[] filePaths)
+        {
+            bool validUserInput = FileEncryptionValidation.FileEncryptionWithPrivateKey(privateKeyPath, filePaths);
+            if (!validUserInput) { return; }
+            byte[] privateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(privateKeyPath);
+            if (privateKey == null) { return; }
+            FileEncryption.EncryptEachFileWithPrivateKey(filePaths, privateKey);
         }
 
         public static void Decrypt(bool usePassword, string keyfile, string privateKey, string publicKey, string[] filePaths)
@@ -92,7 +105,7 @@ namespace KryptorCLI
                 }
                 FileDecryptionWithPassword(password, keyfile, filePaths);
             }
-            else if (!string.IsNullOrEmpty(privateKey) && !string.IsNullOrEmpty(publicKey))
+            else if (!string.IsNullOrEmpty(publicKey) && !string.IsNullOrEmpty(privateKey))
             {
                 if (publicKey.EndsWith(Constants.PublicKeyExtension))
                 {
@@ -103,9 +116,13 @@ namespace KryptorCLI
                 // Use public key string
                 FileDecryptionWithPublicKey(privateKey, publicKey.ToCharArray(), filePaths);
             }
+            else if (!string.IsNullOrEmpty(privateKey))
+            {
+                FileDecryptionWithPrivateKey(privateKey, filePaths);
+            }
             else
             {
-                DisplayMessage.Error("Please either specify a (password and/or keyfile) or (private key and public key).");
+                DisplayMessage.Error("Please either specify a (password and/or keyfile), (private key and public key), or private key.");
             }
         }
 
@@ -113,7 +130,7 @@ namespace KryptorCLI
         {
             bool validUserInput = FileEncryptionValidation.FileEncryptionWithPassword(password, keyfilePath, filePaths);
             if (!validUserInput) { return; }
-            byte[] passwordBytes = Password.GetFileEncryptionPassword(password, keyfilePath);
+            byte[] passwordBytes = Password.Hash(password, keyfilePath);
             FileDecryption.DecryptEachFileWithPassword(filePaths, passwordBytes);
         }
 
@@ -121,9 +138,9 @@ namespace KryptorCLI
         {
             bool validUserInput = FileEncryptionValidation.FileEncryptionWithPublicKey(recipientPrivateKeyPath, senderPublicKeyPath, filePaths);
             if (!validUserInput) { return; }
-            byte[] senderPrivateKey = AsymmetricKeyValidation.GetPrivateKeyFromFile(recipientPrivateKeyPath);
+            byte[] senderPrivateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(recipientPrivateKeyPath);
             if (senderPrivateKey == null) { return; }
-            byte[] recipientPublicKey = AsymmetricKeyValidation.GetPublicKeyFromFile(senderPublicKeyPath);
+            byte[] recipientPublicKey = AsymmetricKeyValidation.EncryptionPublicKeyFile(senderPublicKeyPath);
             if (recipientPublicKey == null) { return; }
             FileDecryption.DecryptEachFileWithPrivateKey(filePaths, senderPrivateKey, recipientPublicKey);
         }
@@ -132,43 +149,66 @@ namespace KryptorCLI
         {
             bool validUserInput = FileEncryptionValidation.FileEncryptionWithPublicKey(recipientPrivateKeyPath, senderPublicKeyString, filePaths);
             if (!validUserInput) { return; }
-            byte[] senderPrivateKey = AsymmetricKeyValidation.GetPrivateKeyFromFile(recipientPrivateKeyPath);
+            byte[] senderPrivateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(recipientPrivateKeyPath);
             if (senderPrivateKey == null) { return; }
-            byte[] recipientPublicKey = AsymmetricKeyValidation.ConvertPublicKeyString(senderPublicKeyString);
+            byte[] recipientPublicKey = AsymmetricKeyValidation.EncryptionPublicKeyString(senderPublicKeyString);
             if (recipientPublicKey == null) { return; }
             FileDecryption.DecryptEachFileWithPrivateKey(filePaths, senderPrivateKey, recipientPublicKey);
         }
 
-        public static void GenerateNewKeyPair(string exportDirectoryPath)
+        private static void FileDecryptionWithPrivateKey(string privateKeyPath, string[] filePaths)
         {
-            Console.WriteLine("Please name your key pair (e.g. 'signing'):");
-            string keyPairName = Console.ReadLine();
-            Console.WriteLine();
-            bool validUserInput = FilePathValidation.GenerateKeyPair(exportDirectoryPath, keyPairName);
+            bool validUserInput = FileEncryptionValidation.FileEncryptionWithPrivateKey(privateKeyPath, filePaths);
             if (!validUserInput) { return; }
-            (string publicKey, string privateKey) = AsymmetricKeys.Generate();
-            ExportKeyPair(exportDirectoryPath, keyPairName, publicKey, privateKey);
+            byte[] privateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(privateKeyPath);
+            if (privateKey == null) { return; }
+            FileDecryption.DecryptEachFileWithPrivateKey(filePaths, privateKey);
         }
 
-        private static void ExportKeyPair(string directoryPath, string keyPairName, string publicKey, string privateKey)
+        public static void GenerateNewKeyPair(string exportDirectoryPath)
         {
             try
             {
-                if (string.IsNullOrEmpty(directoryPath))
-                {
-                    directoryPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), Constants.EncryptedExtension);
-                }
-                (string publicKeyPath, string privateKeyPath) = AsymmetricKeys.Export(directoryPath, keyPairName, publicKey, privateKey);
-                Console.WriteLine($"Public key: {publicKey}");
-                Console.WriteLine($"Public key file: {publicKeyPath}");
+                int keyPairType = GetKeyPairType();
                 Console.WriteLine();
-                Console.WriteLine($"Private key file: {privateKeyPath} - Keep this secret!");
+                bool validUserInput = FilePathValidation.GenerateKeyPair(exportDirectoryPath, keyPairType);
+                if (!validUserInput) { return; }
+                string publicKey, privateKey, publicKeyPath, privateKeyPath;
+                if (keyPairType == 1)
+                {
+                    (publicKey, privateKey) = AsymmetricKeys.GenerateEncryptionKeyPair();
+                    (publicKeyPath, privateKeyPath) = AsymmetricKeys.ExportEncryptionKeyPair(exportDirectoryPath, publicKey, privateKey);
+                }
+                else
+                {
+                    (publicKey, privateKey) = AsymmetricKeys.GenerateSigningKeyPair();
+                    (publicKeyPath, privateKeyPath) = AsymmetricKeys.ExportSigningKeyPair(exportDirectoryPath, publicKey, privateKey);
+                }
+                DisplayKeyPair(publicKey, publicKeyPath, privateKeyPath);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.Error);
-                DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to export key pair.");
+                DisplayMessage.FilePathException(exportDirectoryPath, ex.GetType().Name, "Unable to export key pair.");
             }
+        }
+
+        private static int GetKeyPairType()
+        {
+            Console.WriteLine("Please select a key pair type (type 1 or 2):");
+            Console.WriteLine("1) Encryption");
+            Console.WriteLine("2) Signing");
+            string userInput = Console.ReadLine();
+            _ = int.TryParse(userInput, out int keyPairType);
+            return keyPairType;
+        }
+
+        private static void DisplayKeyPair(string publicKey, string publicKeyPath, string privateKeyPath)
+        {
+            Console.WriteLine($"Public key: {publicKey}");
+            Console.WriteLine($"Public key file: {publicKeyPath}");
+            Console.WriteLine();
+            Console.WriteLine($"Private key file: {privateKeyPath} - Keep this secret!");
         }
 
         public static void RecoverPublicKey(string privateKeyPath)
@@ -179,28 +219,28 @@ namespace KryptorCLI
             if (privateKey == null) { return; }
             privateKey = PrivateKey.Decrypt(privateKey);
             if (privateKey == null) { return; }
-            byte[] publicKey = AsymmetricKeys.ExtractPublicKey(privateKey);
+            byte[] publicKey = privateKey.Length switch
+            {
+                Constants.EncryptionKeySize => AsymmetricKeys.ExtractCurve25519PublicKey(privateKey),
+                _ => AsymmetricKeys.ExtractEd25519PublicKey(privateKey),
+            };
+            Utilities.ZeroArray(privateKey);
             string encodedPublicKey = Convert.ToBase64String(publicKey);
             Console.WriteLine($"Public key: {encodedPublicKey}");
         }
 
         public static void Sign(string privateKeyPath, string comment, bool preHash, string[] filePaths)
         {
-            bool validUserInput = SignValidation.Sign(privateKeyPath, comment, filePaths);
+            bool validUserInput = SigningValidation.Sign(privateKeyPath, comment, filePaths);
             if (!validUserInput) { return; }
-            byte[] privateKey = AsymmetricKeyValidation.GetPrivateKeyFromFile(privateKeyPath);
+            byte[] privateKey = AsymmetricKeyValidation.SigningPrivateKeyFile(privateKeyPath);
             if (privateKey == null) { return; }
             FileSigning.SignEachFile(privateKey, comment, preHash, filePaths);
         }
 
         public static void Verify(string publicKey, string[] filePaths)
         {
-            if (string.IsNullOrEmpty(publicKey))
-            {
-                DisplayMessage.Error("Please specify a public key.");
-                return;
-            }
-            if (publicKey.EndsWith(Constants.PublicKeyExtension))
+            if (string.IsNullOrEmpty(publicKey) || publicKey.EndsWith(Constants.PublicKeyExtension))
             {
                 // Use public key file
                 VerifySignature(publicKey, filePaths);
@@ -212,24 +252,24 @@ namespace KryptorCLI
 
         private static void VerifySignature(char[] encodedPublicKey, string[] filePaths)
         {
-            bool validUserInput = VerifyValidation.Verify(encodedPublicKey, filePaths);
+            bool validUserInput = SigningValidation.Verify(encodedPublicKey, filePaths);
             if (!validUserInput) { return; }
-            string signatureFilePath = VerifyValidation.GetSignatureFilePath(ref filePaths);
-            bool validSignatureFile = VerifyValidation.SignatureFile(signatureFilePath, filePaths);
+            string signatureFilePath = SigningValidation.GetSignatureFilePath(ref filePaths);
+            bool validSignatureFile = SigningValidation.SignatureFile(signatureFilePath, filePaths);
             if (!validSignatureFile) { return; }
-            byte[] publicKey = AsymmetricKeyValidation.ConvertPublicKeyString(encodedPublicKey);
+            byte[] publicKey = AsymmetricKeyValidation.SigningPublicKeyString(encodedPublicKey);
             if (publicKey == null) { return; }
             FileSigning.VerifyFile(publicKey, signatureFilePath, filePaths[0]);
         }
 
         private static void VerifySignature(string publicKeyPath, string[] filePaths)
         {
-            bool validUserInput = VerifyValidation.Verify(publicKeyPath, filePaths);
+            bool validUserInput = SigningValidation.Verify(publicKeyPath, filePaths);
             if (!validUserInput) { return; }
-            string signatureFilePath = VerifyValidation.GetSignatureFilePath(ref filePaths);
-            bool validSignatureFile = VerifyValidation.SignatureFile(signatureFilePath, filePaths);
+            string signatureFilePath = SigningValidation.GetSignatureFilePath(ref filePaths);
+            bool validSignatureFile = SigningValidation.SignatureFile(signatureFilePath, filePaths);
             if (!validSignatureFile) { return; }
-            byte[] publicKey = AsymmetricKeyValidation.GetPublicKeyFromFile(publicKeyPath);
+            byte[] publicKey = AsymmetricKeyValidation.SigningPublicKeyFile(publicKeyPath);
             if (publicKey == null) { return; }
             FileSigning.VerifyFile(publicKey, signatureFilePath, filePaths[0]);
         }

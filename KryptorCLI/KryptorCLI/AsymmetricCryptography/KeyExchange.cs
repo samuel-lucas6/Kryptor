@@ -22,13 +22,6 @@ namespace KryptorCLI
 {
     public static class KeyExchange
     {
-        public static byte[] GetLongTermSharedSecret(byte[] privateKey, byte[] publicKey)
-        {
-            privateKey = ConvertPrivateKeyToCurve25519(privateKey);
-            publicKey = ConvertPublicKeyToCurve25519(publicKey);
-            return GetSharedSecret(privateKey, publicKey);
-        }
-
         public static byte[] GetSharedSecret(byte[] privateKey, byte[] publicKey)
         {
             return ScalarMult.Mult(privateKey, publicKey);
@@ -46,16 +39,6 @@ namespace KryptorCLI
             using var ephemeralKeyPair = PublicKeyBox.GenerateKeyPair();
             byte[] ephemeralSharedSecret = ScalarMult.Mult(privateKey, ephemeralKeyPair.PublicKey);
             return (ephemeralSharedSecret, ephemeralKeyPair.PublicKey);
-        }
-
-        private static byte[] ConvertPublicKeyToCurve25519(byte[] publicKey)
-        {
-            return PublicKeyAuth.ConvertEd25519PublicKeyToCurve25519PublicKey(publicKey);
-        }
-
-        public static byte[] ConvertPrivateKeyToCurve25519(byte[] privateKey)
-        {
-            return PublicKeyAuth.ConvertEd25519SecretKeyToCurve25519SecretKey(privateKey);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 
 /*
@@ -51,12 +52,21 @@ namespace KryptorCLI
         public const string BLAKE2Personal = "Kryptor.Personal";
 
         // Asymmetric keys
-        public const int PublicKeyLength = 44;
-        public const int PrivateKeyLength = 184;
+        public static readonly string DefaultKeyDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), EncryptedExtension);
+        public static readonly string DefaultEncryptionKeyFileName = "encryption";
+        public static readonly string DefaultSigningKeyFileName = "signing";
         public const string PublicKeyExtension = ".public";
         public const string PrivateKeyExtension = ".private";
-        public const int EncryptedPrivateKeyLength = 96;
-        public static readonly byte[] KeyVersion = BitConverter.GetBytes((short)1);
+        public static readonly string DefaultEncryptionPublicKeyPath = Path.Combine(DefaultKeyDirectory, DefaultEncryptionKeyFileName + PublicKeyExtension);
+        public static readonly string DefaultEncryptionPrivateKeyPath = Path.Combine(DefaultKeyDirectory, DefaultEncryptionKeyFileName + PrivateKeyExtension);
+        public static readonly string DefaultSigningPublicKeyPath = Path.Combine(DefaultKeyDirectory, DefaultSigningKeyFileName + PublicKeyExtension);
+        public static readonly string DefaultSigningPrivateKeyPath = Path.Combine(DefaultKeyDirectory, DefaultSigningKeyFileName + PrivateKeyExtension);
+        public const int PublicKeyLength = 48;
+        public const int EncryptionPrivateKeyLength = 144;
+        public const int SigningPrivateKeyLength = 188;
+        public static readonly byte[] Curve25519KeyHeader = Encoding.UTF8.GetBytes("Cu");
+        public static readonly byte[] Ed25519KeyHeader = Encoding.UTF8.GetBytes("Ed");
+        public static readonly byte[] PrivateKeyVersion = BitConverter.GetBytes((short)1);
 
         // File signing
         public const int SignatureLength = 64;

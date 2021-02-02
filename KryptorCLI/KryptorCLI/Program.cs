@@ -27,7 +27,6 @@ namespace KryptorCLI
 
 Examples:
   --encrypt -p [file]
-  --encrypt -p [-k keyfile] [file]
   --encrypt [-x sender private key] [-y recipient public key] [file]
   --decrypt [-x recipient private key] [-y sender public key]  [file]
   --sign [-x private key] [-c comment] [file]
@@ -35,7 +34,7 @@ Examples:
 
 Please report bugs to <https://github.com/samuel-lucas6/Kryptor/issues>.
 
-Still need help? Check out the tutorial <https://kryptor.co.uk>.")]
+Still need help? Read the tutorial <https://kryptor.co.uk>.")]
     public class Program
     {
         [Option("-e|--encrypt", "encrypt files/folders", CommandOptionType.NoValue)]
@@ -50,11 +49,11 @@ Still need help? Check out the tutorial <https://kryptor.co.uk>.")]
         [Option("-k|--keyfile", "specify a keyfile", CommandOptionType.SingleValue)]
         public string Keyfile { get; }
 
-        [Option("-x|--private", "specify your private key", CommandOptionType.SingleValue)]
-        public string PrivateKey { get; }
+        [Option("-x|--private", "specify your private key", CommandOptionType.SingleOrNoValue)]
+        public (bool hasValue, string value) PrivateKey { get; }
 
-        [Option("-y|--public", "specify a public key", CommandOptionType.SingleValue)]
-        public string PublicKey { get; }
+        [Option("-y|--public", "specify a public key", CommandOptionType.SingleOrNoValue)]
+        public (bool hasValue, string value) PublicKey { get; }
 
         [Option("-f|--obfuscate", "obfuscate file names", CommandOptionType.NoValue)]
         public bool ObfuscateFileNames { get; }
@@ -97,29 +96,33 @@ Still need help? Check out the tutorial <https://kryptor.co.uk>.")]
             SetSettings(Overwrite, ObfuscateFileNames);
             if (Encrypt)
             {
-                CommandLine.Encrypt(Password, Keyfile, PrivateKey, PublicKey, FilePaths);
+                string privateKey = GetEncryptionPrivateKey(PrivateKey.value);
+                string publicKey = GetEncryptionPublicKey(PublicKey.value);
+                CommandLine.Encrypt(Password, Keyfile, privateKey, publicKey, FilePaths);
             }
             else if (Decrypt)
             {
-                CommandLine.Decrypt(Password, Keyfile, PrivateKey, PublicKey, FilePaths);
+                string privateKey = GetEncryptionPrivateKey(PrivateKey.value);
+                string publicKey = GetEncryptionPublicKey(PublicKey.value);
+                CommandLine.Decrypt(Password, Keyfile, privateKey, publicKey, FilePaths);
             }
             else if (GenerateKeys)
             {
-                string exportDirectoryPath = string.Empty;
-                if (FilePaths != null) { exportDirectoryPath = FilePaths[0]; }
-                CommandLine.GenerateNewKeyPair(exportDirectoryPath);
+                CommandLine.GenerateNewKeyPair((FilePaths != null) ? FilePaths[0] : Constants.DefaultKeyDirectory);
             }
             else if (RecoverPublicKey)
             {
-                CommandLine.RecoverPublicKey(PrivateKey);
+                CommandLine.RecoverPublicKey(PrivateKey.value);
             }
             else if (Sign)
             {
-                CommandLine.Sign(PrivateKey, Comment, Prehash, FilePaths);
+                string privateKey = GetSigningPrivateKey(PrivateKey.value);
+                CommandLine.Sign(privateKey, Comment, Prehash, FilePaths);
             }
             else if (Verify)
             {
-                CommandLine.Verify(PublicKey, FilePaths);
+                string publicKey = GetSigningPublicKey(PublicKey.value);
+                CommandLine.Verify(publicKey, FilePaths);
             }
             else if (CheckForUpdates)
             {
@@ -140,6 +143,26 @@ Still need help? Check out the tutorial <https://kryptor.co.uk>.")]
             // Don't overwrite or obfuscate by default
             Globals.Overwrite = overwrite;
             Globals.ObfuscateFileNames = obfuscateFileNames;
+        }
+
+        private static string GetEncryptionPrivateKey(string privateKey)
+        {
+            return string.IsNullOrEmpty(privateKey) ? Constants.DefaultEncryptionPrivateKeyPath : string.Empty;
+        }
+
+        private static string GetEncryptionPublicKey(string publicKey)
+        {
+            return string.IsNullOrEmpty(publicKey) ? Constants.DefaultEncryptionPublicKeyPath : string.Empty;
+        }
+
+        private static string GetSigningPrivateKey(string privateKey)
+        {
+            return string.IsNullOrEmpty(privateKey) ? Constants.DefaultSigningPrivateKeyPath : string.Empty;
+        }
+
+        private static string GetSigningPublicKey(string publicKey)
+        {
+            return string.IsNullOrEmpty(publicKey) ? Constants.DefaultSigningPublicKeyPath : string.Empty;
         }
 
         public static string GetVersion()

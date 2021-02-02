@@ -35,7 +35,14 @@ namespace KryptorCLI
 
         private static IEnumerable<string> GetSignErrors(string privateKeyPath, string comment, string[] filePaths)
         {
-            if (!File.Exists(privateKeyPath) || !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
+            if (string.IsNullOrEmpty(privateKeyPath))
+            {
+                if (!File.Exists(Constants.DefaultSigningPrivateKeyPath))
+                {
+                    yield return ValidationMessages.PrivateKeyFile;
+                }
+            }
+            else if (!File.Exists(privateKeyPath) || !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
             {
                 yield return ValidationMessages.PrivateKeyFile;
             }
@@ -75,7 +82,14 @@ namespace KryptorCLI
 
         private static IEnumerable<string> GetVerifyErrors(string publicKeyPath, string[] filePaths)
         {
-            if (!File.Exists(publicKeyPath) || !publicKeyPath.EndsWith(Constants.PublicKeyExtension))
+            if (string.IsNullOrEmpty(publicKeyPath))
+            {
+                if (!File.Exists(Constants.DefaultSigningPublicKeyPath))
+                {
+                    yield return ValidationMessages.PublicKeyFile;
+                }
+            }
+            else if (!File.Exists(publicKeyPath) || !publicKeyPath.EndsWith(Constants.PublicKeyExtension))
             {
                 yield return ValidationMessages.PublicKeyFile;
             }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 
 /*
     Kryptor: Free and open source file encryption.
@@ -74,7 +73,7 @@ namespace KryptorCLI
             Globals.TotalCount = filePaths.Length;
             recipientPrivateKey = PrivateKey.Decrypt(recipientPrivateKey);
             if (recipientPrivateKey == null) { return; }
-            byte[] sharedSecret = KeyExchange.GetLongTermSharedSecret(recipientPrivateKey, senderPublicKey);
+            byte[] sharedSecret = KeyExchange.GetSharedSecret(recipientPrivateKey, senderPublicKey);
             Utilities.ZeroArray(recipientPrivateKey);
             foreach (string inputFilePath in filePaths)
             {
@@ -126,7 +125,6 @@ namespace KryptorCLI
             Globals.TotalCount = filePaths.Length;
             privateKey = PrivateKey.Decrypt(privateKey);
             if (privateKey == null) { return; }
-            privateKey = KeyExchange.ConvertPrivateKeyToCurve25519(privateKey);
             foreach (string inputFilePath in filePaths)
             {
                 bool validFilePath = FilePathValidation.FileDecryption(inputFilePath);

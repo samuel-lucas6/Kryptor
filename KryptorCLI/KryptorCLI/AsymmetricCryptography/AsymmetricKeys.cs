@@ -24,13 +24,26 @@ namespace KryptorCLI
 {
     public static class AsymmetricKeys
     {
-        public static (string publicKey, string privateKey) Generate()
+        public static (string publicKey, string privateKey) GenerateEncryptionKeyPair()
+        {
+            char[] password = PasswordPrompt.EnterNewPassword();
+            byte[] passwordBytes = Password.Hash(password);
+            using var keyPair = PublicKeyBox.GenerateKeyPair();
+            byte[] publicKey = Utilities.ConcatArrays(Constants.Curve25519KeyHeader, keyPair.PublicKey);
+            byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, keyPair.PrivateKey);
+            encryptedPrivateKey = Utilities.ConcatArrays(Constants.Curve25519KeyHeader, encryptedPrivateKey);
+            return ConvertKeys(publicKey, encryptedPrivateKey);
+        }
+
+        public static (string publicKey, string privateKey) GenerateSigningKeyPair()
         {
             char[] password = PasswordPrompt.EnterNewPassword();
             byte[] passwordBytes = Password.Hash(password);
             using var keyPair = PublicKeyAuth.GenerateKeyPair();
+            byte[] publicKey = Utilities.ConcatArrays(Constants.Ed25519KeyHeader, keyPair.PublicKey);
             byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, keyPair.PrivateKey);
-            return ConvertKeys(keyPair.PublicKey, encryptedPrivateKey);
+            encryptedPrivateKey = Utilities.ConcatArrays(Constants.Ed25519KeyHeader, encryptedPrivateKey);
+            return ConvertKeys(publicKey, encryptedPrivateKey);
         }
 
         private static (string publicKey, string privateKey) ConvertKeys(byte[] publicKey, byte[] encryptedPrivateKey)
@@ -38,12 +51,22 @@ namespace KryptorCLI
             return (Convert.ToBase64String(publicKey), Convert.ToBase64String(encryptedPrivateKey));
         }
 
-        public static (string publicKeyPath, string privateKeyPath) Export(string directoryPath, string keyPairName, string publicKey, string privateKey)
+        public static (string publicKeyPath, string privateKeyPath) ExportEncryptionKeyPair(string directoryPath, string publicKey, string privateKey)
         {
             CreateKeysDirectory(directoryPath);
-            string publicKeyPath = Path.Combine(directoryPath, keyPairName + Constants.PublicKeyExtension);
+            string publicKeyPath = Path.Combine(directoryPath, Constants.DefaultEncryptionKeyFileName + Constants.PublicKeyExtension);
             CreateKeyFile(publicKeyPath, publicKey);
-            string privateKeyPath = Path.Combine(directoryPath, keyPairName + Constants.PrivateKeyExtension);
+            string privateKeyPath = Path.Combine(directoryPath, Constants.DefaultEncryptionKeyFileName + Constants.PrivateKeyExtension);
+            CreateKeyFile(privateKeyPath, privateKey);
+            return (publicKeyPath, privateKeyPath);
+        }
+
+        public static (string publicKeyPath, string privateKeyPath) ExportSigningKeyPair(string directoryPath, string publicKey, string privateKey)
+        {
+            CreateKeysDirectory(directoryPath);
+            string publicKeyPath = Path.Combine(directoryPath, Constants.DefaultSigningKeyFileName + Constants.PublicKeyExtension);
+            CreateKeyFile(publicKeyPath, publicKey);
+            string privateKeyPath = Path.Combine(directoryPath, Constants.DefaultSigningKeyFileName + Constants.PrivateKeyExtension);
             CreateKeyFile(privateKeyPath, privateKey);
             return (publicKeyPath, privateKeyPath);
         }
@@ -58,11 +81,20 @@ namespace KryptorCLI
 
         private static void CreateKeyFile(string filePath, string asymmetricKey)
         {
+            if (File.Exists(filePath))
+            {
+                File.SetAttributes(filePath, FileAttributes.Normal);
+            }
             File.WriteAllText(filePath, asymmetricKey);
             File.SetAttributes(filePath, FileAttributes.ReadOnly);
         }
 
-        public static byte[] ExtractPublicKey(byte[] privateKey)
+        public static byte[] ExtractCurve25519PublicKey(byte[] privateKey)
+        {
+            return ScalarMult.Base(privateKey);
+        }
+
+        public static byte[] ExtractEd25519PublicKey(byte[] privateKey)
         {
             return PublicKeyAuth.ExtractEd25519PublicKeyFromEd25519SecretKey(privateKey);
         }

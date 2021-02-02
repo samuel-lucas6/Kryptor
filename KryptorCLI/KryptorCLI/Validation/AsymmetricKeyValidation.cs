@@ -23,7 +23,41 @@ namespace KryptorCLI
 {
     public static class AsymmetricKeyValidation
     {
-        public static byte[] GetPublicKeyFromFile(string publicKeyPath)
+        public static byte[] EncryptionPublicKeyFile(string publicKeyPath)
+        {
+            try
+            {
+                byte[] publicKey = GetPublicKeyFromFile(publicKeyPath);
+                if (publicKey == null) { return null; }
+                byte[] keyAlgorithm = GetKeyAlgorithm(publicKey);
+                ValidateEncryptionKey(keyAlgorithm);
+                return RemoveKeyAlgorithm(publicKey);
+            }
+            catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
+            {
+                DisplayMessage.Exception(ex.GetType().Name, "Please specify a valid encryption public key.");
+                return null;
+            }
+        }
+
+        public static byte[] SigningPublicKeyFile(string publicKeyPath)
+        {
+            try
+            {
+                byte[] publicKey = GetPublicKeyFromFile(publicKeyPath);
+                if (publicKey == null) { return null; }
+                byte[] keyAlgorithm = GetKeyAlgorithm(publicKey);
+                ValidateSigningKey(keyAlgorithm);
+                return RemoveKeyAlgorithm(publicKey);
+            }
+            catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
+            {
+                DisplayMessage.Exception(ex.GetType().Name, "Please specify a valid signing public key.");
+                return null;
+            }
+        }
+
+        private static byte[] GetPublicKeyFromFile(string publicKeyPath)
         {
             try
             {
@@ -42,12 +76,111 @@ namespace KryptorCLI
             }
         }
 
+        public static byte[] EncryptionPublicKeyString(char[] encodedPublicKey)
+        {
+            try
+            {
+                byte[] publicKey = ConvertPublicKeyString(encodedPublicKey);
+                if (publicKey == null) { return null; }
+                byte[] keyAlgorithm = GetKeyAlgorithm(publicKey);
+                ValidateEncryptionKey(keyAlgorithm);
+                return RemoveKeyAlgorithm(publicKey);
+            }
+            catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
+            {
+                DisplayMessage.Exception(ex.GetType().Name, "Please enter a valid encryption public key.");
+                return null;
+            }
+        }
+
+        public static byte[] SigningPublicKeyString(char[] encodedPublicKey)
+        {
+            try
+            {
+                byte[] publicKey = ConvertPublicKeyString(encodedPublicKey);
+                if (publicKey == null) { return null; }
+                byte[] keyAlgorithm = GetKeyAlgorithm(publicKey);
+                ValidateSigningKey(keyAlgorithm);
+                return RemoveKeyAlgorithm(publicKey);
+            }
+            catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
+            {
+                DisplayMessage.Exception(ex.GetType().Name, "Please enter a valid signing public key.");
+                return null;
+            }
+        }
+
+        private static byte[] ConvertPublicKeyString(char[] encodedPublicKey)
+        {
+            return Convert.FromBase64CharArray(encodedPublicKey, offset: 0, encodedPublicKey.Length);
+        }
+
+        private static byte[] GetKeyAlgorithm(byte[] asymmetricKey)
+        {
+            byte[] keyAlgorithm = new byte[Constants.Curve25519KeyHeader.Length];
+            Array.Copy(asymmetricKey, keyAlgorithm, keyAlgorithm.Length);
+            return keyAlgorithm;
+        }
+
+        private static void ValidateEncryptionKey(byte[] keyAlgorithm)
+        {
+            bool validKey = Sodium.Utilities.Compare(keyAlgorithm, Constants.Curve25519KeyHeader);
+            if (!validKey) { throw new ArgumentException("Please specify an asymmetric encryption key."); }
+        }
+
+        private static void ValidateSigningKey(byte[] keyAlgorithm)
+        {
+            bool validKey = Sodium.Utilities.Compare(keyAlgorithm, Constants.Curve25519KeyHeader);
+            if (!validKey) { throw new ArgumentException("Please specify an asymmetric signing key."); }
+        }
+
+        private static byte[] RemoveKeyAlgorithm(byte[] asymmetricKey)
+        {
+            byte[] publicKey = new byte[asymmetricKey.Length - Constants.Curve25519KeyHeader.Length];
+            Array.Copy(asymmetricKey, Constants.Curve25519KeyHeader.Length, publicKey, destinationIndex: 0, publicKey.Length);
+            return publicKey;
+        }
+
+        public static byte[] EncryptionPrivateKeyFile(string privateKeyPath)
+        {
+            try
+            {
+                byte[] privateKey = GetPrivateKeyFromFile(privateKeyPath);
+                if (privateKey == null) { return null; }
+                byte[] keyAlgorithm = GetKeyAlgorithm(privateKey);
+                ValidateEncryptionKey(keyAlgorithm);
+                return RemoveKeyAlgorithm(privateKey);
+            }
+            catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
+            {
+                DisplayMessage.Exception(ex.GetType().Name, "Please specify a valid encryption private key.");
+                return null;
+            }
+        }
+
+        public static byte[] SigningPrivateKeyFile(string privateKeyPath)
+        {
+            try
+            {
+                byte[] privateKey = GetPrivateKeyFromFile(privateKeyPath);
+                if (privateKey == null) { return null; }
+                byte[] keyAlgorithm = GetKeyAlgorithm(privateKey);
+                ValidateSigningKey(keyAlgorithm);
+                return RemoveKeyAlgorithm(privateKey);
+            }
+            catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
+            {
+                DisplayMessage.Exception(ex.GetType().Name, "Please specify a valid signing private key.");
+                return null;
+            }
+        }
+
         public static byte[] GetPrivateKeyFromFile(string privateKeyPath)
         {
             try
             {
                 string encodedPrivateKey = File.ReadAllText(privateKeyPath);
-                if (encodedPrivateKey.Length != Constants.PrivateKeyLength)
+                if (encodedPrivateKey.Length != Constants.SigningPrivateKeyLength && encodedPrivateKey.Length != Constants.EncryptionPrivateKeyLength)
                 {
                     DisplayMessage.Error(ValidationMessages.PrivateKeyFile);
                     return null;
@@ -68,19 +201,6 @@ namespace KryptorCLI
             }
         }
 
-        public static byte[] ConvertPublicKeyString(char[] encodedPublicKey)
-        {
-            try
-            {
-                return Convert.FromBase64CharArray(encodedPublicKey, offset: 0, encodedPublicKey.Length);
-            }
-            catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
-            {
-                DisplayMessage.Exception(ex.GetType().Name, "Invalid public key format.");
-                return null;
-            }
-        }
-
         private static void ValidateKeyVersion(byte[] privateKey)
         {
             byte[] keyVersion = GetKeyVersion(privateKey);
@@ -91,7 +211,7 @@ namespace KryptorCLI
         private static byte[] GetKeyVersion(byte[] privateKey)
         {
             byte[] keyVersion = new byte[Constants.PrivateKeyVersion.Length];
-            Array.Copy(privateKey, keyVersion, keyVersion.Length);
+            Array.Copy(privateKey, Constants.Curve25519KeyHeader.Length, keyVersion, destinationIndex: 0, keyVersion.Length);
             return keyVersion;
         }
     }
