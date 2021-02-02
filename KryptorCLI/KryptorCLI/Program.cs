@@ -147,22 +147,22 @@ Still need help? Read the tutorial <https://kryptor.co.uk>.")]
 
         private static string GetEncryptionPrivateKey(string privateKey)
         {
-            return string.IsNullOrEmpty(privateKey) ? Constants.DefaultEncryptionPrivateKeyPath : string.Empty;
+            return string.IsNullOrEmpty(privateKey) ? Constants.DefaultEncryptionPrivateKeyPath : privateKey;
         }
 
         private static string GetEncryptionPublicKey(string publicKey)
         {
-            return string.IsNullOrEmpty(publicKey) ? Constants.DefaultEncryptionPublicKeyPath : string.Empty;
+            return string.IsNullOrEmpty(publicKey) ? Constants.DefaultEncryptionPublicKeyPath : publicKey;
         }
 
         private static string GetSigningPrivateKey(string privateKey)
         {
-            return string.IsNullOrEmpty(privateKey) ? Constants.DefaultSigningPrivateKeyPath : string.Empty;
+            return string.IsNullOrEmpty(privateKey) ? Constants.DefaultSigningPrivateKeyPath : privateKey;
         }
 
         private static string GetSigningPublicKey(string publicKey)
         {
-            return string.IsNullOrEmpty(publicKey) ? Constants.DefaultSigningPublicKeyPath : string.Empty;
+            return string.IsNullOrEmpty(publicKey) ? Constants.DefaultSigningPublicKeyPath : publicKey;
         }
 
         public static string GetVersion()
