@@ -87,7 +87,7 @@ namespace KryptorCLI
         private static byte[] GetKeyVersion(byte[] privateKey)
         {
             byte[] keyVersion = new byte[Constants.PrivateKeyVersion.Length];
-            Array.Copy(privateKey, Constants.Curve25519KeyHeader.Length, keyVersion, destinationIndex: 0, keyVersion.Length); ;
+            Array.Copy(privateKey, Constants.Curve25519KeyHeader.Length, keyVersion, destinationIndex: 0, keyVersion.Length);
             return keyVersion;
         }
 

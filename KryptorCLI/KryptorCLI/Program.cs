@@ -97,14 +97,12 @@ Still need help? Read the tutorial <https://kryptor.co.uk>.")]
             if (Encrypt)
             {
                 string privateKey = GetEncryptionPrivateKey(PrivateKey.value);
-                string publicKey = GetEncryptionPublicKey(PublicKey.value);
-                CommandLine.Encrypt(Password, Keyfile, privateKey, publicKey, FilePaths);
+                CommandLine.Encrypt(Password, Keyfile, privateKey, PublicKey.value, FilePaths);
             }
             else if (Decrypt)
             {
                 string privateKey = GetEncryptionPrivateKey(PrivateKey.value);
-                string publicKey = GetEncryptionPublicKey(PublicKey.value);
-                CommandLine.Decrypt(Password, Keyfile, privateKey, publicKey, FilePaths);
+                CommandLine.Decrypt(Password, Keyfile, privateKey, PublicKey.value, FilePaths);
             }
             else if (GenerateKeys)
             {
@@ -148,11 +146,6 @@ Still need help? Read the tutorial <https://kryptor.co.uk>.")]
         private static string GetEncryptionPrivateKey(string privateKey)
         {
             return string.IsNullOrEmpty(privateKey) ? Constants.DefaultEncryptionPrivateKeyPath : privateKey;
-        }
-
-        private static string GetEncryptionPublicKey(string publicKey)
-        {
-            return string.IsNullOrEmpty(publicKey) ? Constants.DefaultEncryptionPublicKeyPath : publicKey;
         }
 
         private static string GetSigningPrivateKey(string privateKey)

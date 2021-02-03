@@ -149,7 +149,7 @@ namespace KryptorCLI
                 if (privateKey == null) { return null; }
                 byte[] keyAlgorithm = GetKeyAlgorithm(privateKey);
                 ValidateEncryptionKey(keyAlgorithm);
-                return RemoveKeyAlgorithm(privateKey);
+                return privateKey;
             }
             catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
             {
@@ -166,7 +166,7 @@ namespace KryptorCLI
                 if (privateKey == null) { return null; }
                 byte[] keyAlgorithm = GetKeyAlgorithm(privateKey);
                 ValidateSigningKey(keyAlgorithm);
-                return RemoveKeyAlgorithm(privateKey);
+                return privateKey;
             }
             catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
             {
@@ -180,7 +180,7 @@ namespace KryptorCLI
             try
             {
                 string encodedPrivateKey = File.ReadAllText(privateKeyPath);
-                if (encodedPrivateKey.Length != Constants.SigningPrivateKeyLength && encodedPrivateKey.Length != Constants.EncryptionPrivateKeyLength)
+                if (encodedPrivateKey.Length != Constants.EncryptionPrivateKeyLength && encodedPrivateKey.Length != Constants.SigningPrivateKeyLength)
                 {
                     DisplayMessage.Error(ValidationMessages.PrivateKeyFile);
                     return null;

@@ -5,5 +5,6 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-// False warning
+// False warnings
 [assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>", Scope = "member", Target = "~M:KryptorCLI.Program.OnExecute")]
+[assembly: SuppressMessage("Usage", "CA2208:Instantiate argument exceptions correctly", Justification = "<Pending>", Scope = "member", Target = "~M:KryptorCLI.AsymmetricKeyValidation.ValidateKeyVersion(System.Byte[])")]
