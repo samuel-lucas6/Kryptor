@@ -130,7 +130,7 @@ namespace KryptorCLI
 
         private static void ValidateSigningKey(byte[] keyAlgorithm)
         {
-            bool validKey = Sodium.Utilities.Compare(keyAlgorithm, Constants.Curve25519KeyHeader);
+            bool validKey = Sodium.Utilities.Compare(keyAlgorithm, Constants.Ed25519KeyHeader);
             if (!validKey) { throw new ArgumentException("Please specify an asymmetric signing key."); }
         }
 
