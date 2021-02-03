@@ -27,9 +27,9 @@ namespace KryptorCLI
 
 Examples:
   --encrypt -p [file]
-  --encrypt [-x sender private key] [-y recipient public key] [file]
-  --decrypt [-x recipient private key] [-y sender public key]  [file]
-  --sign [-x private key] [-c comment] [file]
+  --encrypt [-x=sender private key] [-y recipient public key] [file]
+  --decrypt [-x=recipient private key] [-y sender public key]  [file]
+  --sign [-x=private key] [-c comment] [file]
   --verify [-y public key] [signature] [file]
 
 Please report bugs to <https://github.com/samuel-lucas6/Kryptor/issues>.
@@ -49,11 +49,11 @@ Still need help? Read the tutorial <https://kryptor.co.uk>.")]
         [Option("-k|--keyfile", "specify a keyfile", CommandOptionType.SingleValue)]
         public string Keyfile { get; }
 
-        [Option("-x|--private", "specify your private key", CommandOptionType.SingleOrNoValue)]
+        [Option("-x|--private", "specify your private key (blank for default)", CommandOptionType.SingleOrNoValue)]
         public (bool hasValue, string value) PrivateKey { get; }
 
-        [Option("-y|--public", "specify a public key", CommandOptionType.SingleOrNoValue)]
-        public (bool hasValue, string value) PublicKey { get; }
+        [Option("-y|--public", "specify a public key", CommandOptionType.SingleValue)]
+        public string PublicKey { get; }
 
         [Option("-f|--obfuscate", "obfuscate file names", CommandOptionType.NoValue)]
         public bool ObfuscateFileNames { get; }
@@ -97,12 +97,12 @@ Still need help? Read the tutorial <https://kryptor.co.uk>.")]
             if (Encrypt)
             {
                 string privateKey = GetEncryptionPrivateKey(PrivateKey.value);
-                CommandLine.Encrypt(Password, Keyfile, privateKey, PublicKey.value, FilePaths);
+                CommandLine.Encrypt(Password, Keyfile, privateKey, PublicKey, FilePaths);
             }
             else if (Decrypt)
             {
                 string privateKey = GetEncryptionPrivateKey(PrivateKey.value);
-                CommandLine.Decrypt(Password, Keyfile, privateKey, PublicKey.value, FilePaths);
+                CommandLine.Decrypt(Password, Keyfile, privateKey, PublicKey, FilePaths);
             }
             else if (GenerateKeys)
             {
@@ -119,8 +119,7 @@ Still need help? Read the tutorial <https://kryptor.co.uk>.")]
             }
             else if (Verify)
             {
-                string publicKey = GetSigningPublicKey(PublicKey.value);
-                CommandLine.Verify(publicKey, FilePaths);
+                CommandLine.Verify(PublicKey, FilePaths);
             }
             else if (CheckForUpdates)
             {
@@ -151,11 +150,6 @@ Still need help? Read the tutorial <https://kryptor.co.uk>.")]
         private static string GetSigningPrivateKey(string privateKey)
         {
             return string.IsNullOrEmpty(privateKey) ? Constants.DefaultSigningPrivateKeyPath : privateKey;
-        }
-
-        private static string GetSigningPublicKey(string publicKey)
-        {
-            return string.IsNullOrEmpty(publicKey) ? Constants.DefaultSigningPublicKeyPath : publicKey;
         }
 
         public static string GetVersion()
