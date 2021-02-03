@@ -221,7 +221,7 @@ namespace KryptorCLI
             if (privateKey == null) { return; }
             byte[] publicKey = privateKey.Length switch
             {
-                Constants.EncryptionKeySize => AsymmetricKeys.GetCurve25519PublicKey(privateKey),
+                Constants.EncryptionKeyLength => AsymmetricKeys.GetCurve25519PublicKey(privateKey),
                 _ => AsymmetricKeys.GetEd25519PublicKey(privateKey),
             };
             Utilities.ZeroArray(privateKey);

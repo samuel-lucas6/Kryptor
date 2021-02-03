@@ -27,7 +27,7 @@ namespace KryptorCLI
     {
         public static void Initialize(string inputFilePath, string outputFilePath, byte[] keyEncryptionKey)
         {
-            byte[] dataEncryptionKey = new byte[Constants.EncryptionKeySize];
+            byte[] dataEncryptionKey = new byte[Constants.EncryptionKeyLength];
             try
             {
                 byte[] encryptedHeader = FileHeaders.ReadEncryptedHeader(inputFilePath);
@@ -39,8 +39,8 @@ namespace KryptorCLI
                 int fileNameLength = FileHeaders.GetFileNameLength(header);
                 dataEncryptionKey = FileHeaders.GetDataEncryptionKey(header);
                 Utilities.ZeroArray(header);
-                using (var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileBufferSize, FileOptions.SequentialScan))
-                using (var outputFile = new FileStream(outputFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileBufferSize, FileOptions.SequentialScan))
+                using (var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
+                using (var outputFile = new FileStream(outputFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
                 {
                     nonce = Sodium.Utilities.Increment(nonce);
                     byte[] additionalData = ChunkHandling.GetPreviousPoly1305Tag(encryptedHeader);

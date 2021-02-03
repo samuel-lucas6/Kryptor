@@ -46,7 +46,7 @@ namespace KryptorCLI
             Encoding fileEncoding = FileHandling.GetFileEncoding(filePath);
             string fileName = Path.GetFileName(filePath);
             byte[] fileNameBytes = fileEncoding.GetBytes(fileName);
-            using var fileStream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read, Constants.FileBufferSize, FileOptions.RandomAccess);
+            using var fileStream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
             fileStream.Write(fileNameBytes, offset: 0, fileNameBytes.Length);
         }
     }

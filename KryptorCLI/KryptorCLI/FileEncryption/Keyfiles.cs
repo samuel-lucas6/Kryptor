@@ -32,7 +32,7 @@ namespace KryptorCLI
 
         public static byte[] ReadKeyfile(string keyfilePath)
         {
-            using var keyfile = new FileStream(keyfilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileBufferSize, FileOptions.SequentialScan);
+            using var keyfile = new FileStream(keyfilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
             if (keyfile.Length == Constants.KeyfileLength)
             {
                 byte[] keyfileBytes = new byte[Constants.KeyfileLength];

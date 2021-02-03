@@ -51,7 +51,7 @@ namespace KryptorCLI
             long fileSize = FileHandling.GetFileLength(filePath);
             if (fileSize >= oneGibibyte || preHashed)
             {
-                using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, Constants.FileBufferSize, FileOptions.SequentialScan);
+                using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
                 return Blake2.Hash(fileStream);
             }
             return File.ReadAllBytes(filePath);
@@ -66,7 +66,7 @@ namespace KryptorCLI
         {
             const int offset = 0;   
             string signatureFilePath = filePath + Constants.SignatureExtension;
-            using var signatureFile = new FileStream(signatureFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileBufferSize, FileOptions.SequentialScan);
+            using var signatureFile = new FileStream(signatureFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
             signatureFile.Write(Constants.SignatureMagicBytes, offset, Constants.SignatureMagicBytes.Length);
             signatureFile.Write(Constants.SignatureVersion, offset, Constants.SignatureVersion.Length);
             signatureFile.Write(algorithmHeader, offset, algorithmHeader.Length);
@@ -78,7 +78,7 @@ namespace KryptorCLI
 
         public static bool VerifySignature(string signatureFilePath, string filePath, byte[] publicKey)
         {
-            using var signatureFile = new FileStream(signatureFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileBufferSize, FileOptions.RandomAccess);
+            using var signatureFile = new FileStream(signatureFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
             // Verify the global signature
             byte[] magicBytes = GetMagicBytes(signatureFile);
             byte[] formatVersion = GetFormatVersion(signatureFile);

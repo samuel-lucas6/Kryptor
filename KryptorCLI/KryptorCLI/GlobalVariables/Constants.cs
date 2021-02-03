@@ -35,15 +35,15 @@ namespace KryptorCLI
         public const string EncryptedExtension = ".kryptor";
         public const string SaltFile = "Kryptor.salt";
         public const int KeyfileLength = 64;
-        public const int FileBufferSize = 131072;
+        public const int FileStreamBufferSize = 131072;
         public const int FileChunkSize = 16384;
         public const int KeyCommitmentBlockLength = 16;
-        public const int BitConverterLength = 4;
+        public const int IntBitConverterLength = 4;
         public const int EncryptedHeaderLength = 72;
         public static readonly int TotalChunkLength = KeyCommitmentBlockLength + FileChunkSize + Poly1305Length;
 
         // Cryptography
-        public const int EncryptionKeySize = 32;
+        public const int EncryptionKeyLength = 32;
         public const int EphemeralPublicKeyLength = 32;
         public const int SaltLength = 16;
         public const int XChaChaNonceLength = 24;
@@ -69,9 +69,9 @@ namespace KryptorCLI
         public static readonly byte[] PrivateKeyVersion = BitConverter.GetBytes((short)1);
 
         // File signing
-        public const int SignatureLength = 64;
         public const string SignatureExtension = ".signature";
         public static readonly byte[] SignatureMagicBytes = Encoding.UTF8.GetBytes("SIGNATURE");
         public static readonly byte[] SignatureVersion = BitConverter.GetBytes((short)1);
+        public const int SignatureLength = 64;
     }
 }

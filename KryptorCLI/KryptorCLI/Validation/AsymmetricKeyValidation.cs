@@ -31,7 +31,7 @@ namespace KryptorCLI
                 if (publicKey == null) { return null; }
                 byte[] keyAlgorithm = GetKeyAlgorithm(publicKey);
                 ValidateEncryptionKey(keyAlgorithm);
-                return RemoveKeyAlgorithm(publicKey);
+                return RemoveKeyAlgorithmHeader(publicKey);
             }
             catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
             {
@@ -48,7 +48,7 @@ namespace KryptorCLI
                 if (publicKey == null) { return null; }
                 byte[] keyAlgorithm = GetKeyAlgorithm(publicKey);
                 ValidateSigningKey(keyAlgorithm);
-                return RemoveKeyAlgorithm(publicKey);
+                return RemoveKeyAlgorithmHeader(publicKey);
             }
             catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
             {
@@ -80,11 +80,11 @@ namespace KryptorCLI
         {
             try
             {
-                byte[] publicKey = ConvertPublicKeyString(encodedPublicKey);
+                byte[] publicKey = Convert.FromBase64CharArray(encodedPublicKey, offset: 0, encodedPublicKey.Length);
                 if (publicKey == null) { return null; }
                 byte[] keyAlgorithm = GetKeyAlgorithm(publicKey);
                 ValidateEncryptionKey(keyAlgorithm);
-                return RemoveKeyAlgorithm(publicKey);
+                return RemoveKeyAlgorithmHeader(publicKey);
             }
             catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
             {
@@ -97,22 +97,17 @@ namespace KryptorCLI
         {
             try
             {
-                byte[] publicKey = ConvertPublicKeyString(encodedPublicKey);
+                byte[] publicKey = Convert.FromBase64CharArray(encodedPublicKey, offset: 0, encodedPublicKey.Length);
                 if (publicKey == null) { return null; }
                 byte[] keyAlgorithm = GetKeyAlgorithm(publicKey);
                 ValidateSigningKey(keyAlgorithm);
-                return RemoveKeyAlgorithm(publicKey);
+                return RemoveKeyAlgorithmHeader(publicKey);
             }
             catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
             {
                 DisplayMessage.Exception(ex.GetType().Name, "Please enter a valid signing public key.");
                 return null;
             }
-        }
-
-        private static byte[] ConvertPublicKeyString(char[] encodedPublicKey)
-        {
-            return Convert.FromBase64CharArray(encodedPublicKey, offset: 0, encodedPublicKey.Length);
         }
 
         private static byte[] GetKeyAlgorithm(byte[] asymmetricKey)
@@ -134,7 +129,7 @@ namespace KryptorCLI
             if (!validKey) { throw new ArgumentException("Please specify an asymmetric signing key."); }
         }
 
-        private static byte[] RemoveKeyAlgorithm(byte[] asymmetricKey)
+        private static byte[] RemoveKeyAlgorithmHeader(byte[] asymmetricKey)
         {
             byte[] publicKey = new byte[asymmetricKey.Length - Constants.Curve25519KeyHeader.Length];
             Array.Copy(asymmetricKey, Constants.Curve25519KeyHeader.Length, publicKey, destinationIndex: 0, publicKey.Length);

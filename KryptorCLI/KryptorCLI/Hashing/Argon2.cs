@@ -24,7 +24,7 @@ namespace KryptorCLI
     {
         public static byte[] DeriveKey(byte[] passwordBytes, byte[] salt)
         {
-            return PasswordHash.ArgonHashBinary(passwordBytes, salt, Constants.Iterations, Constants.MemorySize, Constants.EncryptionKeySize, PasswordHash.ArgonAlgorithm.Argon_2ID13);
+            return PasswordHash.ArgonHashBinary(passwordBytes, salt, Constants.Iterations, Constants.MemorySize, Constants.EncryptionKeyLength, PasswordHash.ArgonAlgorithm.Argon_2ID13);
         }
     }
 }

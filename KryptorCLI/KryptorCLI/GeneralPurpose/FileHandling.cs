@@ -26,7 +26,7 @@ namespace KryptorCLI
     {
         public static byte[] ReadFileHeader(string filePath, long offset, int length)
         {
-            using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileBufferSize, FileOptions.SequentialScan);
+            using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
             return ReadFileHeader(fileStream, offset, length);
         }
 

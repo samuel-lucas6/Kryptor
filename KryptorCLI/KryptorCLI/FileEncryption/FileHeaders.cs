@@ -91,22 +91,22 @@ namespace KryptorCLI
 
         public static int GetLastChunkLength(byte[] header)
         {
-            byte[] lastChunkLength = new byte[Constants.BitConverterLength];
+            byte[] lastChunkLength = new byte[Constants.IntBitConverterLength];
             Array.Copy(header, Constants.KeyCommitmentBlockLength, lastChunkLength, destinationIndex: 0, lastChunkLength.Length);
             return BitConverter.ToInt32(lastChunkLength);
         }
 
         public static int GetFileNameLength(byte[] header)
         {
-            byte[] fileNameLength = new byte[Constants.BitConverterLength];
-            int sourceIndex = Constants.KeyCommitmentBlockLength + Constants.BitConverterLength;
+            byte[] fileNameLength = new byte[Constants.IntBitConverterLength];
+            int sourceIndex = Constants.KeyCommitmentBlockLength + Constants.IntBitConverterLength;
             Array.Copy(header, sourceIndex, fileNameLength, destinationIndex: 0, fileNameLength.Length);
             return BitConverter.ToInt32(fileNameLength);
         }
 
         public static byte[] GetDataEncryptionKey(byte[] header)
         {
-            byte[] dataEncryptionKey = new byte[Constants.EncryptionKeySize];
+            byte[] dataEncryptionKey = new byte[Constants.EncryptionKeyLength];
             int sourceIndex = header.Length - dataEncryptionKey.Length;
             Array.Copy(header, sourceIndex, dataEncryptionKey, destinationIndex: 0, dataEncryptionKey.Length);
             return dataEncryptionKey;

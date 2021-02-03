@@ -25,7 +25,7 @@ namespace KryptorCLI
         public static byte[] KeyEncryptionKey(byte[] sharedSecret, byte[] ephemeralSharedSecret, byte[] salt)
         {
             byte[] fullSharedSecret = Utilities.ConcatArrays(sharedSecret, ephemeralSharedSecret);
-            byte[] keyEncryptionKey = Blake2.KeyDerivation(fullSharedSecret, salt, Constants.EncryptionKeySize);
+            byte[] keyEncryptionKey = Blake2.KeyDerivation(fullSharedSecret, salt, Constants.EncryptionKeyLength);
             Utilities.ZeroArray(ephemeralSharedSecret);
             Utilities.ZeroArray(fullSharedSecret);
             return keyEncryptionKey;
@@ -33,7 +33,7 @@ namespace KryptorCLI
 
         public static byte[] KeyEncryptionKey(byte[] ephemeralSharedSecret, byte[] salt)
         {
-            byte[] keyEncryptionKey = Blake2.KeyDerivation(ephemeralSharedSecret, salt, Constants.EncryptionKeySize);
+            byte[] keyEncryptionKey = Blake2.KeyDerivation(ephemeralSharedSecret, salt, Constants.EncryptionKeyLength);
             Utilities.ZeroArray(ephemeralSharedSecret);
             return keyEncryptionKey;
         }
@@ -51,7 +51,7 @@ namespace KryptorCLI
 
         public static byte[] RandomDataEncryptionKey()
         {
-            return SodiumCore.GetRandomBytes(Constants.EncryptionKeySize);
+            return SodiumCore.GetRandomBytes(Constants.EncryptionKeyLength);
         }
 
         public static byte[] RandomNonce()
