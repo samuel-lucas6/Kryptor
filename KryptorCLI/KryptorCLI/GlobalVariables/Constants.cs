@@ -68,12 +68,6 @@ namespace KryptorCLI
         public static readonly byte[] Ed25519KeyHeader = Encoding.UTF8.GetBytes("Ed");
         public static readonly byte[] PrivateKeyVersion = BitConverter.GetBytes((short)1);
 
-        public enum KeyAlgorithm
-        {
-            Curve25519,
-            Ed25519
-        }
-
         // File signing
         public const int SignatureLength = 64;
         public const string SignatureExtension = ".signature";

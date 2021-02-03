@@ -24,26 +24,19 @@ namespace KryptorCLI
 {
     public static class PrivateKey
     {
-        public static byte[] Encrypt(byte[] passwordBytes, byte[] privateKey, Constants.KeyAlgorithm keyAlgorithm)
+        public static byte[] Encrypt(byte[] passwordBytes, byte[] privateKey, byte[] keyAlgorithm)
         {
-            byte[] algorithm = GetKeyAlgorithm(keyAlgorithm);
             byte[] salt = Generate.RandomSalt();
             byte[] key = Argon2.DeriveKey(passwordBytes, salt);
             Utilities.ZeroArray(passwordBytes);
             byte[] nonce = Generate.RandomNonce();
-            byte[] additionalData = Utilities.ConcatArrays(algorithm, Constants.PrivateKeyVersion);
+            byte[] additionalData = Utilities.ConcatArrays(keyAlgorithm, Constants.PrivateKeyVersion);
             byte[] keyCommitmentBlock = ChunkHandling.GetKeyCommitmentBlock();
             privateKey = Utilities.ConcatArrays(keyCommitmentBlock, privateKey);
             byte[] encryptedPrivateKey = SecretAeadXChaCha20Poly1305.Encrypt(privateKey, nonce, key, additionalData);
             Utilities.ZeroArray(privateKey);
             Utilities.ZeroArray(key);
             return Utilities.ConcatArrays(additionalData, salt, nonce, encryptedPrivateKey);
-        }
-
-        private static byte[] GetKeyAlgorithm(Constants.KeyAlgorithm keyAlgorithm)
-        {
-            if (keyAlgorithm == Constants.KeyAlgorithm.Curve25519) { return Constants.Curve25519KeyHeader; }
-            return Constants.Ed25519KeyHeader;
         }
 
         public static byte[] Decrypt(byte[] privateKey)
