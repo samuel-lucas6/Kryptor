@@ -71,7 +71,7 @@ namespace KryptorCLI
             {
                 string outputFilePath = FileDecryption.GetOutputFilePath(inputFilePath);
                 DecryptFile.Initialize(inputFilePath, outputFilePath, keyEncryptionKey);
-                FileDecryption.DecryptionSuccessful(inputFilePath);
+                FileDecryption.DecryptionSuccessful(inputFilePath, outputFilePath);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {

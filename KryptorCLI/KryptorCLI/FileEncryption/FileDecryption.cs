@@ -54,7 +54,7 @@ namespace KryptorCLI
                 string outputFilePath = GetOutputFilePath(inputFilePath);
                 DecryptFile.Initialize(inputFilePath, outputFilePath, keyEncryptionKey);
                 Utilities.ZeroArray(keyEncryptionKey);
-                DecryptionSuccessful(inputFilePath);
+                DecryptionSuccessful(inputFilePath, outputFilePath);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
@@ -106,7 +106,7 @@ namespace KryptorCLI
                 string outputFilePath = GetOutputFilePath(inputFilePath);
                 DecryptFile.Initialize(inputFilePath, outputFilePath, keyEncryptionKey);
                 Utilities.ZeroArray(keyEncryptionKey);
-                DecryptionSuccessful(inputFilePath);
+                DecryptionSuccessful(inputFilePath, outputFilePath);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
@@ -156,7 +156,7 @@ namespace KryptorCLI
                 string outputFilePath = GetOutputFilePath(inputFilePath);
                 DecryptFile.Initialize(inputFilePath, outputFilePath, keyEncryptionKey);
                 Utilities.ZeroArray(keyEncryptionKey);
-                DecryptionSuccessful(inputFilePath);
+                DecryptionSuccessful(inputFilePath, outputFilePath);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
@@ -175,9 +175,9 @@ namespace KryptorCLI
             return inputFilePath.Replace(Constants.EncryptedExtension, string.Empty);
         }
 
-        public static void DecryptionSuccessful(string inputFilePath)
+        public static void DecryptionSuccessful(string inputFilePath, string outputFilePath)
         {
-            DisplayMessage.FileEncryptionResult(inputFilePath);
+            DisplayMessage.FileEncryptionResult(inputFilePath, outputFilePath);
             Globals.SuccessfulCount += 1;
         }
     }
