@@ -70,8 +70,11 @@ namespace KryptorCLI
 
         public static void SuccessfullyDecrypted()
         {
-            Console.WriteLine();
-            Console.WriteLine($"Successfully decrypted: {Globals.SuccessfulCount}/{Globals.TotalCount}");
+            if (Globals.TotalCount > 0)
+            {
+                Console.WriteLine();
+                Console.WriteLine($"Successfully decrypted: {Globals.SuccessfulCount}/{Globals.TotalCount}");
+            }
         }
 
         public static bool AnyErrors(IEnumerable<string> errorMessages)
