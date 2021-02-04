@@ -1,4 +1,5 @@
-﻿using Sodium;
+﻿using System;
+using Sodium;
 
 /*
     Kryptor: Free and open source file encryption.
@@ -24,10 +25,10 @@ namespace KryptorCLI
     {
         public static byte[] KeyEncryptionKey(byte[] sharedSecret, byte[] ephemeralSharedSecret, byte[] salt)
         {
-            byte[] fullSharedSecret = Utilities.ConcatArrays(sharedSecret, ephemeralSharedSecret);
-            byte[] keyEncryptionKey = Blake2.KeyDerivation(fullSharedSecret, salt, Constants.EncryptionKeyLength);
+            byte[] inputKeyingMaterial = Utilities.ConcatArrays(sharedSecret, ephemeralSharedSecret);
+            byte[] keyEncryptionKey = Blake2.KeyDerivation(inputKeyingMaterial, salt, Constants.EncryptionKeyLength);
             Utilities.ZeroArray(ephemeralSharedSecret);
-            Utilities.ZeroArray(fullSharedSecret);
+            Utilities.ZeroArray(inputKeyingMaterial);
             return keyEncryptionKey;
         }
 

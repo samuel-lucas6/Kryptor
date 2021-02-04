@@ -1,4 +1,5 @@
-﻿using Sodium;
+﻿using System;
+using Sodium;
 using System.IO;
 using System.Text;
 
@@ -44,7 +45,7 @@ namespace KryptorCLI
 
         public static byte[] KeyDerivation(byte[] inputKeyingMaterial, byte[] salt, int outputLength)
         {
-            return GenericHash.HashSaltPersonal(inputKeyingMaterial, key: null, salt, _personal, outputLength);
+            return GenericHash.HashSaltPersonal(message: Array.Empty<byte>(), inputKeyingMaterial, salt, _personal, outputLength);
         }
     }
 }
