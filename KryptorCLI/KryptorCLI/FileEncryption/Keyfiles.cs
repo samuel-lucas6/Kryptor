@@ -1,7 +1,7 @@
 ﻿using System.IO;
 
 /*
-    Kryptor: Free and open source file encryption.
+    Kryptor: A simple, modern, and secure encryption tool.
     Copyright(C) 2020-2021 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
@@ -24,7 +24,7 @@ namespace KryptorCLI
     {
         public static void GenerateKeyfile(string keyfilePath)
         {
-            byte[] keyfileBytes = Generate.KeyfileBytes();
+            byte[] keyfileBytes = Generate.Keyfile();
             File.WriteAllBytes(keyfilePath, keyfileBytes);
             File.SetAttributes(keyfilePath, FileAttributes.ReadOnly);
             Utilities.ZeroArray(keyfileBytes);

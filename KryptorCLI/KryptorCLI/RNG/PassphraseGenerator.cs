@@ -4,7 +4,7 @@ using System.Globalization;
 using Sodium;
 
 /*
-    Kryptor: Free and open source file encryption.
+    Kryptor: A simple, modern, and secure encryption tool.
     Copyright(C) 2020-2021 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
