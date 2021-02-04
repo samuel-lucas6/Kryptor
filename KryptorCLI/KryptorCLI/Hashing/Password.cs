@@ -35,6 +35,7 @@ namespace KryptorCLI
 
         public static byte[] Hash(char[] password)
         {
+            if (password.Length == 0) { return null; }
             byte[] passwordBytes = GetPasswordBytes(password);
             return Blake2.Hash(passwordBytes);
         }
@@ -51,17 +52,12 @@ namespace KryptorCLI
             try
             {
                 byte[] keyfileBytes = Keyfiles.ReadKeyfile(keyfilePath);
-                if (passwordBytes == null)
-                {
-                    // If only a keyfile was selected
-                    return keyfileBytes;
-                }
-                return CombineKeyfileAndPassword(keyfileBytes, passwordBytes);
+                return passwordBytes == null ? keyfileBytes : CombineKeyfileAndPassword(passwordBytes, keyfileBytes);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.Error);
-                DisplayMessage.Exception(ex.GetType().Name, "Unable to read keyfile. The selected keyfile has not been used.");
+                DisplayMessage.Exception(ex.GetType().Name, "Unable to read keyfile. The keyfile has not been used.");
                 return passwordBytes;
             }
         }

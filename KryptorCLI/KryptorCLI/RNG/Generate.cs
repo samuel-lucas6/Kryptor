@@ -1,5 +1,4 @@
-﻿using System;
-using Sodium;
+﻿using Sodium;
 
 /*
     Kryptor: Free and open source file encryption.

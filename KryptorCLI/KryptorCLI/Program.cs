@@ -106,7 +106,7 @@ Still need help? Read the tutorial <https://kryptor.co.uk>.")]
             }
             else if (GenerateKeys)
             {
-                CommandLine.GenerateNewKeyPair((FilePaths != null) ? FilePaths[0] : Constants.DefaultKeyDirectory);
+                CommandLine.GenerateNewKeyPair((FilePaths == null) ? Constants.DefaultKeyDirectory : FilePaths[0]);
             }
             else if (RecoverPublicKey)
             {
