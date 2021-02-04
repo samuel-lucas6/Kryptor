@@ -22,6 +22,11 @@ namespace KryptorCLI
 {
     public static class Generate
     {
+        public static byte[] Salt()
+        {
+            return SodiumCore.GetRandomBytes(Constants.SaltLength);
+        }
+
         public static byte[] KeyEncryptionKey(byte[] sharedSecret, byte[] ephemeralSharedSecret, byte[] salt)
         {
             byte[] inputKeyingMaterial = Utilities.ConcatArrays(sharedSecret, ephemeralSharedSecret);
@@ -38,28 +43,23 @@ namespace KryptorCLI
             return keyEncryptionKey;
         }
 
-        public static byte[] RandomSalt()
-        {
-            return SodiumCore.GetRandomBytes(Constants.SaltLength);
-        }
-
-        public static byte[] RandomEphemeralPublicKeyHeader()
+        public static byte[] EphemeralPublicKeyHeader()
         {
             using var keyPair = PublicKeyBox.GenerateKeyPair();
             return keyPair.PublicKey;
         }
 
-        public static byte[] RandomDataEncryptionKey()
+        public static byte[] DataEncryptionKey()
         {
             return SodiumCore.GetRandomBytes(Constants.EncryptionKeyLength);
         }
 
-        public static byte[] RandomNonce()
+        public static byte[] Nonce()
         {
             return SodiumCore.GetRandomBytes(Constants.XChaChaNonceLength);
         }
 
-        public static byte[] RandomKeyfile()
+        public static byte[] KeyfileBytes()
         {
             return SodiumCore.GetRandomBytes(Constants.KeyfileLength);
         }

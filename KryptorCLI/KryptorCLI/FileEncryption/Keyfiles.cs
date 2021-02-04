@@ -24,7 +24,7 @@ namespace KryptorCLI
     {
         public static void GenerateKeyfile(string keyfilePath)
         {
-            byte[] keyfileBytes = Generate.RandomKeyfile();
+            byte[] keyfileBytes = Generate.KeyfileBytes();
             File.WriteAllBytes(keyfilePath, keyfileBytes);
             File.SetAttributes(keyfilePath, FileAttributes.ReadOnly);
             Utilities.ZeroArray(keyfileBytes);

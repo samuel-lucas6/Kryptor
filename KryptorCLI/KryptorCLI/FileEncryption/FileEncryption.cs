@@ -51,10 +51,10 @@ namespace KryptorCLI
                     return;
                 }
                 // Derive a unique KEK per file
-                byte[] salt = Generate.RandomSalt();
+                byte[] salt = Generate.Salt();
                 byte[] keyEncryptionKey = Argon2.DeriveKey(passwordBytes, salt);
                 // Fill the ephemeral public key header with random key (since not in use)
-                byte[] randomEphemeralPublicKeyHeader = Generate.RandomEphemeralPublicKeyHeader();
+                byte[] randomEphemeralPublicKeyHeader = Generate.EphemeralPublicKeyHeader();
                 string outputFilePath = GetOutputFilePath(inputFilePath);
                 EncryptFile.Initialize(inputFilePath, outputFilePath, randomEphemeralPublicKeyHeader, salt, keyEncryptionKey);
                 Utilities.ZeroArray(keyEncryptionKey);
@@ -100,7 +100,7 @@ namespace KryptorCLI
                 }
                 // Derive a unique KEK per file
                 (byte[] ephemeralSharedSecret, byte[] ephemeralPublicKey) = KeyExchange.GetEphemeralSharedSecret(recipientPublicKey);
-                byte[] salt = Generate.RandomSalt();
+                byte[] salt = Generate.Salt();
                 byte[] keyEncryptionKey = Generate.KeyEncryptionKey(sharedSecret, ephemeralSharedSecret, salt);
                 string outputFilePath = GetOutputFilePath(inputFilePath);
                 EncryptFile.Initialize(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
@@ -145,7 +145,7 @@ namespace KryptorCLI
                 }
                 // Derive a unique KEK per file
                 (byte[] ephemeralSharedSecret, byte[] ephemeralPublicKey) = KeyExchange.GetPrivateKeySharedSecret(privateKey);
-                byte[] salt = Generate.RandomSalt();
+                byte[] salt = Generate.Salt();
                 byte[] keyEncryptionKey = Generate.KeyEncryptionKey(ephemeralSharedSecret, salt);
                 string outputFilePath = GetOutputFilePath(inputFilePath);
                 EncryptFile.Initialize(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);

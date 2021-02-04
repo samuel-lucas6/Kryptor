@@ -26,13 +26,13 @@ namespace KryptorCLI
     {
         public static void Initialize(string inputFilePath, string outputFilePath, byte[] ephemeralPublicKey, byte[] salt, byte[] keyEncryptionKey)
         {
-            byte[] dataEncryptionKey = Generate.RandomDataEncryptionKey();
+            byte[] dataEncryptionKey = Generate.DataEncryptionKey();
             try
             {
                 using (var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
                 using (var outputFile = new FileStream(outputFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
                 {
-                    byte[] nonce = Generate.RandomNonce();
+                    byte[] nonce = Generate.Nonce();
                     byte[] encryptedHeader = EncryptFileHeader(inputFilePath, dataEncryptionKey, nonce, keyEncryptionKey);
                     FileHeaders.WriteHeaders(outputFile, ephemeralPublicKey, salt, nonce, encryptedHeader);
                     nonce = Sodium.Utilities.Increment(nonce);

@@ -26,10 +26,10 @@ namespace KryptorCLI
     {
         public static byte[] Encrypt(byte[] passwordBytes, byte[] privateKey, byte[] keyAlgorithm)
         {
-            byte[] salt = Generate.RandomSalt();
+            byte[] salt = Generate.Salt();
             byte[] key = Argon2.DeriveKey(passwordBytes, salt);
             Utilities.ZeroArray(passwordBytes);
-            byte[] nonce = Generate.RandomNonce();
+            byte[] nonce = Generate.Nonce();
             byte[] additionalData = Utilities.ConcatArrays(keyAlgorithm, Constants.PrivateKeyVersion);
             byte[] keyCommitmentBlock = ChunkHandling.GetKeyCommitmentBlock();
             privateKey = Utilities.ConcatArrays(keyCommitmentBlock, privateKey);
