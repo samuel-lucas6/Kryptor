@@ -234,7 +234,7 @@ namespace KryptorCLI
             if (!validUserInput) { return; }
             byte[] privateKey = AsymmetricKeyValidation.SigningPrivateKeyFile(privateKeyPath);
             if (privateKey == null) { return; }
-            FileSigning.SignEachFile(privateKey, comment, preHash, filePaths);
+            FileSigning.SignEachFile(filePaths, comment, preHash, privateKey);
         }
 
         public static void Verify(string publicKey, string[] filePaths)
@@ -258,7 +258,7 @@ namespace KryptorCLI
             if (!validSignatureFile) { return; }
             byte[] publicKey = AsymmetricKeyValidation.SigningPublicKeyString(encodedPublicKey);
             if (publicKey == null) { return; }
-            FileSigning.VerifyFile(publicKey, signatureFilePath, filePaths[0]);
+            FileSigning.VerifyFile(signatureFilePath, filePaths[0], publicKey);
         }
 
         private static void VerifySignature(string publicKeyPath, string[] filePaths)
@@ -270,7 +270,7 @@ namespace KryptorCLI
             if (!validSignatureFile) { return; }
             byte[] publicKey = AsymmetricKeyValidation.SigningPublicKeyFile(publicKeyPath);
             if (publicKey == null) { return; }
-            FileSigning.VerifyFile(publicKey, signatureFilePath, filePaths[0]);
+            FileSigning.VerifyFile(signatureFilePath, filePaths[0], publicKey);
         }
         
         public static void CheckForUpdates()

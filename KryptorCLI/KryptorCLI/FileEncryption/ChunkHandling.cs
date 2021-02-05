@@ -32,7 +32,7 @@ namespace KryptorCLI
 
         public static byte[] PrependKeyCommitmentBlock(byte[] plaintextChunk)
         {
-            return Utilities.ConcatArrays(_keyCommitmentBlock, plaintextChunk);
+            return Utilities.Concat(_keyCommitmentBlock, plaintextChunk);
         }
 
         public static byte[] GetPreviousPoly1305Tag(byte[] ciphertextChunk)

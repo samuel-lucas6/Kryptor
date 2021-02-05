@@ -28,28 +28,28 @@ namespace KryptorCLI
         private const int _preHashedHeaderLength = 1;
         private static byte[] _commentBytes;
 
-        public static void SignFile(string filePath, string comment, bool preHashed, byte[] privateKey)
+        public static void SignFile(string filePath, string comment, bool preHash, byte[] privateKey)
         {
-            byte[] preHashedHeader = BitConverter.GetBytes(preHashed);
-            byte[] fileSignature = ComputeFileSignature(filePath, preHashed, privateKey);
+            byte[] preHashedHeader = BitConverter.GetBytes(preHash);
+            byte[] fileSignature = ComputeFileSignature(filePath, preHash, privateKey);
             byte[] commentBytes = Encoding.UTF8.GetBytes(comment);
             // Sign the entire signature file
-            byte[] signatureFileBytes = Utilities.ConcatArrays(Constants.SignatureMagicBytes, Constants.SignatureVersion, preHashedHeader, fileSignature, commentBytes);
+            byte[] signatureFileBytes = Utilities.Concat(Constants.SignatureMagicBytes, Constants.SignatureVersion, preHashedHeader, fileSignature, commentBytes);
             byte[] globalSignature = ComputeGlobalSignature(signatureFileBytes, privateKey);
             CreateSignatureFile(filePath, preHashedHeader, fileSignature, commentBytes, globalSignature);
         }
 
-        private static byte[] ComputeFileSignature(string filePath, bool preHashed, byte[] privateKey)
+        private static byte[] ComputeFileSignature(string filePath, bool preHash, byte[] privateKey)
         {
-            byte[] fileBytes = GetFileBytes(filePath, preHashed);
+            byte[] fileBytes = GetFileBytes(filePath, preHash);
             return PublicKeyAuth.SignDetached(fileBytes, privateKey);
         }
 
-        private static byte[] GetFileBytes(string filePath, bool preHashed)
+        private static byte[] GetFileBytes(string filePath, bool preHash)
         {
             int oneGibibyte = 1024 * Constants.Mebibyte;
             long fileSize = FileHandling.GetFileLength(filePath);
-            if (fileSize >= oneGibibyte || preHashed)
+            if (fileSize >= oneGibibyte || preHash)
             {
                 using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
                 return Blake2.Hash(fileStream);
@@ -86,7 +86,7 @@ namespace KryptorCLI
             byte[] preHashedHeader = GetPreHashedHeader(signatureFile);
             byte[] fileSignature = GetFileSignature(signatureFile);
             _commentBytes = GetCommentBytes(signatureFile);
-            byte[] signatureFileBytes = Utilities.ConcatArrays(magicBytes, formatVersion, preHashedHeader, fileSignature, _commentBytes);
+            byte[] signatureFileBytes = Utilities.Concat(magicBytes, formatVersion, preHashedHeader, fileSignature, _commentBytes);
             bool validGlobalSignature = VerifyGlobalSignature(signatureFile, signatureFileBytes, publicKey);
             if (!validGlobalSignature) { return false; }
             // Verify the file signature

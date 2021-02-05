@@ -29,7 +29,7 @@ namespace KryptorCLI
 
         public static byte[] KeyEncryptionKey(byte[] sharedSecret, byte[] ephemeralSharedSecret, byte[] salt)
         {
-            byte[] inputKeyingMaterial = Utilities.ConcatArrays(sharedSecret, ephemeralSharedSecret);
+            byte[] inputKeyingMaterial = Utilities.Concat(sharedSecret, ephemeralSharedSecret);
             byte[] keyEncryptionKey = Blake2.KeyDerivation(inputKeyingMaterial, salt, Constants.EncryptionKeyLength);
             Utilities.ZeroArray(ephemeralSharedSecret);
             Utilities.ZeroArray(inputKeyingMaterial);

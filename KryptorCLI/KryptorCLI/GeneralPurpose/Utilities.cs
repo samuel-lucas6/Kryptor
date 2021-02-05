@@ -23,11 +23,13 @@ namespace KryptorCLI
 {
     public static class Utilities
     {
+        private const int _index = 0;
+
         public static void ZeroArray(byte[] byteArray)
         {
             if (byteArray != null)
             {
-                Array.Clear(byteArray, index: 0, byteArray.Length);
+                Array.Clear(byteArray, _index, byteArray.Length);
             }
         }
 
@@ -35,49 +37,45 @@ namespace KryptorCLI
         {
             if (charArray.Length > 0)
             {
-                Array.Clear(charArray, index: 0, charArray.Length);
+                Array.Clear(charArray, _index, charArray.Length);
             }
         }
 
-        public static byte[] ConcatArrays(byte[] a, byte[] b)
+        public static byte[] Concat(byte[] a, byte[] b)
         {
-            const int index = 0;
-            byte[] concat = new byte[a.Length + b.Length];
-            Array.Copy(a, index, concat, index, a.Length);
-            Array.Copy(b, index, concat, a.Length, b.Length);
+            var concat = new byte[a.Length + b.Length];
+            Array.Copy(a, _index, concat, _index, a.Length);
+            Array.Copy(b, _index, concat, a.Length, b.Length);
             return concat;
         }
 
-        public static byte[] ConcatArrays(byte[] a, byte[] b, byte[] c)
+        public static byte[] Concat(byte[] a, byte[] b, byte[] c)
         {
-            const int index = 0;
-            byte[] concat = new byte[a.Length + b.Length + c.Length];
-            Array.Copy(a, index, concat, index, a.Length);
-            Array.Copy(b, index, concat, a.Length, b.Length);
-            Array.Copy(c, index, concat, a.Length + b.Length, c.Length);
+            var concat = new byte[a.Length + b.Length + c.Length];
+            Array.Copy(a, _index, concat, _index, a.Length);
+            Array.Copy(b, _index, concat, a.Length, b.Length);
+            Array.Copy(c, _index, concat, a.Length + b.Length, c.Length);
             return concat;
         }
 
-        public static byte[] ConcatArrays(byte[] a, byte[] b, byte[] c, byte[] d)
+        public static byte[] Concat(byte[] a, byte[] b, byte[] c, byte[] d)
         {
-            const int index = 0;
-            byte[] concat = new byte[a.Length + b.Length + c.Length + d.Length];
-            Array.Copy(a, index, concat, index, a.Length);
-            Array.Copy(b, index, concat, a.Length, b.Length);
-            Array.Copy(c, index, concat, a.Length + b.Length, c.Length);
-            Array.Copy(d, index, concat, a.Length + b.Length + c.Length, d.Length);
+            var concat = new byte[a.Length + b.Length + c.Length + d.Length];
+            Array.Copy(a, _index, concat, _index, a.Length);
+            Array.Copy(b, _index, concat, a.Length, b.Length);
+            Array.Copy(c, _index, concat, a.Length + b.Length, c.Length);
+            Array.Copy(d, _index, concat, a.Length + b.Length + c.Length, d.Length);
             return concat;
         }
 
-        public static byte[] ConcatArrays(byte[] a, byte[] b, byte[] c, byte[] d, byte[] e)
+        public static byte[] Concat(byte[] a, byte[] b, byte[] c, byte[] d, byte[] e)
         {
-            const int index = 0;
-            byte[] concat = new byte[a.Length + b.Length + c.Length + d.Length + e.Length];
-            Array.Copy(a, index, concat, index, a.Length);
-            Array.Copy(b, index, concat, a.Length, b.Length);
-            Array.Copy(c, index, concat, a.Length + b.Length, c.Length);
-            Array.Copy(d, index, concat, a.Length + b.Length + c.Length, d.Length);
-            Array.Copy(e, index, concat, a.Length + b.Length + c.Length + d.Length, e.Length);
+            var concat = new byte[a.Length + b.Length + c.Length + d.Length + e.Length];
+            Array.Copy(a, _index, concat, _index, a.Length);
+            Array.Copy(b, _index, concat, a.Length, b.Length);
+            Array.Copy(c, _index, concat, a.Length + b.Length, c.Length);
+            Array.Copy(d, _index, concat, a.Length + b.Length + c.Length, d.Length);
+            Array.Copy(e, _index, concat, a.Length + b.Length + c.Length + d.Length, e.Length);
             return concat;
         }
 
@@ -87,12 +85,6 @@ namespace KryptorCLI
             byte[] aBytes = Encoding.UTF8.GetBytes(a);
             byte[] bBytes = Encoding.UTF8.GetBytes(b);
             return Sodium.Utilities.Compare(aBytes, bBytes);
-        }
-
-        public static long RoundUp(long numerator, int denominator)
-        {
-            // More efficient than Math.Ceiling() that requires casting to decimal
-            return ((numerator - 1) / denominator) + 1;
         }
     }
 }

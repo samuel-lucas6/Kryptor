@@ -22,9 +22,9 @@ namespace KryptorCLI
 {
     public static class FileSigning
     {
-        private static readonly string _defaultComment = "This file has not been tampered with.";
+        private const string _defaultComment = "This file has not been tampered with.";
 
-        public static void SignEachFile(byte[] privateKey, string comment, bool preHash, string[] filePaths)
+        public static void SignEachFile(string[] filePaths, string comment, bool preHash, byte[] privateKey)
         {
             privateKey = PrivateKey.Decrypt(privateKey);
             if (privateKey == null) { return; }
@@ -45,7 +45,7 @@ namespace KryptorCLI
             Utilities.ZeroArray(privateKey);
         }
        
-        public static void VerifyFile(byte[] publicKey, string signatureFilePath, string filePath)
+        public static void VerifyFile(string signatureFilePath, string filePath, byte[] publicKey)
         {
             try
             {

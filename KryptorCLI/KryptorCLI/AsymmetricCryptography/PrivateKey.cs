@@ -24,19 +24,19 @@ namespace KryptorCLI
 {
     public static class PrivateKey
     {
-        public static byte[] Encrypt(byte[] passwordBytes, byte[] privateKey, byte[] keyAlgorithm)
+        public static byte[] Encrypt(byte[] passwordBytes, byte[] keyAlgorithm, byte[] privateKey)
         {
             byte[] salt = Generate.Salt();
             byte[] key = Argon2.DeriveKey(passwordBytes, salt);
             Utilities.ZeroArray(passwordBytes);
             byte[] nonce = Generate.Nonce();
-            byte[] additionalData = Utilities.ConcatArrays(keyAlgorithm, Constants.PrivateKeyVersion);
+            byte[] additionalData = Utilities.Concat(keyAlgorithm, Constants.PrivateKeyVersion);
             byte[] keyCommitmentBlock = ChunkHandling.GetKeyCommitmentBlock();
-            privateKey = Utilities.ConcatArrays(keyCommitmentBlock, privateKey);
+            privateKey = Utilities.Concat(keyCommitmentBlock, privateKey);
             byte[] encryptedPrivateKey = SecretAeadXChaCha20Poly1305.Encrypt(privateKey, nonce, key, additionalData);
             Utilities.ZeroArray(privateKey);
             Utilities.ZeroArray(key);
-            return Utilities.ConcatArrays(additionalData, salt, nonce, encryptedPrivateKey);
+            return Utilities.Concat(additionalData, salt, nonce, encryptedPrivateKey);
         }
 
         public static byte[] Decrypt(byte[] privateKey)
@@ -60,8 +60,8 @@ namespace KryptorCLI
             byte[] keyVersion = GetKeyVersion(privateKey);
             byte[] salt = GetSalt(privateKey);
             byte[] nonce = GetNonce(privateKey);
-            byte[] additionalData = Utilities.ConcatArrays(keyAlgorithm, keyVersion);
             byte[] encryptedPrivateKey = GetEncryptedPrivateKey(privateKey);
+            byte[] additionalData = Utilities.Concat(keyAlgorithm, keyVersion);
             byte[] key = Argon2.DeriveKey(passwordBytes, salt);
             Utilities.ZeroArray(passwordBytes);
             byte[] decryptedPrivateKey = SecretAeadXChaCha20Poly1305.Decrypt(encryptedPrivateKey, nonce, key, additionalData);

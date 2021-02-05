@@ -29,8 +29,8 @@ namespace KryptorCLI
             char[] password = PasswordPrompt.EnterNewPassword();
             byte[] passwordBytes = Password.Hash(password);
             using var keyPair = PublicKeyBox.GenerateKeyPair();
-            byte[] publicKey = Utilities.ConcatArrays(Constants.Curve25519KeyHeader, keyPair.PublicKey);
-            byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, keyPair.PrivateKey, Constants.Curve25519KeyHeader);
+            byte[] publicKey = Utilities.Concat(Constants.Curve25519KeyHeader, keyPair.PublicKey);
+            byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, Constants.Curve25519KeyHeader, keyPair.PrivateKey);
             return ConvertKeys(publicKey, encryptedPrivateKey);
         }
 
@@ -39,8 +39,8 @@ namespace KryptorCLI
             char[] password = PasswordPrompt.EnterNewPassword();
             byte[] passwordBytes = Password.Hash(password);
             using var keyPair = PublicKeyAuth.GenerateKeyPair();
-            byte[] publicKey = Utilities.ConcatArrays(Constants.Ed25519KeyHeader, keyPair.PublicKey);
-            byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, keyPair.PrivateKey, Constants.Ed25519KeyHeader);
+            byte[] publicKey = Utilities.Concat(Constants.Ed25519KeyHeader, keyPair.PublicKey);
+            byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, Constants.Ed25519KeyHeader, keyPair.PrivateKey);
             return ConvertKeys(publicKey, encryptedPrivateKey);
         }
 
@@ -90,13 +90,13 @@ namespace KryptorCLI
         public static byte[] GetCurve25519PublicKey(byte[] privateKey)
         {
             byte[] publicKey = ScalarMult.Base(privateKey);
-            return Utilities.ConcatArrays(Constants.Curve25519KeyHeader, publicKey);
+            return Utilities.Concat(Constants.Curve25519KeyHeader, publicKey);
         }
 
         public static byte[] GetEd25519PublicKey(byte[] privateKey)
         {
             byte[] publicKey = PublicKeyAuth.ExtractEd25519PublicKeyFromEd25519SecretKey(privateKey);
-            return Utilities.ConcatArrays(Constants.Ed25519KeyHeader, publicKey);
+            return Utilities.Concat(Constants.Ed25519KeyHeader, publicKey);
         }
     }
 }
