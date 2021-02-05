@@ -24,7 +24,7 @@ namespace KryptorCLI
     {
         public static void GenerateKeyfile(string keyfilePath)
         {
-            byte[] keyfileBytes = Generate.Keyfile();
+            byte[] keyfileBytes = Generate.KeyfileBytes();
             File.WriteAllBytes(keyfilePath, keyfileBytes);
             File.SetAttributes(keyfilePath, FileAttributes.ReadOnly);
             Utilities.ZeroArray(keyfileBytes);
@@ -33,12 +33,6 @@ namespace KryptorCLI
         public static byte[] ReadKeyfile(string keyfilePath)
         {
             using var keyfile = new FileStream(keyfilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
-            if (keyfile.Length == Constants.KeyfileLength)
-            {
-                byte[] keyfileBytes = new byte[Constants.KeyfileLength];
-                keyfile.Read(keyfileBytes, offset: 0, keyfileBytes.Length);
-                return keyfileBytes;
-            }
             return Blake2.Hash(keyfile);
         }
     }
