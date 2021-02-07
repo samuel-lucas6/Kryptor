@@ -30,6 +30,7 @@ namespace KryptorCLI
 
         public static void SignFile(string filePath, string comment, bool preHash, byte[] privateKey)
         {
+            if (!preHash) { preHash = IsPreHashingRequired(filePath); }
             byte[] preHashedHeader = BitConverter.GetBytes(preHash);
             byte[] fileSignature = ComputeFileSignature(filePath, preHash, privateKey);
             byte[] commentBytes = Encoding.UTF8.GetBytes(comment);
@@ -37,6 +38,13 @@ namespace KryptorCLI
             byte[] signatureFileBytes = Arrays.Concat(Constants.SignatureMagicBytes, Constants.SignatureVersion, preHashedHeader, fileSignature, commentBytes);
             byte[] globalSignature = ComputeGlobalSignature(signatureFileBytes, privateKey);
             CreateSignatureFile(filePath, preHashedHeader, fileSignature, commentBytes, globalSignature);
+        }
+
+        private static bool IsPreHashingRequired(string filePath)
+        {
+            int oneGibibyte = 1024 * Constants.Mebibyte;
+            long fileSize = FileHandling.GetFileLength(filePath);
+            return fileSize >= oneGibibyte;
         }
 
         private static byte[] ComputeFileSignature(string filePath, bool preHash, byte[] privateKey)
@@ -47,14 +55,9 @@ namespace KryptorCLI
 
         private static byte[] GetFileBytes(string filePath, bool preHash)
         {
-            int oneGibibyte = 1024 * Constants.Mebibyte;
-            long fileSize = FileHandling.GetFileLength(filePath);
-            if (fileSize >= oneGibibyte || preHash)
-            {
-                using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
-                return Blake2.Hash(fileStream);
-            }
-            return File.ReadAllBytes(filePath);
+            if (!preHash) { return File.ReadAllBytes(filePath); }
+            using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
+            return Blake2.Hash(fileStream);
         }
 
         private static byte[] ComputeGlobalSignature(byte[] signatureFileBytes, byte[] privateKey)
