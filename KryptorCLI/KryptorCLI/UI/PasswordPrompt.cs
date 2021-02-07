@@ -55,7 +55,7 @@ namespace KryptorCLI
         {
             Console.WriteLine("Retype password:");
             char[] retypedPassword = GetPassword();
-            if (!Utilities.Compare(password, retypedPassword))
+            if (!Arrays.Compare(password, retypedPassword))
             {
                 DisplayMessage.Error("Passwords do not match.");
                 Environment.Exit(13);

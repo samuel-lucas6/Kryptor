@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sodium;
+using System;
 using System.IO;
 
 /*
@@ -119,13 +120,13 @@ namespace KryptorCLI
 
         private static void ValidateEncryptionKey(byte[] keyAlgorithm)
         {
-            bool validKey = Sodium.Utilities.Compare(keyAlgorithm, Constants.Curve25519KeyHeader);
+            bool validKey = Utilities.Compare(keyAlgorithm, Constants.Curve25519KeyHeader);
             if (!validKey) { throw new ArgumentException("Please specify an asymmetric encryption key."); }
         }
 
         private static void ValidateSigningKey(byte[] keyAlgorithm)
         {
-            bool validKey = Sodium.Utilities.Compare(keyAlgorithm, Constants.Ed25519KeyHeader);
+            bool validKey = Utilities.Compare(keyAlgorithm, Constants.Ed25519KeyHeader);
             if (!validKey) { throw new ArgumentException("Please specify an asymmetric signing key."); }
         }
 
@@ -199,7 +200,7 @@ namespace KryptorCLI
         private static void ValidateKeyVersion(byte[] privateKey)
         {
             byte[] keyVersion = GetKeyVersion(privateKey);
-            bool validKeyVersion = Sodium.Utilities.Compare(keyVersion, Constants.PrivateKeyVersion);
+            bool validKeyVersion = Utilities.Compare(keyVersion, Constants.PrivateKeyVersion);
             if (!validKeyVersion) { throw new ArgumentOutOfRangeException("Unsupported private key version."); }
         }
 

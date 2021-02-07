@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sodium;
+using System;
 using System.Security.Cryptography;
 
 /*
@@ -32,7 +33,7 @@ namespace KryptorCLI
 
         public static byte[] PrependKeyCommitmentBlock(byte[] plaintextChunk)
         {
-            return Utilities.Concat(_keyCommitmentBlock, plaintextChunk);
+            return Arrays.Concat(_keyCommitmentBlock, plaintextChunk);
         }
 
         public static byte[] GetPreviousPoly1305Tag(byte[] ciphertextChunk)
@@ -52,7 +53,7 @@ namespace KryptorCLI
         {
             byte[] keyCommitmentBlock = new byte[Constants.KeyCommitmentBlockLength];
             Array.Copy(plaintextChunk, keyCommitmentBlock, keyCommitmentBlock.Length);
-            return Sodium.Utilities.Compare(keyCommitmentBlock, _keyCommitmentBlock);
+            return Utilities.Compare(keyCommitmentBlock, _keyCommitmentBlock);
         }
 
         public static byte[] RemoveKeyCommitmentBlock(byte[] plaintextChunk)

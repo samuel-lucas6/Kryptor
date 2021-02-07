@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sodium;
+using System;
 using System.IO;
 using System.Text;
 
@@ -61,7 +62,7 @@ namespace KryptorCLI
 
         public static void ValidateFormatVersion(string filePath, byte[] formatVersion, byte[] currentFormatVersion)
         {
-            bool validFormatVersion = Sodium.Utilities.Compare(formatVersion, currentFormatVersion);
+            bool validFormatVersion = Utilities.Compare(formatVersion, currentFormatVersion);
             if (!validFormatVersion) { throw new ArgumentOutOfRangeException(filePath, "Incorrect file format for this version of Kryptor."); }
         }
 

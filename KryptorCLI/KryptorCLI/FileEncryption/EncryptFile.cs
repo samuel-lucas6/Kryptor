@@ -35,7 +35,7 @@ namespace KryptorCLI
                     byte[] nonce = Generate.Nonce();
                     byte[] encryptedHeader = EncryptFileHeader(inputFilePath, dataEncryptionKey, nonce, keyEncryptionKey);
                     FileHeaders.WriteHeaders(outputFile, ephemeralPublicKey, salt, nonce, encryptedHeader);
-                    nonce = Sodium.Utilities.Increment(nonce);
+                    nonce = Utilities.Increment(nonce);
                     byte[] additionalData = ChunkHandling.GetPreviousPoly1305Tag(encryptedHeader);
                     Encrypt(inputFile, outputFile, nonce, dataEncryptionKey, additionalData);
                 }
@@ -44,7 +44,7 @@ namespace KryptorCLI
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
                 FileHandling.DeleteFile(outputFilePath);
-                Utilities.ZeroArray(dataEncryptionKey);
+                Arrays.Zero(dataEncryptionKey);
                 throw;
             }
         }
@@ -55,7 +55,7 @@ namespace KryptorCLI
             long fileLength = FileHandling.GetFileLength(inputFilePath);
             byte[] lastChunkLength = BitConverter.GetBytes(Convert.ToInt32(fileLength % Constants.FileChunkSize));
             byte[] fileNameLength = FileHeaders.GetFileNameLength(inputFilePath);
-            byte[] fileHeader = Utilities.Concat(keyCommitmentBlock, lastChunkLength, fileNameLength, dataEncryptionKey);
+            byte[] fileHeader = Arrays.Concat(keyCommitmentBlock, lastChunkLength, fileNameLength, dataEncryptionKey);
             byte[] additionalData = HeaderEncryption.ComputeAdditionalData(fileLength);
             return HeaderEncryption.Encrypt(fileHeader, nonce, keyEncryptionKey, additionalData);
         }
@@ -68,11 +68,11 @@ namespace KryptorCLI
             {
                 byte[] plaintextChunk = ChunkHandling.PrependKeyCommitmentBlock(plaintext);
                 byte[] ciphertextChunk = SecretAeadXChaCha20Poly1305.Encrypt(plaintextChunk, nonce, dataEncryptionKey, additionalData);
-                nonce = Sodium.Utilities.Increment(nonce);
+                nonce = Utilities.Increment(nonce);
                 additionalData = ChunkHandling.GetPreviousPoly1305Tag(ciphertextChunk);
                 outputFile.Write(ciphertextChunk, offset, ciphertextChunk.Length);
             }
-            Utilities.ZeroArray(dataEncryptionKey);
+            Arrays.Zero(dataEncryptionKey);
         }
 
         private static void Finalize(string inputFilePath, string outputFilePath)

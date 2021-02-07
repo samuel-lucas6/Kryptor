@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sodium;
+using System;
 using System.Text;
 
 /*
@@ -21,11 +22,11 @@ using System.Text;
 
 namespace KryptorCLI
 {
-    public static class Utilities
+    public static class Arrays
     {
         private const int _index = 0;
 
-        public static void ZeroArray(byte[] byteArray)
+        public static void Zero(byte[] byteArray)
         {
             if (byteArray != null)
             {
@@ -33,7 +34,7 @@ namespace KryptorCLI
             }
         }
 
-        public static void ZeroArray(char[] charArray)
+        public static void Zero(char[] charArray)
         {
             if (charArray.Length > 0)
             {
@@ -84,7 +85,7 @@ namespace KryptorCLI
             // Constant time comparison
             byte[] aBytes = Encoding.UTF8.GetBytes(a);
             byte[] bBytes = Encoding.UTF8.GetBytes(b);
-            return Sodium.Utilities.Compare(aBytes, bBytes);
+            return Utilities.Compare(aBytes, bBytes);
         }
     }
 }

@@ -54,7 +54,7 @@ namespace KryptorCLI
                 }
                 DecryptInputFile(inputFilePath, keyEncryptionKey);
             }
-            Utilities.ZeroArray(keyEncryptionKey);
+            Arrays.Zero(keyEncryptionKey);
         }
 
         private static string[] GetFiles(string directoryPath)
@@ -115,7 +115,7 @@ namespace KryptorCLI
                 byte[] salt = FileHeaders.ReadSalt(inputFilePath);
                 byte[] keyEncryptionKey = Generate.KeyEncryptionKey(sharedSecret, ephemeralSharedSecret, salt);
                 DecryptInputFile(inputFilePath, keyEncryptionKey);
-                Utilities.ZeroArray(keyEncryptionKey);
+                Arrays.Zero(keyEncryptionKey);
             }
         }
 
@@ -149,7 +149,7 @@ namespace KryptorCLI
                 byte[] salt = FileHeaders.ReadSalt(inputFilePath);
                 byte[] keyEncryptionKey = Generate.KeyEncryptionKey(ephemeralSharedSecret, salt);
                 DecryptInputFile(inputFilePath, keyEncryptionKey);
-                Utilities.ZeroArray(keyEncryptionKey);
+                Arrays.Zero(keyEncryptionKey);
             }
         }
 

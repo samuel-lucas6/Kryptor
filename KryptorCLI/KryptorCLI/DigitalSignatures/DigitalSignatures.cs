@@ -34,7 +34,7 @@ namespace KryptorCLI
             byte[] fileSignature = ComputeFileSignature(filePath, preHash, privateKey);
             byte[] commentBytes = Encoding.UTF8.GetBytes(comment);
             // Sign the entire signature file
-            byte[] signatureFileBytes = Utilities.Concat(Constants.SignatureMagicBytes, Constants.SignatureVersion, preHashedHeader, fileSignature, commentBytes);
+            byte[] signatureFileBytes = Arrays.Concat(Constants.SignatureMagicBytes, Constants.SignatureVersion, preHashedHeader, fileSignature, commentBytes);
             byte[] globalSignature = ComputeGlobalSignature(signatureFileBytes, privateKey);
             CreateSignatureFile(filePath, preHashedHeader, fileSignature, commentBytes, globalSignature);
         }
@@ -86,7 +86,7 @@ namespace KryptorCLI
             byte[] preHashedHeader = GetPreHashedHeader(signatureFile);
             byte[] fileSignature = GetFileSignature(signatureFile);
             _commentBytes = GetCommentBytes(signatureFile);
-            byte[] signatureFileBytes = Utilities.Concat(magicBytes, formatVersion, preHashedHeader, fileSignature, _commentBytes);
+            byte[] signatureFileBytes = Arrays.Concat(magicBytes, formatVersion, preHashedHeader, fileSignature, _commentBytes);
             bool validGlobalSignature = VerifyGlobalSignature(signatureFile, signatureFileBytes, publicKey);
             if (!validGlobalSignature) { return false; }
             // Verify the file signature

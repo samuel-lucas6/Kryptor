@@ -43,7 +43,7 @@ namespace KryptorCLI
         private static byte[] GetPasswordBytes(char[] password)
         {
             byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
-            Utilities.ZeroArray(password);
+            Arrays.Zero(password);
             return passwordBytes;
         }
 
@@ -65,7 +65,7 @@ namespace KryptorCLI
         private static byte[] CombineKeyfileAndPassword(byte[] passwordBytes, byte[] keyfileBytes)
         {
             passwordBytes = Blake2.KeyedHash(passwordBytes, keyfileBytes);
-            Utilities.ZeroArray(keyfileBytes);
+            Arrays.Zero(keyfileBytes);
             return passwordBytes;
         }
     }

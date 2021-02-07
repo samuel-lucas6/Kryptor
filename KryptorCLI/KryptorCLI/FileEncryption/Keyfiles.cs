@@ -27,7 +27,7 @@ namespace KryptorCLI
             byte[] keyfileBytes = Generate.KeyfileBytes();
             File.WriteAllBytes(keyfilePath, keyfileBytes);
             File.SetAttributes(keyfilePath, FileAttributes.ReadOnly);
-            Utilities.ZeroArray(keyfileBytes);
+            Arrays.Zero(keyfileBytes);
         }
 
         public static byte[] ReadKeyfile(string keyfilePath)

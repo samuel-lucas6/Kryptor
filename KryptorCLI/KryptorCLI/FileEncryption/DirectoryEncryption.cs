@@ -84,7 +84,7 @@ namespace KryptorCLI
                 string outputFilePath = FileEncryption.GetOutputFilePath(inputFilePath);
                 EncryptInputFile(inputFilePath, outputFilePath, randomEphemeralPublicKeyHeader, salt, keyEncryptionKey);
             }
-            Utilities.ZeroArray(keyEncryptionKey);
+            Arrays.Zero(keyEncryptionKey);
         }
 
         private static void EncryptInputFile(string inputFilePath, string outputFilePath, byte[] ephemeralPublicKey, byte[] salt, byte[] keyEncryptionKey)
@@ -131,7 +131,7 @@ namespace KryptorCLI
                 byte[] keyEncryptionKey = Generate.KeyEncryptionKey(sharedSecret, ephemeralSharedSecret, salt);
                 string outputFilePath = FileEncryption.GetOutputFilePath(inputFilePath);
                 EncryptInputFile(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
-                Utilities.ZeroArray(keyEncryptionKey);
+                Arrays.Zero(keyEncryptionKey);
             }
         }
 
@@ -165,7 +165,7 @@ namespace KryptorCLI
                 byte[] keyEncryptionKey = Generate.KeyEncryptionKey(ephemeralSharedSecret, salt);
                 string outputFilePath = FileEncryption.GetOutputFilePath(inputFilePath);
                 EncryptInputFile(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
-                Utilities.ZeroArray(keyEncryptionKey);
+                Arrays.Zero(keyEncryptionKey);
             }
         }
     }

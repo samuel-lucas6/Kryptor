@@ -42,7 +42,7 @@ namespace KryptorCLI
                     DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to create signature.");
                 }
             }
-            Utilities.ZeroArray(privateKey);
+            Arrays.Zero(privateKey);
         }
        
         public static void VerifyFile(string signatureFilePath, string filePath, byte[] publicKey)

@@ -28,15 +28,15 @@ namespace KryptorCLI
         {
             byte[] salt = Generate.Salt();
             byte[] key = Argon2.DeriveKey(passwordBytes, salt);
-            Utilities.ZeroArray(passwordBytes);
+            Arrays.Zero(passwordBytes);
             byte[] nonce = Generate.Nonce();
-            byte[] additionalData = Utilities.Concat(keyAlgorithm, Constants.PrivateKeyVersion);
+            byte[] additionalData = Arrays.Concat(keyAlgorithm, Constants.PrivateKeyVersion);
             byte[] keyCommitmentBlock = ChunkHandling.GetKeyCommitmentBlock();
-            privateKey = Utilities.Concat(keyCommitmentBlock, privateKey);
+            privateKey = Arrays.Concat(keyCommitmentBlock, privateKey);
             byte[] encryptedPrivateKey = SecretAeadXChaCha20Poly1305.Encrypt(privateKey, nonce, key, additionalData);
-            Utilities.ZeroArray(privateKey);
-            Utilities.ZeroArray(key);
-            return Utilities.Concat(additionalData, salt, nonce, encryptedPrivateKey);
+            Arrays.Zero(privateKey);
+            Arrays.Zero(key);
+            return Arrays.Concat(additionalData, salt, nonce, encryptedPrivateKey);
         }
 
         public static byte[] Decrypt(byte[] privateKey)
@@ -61,11 +61,11 @@ namespace KryptorCLI
             byte[] salt = GetSalt(privateKey);
             byte[] nonce = GetNonce(privateKey);
             byte[] encryptedPrivateKey = GetEncryptedPrivateKey(privateKey);
-            byte[] additionalData = Utilities.Concat(keyAlgorithm, keyVersion);
+            byte[] additionalData = Arrays.Concat(keyAlgorithm, keyVersion);
             byte[] key = Argon2.DeriveKey(passwordBytes, salt);
-            Utilities.ZeroArray(passwordBytes);
+            Arrays.Zero(passwordBytes);
             byte[] decryptedPrivateKey = SecretAeadXChaCha20Poly1305.Decrypt(encryptedPrivateKey, nonce, key, additionalData);
-            Utilities.ZeroArray(key);
+            Arrays.Zero(key);
             ChunkHandling.ValidateKeyCommitmentBlock(decryptedPrivateKey);
             return ChunkHandling.RemoveKeyCommitmentBlock(decryptedPrivateKey);
         }

@@ -224,7 +224,7 @@ namespace KryptorCLI
                 Constants.EncryptionKeyLength => AsymmetricKeys.GetCurve25519PublicKey(privateKey),
                 _ => AsymmetricKeys.GetEd25519PublicKey(privateKey),
             };
-            Utilities.ZeroArray(privateKey);
+            Arrays.Zero(privateKey);
             Console.WriteLine($"Public key: {Convert.ToBase64String(publicKey)}");
         }
 

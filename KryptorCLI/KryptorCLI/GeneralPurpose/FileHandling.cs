@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sodium;
+using System;
 using System.IO;
 using System.Text;
 
@@ -59,7 +60,7 @@ namespace KryptorCLI
             try
             {
                 byte[] magicBytes = FileHeaders.ReadMagicBytes(filePath);
-                return Sodium.Utilities.Compare(magicBytes, Constants.KryptorMagicBytes);
+                return Utilities.Compare(magicBytes, Constants.KryptorMagicBytes);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
@@ -77,7 +78,7 @@ namespace KryptorCLI
             try
             {
                 byte[] magicBytes = ReadFileHeader(filePath, offset: 0, Constants.SignatureMagicBytes.Length);
-                return Sodium.Utilities.Compare(magicBytes, Constants.SignatureMagicBytes);
+                return Utilities.Compare(magicBytes, Constants.SignatureMagicBytes);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {

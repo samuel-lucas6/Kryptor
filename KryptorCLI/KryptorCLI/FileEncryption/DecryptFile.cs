@@ -38,11 +38,11 @@ namespace KryptorCLI
                 int lastChunkLength = FileHeaders.GetLastChunkLength(header);
                 int fileNameLength = FileHeaders.GetFileNameLength(header);
                 dataEncryptionKey = FileHeaders.GetDataEncryptionKey(header);
-                Utilities.ZeroArray(header);
+                Arrays.Zero(header);
                 using (var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
                 using (var outputFile = new FileStream(outputFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
                 {
-                    nonce = Sodium.Utilities.Increment(nonce);
+                    nonce = Utilities.Increment(nonce);
                     byte[] additionalData = ChunkHandling.GetPreviousPoly1305Tag(encryptedHeader);
                     Decrypt(inputFile, outputFile, nonce, dataEncryptionKey, additionalData, lastChunkLength);
                 }
@@ -50,7 +50,7 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
-                Utilities.ZeroArray(dataEncryptionKey);
+                Arrays.Zero(dataEncryptionKey);
                 throw;
             }
         }
@@ -71,13 +71,13 @@ namespace KryptorCLI
             {
                 byte[] plaintextChunk = SecretAeadXChaCha20Poly1305.Decrypt(ciphertextChunk, nonce, dataEncryptionKey, additionalData);
                 ChunkHandling.ValidateKeyCommitmentBlock(plaintextChunk);
-                nonce = Sodium.Utilities.Increment(nonce);
+                nonce = Utilities.Increment(nonce);
                 additionalData = ChunkHandling.GetPreviousPoly1305Tag(ciphertextChunk);
                 plaintextChunk = ChunkHandling.RemoveKeyCommitmentBlock(plaintextChunk);
                 outputFile.Write(plaintextChunk, offset, plaintextChunk.Length);
             }
             outputFile.SetLength((outputFile.Length - Constants.FileChunkSize) + lastChunkLength);
-            Utilities.ZeroArray(dataEncryptionKey);
+            Arrays.Zero(dataEncryptionKey);
         }
 
         private static void Finalize(string inputFilePath, string outputFilePath, int fileNameLength)
