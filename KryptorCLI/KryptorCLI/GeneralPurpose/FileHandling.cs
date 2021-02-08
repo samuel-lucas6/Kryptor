@@ -39,9 +39,16 @@ namespace KryptorCLI
             return header;
         }
 
+        public static byte[] ReadFileHeader(FileStream fileStream, int length)
+        {
+            byte[] header = new byte[length];
+            fileStream.Read(header, offset: 0, header.Length);
+            return header;
+        }
+
         public static bool IsDirectory(string filePath)
         {
-            FileAttributes fileAttributes = File.GetAttributes(filePath);
+            var fileAttributes = File.GetAttributes(filePath);
             return fileAttributes.HasFlag(FileAttributes.Directory);
         }
 

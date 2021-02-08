@@ -49,14 +49,13 @@ namespace KryptorCLI
         {
             try
             {
-                bool validSignature = DigitalSignatures.VerifySignature(signatureFilePath, filePath, publicKey);
+                bool validSignature = DigitalSignatures.VerifySignature(signatureFilePath, filePath, publicKey, out string comment);
                 if (!validSignature)
                 {
                     DisplayMessage.FilePathMessage(filePath, "Bad signature.");
                     return;
                 }
                 DisplayMessage.FilePathMessage(filePath, "Good signature.");
-                string comment = DigitalSignatures.GetComment();
                 DisplayMessage.Message($"Authenticated comment: {comment}");
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
