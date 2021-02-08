@@ -126,7 +126,7 @@ namespace KryptorCLI
                     continue;
                 }
                 // Derive a unique KEK per file
-                (byte[] ephemeralSharedSecret, byte[] ephemeralPublicKey) = KeyExchange.GetEphemeralSharedSecret(recipientPublicKey);
+                byte[] ephemeralSharedSecret = KeyExchange.GetEphemeralSharedSecret(recipientPublicKey, out byte[] ephemeralPublicKey);
                 byte[] salt = Generate.Salt();
                 byte[] keyEncryptionKey = Generate.KeyEncryptionKey(sharedSecret, ephemeralSharedSecret, salt);
                 string outputFilePath = FileEncryption.GetOutputFilePath(inputFilePath);
@@ -160,7 +160,7 @@ namespace KryptorCLI
                     continue;
                 }
                 // Derive a unique KEK per file
-                (byte[] ephemeralSharedSecret, byte[] ephemeralPublicKey) = KeyExchange.GetPrivateKeySharedSecret(privateKey);
+                byte[] ephemeralSharedSecret = KeyExchange.GetPrivateKeySharedSecret(privateKey, out byte[] ephemeralPublicKey);
                 byte[] salt = Generate.Salt();
                 byte[] keyEncryptionKey = Generate.KeyEncryptionKey(ephemeralSharedSecret, salt);
                 string outputFilePath = FileEncryption.GetOutputFilePath(inputFilePath);

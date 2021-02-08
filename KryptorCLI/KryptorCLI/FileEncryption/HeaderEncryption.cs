@@ -26,14 +26,14 @@ namespace KryptorCLI
     {
         public static byte[] ComputeAdditionalData(long fileLength)
         {
-            long chunkCount = (long)Math.Ceiling((double)fileLength / (double) Constants.FileChunkSize);
+            long chunkCount = (long)Math.Ceiling((double)fileLength / Constants.FileChunkSize);
             byte[] ciphertextLength = BitConverter.GetBytes(chunkCount * Constants.TotalChunkLength);
             return Arrays.Concat(Constants.KryptorMagicBytes, Constants.EncryptionVersion, ciphertextLength);
         }
 
-        public static byte[] Encrypt(byte[] header, byte[] nonce, byte[] keyEncryptionKey, byte[] additionalData)
+        public static byte[] Encrypt(byte[] fileHeader, byte[] nonce, byte[] keyEncryptionKey, byte[] additionalData)
         {
-            return SecretAeadXChaCha20Poly1305.Encrypt(header, nonce, keyEncryptionKey, additionalData);
+            return SecretAeadXChaCha20Poly1305.Encrypt(fileHeader, nonce, keyEncryptionKey, additionalData);
         }
 
         public static byte[] GetAdditionalData(string inputFilePath)
@@ -47,11 +47,11 @@ namespace KryptorCLI
             return Arrays.Concat(magicBytes, formatVersion, ciphertextLength);
         }
 
-        public static byte[] Decrypt(byte[] encryptedHeader, byte[] nonce, byte[] keyEncryptionKey, byte[] additionalData)
+        public static byte[] Decrypt(byte[] encryptedFileHeader, byte[] nonce, byte[] keyEncryptionKey, byte[] additionalData)
         {
             try
             {
-                return SecretAeadXChaCha20Poly1305.Decrypt(encryptedHeader, nonce, keyEncryptionKey, additionalData);
+                return SecretAeadXChaCha20Poly1305.Decrypt(encryptedFileHeader, nonce, keyEncryptionKey, additionalData);
             }
             catch (CryptographicException)
             {

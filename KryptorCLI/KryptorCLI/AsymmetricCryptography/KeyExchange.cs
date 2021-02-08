@@ -27,18 +27,20 @@ namespace KryptorCLI
             return ScalarMult.Mult(privateKey, publicKey);
         }
 
-        public static (byte[] ephemeralSharedSecret, byte[] ephemeralPublicKey) GetEphemeralSharedSecret(byte[] publicKey)
+        public static byte[] GetEphemeralSharedSecret(byte[] publicKey, out byte[] ephemeralPublicKey)
         {
             using var ephemeralKeyPair = PublicKeyBox.GenerateKeyPair();
             byte[] ephemeralSharedSecret = ScalarMult.Mult(ephemeralKeyPair.PrivateKey, publicKey);
-            return (ephemeralSharedSecret, ephemeralKeyPair.PublicKey);
+            ephemeralPublicKey = ephemeralKeyPair.PublicKey;
+            return ephemeralSharedSecret;
         }
 
-        public static (byte[] ephemeralSharedSecret, byte[] ephemeralPublicKey) GetPrivateKeySharedSecret(byte[] privateKey)
+        public static byte[] GetPrivateKeySharedSecret(byte[] privateKey, out byte[] ephemeralPublicKey)
         {
             using var ephemeralKeyPair = PublicKeyBox.GenerateKeyPair();
             byte[] ephemeralSharedSecret = ScalarMult.Mult(privateKey, ephemeralKeyPair.PublicKey);
-            return (ephemeralSharedSecret, ephemeralKeyPair.PublicKey);
+            ephemeralPublicKey = ephemeralKeyPair.PublicKey;
+            return ephemeralSharedSecret;
         }
     }
 }

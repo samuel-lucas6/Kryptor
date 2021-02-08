@@ -26,19 +26,19 @@ namespace KryptorCLI
     {
         private const int _index = 0;
 
-        public static void Zero(byte[] byteArray)
+        public static void Zero(byte[] array)
         {
-            if (byteArray != null)
+            if (array != null)
             {
-                Array.Clear(byteArray, _index, byteArray.Length);
+                Array.Clear(array, _index, array.Length);
             }
         }
 
-        public static void Zero(char[] charArray)
+        public static void Zero(char[] array)
         {
-            if (charArray.Length > 0)
+            if (array.Length > 0)
             {
-                Array.Clear(charArray, _index, charArray.Length);
+                Array.Clear(array, _index, array.Length);
             }
         }
 
