@@ -138,22 +138,22 @@ namespace KryptorCLI
         {
             bool validUserInput = FileEncryptionValidation.FileEncryptionWithPublicKey(recipientPrivateKeyPath, senderPublicKeyPath, filePaths);
             if (!validUserInput) { return; }
-            byte[] senderPrivateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(recipientPrivateKeyPath);
-            if (senderPrivateKey == null) { return; }
-            byte[] recipientPublicKey = AsymmetricKeyValidation.EncryptionPublicKeyFile(senderPublicKeyPath);
-            if (recipientPublicKey == null) { return; }
-            FileDecryption.DecryptEachFileWithPrivateKey(filePaths, senderPrivateKey, recipientPublicKey);
+            byte[] recipientPrivateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(recipientPrivateKeyPath);
+            if (recipientPrivateKey == null) { return; }
+            byte[] senderPublicKey = AsymmetricKeyValidation.EncryptionPublicKeyFile(senderPublicKeyPath);
+            if (senderPublicKey == null) { return; }
+            FileDecryption.DecryptEachFileWithPublicKey(filePaths, recipientPrivateKey, senderPublicKey);
         }
 
         private static void FileDecryptionWithPublicKey(string recipientPrivateKeyPath, char[] senderPublicKeyString, string[] filePaths)
         {
             bool validUserInput = FileEncryptionValidation.FileEncryptionWithPublicKey(recipientPrivateKeyPath, senderPublicKeyString, filePaths);
             if (!validUserInput) { return; }
-            byte[] senderPrivateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(recipientPrivateKeyPath);
-            if (senderPrivateKey == null) { return; }
-            byte[] recipientPublicKey = AsymmetricKeyValidation.EncryptionPublicKeyString(senderPublicKeyString);
-            if (recipientPublicKey == null) { return; }
-            FileDecryption.DecryptEachFileWithPrivateKey(filePaths, senderPrivateKey, recipientPublicKey);
+            byte[] recipientPrivateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(recipientPrivateKeyPath);
+            if (recipientPrivateKey == null) { return; }
+            byte[] senderPublicKey = AsymmetricKeyValidation.EncryptionPublicKeyString(senderPublicKeyString);
+            if (senderPublicKey == null) { return; }
+            FileDecryption.DecryptEachFileWithPublicKey(filePaths, recipientPrivateKey, senderPublicKey);
         }
 
         private static void FileDecryptionWithPrivateKey(string privateKeyPath, string[] filePaths)

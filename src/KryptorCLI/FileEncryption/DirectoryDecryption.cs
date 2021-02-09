@@ -30,7 +30,7 @@ namespace KryptorCLI
                 string[] filePaths = GetFiles(directoryPath);
                 string saltFilePath = Path.Combine(directoryPath, Constants.SaltFile);
                 byte[] salt = File.ReadAllBytes(saltFilePath);
-                if (salt.Length != Constants.SaltLength) { throw new ArgumentException("Invalid salt length.", directoryPath); }
+                if (salt.Length != Constants.SaltLength) { throw new ArgumentException("Invalid salt length."); }
                 byte[] keyEncryptionKey = Argon2.DeriveKey(passwordBytes, salt);
                 DecryptEachFileWithPassword(filePaths, keyEncryptionKey);
                 Finalize(directoryPath, saltFilePath);
@@ -38,6 +38,11 @@ namespace KryptorCLI
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.Error);
+                if (ex is ArgumentException)
+                {
+                    DisplayMessage.FilePathMessage(directoryPath, ex.Message);
+                    return;
+                }
                 DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to decrypt the directory.");
             }
         }
@@ -52,7 +57,15 @@ namespace KryptorCLI
                     --Globals.TotalCount;
                     continue;
                 }
-                DecryptInputFile(inputFilePath, keyEncryptionKey);
+                try
+                {
+                    using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
+                    DecryptInputFile(inputFile, keyEncryptionKey);
+                }
+                catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
+                {
+                    FileException(inputFilePath, ex);
+                }
             }
             Arrays.Zero(keyEncryptionKey);
         }
@@ -65,33 +78,20 @@ namespace KryptorCLI
             return filePaths;
         }
 
-        private static void DecryptInputFile(string inputFilePath, byte[] keyEncryptionKey)
+        private static void DecryptInputFile(FileStream inputFile, byte[] keyEncryptionKey)
         {
-            try
-            {
-                string outputFilePath = FileDecryption.GetOutputFilePath(inputFilePath);
-                using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
-                DecryptFile.Initialize(inputFile, outputFilePath, keyEncryptionKey);
-                FileDecryption.DecryptionSuccessful(inputFilePath, outputFilePath);
-            }
-            catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
-            {
-                Logging.LogException(ex.ToString(), Logging.Severity.Error);
-                if (ex is ArgumentException)
-                {
-                    DisplayMessage.FilePathMessage(inputFilePath, ex.Message);
-                    return;
-                }
-                DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to decrypt the file.");
-            }
+            string inputFilePath = inputFile.Name;
+            string outputFilePath = FileDecryption.GetOutputFilePath(inputFilePath);
+            DecryptFile.Initialize(inputFile, outputFilePath, keyEncryptionKey);
+            FileDecryption.DecryptionSuccessful(inputFilePath, outputFilePath);
         }
 
-        public static void UsingPrivateKey(string directoryPath, byte[] sharedSecret, byte[] recipientPrivateKey)
+        public static void UsingPublicKey(string directoryPath, byte[] sharedSecret, byte[] recipientPrivateKey)
         {
             try
             {
                 string[] filePaths = GetFiles(directoryPath);
-                DecryptEachFileWithPrivateKey(filePaths, sharedSecret, recipientPrivateKey);
+                DecryptEachFileWithPublicKey(filePaths, sharedSecret, recipientPrivateKey);
                 Finalize(directoryPath);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
@@ -101,7 +101,7 @@ namespace KryptorCLI
             }
         }
 
-        private static void DecryptEachFileWithPrivateKey(string[] filePaths, byte[] sharedSecret, byte[] recipientPrivateKey)
+        private static void DecryptEachFileWithPublicKey(string[] filePaths, byte[] sharedSecret, byte[] recipientPrivateKey)
         {
             foreach (string inputFilePath in filePaths)
             {
@@ -111,13 +111,20 @@ namespace KryptorCLI
                     --Globals.TotalCount;
                     continue;
                 }
-                using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
-                byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
-                byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecret(recipientPrivateKey, ephemeralPublicKey);
-                byte[] salt = FileHeaders.ReadSalt(inputFile);
-                byte[] keyEncryptionKey = Generate.KeyEncryptionKey(sharedSecret, ephemeralSharedSecret, salt);
-                DecryptInputFile(inputFilePath, keyEncryptionKey);
-                Arrays.Zero(keyEncryptionKey);
+                try
+                {
+                    using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
+                    byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
+                    byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecret(recipientPrivateKey, ephemeralPublicKey);
+                    byte[] salt = FileHeaders.ReadSalt(inputFile);
+                    byte[] keyEncryptionKey = Generate.KeyEncryptionKey(sharedSecret, ephemeralSharedSecret, salt);
+                    DecryptInputFile(inputFile, keyEncryptionKey);
+                    Arrays.Zero(keyEncryptionKey);
+                }
+                catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
+                {
+                    FileException(inputFilePath, ex);
+                }
             }
         }
 
@@ -146,13 +153,20 @@ namespace KryptorCLI
                     --Globals.TotalCount;
                     continue;
                 }
-                using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
-                byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
-                byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecret(privateKey, ephemeralPublicKey);
-                byte[] salt = FileHeaders.ReadSalt(inputFile);
-                byte[] keyEncryptionKey = Generate.KeyEncryptionKey(ephemeralSharedSecret, salt);
-                DecryptInputFile(inputFilePath, keyEncryptionKey);
-                Arrays.Zero(keyEncryptionKey);
+                try
+                {
+                    using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
+                    byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
+                    byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecret(privateKey, ephemeralPublicKey);
+                    byte[] salt = FileHeaders.ReadSalt(inputFile);
+                    byte[] keyEncryptionKey = Generate.KeyEncryptionKey(ephemeralSharedSecret, salt);
+                    DecryptInputFile(inputFile, keyEncryptionKey);
+                    Arrays.Zero(keyEncryptionKey);
+                }
+                catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
+                {
+                    FileException(inputFilePath, ex);
+                }
             }
         }
 
@@ -179,6 +193,17 @@ namespace KryptorCLI
                 Logging.LogException(ex.ToString(), Logging.Severity.Error);
                 DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to restore the directory names.");
             }
+        }
+
+        private static void FileException(string inputFilePath, Exception ex)
+        {
+            Logging.LogException(ex.ToString(), Logging.Severity.Error);
+            if (ex is ArgumentException)
+            {
+                DisplayMessage.FilePathMessage(inputFilePath, ex.Message);
+                return;
+            }
+            DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to decrypt the file.");
         }
     }
 }
