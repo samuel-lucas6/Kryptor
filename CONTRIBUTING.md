@@ -7,7 +7,7 @@ Thank you for your interest in Kryptor. This document outlines the things you ne
 - If you want to implement a feature request and there isn't an existing issue, please open a new issue to discuss the feature request.
 - Familiarise yourself with my coding style. Please try to stick to a similar format.
 - Familiarise yourself with the [C# Naming Conventions](https://www.c-sharpcorner.com/UploadFile/8a67c0/C-Sharp-coding-standards-and-naming-conventions/) and [C# Coding Conventions](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/inside-a-program/coding-conventions). Please follow these conventions.
-- Remember that good naming typically makes commenting redundant. Write comments when necessary but don't overdo it.
+- Remember that good naming typically makes comments redundant. Only write comments when necessary - don't overdo it.
 
 ## Before Your Pull Request
 1. Please test your code. Make sure that any code that has been touched has been tested.
