@@ -54,40 +54,45 @@ namespace KryptorCLI
             return FileHandling.ReadFileHeader(inputFilePath, offset: 0, Constants.KryptorMagicBytes.Length);
         }
 
-        public static byte[] ReadFileFormatVersion(string inputFilePath)
+        public static byte[] ReadMagicBytes(FileStream inputFile)
+        {
+            return FileHandling.ReadFileHeader(inputFile, offset: 0, Constants.KryptorMagicBytes.Length);
+        }
+
+        public static byte[] ReadFileFormatVersion(FileStream inputFile)
         {
             int offset = Constants.KryptorMagicBytes.Length;
-            return FileHandling.ReadFileHeader(inputFilePath, offset, Constants.EncryptionVersion.Length);
+            return FileHandling.ReadFileHeader(inputFile, offset, Constants.EncryptionVersion.Length);
         }
 
-        public static void ValidateFormatVersion(string filePath, byte[] formatVersion, byte[] currentFormatVersion)
+        public static void ValidateFormatVersion(byte[] formatVersion, byte[] currentFormatVersion)
         {
             bool validFormatVersion = Utilities.Compare(formatVersion, currentFormatVersion);
-            if (!validFormatVersion) { throw new ArgumentOutOfRangeException(filePath, "Incorrect file format for this version of Kryptor."); }
+            if (!validFormatVersion) { throw new ArgumentException("Incorrect file format for this version of Kryptor."); }
         }
 
-        public static byte[] ReadEphemeralPublicKey(string inputFilePath)
+        public static byte[] ReadEphemeralPublicKey(FileStream inputFile)
         {
             int offset = Constants.KryptorMagicBytes.Length + Constants.EncryptionVersion.Length;
-            return FileHandling.ReadFileHeader(inputFilePath, offset, Constants.EphemeralPublicKeyLength);
+            return FileHandling.ReadFileHeader(inputFile, offset, Constants.EphemeralPublicKeyLength);
         }
 
-        public static byte[] ReadSalt(string inputFilePath)
+        public static byte[] ReadSalt(FileStream inputFile)
         {
             int offset = Constants.KryptorMagicBytes.Length + Constants.EncryptionVersion.Length + Constants.EphemeralPublicKeyLength;
-            return FileHandling.ReadFileHeader(inputFilePath, offset, Constants.SaltLength);
+            return FileHandling.ReadFileHeader(inputFile, offset, Constants.SaltLength);
         }
 
-        public static byte[] ReadNonce(string inputFilePath)
+        public static byte[] ReadNonce(FileStream inputFile)
         {
             int offset = Constants.KryptorMagicBytes.Length + Constants.EncryptionVersion.Length + Constants.EphemeralPublicKeyLength + Constants.SaltLength;
-            return FileHandling.ReadFileHeader(inputFilePath, offset, Constants.XChaChaNonceLength);
+            return FileHandling.ReadFileHeader(inputFile, offset, Constants.XChaChaNonceLength);
         }
 
-        public static byte[] ReadEncryptedHeader(string inputFilePath)
+        public static byte[] ReadEncryptedHeader(FileStream inputFile)
         {
             int offset = Constants.KryptorMagicBytes.Length + Constants.EncryptionVersion.Length + Constants.EphemeralPublicKeyLength + Constants.SaltLength + Constants.XChaChaNonceLength;
-            return FileHandling.ReadFileHeader(inputFilePath, offset, Constants.EncryptedHeaderLength);
+            return FileHandling.ReadFileHeader(inputFile, offset, Constants.EncryptedHeaderLength);
         }
 
         public static int GetLastChunkLength(byte[] header)

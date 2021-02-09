@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Security.Cryptography;
 using Sodium;
 
@@ -36,14 +37,13 @@ namespace KryptorCLI
             return SecretAeadXChaCha20Poly1305.Encrypt(fileHeader, nonce, keyEncryptionKey, additionalData);
         }
 
-        public static byte[] GetAdditionalData(string inputFilePath)
+        public static byte[] GetAdditionalData(FileStream inputFile)
         {
-            byte[] magicBytes = FileHeaders.ReadMagicBytes(inputFilePath);
-            byte[] formatVersion = FileHeaders.ReadFileFormatVersion(inputFilePath);
-            FileHeaders.ValidateFormatVersion(inputFilePath, formatVersion, Constants.EncryptionVersion);
-            long fileLength = FileHandling.GetFileLength(inputFilePath);
+            byte[] magicBytes = FileHeaders.ReadMagicBytes(inputFile);
+            byte[] formatVersion = FileHeaders.ReadFileFormatVersion(inputFile);
+            FileHeaders.ValidateFormatVersion(formatVersion, Constants.EncryptionVersion);
             int headersLength = FileHeaders.GetHeadersLength();
-            byte[] ciphertextLength = BitConverter.GetBytes(fileLength - headersLength);
+            byte[] ciphertextLength = BitConverter.GetBytes(inputFile.Length - headersLength);
             return Arrays.Concat(magicBytes, formatVersion, ciphertextLength);
         }
 

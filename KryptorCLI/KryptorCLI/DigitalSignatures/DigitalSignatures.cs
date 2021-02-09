@@ -78,7 +78,7 @@ namespace KryptorCLI
             using var signatureFile = new FileStream(signatureFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
             byte[] magicBytes = GetMagicBytes(signatureFile);
             byte[] formatVersion = GetFormatVersion(signatureFile);
-            FileHeaders.ValidateFormatVersion(signatureFilePath, formatVersion, Constants.SignatureVersion);
+            FileHeaders.ValidateFormatVersion(formatVersion, Constants.SignatureVersion);
             byte[] preHashed = GetPreHashedHeader(signatureFile);
             byte[] fileSignature = GetFileSignature(signatureFile);
             byte[] commentBytes = GetCommentBytes(signatureFile);

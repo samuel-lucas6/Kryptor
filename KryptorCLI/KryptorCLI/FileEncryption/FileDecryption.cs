@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 /*
     Kryptor: A simple, modern, and secure encryption tool.
@@ -49,17 +50,18 @@ namespace KryptorCLI
                     DirectoryDecryption.UsingPassword(inputFilePath, passwordBytes);
                     return;
                 }
-                byte[] salt = FileHeaders.ReadSalt(inputFilePath);
+                using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
+                byte[] salt = FileHeaders.ReadSalt(inputFile);
                 byte[] keyEncryptionKey = Argon2.DeriveKey(passwordBytes, salt);
                 string outputFilePath = GetOutputFilePath(inputFilePath);
-                DecryptFile.Initialize(inputFilePath, outputFilePath, keyEncryptionKey);
+                DecryptFile.Initialize(inputFile, outputFilePath, keyEncryptionKey);
                 Arrays.Zero(keyEncryptionKey);
                 DecryptionSuccessful(inputFilePath, outputFilePath);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.Error);
-                if (ex is ArgumentException || ex is ArgumentOutOfRangeException)
+                if (ex is ArgumentException)
                 {
                     DisplayMessage.FilePathMessage(inputFilePath, ex.Message);
                     return;
@@ -99,19 +101,20 @@ namespace KryptorCLI
                     DirectoryDecryption.UsingPrivateKey(inputFilePath, sharedSecret, recipientPrivateKey);
                     return;
                 }
-                byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFilePath);
+                using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
+                byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
                 byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecret(recipientPrivateKey, ephemeralPublicKey);
-                byte[] salt = FileHeaders.ReadSalt(inputFilePath);
+                byte[] salt = FileHeaders.ReadSalt(inputFile);
                 byte[] keyEncryptionKey = Generate.KeyEncryptionKey(sharedSecret, ephemeralSharedSecret, salt);
                 string outputFilePath = GetOutputFilePath(inputFilePath);
-                DecryptFile.Initialize(inputFilePath, outputFilePath, keyEncryptionKey);
+                DecryptFile.Initialize(inputFile, outputFilePath, keyEncryptionKey);
                 Arrays.Zero(keyEncryptionKey);
                 DecryptionSuccessful(inputFilePath, outputFilePath);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.Error);
-                if (ex is ArgumentException || ex is ArgumentOutOfRangeException)
+                if (ex is ArgumentException)
                 {
                     DisplayMessage.FilePathMessage(inputFilePath, ex.Message);
                     return;
@@ -149,19 +152,20 @@ namespace KryptorCLI
                     DirectoryDecryption.UsingPrivateKey(inputFilePath, privateKey);
                     return;
                 }
-                byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFilePath);
+                using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
+                byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
                 byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecret(privateKey, ephemeralPublicKey);
-                byte[] salt = FileHeaders.ReadSalt(inputFilePath);
+                byte[] salt = FileHeaders.ReadSalt(inputFile);
                 byte[] keyEncryptionKey = Generate.KeyEncryptionKey(ephemeralSharedSecret, salt);
                 string outputFilePath = GetOutputFilePath(inputFilePath);
-                DecryptFile.Initialize(inputFilePath, outputFilePath, keyEncryptionKey);
+                DecryptFile.Initialize(inputFile, outputFilePath, keyEncryptionKey);
                 Arrays.Zero(keyEncryptionKey);
                 DecryptionSuccessful(inputFilePath, outputFilePath);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.Error);
-                if (ex is ArgumentException || ex is ArgumentOutOfRangeException)
+                if (ex is ArgumentException)
                 {
                     DisplayMessage.FilePathMessage(inputFilePath, ex.Message);
                     return;

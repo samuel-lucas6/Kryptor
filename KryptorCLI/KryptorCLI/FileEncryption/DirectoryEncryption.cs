@@ -28,7 +28,7 @@ namespace KryptorCLI
             try
             {
                 string[] filePaths = GetFiles(ref directoryPath);
-                // Generate one salt for all files in directory
+                // Generate one salt for the entire directory
                 byte[] salt = Generate.Salt();
                 CreateSaltFile(directoryPath, salt);
                 // Perform password hashing once
@@ -79,10 +79,10 @@ namespace KryptorCLI
                     --Globals.TotalCount;
                     continue;
                 }
-                // Fill the ephemeral public key header with random bytes (since not in use)
-                byte[] randomEphemeralPublicKeyHeader = Generate.EphemeralPublicKeyHeader();
+                // Fill unused header with random public key
+                byte[] ephemeralPublicKey = Generate.EphemeralPublicKeyHeader();
                 string outputFilePath = FileEncryption.GetOutputFilePath(inputFilePath);
-                EncryptInputFile(inputFilePath, outputFilePath, randomEphemeralPublicKeyHeader, salt, keyEncryptionKey);
+                EncryptInputFile(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
             }
             Arrays.Zero(keyEncryptionKey);
         }

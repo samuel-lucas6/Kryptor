@@ -61,9 +61,9 @@ namespace KryptorCLI
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.Error);
-                if (ex is ArgumentOutOfRangeException)
+                if (ex is ArgumentException)
                 {
-                    DisplayMessage.Exception(ex.GetType().Name, ex.Message);
+                    DisplayMessage.FilePathMessage(signatureFilePath, ex.Message);
                     return;
                 }
                 DisplayMessage.Exception(ex.GetType().Name, "Unable to verify signature.");
