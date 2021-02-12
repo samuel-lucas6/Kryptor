@@ -1,5 +1,6 @@
 ﻿using Sodium;
 using System;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 /*
@@ -26,6 +27,7 @@ namespace KryptorCLI
     {
         private const int _index = 0;
 
+        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
         public static void Zero(byte[] array)
         {
             if (array != null)
@@ -34,6 +36,7 @@ namespace KryptorCLI
             }
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
         public static void Zero(char[] array)
         {
             if (array.Length > 0)
