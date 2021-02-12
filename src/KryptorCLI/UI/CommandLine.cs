@@ -128,7 +128,7 @@ namespace KryptorCLI
 
         private static void FileDecryptionWithPassword(char[] password, string keyfilePath, string[] filePaths)
         {
-            bool validUserInput = FileEncryptionValidation.FileEncryptionWithPassword(password, keyfilePath, filePaths);
+            bool validUserInput = FileEncryptionValidation.FileDecryptionWithPassword(password, keyfilePath, filePaths);
             if (!validUserInput) { return; }
             byte[] passwordBytes = Password.Hash(password, keyfilePath);
             FileDecryption.DecryptEachFileWithPassword(filePaths, passwordBytes);

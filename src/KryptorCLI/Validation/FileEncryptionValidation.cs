@@ -33,7 +33,7 @@ namespace KryptorCLI
         {
             if (password.Length == 0 && string.IsNullOrEmpty(keyfilePath))
             {
-                yield return "Please specify whether to use a password and/or keyfile.";
+                yield return ValidationMessages.PasswordOrKeyfile;
             }
             if (File.Exists(keyfilePath))
             {
@@ -132,6 +132,28 @@ namespace KryptorCLI
             else if (!File.Exists(privateKeyPath) || !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
             {
                 yield return ValidationMessages.PrivateKeyFile;
+            }
+            if (filePaths == null)
+            {
+                yield return ValidationMessages.FilePath;
+            }
+        }
+
+        public static bool FileDecryptionWithPassword(char[] password, string keyfilePath, string[] filePaths)
+        {
+            IEnumerable<string> errorMessages = GetFileDecryptionErrors(password, keyfilePath, filePaths);
+            return DisplayMessage.AnyErrors(errorMessages);
+        }
+
+        private static IEnumerable<string> GetFileDecryptionErrors(char[] password, string keyfilePath, string[] filePaths)
+        {
+            if (password.Length == 0 && string.IsNullOrEmpty(keyfilePath))
+            {
+                yield return ValidationMessages.PasswordOrKeyfile;
+            }
+            if (!string.IsNullOrEmpty(keyfilePath) && !File.Exists(keyfilePath))
+            {
+                yield return "Please specify a keyfile that exists.";
             }
             if (filePaths == null)
             {
