@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 
 /*
     Kryptor: Simple, modern, secure file encryption.

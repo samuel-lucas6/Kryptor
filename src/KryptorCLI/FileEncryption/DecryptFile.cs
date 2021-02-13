@@ -32,7 +32,7 @@ namespace KryptorCLI
                 byte[] encryptedHeader = FileHeaders.ReadEncryptedHeader(inputFile);
                 byte[] nonce = FileHeaders.ReadNonce(inputFile);
                 byte[] header = DecryptFileHeader(inputFile, encryptedHeader, nonce, keyEncryptionKey);
-                if (header == null) { throw new ArgumentException("Incorrect password/keyfile or this file has been tampered with."); }
+                if (header == null) { throw new ArgumentException("Incorrect password/key or this file has been tampered with."); }
                 ChunkHandling.ValidateKeyCommitmentBlock(header);
                 int lastChunkLength = FileHeaders.GetLastChunkLength(header);
                 int fileNameLength = FileHeaders.GetFileNameLength(header);
@@ -76,7 +76,7 @@ namespace KryptorCLI
                 plaintextChunk = ChunkHandling.RemoveKeyCommitmentBlock(plaintextChunk);
                 outputFile.Write(plaintextChunk, offset, plaintextChunk.Length);
             }
-            outputFile.SetLength((outputFile.Length - Constants.FileChunkSize) + lastChunkLength);
+            outputFile.SetLength(outputFile.Length - Constants.FileChunkSize + lastChunkLength);
             Arrays.Zero(dataEncryptionKey);
         }
 
