@@ -30,7 +30,7 @@ namespace KryptorCLI
             DownloadVersionFile(downloadFilePath);
             string assemblyVersion = Program.GetVersion();
             string latestVersion = GetLatestVersion(downloadFilePath);
-            return CompareVersions(assemblyVersion, latestVersion);
+            return !CompareVersions(assemblyVersion, latestVersion);
         }
 
         private static void DownloadVersionFile(string downloadFilePath)
