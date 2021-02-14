@@ -157,7 +157,11 @@ namespace KryptorCLI
 
         private static IEnumerable<string> GetRecoverPublicKeyError(string privateKeyPath)
         {
-            if (!File.Exists(privateKeyPath) || !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
+            if (privateKeyPath == null)
+            {
+                yield return "Please specify the key pair using [-x=filepath].";
+            }
+            else if (!File.Exists(privateKeyPath) || !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
             {
                 yield return ValidationMessages.PrivateKeyFile;
             }
