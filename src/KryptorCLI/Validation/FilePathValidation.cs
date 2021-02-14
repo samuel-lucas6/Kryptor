@@ -110,22 +110,41 @@ namespace KryptorCLI
             {
                 yield return "Please enter a valid number.";
             }
-            if (!string.Equals(directoryPath, Constants.DefaultKeyDirectory) && !Directory.Exists(directoryPath))
+            bool defaultKeyDirectory = string.Equals(directoryPath, Constants.DefaultKeyDirectory);
+            if (!defaultKeyDirectory && !Directory.Exists(directoryPath))
             {
                 yield return "This directory doesn't exist.";
             }
-            else if (!Globals.Overwrite && keyPairType == 1)
+            else if (defaultKeyDirectory && !Globals.Overwrite && keyPairType == 1)
             {
                 if (File.Exists(Constants.DefaultEncryptionPublicKeyPath) || File.Exists(Constants.DefaultEncryptionPrivateKeyPath))
                 {
                     yield return "An encryption key pair already exists. Please use -o|--overwrite if you want to overwrite your key pair.";
                 }
             }
-            else if (!Globals.Overwrite && keyPairType == 2)
+            else if (defaultKeyDirectory && !Globals.Overwrite && keyPairType == 2)
             {
                 if (File.Exists(Constants.DefaultSigningPublicKeyPath) || File.Exists(Constants.DefaultSigningPrivateKeyPath))
                 {   
                     yield return "A signing key pair already exists. Please use -o|--overwrite if you want to overwrite your key pair.";
+                }
+            }
+            else if (!defaultKeyDirectory && !Globals.Overwrite && keyPairType == 1)
+            {
+                string publicKeyPath = Path.Combine(directoryPath, Constants.DefaultEncryptionKeyFileName + Constants.PublicKeyExtension);
+                string privateKeyPath = Path.Combine(directoryPath, Constants.DefaultEncryptionKeyFileName + Constants.PrivateKeyExtension);
+                if (File.Exists(publicKeyPath) || File.Exists(privateKeyPath))
+                {
+                    yield return "An encryption key pair already exists in the specified directory. Please use -o|--overwrite if you want to overwrite your key pair.";
+                }
+            }
+            else if (!defaultKeyDirectory && !Globals.Overwrite && keyPairType == 2)
+            {
+                string publicKeyPath = Path.Combine(directoryPath, Constants.DefaultSigningKeyFileName + Constants.PublicKeyExtension);
+                string privateKeyPath = Path.Combine(directoryPath, Constants.DefaultSigningKeyFileName + Constants.PrivateKeyExtension);
+                if (File.Exists(publicKeyPath) || File.Exists(privateKeyPath))
+                {
+                    yield return "A signing key pair already exists in the specified directory. Please use -o|--overwrite if you want to overwrite your key pair.";
                 }
             }
         }
