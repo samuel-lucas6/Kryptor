@@ -187,7 +187,7 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
             {
-                if (ex is ArgumentOutOfRangeException)
+                if (ex is ArgumentException)
                 {
                     DisplayMessage.Exception(ex.GetType().Name, ex.Message);
                     return null;
@@ -201,7 +201,7 @@ namespace KryptorCLI
         {
             byte[] keyVersion = GetKeyVersion(privateKey);
             bool validKeyVersion = Utilities.Compare(keyVersion, Constants.PrivateKeyVersion);
-            if (!validKeyVersion) { throw new ArgumentOutOfRangeException("Unsupported private key version."); }
+            if (!validKeyVersion) { throw new ArgumentException("Unsupported private key version."); }
         }
 
         private static byte[] GetKeyVersion(byte[] privateKey)

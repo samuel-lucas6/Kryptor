@@ -159,7 +159,7 @@ namespace KryptorCLI
         {
             if (privateKeyPath == null)
             {
-                yield return "Please specify the key pair using [-x=filepath].";
+                yield return "Please specify the private key using [-x=filepath].";
             }
             else if (!File.Exists(privateKeyPath) || !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
             {
