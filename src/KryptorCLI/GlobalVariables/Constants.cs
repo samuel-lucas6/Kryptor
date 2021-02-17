@@ -37,17 +37,16 @@ namespace KryptorCLI
         public const int KeyfileLength = 64;
         public const int FileStreamBufferSize = 131072;
         public const int FileChunkSize = 16384;
-        public const int KeyCommitmentBlockLength = 16;
         public const int IntBitConverterLength = 4;
         public const int EncryptedHeaderLength = 72;
-        public static readonly int TotalChunkLength = KeyCommitmentBlockLength + FileChunkSize + Poly1305Length;
+        public static readonly int TotalChunkLength = FileChunkSize + TagLength;
 
         // Cryptography
         public const int EncryptionKeyLength = 32;
         public const int EphemeralPublicKeyLength = 32;
         public const int SaltLength = 16;
         public const int XChaChaNonceLength = 24;
-        public const int Poly1305Length = 16;
+        public const int TagLength = 32;
         public const int BLAKE2Length = 64;
         public const string BLAKE2Personal = "Kryptor.Personal";
 

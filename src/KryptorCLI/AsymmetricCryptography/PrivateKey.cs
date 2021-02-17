@@ -1,6 +1,7 @@
 ﻿using System;
 using Sodium;
 using System.Security.Cryptography;
+using ChaCha20BLAKE2;
 
 /*
     Kryptor: A simple, modern, and secure encryption tool.
@@ -31,9 +32,7 @@ namespace KryptorCLI
             Arrays.Zero(passwordBytes);
             byte[] nonce = Generate.Nonce();
             byte[] additionalData = Arrays.Concat(keyAlgorithm, Constants.PrivateKeyVersion);
-            byte[] keyCommitmentBlock = ChunkHandling.GetKeyCommitmentBlock();
-            privateKey = Arrays.Concat(keyCommitmentBlock, privateKey);
-            byte[] encryptedPrivateKey = SecretAeadXChaCha20Poly1305.Encrypt(privateKey, nonce, key, additionalData);
+            byte[] encryptedPrivateKey = XChaCha20BLAKE2b.Encrypt(privateKey, nonce, key, additionalData, TagLength.Medium);
             Arrays.Zero(privateKey);
             Arrays.Zero(key);
             return Arrays.Concat(additionalData, salt, nonce, encryptedPrivateKey);
@@ -64,10 +63,9 @@ namespace KryptorCLI
             byte[] additionalData = Arrays.Concat(keyAlgorithm, keyVersion);
             byte[] key = Argon2.DeriveKey(passwordBytes, salt);
             Arrays.Zero(passwordBytes);
-            byte[] decryptedPrivateKey = SecretAeadXChaCha20Poly1305.Decrypt(encryptedPrivateKey, nonce, key, additionalData);
+            byte[] decryptedPrivateKey = XChaCha20BLAKE2b.Decrypt(encryptedPrivateKey, nonce, key, additionalData, TagLength.Medium);
             Arrays.Zero(key);
-            ChunkHandling.ValidateKeyCommitmentBlock(decryptedPrivateKey);
-            return ChunkHandling.RemoveKeyCommitmentBlock(decryptedPrivateKey);
+            return decryptedPrivateKey;
         }
 
         private static byte[] GetKeyAlgorithm(byte[] privateKey)

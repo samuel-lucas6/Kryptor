@@ -58,7 +58,7 @@ namespace KryptorCLI
                 Arrays.Zero(keyEncryptionKey);
                 DecryptionSuccessful(inputFilePath, outputFilePath);
             }
-            catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
+            catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
                 FileException(inputFilePath, ex);
             }
@@ -105,7 +105,7 @@ namespace KryptorCLI
                 Arrays.Zero(keyEncryptionKey);
                 DecryptionSuccessful(inputFilePath, outputFilePath);
             }
-            catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
+            catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
                 FileException(inputFilePath, ex);
             }
@@ -150,7 +150,7 @@ namespace KryptorCLI
                 Arrays.Zero(keyEncryptionKey);
                 DecryptionSuccessful(inputFilePath, outputFilePath);
             }
-            catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
+            catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
                 FileException(inputFilePath, ex);
             }

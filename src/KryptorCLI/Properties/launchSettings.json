@@ -2,7 +2,7 @@
   "profiles": {
     "KryptorCLI": {
       "commandName": "Project",
-      "commandLineArgs": "-e -k keyfile test.jpg"
+      "commandLineArgs": "-r -x"
     }
   }
 }

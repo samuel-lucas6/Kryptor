@@ -24,43 +24,11 @@ namespace KryptorCLI
 {
     public static class ChunkHandling
     {
-        private static readonly byte[] _keyCommitmentBlock = new byte[Constants.KeyCommitmentBlockLength];
-
-        public static byte[] GetKeyCommitmentBlock()
+        public static byte[] GetPreviousTag(byte[] ciphertextChunk)
         {
-            return _keyCommitmentBlock;
-        }
-
-        public static byte[] PrependKeyCommitmentBlock(byte[] plaintextChunk)
-        {
-            return Arrays.Concat(_keyCommitmentBlock, plaintextChunk);
-        }
-
-        public static byte[] GetPreviousPoly1305Tag(byte[] ciphertextChunk)
-        {
-            byte[] previousTag = new byte[Constants.Poly1305Length];
+            byte[] previousTag = new byte[Constants.TagLength];
             Array.Copy(ciphertextChunk, ciphertextChunk.Length - previousTag.Length, previousTag, destinationIndex: 0, previousTag.Length);
             return previousTag;
-        }
-
-        public static void ValidateKeyCommitmentBlock(byte[] plaintextChunk)
-        {
-            bool validKeyCommitmentBlock = CompareKeyCommitmentBlock(plaintextChunk);
-            if (!validKeyCommitmentBlock) { throw new CryptographicException("Error decrypting message."); }
-        }
-
-        private static bool CompareKeyCommitmentBlock(byte[] plaintextChunk)
-        {
-            byte[] keyCommitmentBlock = new byte[Constants.KeyCommitmentBlockLength];
-            Array.Copy(plaintextChunk, keyCommitmentBlock, keyCommitmentBlock.Length);
-            return Utilities.Compare(keyCommitmentBlock, _keyCommitmentBlock);
-        }
-
-        public static byte[] RemoveKeyCommitmentBlock(byte[] plaintextChunk)
-        {
-            byte[] plaintext = new byte[plaintextChunk.Length - Constants.KeyCommitmentBlockLength];
-            Array.Copy(plaintextChunk, Constants.KeyCommitmentBlockLength, plaintext, destinationIndex: 0, plaintext.Length);
-            return plaintext;
         }
     }
 }

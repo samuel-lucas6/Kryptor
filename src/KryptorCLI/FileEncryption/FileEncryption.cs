@@ -60,7 +60,7 @@ namespace KryptorCLI
                 Arrays.Zero(keyEncryptionKey);
                 EncryptionSuccessful(inputFilePath, outputFilePath);
             }
-            catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
+            catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.Error);
                 DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to encrypt the file.");
@@ -107,7 +107,7 @@ namespace KryptorCLI
                 Arrays.Zero(keyEncryptionKey);
                 EncryptionSuccessful(inputFilePath, outputFilePath);
             }
-            catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
+            catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.Error);
                 DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to encrypt the file.");
@@ -152,7 +152,7 @@ namespace KryptorCLI
                 Arrays.Zero(keyEncryptionKey);
                 EncryptionSuccessful(inputFilePath, outputFilePath);
             }
-            catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
+            catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.Error);
                 DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to encrypt the file.");

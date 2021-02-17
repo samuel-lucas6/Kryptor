@@ -2,6 +2,7 @@
 using System.IO;
 using System.Security.Cryptography;
 using Sodium;
+using ChaCha20BLAKE2;
 
 /*
     Kryptor: A simple, modern, and secure encryption tool.
@@ -34,7 +35,7 @@ namespace KryptorCLI
 
         public static byte[] Encrypt(byte[] fileHeader, byte[] nonce, byte[] keyEncryptionKey, byte[] additionalData)
         {
-            return SecretAeadXChaCha20Poly1305.Encrypt(fileHeader, nonce, keyEncryptionKey, additionalData);
+            return XChaCha20BLAKE2b.Encrypt(fileHeader, nonce, keyEncryptionKey, additionalData, TagLength.Medium);
         }
 
         public static byte[] GetAdditionalData(FileStream inputFile)
@@ -51,7 +52,7 @@ namespace KryptorCLI
         {
             try
             {
-                return SecretAeadXChaCha20Poly1305.Decrypt(encryptedFileHeader, nonce, keyEncryptionKey, additionalData);
+                return XChaCha20BLAKE2b.Decrypt(encryptedFileHeader, nonce, keyEncryptionKey, additionalData, TagLength.Medium);
             }
             catch (CryptographicException)
             {

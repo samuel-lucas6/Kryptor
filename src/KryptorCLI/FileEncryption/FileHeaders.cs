@@ -98,15 +98,14 @@ namespace KryptorCLI
         public static int GetLastChunkLength(byte[] header)
         {
             byte[] lastChunkLength = new byte[Constants.IntBitConverterLength];
-            Array.Copy(header, Constants.KeyCommitmentBlockLength, lastChunkLength, destinationIndex: 0, lastChunkLength.Length);
+            Array.Copy(header, lastChunkLength, lastChunkLength.Length);
             return BitConversion.ToInt32(lastChunkLength);
         }
 
         public static int GetFileNameLength(byte[] header)
         {
             byte[] fileNameLength = new byte[Constants.IntBitConverterLength];
-            int sourceIndex = Constants.KeyCommitmentBlockLength + Constants.IntBitConverterLength;
-            Array.Copy(header, sourceIndex, fileNameLength, destinationIndex: 0, fileNameLength.Length);
+            Array.Copy(header, Constants.IntBitConverterLength, fileNameLength, destinationIndex: 0, fileNameLength.Length);
             return BitConversion.ToInt32(fileNameLength);
         }
 

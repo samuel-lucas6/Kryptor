@@ -1,6 +1,7 @@
 ﻿using System;
 using Sodium;
 using System.IO;
+using ChaCha20BLAKE2;
 
 /*
     Kryptor: A simple, modern, and secure encryption tool.
@@ -33,7 +34,6 @@ namespace KryptorCLI
                 byte[] nonce = FileHeaders.ReadNonce(inputFile);
                 byte[] header = DecryptFileHeader(inputFile, encryptedHeader, nonce, keyEncryptionKey);
                 if (header == null) { throw new ArgumentException("Incorrect password/key or this file has been tampered with."); }
-                ChunkHandling.ValidateKeyCommitmentBlock(header);
                 int lastChunkLength = FileHeaders.GetLastChunkLength(header);
                 int fileNameLength = FileHeaders.GetFileNameLength(header);
                 dataEncryptionKey = FileHeaders.GetDataEncryptionKey(header);
@@ -41,7 +41,7 @@ namespace KryptorCLI
                 using (var outputFile = new FileStream(outputFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
                 {
                     nonce = Utilities.Increment(nonce);
-                    byte[] additionalData = ChunkHandling.GetPreviousPoly1305Tag(encryptedHeader);
+                    byte[] additionalData = ChunkHandling.GetPreviousTag(encryptedHeader);
                     Decrypt(inputFile, outputFile, nonce, dataEncryptionKey, additionalData, lastChunkLength);
                 }
                 string inputFilePath = inputFile.Name;
@@ -51,6 +51,7 @@ namespace KryptorCLI
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
                 Arrays.Zero(dataEncryptionKey);
+                FileHandling.DeleteFile(outputFilePath);
                 throw;
             }
         }
@@ -69,11 +70,9 @@ namespace KryptorCLI
             byte[] ciphertextChunk = new byte[Constants.TotalChunkLength];
             while (inputFile.Read(ciphertextChunk, offset, ciphertextChunk.Length) > 0)
             {
-                byte[] plaintextChunk = SecretAeadXChaCha20Poly1305.Decrypt(ciphertextChunk, nonce, dataEncryptionKey, additionalData);
-                ChunkHandling.ValidateKeyCommitmentBlock(plaintextChunk);
+                byte[] plaintextChunk = XChaCha20BLAKE2b.Decrypt(ciphertextChunk, nonce, dataEncryptionKey, additionalData, TagLength.Medium);
                 nonce = Utilities.Increment(nonce);
-                additionalData = ChunkHandling.GetPreviousPoly1305Tag(ciphertextChunk);
-                plaintextChunk = ChunkHandling.RemoveKeyCommitmentBlock(plaintextChunk);
+                additionalData = ChunkHandling.GetPreviousTag(ciphertextChunk);
                 outputFile.Write(plaintextChunk, offset, plaintextChunk.Length);
             }
             outputFile.SetLength(outputFile.Length - Constants.FileChunkSize + lastChunkLength);

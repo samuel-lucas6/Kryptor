@@ -1,6 +1,7 @@
 ﻿using System;
 using Sodium;
 using System.IO;
+using ChaCha20BLAKE2;
 
 /*
     Kryptor: A simple, modern, and secure encryption tool.
@@ -36,7 +37,7 @@ namespace KryptorCLI
                     byte[] encryptedHeader = EncryptFileHeader(inputFilePath, dataEncryptionKey, nonce, keyEncryptionKey);
                     FileHeaders.WriteHeaders(outputFile, ephemeralPublicKey, salt, nonce, encryptedHeader);
                     nonce = Utilities.Increment(nonce);
-                    byte[] additionalData = ChunkHandling.GetPreviousPoly1305Tag(encryptedHeader);
+                    byte[] additionalData = ChunkHandling.GetPreviousTag(encryptedHeader);
                     Encrypt(inputFile, outputFile, nonce, dataEncryptionKey, additionalData);
                 }
                 Finalize(inputFilePath, outputFilePath);
@@ -51,11 +52,10 @@ namespace KryptorCLI
 
         private static byte[] EncryptFileHeader(string inputFilePath, byte[] dataEncryptionKey, byte[] nonce, byte[] keyEncryptionKey)
         {
-            byte[] keyCommitmentBlock = ChunkHandling.GetKeyCommitmentBlock();
             long fileLength = FileHandling.GetFileLength(inputFilePath);
             byte[] lastChunkLength = BitConversion.GetBytes(Convert.ToInt32(fileLength % Constants.FileChunkSize));
             byte[] fileNameLength = FileHeaders.GetFileNameLength(inputFilePath);
-            byte[] fileHeader = Arrays.Concat(keyCommitmentBlock, lastChunkLength, fileNameLength, dataEncryptionKey);
+            byte[] fileHeader = Arrays.Concat(lastChunkLength, fileNameLength, dataEncryptionKey);
             byte[] additionalData = HeaderEncryption.ComputeAdditionalData(fileLength);
             return HeaderEncryption.Encrypt(fileHeader, nonce, keyEncryptionKey, additionalData);
         }
@@ -63,13 +63,12 @@ namespace KryptorCLI
         private static void Encrypt(FileStream inputFile, FileStream outputFile, byte[] nonce, byte[] dataEncryptionKey, byte[] additionalData)
         {
             const int offset = 0;
-            byte[] plaintext = new byte[Constants.FileChunkSize];
-            while (inputFile.Read(plaintext, offset, plaintext.Length) > 0)
+            byte[] plaintextChunk = new byte[Constants.FileChunkSize];
+            while (inputFile.Read(plaintextChunk, offset, plaintextChunk.Length) > 0)
             {
-                byte[] plaintextChunk = ChunkHandling.PrependKeyCommitmentBlock(plaintext);
-                byte[] ciphertextChunk = SecretAeadXChaCha20Poly1305.Encrypt(plaintextChunk, nonce, dataEncryptionKey, additionalData);
+                byte[] ciphertextChunk = XChaCha20BLAKE2b.Encrypt(plaintextChunk, nonce, dataEncryptionKey, additionalData, TagLength.Medium);
                 nonce = Utilities.Increment(nonce);
-                additionalData = ChunkHandling.GetPreviousPoly1305Tag(ciphertextChunk);
+                additionalData = ChunkHandling.GetPreviousTag(ciphertextChunk);
                 outputFile.Write(ciphertextChunk, offset, ciphertextChunk.Length);
             }
             Arrays.Zero(dataEncryptionKey);
