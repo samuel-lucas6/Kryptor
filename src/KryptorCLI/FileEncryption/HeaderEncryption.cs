@@ -28,7 +28,7 @@ namespace KryptorCLI
         public static byte[] ComputeAdditionalData(long fileLength)
         {
             long chunkCount = (long)Math.Ceiling((double)fileLength / Constants.FileChunkSize);
-            byte[] ciphertextLength = BitConverter.GetBytes(chunkCount * Constants.TotalChunkLength);
+            byte[] ciphertextLength = BitConversion.GetBytes(chunkCount * Constants.TotalChunkLength);
             return Arrays.Concat(Constants.KryptorMagicBytes, Constants.EncryptionVersion, ciphertextLength);
         }
 
@@ -43,7 +43,7 @@ namespace KryptorCLI
             byte[] formatVersion = FileHeaders.ReadFileFormatVersion(inputFile);
             FileHeaders.ValidateFormatVersion(formatVersion, Constants.EncryptionVersion);
             int headersLength = FileHeaders.GetHeadersLength();
-            byte[] ciphertextLength = BitConverter.GetBytes(inputFile.Length - headersLength);
+            byte[] ciphertextLength = BitConversion.GetBytes(inputFile.Length - headersLength);
             return Arrays.Concat(magicBytes, formatVersion, ciphertextLength);
         }
 

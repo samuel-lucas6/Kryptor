@@ -31,7 +31,7 @@ namespace KryptorCLI
 
         // File encryption
         public static readonly byte[] KryptorMagicBytes = Encoding.UTF8.GetBytes("KRYPTOR");
-        public static readonly byte[] EncryptionVersion = BitConverter.GetBytes((short)3);
+        public static readonly byte[] EncryptionVersion = BitConversion.GetBytes((short)3);
         public const string EncryptedExtension = ".kryptor";
         public const string SaltFile = "Kryptor.salt";
         public const int KeyfileLength = 64;
@@ -66,12 +66,12 @@ namespace KryptorCLI
         public const int SigningPrivateKeyLength = 188;
         public static readonly byte[] Curve25519KeyHeader = Encoding.UTF8.GetBytes("Cu");
         public static readonly byte[] Ed25519KeyHeader = Encoding.UTF8.GetBytes("Ed");
-        public static readonly byte[] PrivateKeyVersion = BitConverter.GetBytes((short)1);
+        public static readonly byte[] PrivateKeyVersion = BitConversion.GetBytes((short)1);
 
         // File signing
         public const string SignatureExtension = ".signature";
         public static readonly byte[] SignatureMagicBytes = Encoding.UTF8.GetBytes("SIGNATURE");
-        public static readonly byte[] SignatureVersion = BitConverter.GetBytes((short)1);
+        public static readonly byte[] SignatureVersion = BitConversion.GetBytes((short)1);
         public const int SignatureLength = 64;
     }
 }

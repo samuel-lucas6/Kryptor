@@ -38,10 +38,10 @@ namespace KryptorCLI
 
         public static byte[] GetFileNameLength(string inputFilePath)
         {
-            if (!Globals.ObfuscateFileNames) { return BitConverter.GetBytes(0); }
+            if (!Globals.ObfuscateFileNames) { return BitConversion.GetBytes(0); }
             string fileName = Path.GetFileName(inputFilePath);
             byte[] fileNameBytes = Encoding.UTF8.GetBytes(fileName);
-            return BitConverter.GetBytes(fileNameBytes.Length);
+            return BitConversion.GetBytes(fileNameBytes.Length);
         }
 
         public static int GetHeadersLength()
@@ -99,7 +99,7 @@ namespace KryptorCLI
         {
             byte[] lastChunkLength = new byte[Constants.IntBitConverterLength];
             Array.Copy(header, Constants.KeyCommitmentBlockLength, lastChunkLength, destinationIndex: 0, lastChunkLength.Length);
-            return BitConverter.ToInt32(lastChunkLength);
+            return BitConversion.ToInt32(lastChunkLength);
         }
 
         public static int GetFileNameLength(byte[] header)
@@ -107,7 +107,7 @@ namespace KryptorCLI
             byte[] fileNameLength = new byte[Constants.IntBitConverterLength];
             int sourceIndex = Constants.KeyCommitmentBlockLength + Constants.IntBitConverterLength;
             Array.Copy(header, sourceIndex, fileNameLength, destinationIndex: 0, fileNameLength.Length);
-            return BitConverter.ToInt32(fileNameLength);
+            return BitConversion.ToInt32(fileNameLength);
         }
 
         public static byte[] GetDataEncryptionKey(byte[] header)

@@ -53,7 +53,7 @@ namespace KryptorCLI
         {
             byte[] keyCommitmentBlock = ChunkHandling.GetKeyCommitmentBlock();
             long fileLength = FileHandling.GetFileLength(inputFilePath);
-            byte[] lastChunkLength = BitConverter.GetBytes(Convert.ToInt32(fileLength % Constants.FileChunkSize));
+            byte[] lastChunkLength = BitConversion.GetBytes(Convert.ToInt32(fileLength % Constants.FileChunkSize));
             byte[] fileNameLength = FileHeaders.GetFileNameLength(inputFilePath);
             byte[] fileHeader = Arrays.Concat(keyCommitmentBlock, lastChunkLength, fileNameLength, dataEncryptionKey);
             byte[] additionalData = HeaderEncryption.ComputeAdditionalData(fileLength);
