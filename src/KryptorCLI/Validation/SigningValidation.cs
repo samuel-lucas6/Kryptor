@@ -82,14 +82,7 @@ namespace KryptorCLI
 
         private static IEnumerable<string> GetVerifyErrors(string publicKeyPath, string[] filePaths)
         {
-            if (string.IsNullOrEmpty(publicKeyPath))
-            {
-                if (!File.Exists(Constants.DefaultSigningPublicKeyPath))
-                {
-                    yield return ValidationMessages.PublicKeyFile;
-                }
-            }
-            else if (!File.Exists(publicKeyPath) || !publicKeyPath.EndsWith(Constants.PublicKeyExtension))
+            if (!File.Exists(publicKeyPath) || !publicKeyPath.EndsWith(Constants.PublicKeyExtension))
             {
                 yield return ValidationMessages.PublicKeyFile;
             }
