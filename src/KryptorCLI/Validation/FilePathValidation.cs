@@ -31,7 +31,7 @@ namespace KryptorCLI
         {
             string errorMessage = GetFileEncryptionError(inputFilePath);
             if (string.IsNullOrEmpty(errorMessage)) { return true; }
-            DisplayMessage.Error(errorMessage);
+            DisplayMessage.FilePathError(inputFilePath, errorMessage);
             return false;
         }
 
@@ -81,7 +81,7 @@ namespace KryptorCLI
             if (inputFilePath.Contains(Constants.SaltFile)) { return false; }
             string errorMessage = GetFileDecryptionError(inputFilePath);
             if (string.IsNullOrEmpty(errorMessage)) { return true; }
-            DisplayMessage.Error(errorMessage);
+            DisplayMessage.FilePathError(inputFilePath, errorMessage);
             return false;
         }
 

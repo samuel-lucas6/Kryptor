@@ -47,6 +47,11 @@ namespace KryptorCLI
             Console.WriteLine($"{Path.GetFileName(filePath)}: {message}");
         }
 
+        public static void FilePathError(string filePath, string message)
+        {
+            Console.WriteLine($"{Path.GetFileName(filePath)} - {_error}: {message}");
+        }
+
         public static void Message(string message)
         {
             Console.WriteLine(message);
