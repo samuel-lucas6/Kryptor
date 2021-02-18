@@ -88,7 +88,8 @@ namespace KryptorCLI
             // Constant time comparison
             byte[] aBytes = Encoding.UTF8.GetBytes(a);
             byte[] bBytes = Encoding.UTF8.GetBytes(b);
-            return Utilities.Compare(aBytes, bBytes);
+            // Pass in bBytes first because libsodium-core uses the length of the first array
+            return Utilities.Compare(bBytes, aBytes);
         }
     }
 }
