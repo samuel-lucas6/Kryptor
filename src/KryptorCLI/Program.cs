@@ -73,7 +73,7 @@ Still need help? Read the tutorial <https://kryptor.co.uk>.")]
         [Option("-c|--comment", "add a comment to a signature", CommandOptionType.SingleValue)]
         public string Comment { get; }
 
-        [Option("-h|--prehash", "sign large files by prehashing", CommandOptionType.NoValue)]
+        [Option("-l|--prehash", "sign large files by prehashing", CommandOptionType.NoValue)]
         public bool Prehash { get; }
 
         [Option("-v|--verify", "verify a signature", CommandOptionType.NoValue)]
