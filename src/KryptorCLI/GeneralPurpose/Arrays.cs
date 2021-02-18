@@ -86,10 +86,17 @@ namespace KryptorCLI
         public static bool Compare(char[] a, char[] b)
         {
             // Constant time comparison
-            byte[] aBytes = Encoding.UTF8.GetBytes(a);
-            byte[] bBytes = Encoding.UTF8.GetBytes(b);
-            // Pass in bBytes first because libsodium-core uses the length of the first array
-            return Utilities.Compare(bBytes, aBytes);
+            int length = Math.Min(a.Length, b.Length);
+            int nonEqual = a.Length ^ b.Length;
+            for (int i = 0; i < length; i++)
+            {
+                nonEqual |= a[i] ^ b[i];
+            }
+            for (int i = length; i < b.Length; i++)
+            {
+                nonEqual |= b[i] ^ ~b[i];
+            }
+            return 0 == nonEqual;
         }
     }
 }
