@@ -29,6 +29,7 @@ namespace KryptorCLI
             {
                 string[] filePaths = GetFiles(directoryPath);
                 string saltFilePath = Path.Combine(directoryPath, Constants.SaltFile);
+                if (!File.Exists(saltFilePath)) { throw new FileNotFoundException("No salt file found. Unable to decrypt the directory. Please decrypt these files individually."); }
                 byte[] salt = File.ReadAllBytes(saltFilePath);
                 if (salt.Length != Constants.SaltLength) { throw new ArgumentException("Invalid salt length."); }
                 byte[] keyEncryptionKey = Argon2.DeriveKey(passwordBytes, salt);
@@ -38,9 +39,9 @@ namespace KryptorCLI
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.Error);
-                if (ex is ArgumentException)
+                if (ex is ArgumentException || ex is FileNotFoundException)
                 {
-                    DisplayMessage.FilePathMessage(directoryPath, ex.Message);
+                    DisplayMessage.FilePathError(directoryPath, ex.Message);
                     return;
                 }
                 DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to decrypt the directory.");
