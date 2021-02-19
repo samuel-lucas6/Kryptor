@@ -33,7 +33,7 @@ namespace KryptorCLI
         public static readonly byte[] KryptorMagicBytes = Encoding.UTF8.GetBytes("KRYPTOR");
         public static readonly byte[] EncryptionVersion = BitConversion.GetBytes((short)3);
         public const string EncryptedExtension = ".kryptor";
-        public const string SaltFile = "Kryptor.salt";
+        public const string SaltFile = "kryptor.salt";
         public const int KeyfileLength = 64;
         public const int FileStreamBufferSize = 131072;
         public const int FileChunkSize = 16384;
