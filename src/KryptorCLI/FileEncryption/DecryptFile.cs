@@ -51,7 +51,10 @@ namespace KryptorCLI
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
                 Arrays.Zero(dataEncryptionKey);
-                FileHandling.DeleteFile(outputFilePath);
+                if (!(ex is ArgumentException))
+                {
+                    FileHandling.DeleteFile(outputFilePath);
+                }
                 throw;
             }
         }
