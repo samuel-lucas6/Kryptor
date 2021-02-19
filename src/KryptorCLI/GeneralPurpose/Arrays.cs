@@ -86,17 +86,9 @@ namespace KryptorCLI
         public static bool Compare(char[] a, char[] b)
         {
             // Constant time comparison
-            int length = Math.Min(a.Length, b.Length);
-            int nonEqual = a.Length ^ b.Length;
-            for (int i = 0; i < length; i++)
-            {
-                nonEqual |= a[i] ^ b[i];
-            }
-            for (int i = length; i < b.Length; i++)
-            {
-                nonEqual |= b[i] ^ ~b[i];
-            }
-            return 0 == nonEqual;
+            byte[] aBytes = Blake2.Hash(Encoding.UTF8.GetBytes(a));
+            byte[] bBytes = Blake2.Hash(Encoding.UTF8.GetBytes(b));
+            return Utilities.Compare(aBytes, bBytes);
         }
     }
 }
