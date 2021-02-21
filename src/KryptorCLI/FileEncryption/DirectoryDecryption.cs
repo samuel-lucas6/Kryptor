@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 
 /*
     Kryptor: A simple, modern, and secure encryption tool.
@@ -184,10 +185,7 @@ namespace KryptorCLI
         {
             try
             {
-                if (Globals.ObfuscateFileNames)
-                {
-                    RestoreDirectoryNames.AllDirectories(directoryPath);
-                }
+                RestoreDirectoryNames.AllDirectories(directoryPath);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
