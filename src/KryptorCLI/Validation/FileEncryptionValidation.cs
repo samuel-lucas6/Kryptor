@@ -43,6 +43,10 @@ namespace KryptorCLI
                     yield return "Please specify a keyfile that is at least 64 bytes in size.";
                 }
             }
+            else if (Path.EndsInDirectorySeparator(keyfilePath) && !Directory.Exists(keyfilePath))
+            {
+                yield return "Please specify a valid keyfile directory.";
+            }
             if (filePaths == null)
             {
                 yield return ValidationMessages.FilePath;

@@ -59,6 +59,7 @@ namespace KryptorCLI
             if (!validUserInput) { return; }
             keyfilePath = FilePathValidation.KeyfilePath(keyfilePath);
             byte[] passwordBytes = Password.Hash(password, keyfilePath);
+            if (passwordBytes == null) { return; }
             FileEncryption.EncryptEachFileWithPassword(filePaths, passwordBytes);
         }
 
@@ -130,6 +131,7 @@ namespace KryptorCLI
             bool validUserInput = FileEncryptionValidation.FileDecryptionWithPassword(password, keyfilePath, filePaths);
             if (!validUserInput) { return; }
             byte[] passwordBytes = Password.Hash(password, keyfilePath);
+            if (passwordBytes == null) { return; }
             FileDecryption.DecryptEachFileWithPassword(filePaths, passwordBytes);
         }
 

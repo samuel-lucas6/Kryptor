@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 
 /*
     Kryptor: A simple, modern, and secure encryption tool.
