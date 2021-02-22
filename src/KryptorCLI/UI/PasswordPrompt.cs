@@ -25,7 +25,7 @@ namespace KryptorCLI
     {
         public static char[] EnterNewPassword()
         {
-            Console.WriteLine("Enter a password (empty for random passphrase):");
+            Console.WriteLine("Enter a password (blank for random passphrase):");
             char[] password = GetPassword();
             if (password.Length == 0)
             {
@@ -65,11 +65,13 @@ namespace KryptorCLI
         public static char[] EnterYourPassword()
         {
             char[] password;
-            do
+            Console.WriteLine("Enter your password:");
+            password = GetPassword();
+            if (password.Length == 0)
             {
-                Console.WriteLine("Enter your password:");
-                password = GetPassword();
-            } while (password.Length == 0);
+                DisplayMessage.Error("Password cannot be empty.");
+                Environment.Exit(13);
+            }
             return password;
         }
 
