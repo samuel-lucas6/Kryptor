@@ -79,10 +79,7 @@ namespace KryptorCLI
 
         private static void CreateKeyFile(string filePath, string asymmetricKey)
         {
-            if (File.Exists(filePath))
-            {
-                File.SetAttributes(filePath, FileAttributes.Normal);
-            }
+            FileHandling.SetFileAttributesNormal(filePath);
             File.WriteAllText(filePath, asymmetricKey);
             File.SetAttributes(filePath, FileAttributes.ReadOnly);
         }

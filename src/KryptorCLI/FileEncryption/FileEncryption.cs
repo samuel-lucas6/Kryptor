@@ -174,7 +174,9 @@ namespace KryptorCLI
                 Logging.LogException(ex.ToString(), Logging.Severity.Error);
                 DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to store file name.");
             }
-            return inputFilePath + Constants.EncryptedExtension;
+            string outputFilePath = inputFilePath + Constants.EncryptedExtension;
+            FileHandling.SetFileAttributesNormal(outputFilePath);
+            return outputFilePath;
         }
 
         public static void EncryptionSuccessful(string inputFilePath, string outputFilePath)

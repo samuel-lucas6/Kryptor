@@ -159,10 +159,7 @@ namespace KryptorCLI
         public static string GetOutputFilePath(string inputFilePath)
         {
             string outputFilePath = inputFilePath.Replace(Constants.EncryptedExtension, string.Empty);
-            if (File.Exists(outputFilePath))
-            {
-                File.SetAttributes(outputFilePath, FileAttributes.Normal);
-            }
+            FileHandling.SetFileAttributesNormal(outputFilePath);
             return outputFilePath;
         }
 

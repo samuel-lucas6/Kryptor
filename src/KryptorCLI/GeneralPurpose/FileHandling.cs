@@ -130,7 +130,15 @@ namespace KryptorCLI
             }
         }
 
-        public static void MakeFileReadOnly(string filePath)
+        public static void SetFileAttributesNormal(string filePath)
+        {
+            if (File.Exists(filePath))
+            {
+                File.SetAttributes(filePath, FileAttributes.Normal);
+            }
+        }
+
+        public static void SetFileAttributesReadOnly(string filePath)
         {
             try
             {

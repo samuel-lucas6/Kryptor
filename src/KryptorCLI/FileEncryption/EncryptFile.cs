@@ -84,7 +84,7 @@ namespace KryptorCLI
             {
                 RestoreFileName.RemoveAppendedFileName(inputFilePath);
             }
-            FileHandling.MakeFileReadOnly(outputFilePath);
+            FileHandling.SetFileAttributesReadOnly(outputFilePath);
         }
     }
 }

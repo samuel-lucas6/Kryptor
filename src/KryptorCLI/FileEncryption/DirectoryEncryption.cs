@@ -66,7 +66,7 @@ namespace KryptorCLI
         {
             string saltFilePath = Path.Combine(directoryPath, Constants.SaltFile);
             File.WriteAllBytes(saltFilePath, salt);
-            FileHandling.MakeFileReadOnly(saltFilePath);
+            FileHandling.SetFileAttributesReadOnly(saltFilePath);
         }
 
         private static void EncryptEachFileWithPassword(string[] filePaths, byte[] salt, byte[] keyEncryptionKey)
