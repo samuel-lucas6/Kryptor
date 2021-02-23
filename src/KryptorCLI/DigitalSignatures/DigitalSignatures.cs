@@ -27,7 +27,7 @@ namespace KryptorCLI
     {
         private const int _preHashedHeaderLength = 1;
 
-        public static void SignFile(string filePath, string comment, bool preHash, byte[] privateKey)
+        public static void SignFile(string filePath, string signatureFilePath, string comment, bool preHash, byte[] privateKey)
         {
             if (!preHash) { preHash = IsPreHashingRequired(filePath); }
             byte[] preHashed = BitConverter.GetBytes(preHash);
@@ -35,7 +35,7 @@ namespace KryptorCLI
             byte[] commentBytes = Encoding.UTF8.GetBytes(comment);
             byte[] signatureFileBytes = Arrays.Concat(Constants.SignatureMagicBytes, Constants.SignatureVersion, preHashed, fileSignature, commentBytes);
             byte[] globalSignature = ComputeGlobalSignature(signatureFileBytes, privateKey);
-            CreateSignatureFile(filePath, signatureFileBytes, globalSignature);
+            CreateSignatureFile(filePath, signatureFilePath, signatureFileBytes, globalSignature);
         }
 
         private static bool IsPreHashingRequired(string filePath)
@@ -63,10 +63,13 @@ namespace KryptorCLI
             return PublicKeyAuth.SignDetached(signatureFileBytes, privateKey);
         }
 
-        private static void CreateSignatureFile(string filePath, byte[] signatureFileBytes, byte[] globalSignature)
+        private static void CreateSignatureFile(string filePath, string signatureFilePath, byte[] signatureFileBytes, byte[] globalSignature)
         {
             const int offset = 0;
-            string signatureFilePath = filePath + Constants.SignatureExtension;
+            if (string.IsNullOrEmpty(signatureFilePath))
+            {
+                signatureFilePath = filePath + Constants.SignatureExtension;
+            }
             FileHandling.SetFileAttributesNormal(signatureFilePath);
             using var signatureFile = new FileStream(signatureFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
             signatureFile.Write(signatureFileBytes, offset, signatureFileBytes.Length);

@@ -30,7 +30,7 @@ Examples:
   --encrypt -x [-y recipient public key] [file]
   --decrypt -x [-y sender public key] [file]
   --sign -x [-c comment] [file]
-  --verify [-y public key] [signature] [file]
+  --verify [-y public key] [-t signature] [file]
 
 Please report bugs to <https://github.com/samuel-lucas6/Kryptor/issues>.
 
@@ -79,6 +79,9 @@ Still need help? Read the tutorial <https://kryptor.co.uk>.")]
         [Option("-v|--verify", "verify a signature", CommandOptionType.NoValue)]
         public bool Verify { get; }
 
+        [Option("-t|--signature", "specify a signature file", CommandOptionType.SingleValue)]
+        public string Signature { get; }
+
         [Option("-u|--update", "check for updates", CommandOptionType.NoValue)]
         public bool CheckForUpdates { get; }
 
@@ -115,11 +118,11 @@ Still need help? Read the tutorial <https://kryptor.co.uk>.")]
             else if (Sign)
             {
                 string privateKey = GetSigningPrivateKey(PrivateKey.value);
-                CommandLine.Sign(privateKey, Comment, Prehash, FilePaths);
+                CommandLine.Sign(privateKey, Comment, Prehash, Signature, FilePaths);
             }
             else if (Verify)
             {
-                CommandLine.Verify(PublicKey, FilePaths);
+                CommandLine.Verify(PublicKey, Signature, FilePaths);
             }
             else if (CheckForUpdates)
             {

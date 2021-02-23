@@ -229,45 +229,45 @@ namespace KryptorCLI
             Console.WriteLine($"Public key: {Convert.ToBase64String(publicKey)}");
         }
 
-        public static void Sign(string privateKeyPath, string comment, bool preHash, string[] filePaths)
+        public static void Sign(string privateKeyPath, string comment, bool preHash, string signatureFilePath, string[] filePaths)
         {
-            bool validUserInput = SigningValidation.Sign(privateKeyPath, comment, filePaths);
+            bool validUserInput = SigningValidation.Sign(privateKeyPath, comment, signatureFilePath, filePaths);
             if (!validUserInput) { return; }
             byte[] privateKey = AsymmetricKeyValidation.SigningPrivateKeyFile(privateKeyPath);
             if (privateKey == null) { return; }
-            FileSigning.SignEachFile(filePaths, comment, preHash, privateKey);
+            FileSigning.SignEachFile(filePaths, signatureFilePath, comment, preHash, privateKey);
         }
 
-        public static void Verify(string publicKey, string[] filePaths)
+        public static void Verify(string publicKey, string signatureFilePath, string[] filePaths)
         {
             if (string.IsNullOrEmpty(publicKey) || publicKey.EndsWith(Constants.PublicKeyExtension))
             {
                 // Use public key file
-                VerifySignature(publicKey, filePaths);
+                VerifySignature(publicKey, signatureFilePath, filePaths);
                 return;
             }
             // Use public key string
-            VerifySignature(publicKey.ToCharArray(), filePaths);
+            VerifySignature(publicKey.ToCharArray(), signatureFilePath, filePaths);
         }
 
-        private static void VerifySignature(char[] encodedPublicKey, string[] filePaths)
+        private static void VerifySignature(char[] encodedPublicKey, string signatureFilePath, string[] filePaths)
         {
-            bool validUserInput = SigningValidation.Verify(encodedPublicKey, filePaths);
+            bool validUserInput = SigningValidation.Verify(encodedPublicKey, signatureFilePath, filePaths);
             if (!validUserInput) { return; }
-            string signatureFilePath = SigningValidation.GetSignatureFilePath(ref filePaths);
-            bool validSignatureFile = SigningValidation.SignatureFile(signatureFilePath, filePaths);
+            signatureFilePath = FilePathValidation.GetSignatureFilePath(signatureFilePath, filePaths);
+            bool validSignatureFile = SigningValidation.SignatureFile(signatureFilePath);
             if (!validSignatureFile) { return; }
             byte[] publicKey = AsymmetricKeyValidation.SigningPublicKeyString(encodedPublicKey);
             if (publicKey == null) { return; }
             FileSigning.VerifyFile(signatureFilePath, filePaths[0], publicKey);
         }
 
-        private static void VerifySignature(string publicKeyPath, string[] filePaths)
+        private static void VerifySignature(string publicKeyPath, string signatureFilePath, string[] filePaths)
         {
-            bool validUserInput = SigningValidation.Verify(publicKeyPath, filePaths);
+            bool validUserInput = SigningValidation.Verify(publicKeyPath, signatureFilePath, filePaths);
             if (!validUserInput) { return; }
-            string signatureFilePath = SigningValidation.GetSignatureFilePath(ref filePaths);
-            bool validSignatureFile = SigningValidation.SignatureFile(signatureFilePath, filePaths);
+            signatureFilePath = FilePathValidation.GetSignatureFilePath(signatureFilePath, filePaths);
+            bool validSignatureFile = SigningValidation.SignatureFile(signatureFilePath);
             if (!validSignatureFile) { return; }
             byte[] publicKey = AsymmetricKeyValidation.SigningPublicKeyFile(publicKeyPath);
             if (publicKey == null) { return; }

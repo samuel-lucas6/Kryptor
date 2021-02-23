@@ -166,5 +166,18 @@ namespace KryptorCLI
                 yield return ValidationMessages.PrivateKeyFile;
             }
         }
+
+        public static string GetSignatureFilePath(string signatureFilePath, string[] filePaths)
+        {
+            if (string.IsNullOrEmpty(signatureFilePath) && filePaths != null)
+            {
+                string possibleSignaturePath = filePaths[0] + Constants.SignatureExtension;
+                if (File.Exists(possibleSignaturePath))
+                {
+                    signatureFilePath = possibleSignaturePath;
+                }
+            }
+            return signatureFilePath;
+        }
     }
 }

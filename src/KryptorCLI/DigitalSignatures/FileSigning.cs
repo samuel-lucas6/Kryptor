@@ -24,7 +24,7 @@ namespace KryptorCLI
     {
         private const string _defaultComment = "This file has not been tampered with.";
 
-        public static void SignEachFile(string[] filePaths, string comment, bool preHash, byte[] privateKey)
+        public static void SignEachFile(string[] filePaths, string signatureFilePath, string comment, bool preHash, byte[] privateKey)
         {
             privateKey = PrivateKey.Decrypt(privateKey);
             if (privateKey == null) { return; }
@@ -33,7 +33,7 @@ namespace KryptorCLI
             {
                 try
                 {
-                    DigitalSignatures.SignFile(filePath, comment, preHash, privateKey);
+                    DigitalSignatures.SignFile(filePath, signatureFilePath, comment, preHash, privateKey);
                     DisplayMessage.FilePathMessage(filePath, "File signed successfully.");
                 }
                 catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
