@@ -45,6 +45,7 @@ namespace KryptorCLI
                 if (!File.Exists(storageFilePath)) { return; }
                 string directoryName = File.ReadAllText(storageFilePath);
                 string directoryPath = obfuscatedDirectoryPath.Replace(obfuscatedDirectoryName, directoryName);
+                if (Directory.Exists(directoryPath)) { directoryPath += " - Decrypted"; }
                 Directory.Move(obfuscatedDirectoryPath, directoryPath);
                 storageFilePath = Path.Combine(directoryPath, storageFileName);
                 FileHandling.DeleteFile(storageFilePath);
