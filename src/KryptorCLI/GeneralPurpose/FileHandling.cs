@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 
 /*
     Kryptor: A simple, modern, and secure encryption tool.
@@ -128,6 +129,47 @@ namespace KryptorCLI
                 Logging.LogException(ex.ToString(), Logging.Severity.Warning);
                 DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to delete the file.");
             }
+        }
+
+        public static string GetUniqueFilePath(string filePath)
+        {
+            if (!File.Exists(filePath)) { return filePath; }
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
+            int fileNumber = 1;
+            var regexMatch = Regex.Match(fileNameWithoutExtension, @"^(.+) \((\d+)\)$");
+            if (regexMatch.Success)
+            {
+                fileNameWithoutExtension = regexMatch.Groups[1].Value;
+                fileNumber = int.Parse(regexMatch.Groups[2].Value);
+            }
+            do
+            {
+                fileNumber++;
+                string newFileName = $"{fileNameWithoutExtension} ({fileNumber}){Path.GetExtension(filePath)}";
+                filePath = Path.Combine(Path.GetDirectoryName(filePath), newFileName);
+            }
+            while (File.Exists(filePath));
+            return filePath;
+        }
+
+        public static string GetUniqueDirectoryPath(string directoryPath)
+        {
+            if (!Directory.Exists(directoryPath)) { return directoryPath; }
+            string directoryName = Path.GetFileName(directoryPath);
+            int directoryNumber = 1;
+            var regexMatch = Regex.Match(directoryName, @"^(.+) \((\d+)\)$");
+            if (regexMatch.Success)
+            {
+                directoryName = regexMatch.Groups[1].Value;
+                directoryNumber = int.Parse(regexMatch.Groups[2].Value);
+            }
+            do
+            {
+                directoryNumber++;
+                directoryPath = directoryPath.Replace(directoryName, $"{directoryName} ({directoryNumber})");
+            }
+            while (Directory.Exists(directoryPath));
+            return directoryPath;
         }
 
         public static void SetFileAttributesNormal(string filePath)

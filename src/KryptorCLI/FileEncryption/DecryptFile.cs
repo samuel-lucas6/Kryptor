@@ -84,7 +84,7 @@ namespace KryptorCLI
 
         private static void Finalize(string inputFilePath, string outputFilePath, int fileNameLength)
         {
-            RestoreFileName.RenameFile(outputFilePath, fileNameLength);
+            RestoreFileName.RenameFile(inputFilePath, outputFilePath, fileNameLength);
             FileHandling.DeleteFile(inputFilePath);
         }
     }

@@ -175,8 +175,7 @@ namespace KryptorCLI
                 DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to store file name.");
             }
             string outputFilePath = inputFilePath + Constants.EncryptedExtension;
-            FileHandling.SetFileAttributesNormal(outputFilePath);
-            return outputFilePath;
+            return FileHandling.GetUniqueFilePath(outputFilePath);
         }
 
         public static void EncryptionSuccessful(string inputFilePath, string outputFilePath)

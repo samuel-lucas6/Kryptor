@@ -24,17 +24,18 @@ namespace KryptorCLI
 {
     public static class RestoreFileName
     {
-        public static void RenameFile(string outputFilePath, int fileNameLength)
+        public static void RenameFile(string inputFilePath, string outputFilePath, int fileNameLength)
         {
             try
             {
                 if (fileNameLength == 0) { return; }
+                Globals.ObfuscateFileNames = true;
                 string originalFileName = ReadFileName(outputFilePath, fileNameLength);
                 string obfuscatedFileName = Path.GetFileName(outputFilePath);
                 string restoredFilePath = outputFilePath.Replace(obfuscatedFileName, originalFileName);
-                // Replace the file if it already exists
-                FileHandling.DeleteFile(restoredFilePath);
+                restoredFilePath = FileHandling.GetUniqueFilePath(restoredFilePath);
                 File.Move(outputFilePath, restoredFilePath);
+                DisplayMessage.FileEncryptionResult(inputFilePath, restoredFilePath);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {

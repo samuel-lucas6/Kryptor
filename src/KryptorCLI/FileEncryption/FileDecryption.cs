@@ -159,13 +159,15 @@ namespace KryptorCLI
         public static string GetOutputFilePath(string inputFilePath)
         {
             string outputFilePath = inputFilePath.Replace(Constants.EncryptedExtension, string.Empty);
-            FileHandling.SetFileAttributesNormal(outputFilePath);
-            return outputFilePath;
+            return FileHandling.GetUniqueFilePath(outputFilePath);
         }
 
         public static void DecryptionSuccessful(string inputFilePath, string outputFilePath)
         {
-            DisplayMessage.FileEncryptionResult(inputFilePath, outputFilePath);
+            if (!Globals.ObfuscateFileNames)
+            {
+                DisplayMessage.FileEncryptionResult(inputFilePath, outputFilePath);
+            }
             Globals.SuccessfulCount += 1;
         }
 
