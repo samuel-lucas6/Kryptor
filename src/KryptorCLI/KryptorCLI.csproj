@@ -2,8 +2,9 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <StartupObject></StartupObject>
+    <TargetFramework>net5.0</TargetFramework>
+	<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+	<StartupObject></StartupObject>
     <ApplicationIcon>Kryptor Icon.ico</ApplicationIcon>
     <Platforms>AnyCPU;x64</Platforms>
     <PackageId>Kryptor</PackageId>
@@ -22,7 +23,7 @@
     <AssemblyName>kryptor</AssemblyName>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <AnalysisLevel>5.0</AnalysisLevel>
+    <AnalysisLevel>latest</AnalysisLevel>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

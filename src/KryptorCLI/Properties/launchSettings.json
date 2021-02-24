@@ -2,7 +2,8 @@
   "profiles": {
     "KryptorCLI": {
       "commandName": "Project",
-      "commandLineArgs": "-r -x"
+      "commandLineArgs": "-d -p test.jpg.kryptor",
+      "remoteDebugEnabled": false
     }
   }
 }
