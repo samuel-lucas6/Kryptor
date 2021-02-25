@@ -1,4 +1,5 @@
 ﻿using Sodium;
+using System.Security.Cryptography;
 
 /*
     Kryptor: A simple, modern, and secure encryption tool.
@@ -31,15 +32,15 @@ namespace KryptorCLI
         {
             byte[] inputKeyingMaterial = Arrays.Concat(sharedSecret, ephemeralSharedSecret);
             byte[] keyEncryptionKey = Blake2.KeyDerivation(inputKeyingMaterial, salt, Constants.EncryptionKeyLength);
-            Arrays.Zero(ephemeralSharedSecret);
-            Arrays.Zero(inputKeyingMaterial);
+            CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
+            CryptographicOperations.ZeroMemory(inputKeyingMaterial);
             return keyEncryptionKey;
         }
 
         public static byte[] KeyEncryptionKey(byte[] ephemeralSharedSecret, byte[] salt)
         {
             byte[] keyEncryptionKey = Blake2.KeyDerivation(ephemeralSharedSecret, salt, Constants.EncryptionKeyLength);
-            Arrays.Zero(ephemeralSharedSecret);
+            CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
             return keyEncryptionKey;
         }
 

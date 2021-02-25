@@ -34,7 +34,7 @@ namespace KryptorCLI
 
         public static byte[] ReadFileHeader(FileStream fileStream, long offset, int length)
         {
-            byte[] header = new byte[length];
+            var header = new byte[length];
             fileStream.Seek(offset, SeekOrigin.Begin);
             fileStream.Read(header, offset: 0, header.Length);
             return header;
@@ -42,7 +42,7 @@ namespace KryptorCLI
 
         public static byte[] ReadFileHeader(FileStream fileStream, int length)
         {
-            byte[] header = new byte[length];
+            var header = new byte[length];
             fileStream.Read(header, offset: 0, header.Length);
             return header;
         }

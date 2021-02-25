@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Security.Cryptography;
 
 /*
     Kryptor: A simple, modern, and secure encryption tool.
@@ -68,7 +69,7 @@ namespace KryptorCLI
                     FileException(inputFilePath, ex);
                 }
             }
-            Arrays.Zero(keyEncryptionKey);
+            CryptographicOperations.ZeroMemory(keyEncryptionKey);
         }
 
         private static string[] GetFiles(string directoryPath)
@@ -120,7 +121,7 @@ namespace KryptorCLI
                     byte[] salt = FileHeaders.ReadSalt(inputFile);
                     byte[] keyEncryptionKey = Generate.KeyEncryptionKey(sharedSecret, ephemeralSharedSecret, salt);
                     DecryptInputFile(inputFile, keyEncryptionKey);
-                    Arrays.Zero(keyEncryptionKey);
+                    CryptographicOperations.ZeroMemory(keyEncryptionKey);
                 }
                 catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
                 {
@@ -162,7 +163,7 @@ namespace KryptorCLI
                     byte[] salt = FileHeaders.ReadSalt(inputFile);
                     byte[] keyEncryptionKey = Generate.KeyEncryptionKey(ephemeralSharedSecret, salt);
                     DecryptInputFile(inputFile, keyEncryptionKey);
-                    Arrays.Zero(keyEncryptionKey);
+                    CryptographicOperations.ZeroMemory(keyEncryptionKey);
                 }
                 catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
                 {

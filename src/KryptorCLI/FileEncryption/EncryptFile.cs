@@ -2,6 +2,7 @@
 using Sodium;
 using System.IO;
 using ChaCha20BLAKE2;
+using System.Security.Cryptography;
 
 /*
     Kryptor: A simple, modern, and secure encryption tool.
@@ -45,7 +46,7 @@ namespace KryptorCLI
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
                 FileHandling.DeleteFile(outputFilePath);
-                Arrays.Zero(dataEncryptionKey);
+                CryptographicOperations.ZeroMemory(dataEncryptionKey);
                 throw;
             }
         }
@@ -71,7 +72,7 @@ namespace KryptorCLI
                 additionalData = ChunkHandling.GetPreviousTag(ciphertextChunk);
                 outputFile.Write(ciphertextChunk, offset, ciphertextChunk.Length);
             }
-            Arrays.Zero(dataEncryptionKey);
+            CryptographicOperations.ZeroMemory(dataEncryptionKey);
         }
 
         private static void Finalize(string inputFilePath, string outputFilePath)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Cryptography;
 using System.Text;
 
 /*
@@ -43,7 +44,7 @@ namespace KryptorCLI
         private static byte[] GetPasswordBytes(char[] password)
         {
             byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
-            Arrays.Zero(password);
+            Arrays.ZeroMemory(password);
             return passwordBytes;
         }
 
@@ -65,7 +66,7 @@ namespace KryptorCLI
         private static byte[] CombineKeyfileAndPassword(byte[] passwordBytes, byte[] keyfileBytes)
         {
             passwordBytes = Blake2.KeyedHash(passwordBytes, keyfileBytes);
-            Arrays.Zero(keyfileBytes);
+            CryptographicOperations.ZeroMemory(keyfileBytes);
             return passwordBytes;
         }
     }

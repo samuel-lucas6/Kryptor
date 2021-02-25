@@ -1,6 +1,4 @@
-﻿using Sodium;
-using System;
-using System.Security.Cryptography;
+﻿using System;
 
 /*
     Kryptor: A simple, modern, and secure encryption tool.

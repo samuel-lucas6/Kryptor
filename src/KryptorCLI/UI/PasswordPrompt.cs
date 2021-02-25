@@ -60,13 +60,13 @@ namespace KryptorCLI
                 DisplayMessage.Error("Passwords do not match.");
                 Environment.Exit(13);
             }
+            Arrays.ZeroMemory(retypedPassword);
         }
 
         public static char[] EnterYourPassword()
         {
-            char[] password;
             Console.WriteLine("Enter your password:");
-            password = GetPassword();
+            char[] password = GetPassword();
             if (password.Length == 0)
             {
                 DisplayMessage.Error("Password cannot be empty.");

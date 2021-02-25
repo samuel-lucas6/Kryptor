@@ -87,6 +87,7 @@ namespace KryptorCLI
         public static byte[] GetCurve25519PublicKey(byte[] privateKey)
         {
             byte[] publicKey = ScalarMult.Base(privateKey);
+            CryptographicOperations.ZeroMemory(privateKey);
             return Arrays.Concat(Constants.Curve25519KeyHeader, publicKey);
         }
 

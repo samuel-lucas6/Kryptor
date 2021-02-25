@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Security.Cryptography;
 
 /*
     Kryptor: A simple, modern, and secure encryption tool.
@@ -27,7 +28,7 @@ namespace KryptorCLI
             byte[] keyfileBytes = Generate.KeyfileBytes();
             File.WriteAllBytes(keyfilePath, keyfileBytes);
             File.SetAttributes(keyfilePath, FileAttributes.ReadOnly);
-            Arrays.Zero(keyfileBytes);
+            CryptographicOperations.ZeroMemory(keyfileBytes);
         }
 
         public static byte[] ReadKeyfile(string keyfilePath)

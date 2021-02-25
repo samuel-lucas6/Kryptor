@@ -2,6 +2,7 @@
 using Sodium;
 using System.IO;
 using ChaCha20BLAKE2;
+using System.Security.Cryptography;
 
 /*
     Kryptor: A simple, modern, and secure encryption tool.
@@ -27,7 +28,7 @@ namespace KryptorCLI
     {
         public static void Initialize(FileStream inputFile, string outputFilePath, byte[] keyEncryptionKey)
         {
-            byte[] dataEncryptionKey = new byte[Constants.EncryptionKeyLength];
+            var dataEncryptionKey = new byte[Constants.EncryptionKeyLength];
             try
             {
                 byte[] encryptedHeader = FileHeaders.ReadEncryptedHeader(inputFile);
@@ -37,7 +38,7 @@ namespace KryptorCLI
                 int lastChunkLength = FileHeaders.GetLastChunkLength(header);
                 int fileNameLength = FileHeaders.GetFileNameLength(header);
                 dataEncryptionKey = FileHeaders.GetDataEncryptionKey(header);
-                Arrays.Zero(header);
+                CryptographicOperations.ZeroMemory(header);
                 using (var outputFile = new FileStream(outputFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
                 {
                     nonce = Utilities.Increment(nonce);
@@ -50,7 +51,7 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
-                Arrays.Zero(dataEncryptionKey);
+                CryptographicOperations.ZeroMemory(dataEncryptionKey);
                 if (!(ex is ArgumentException))
                 {
                     FileHandling.DeleteFile(outputFilePath);
@@ -79,7 +80,7 @@ namespace KryptorCLI
                 outputFile.Write(plaintextChunk, offset, plaintextChunk.Length);
             }
             outputFile.SetLength(outputFile.Length - Constants.FileChunkSize + lastChunkLength);
-            Arrays.Zero(dataEncryptionKey);
+            CryptographicOperations.ZeroMemory(dataEncryptionKey);
         }
 
         private static void Finalize(string inputFilePath, string outputFilePath, int fileNameLength)

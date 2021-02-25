@@ -1,5 +1,4 @@
 ﻿using System;
-using Sodium;
 using System.Security.Cryptography;
 using ChaCha20BLAKE2;
 
@@ -29,12 +28,12 @@ namespace KryptorCLI
         {
             byte[] salt = Generate.Salt();
             byte[] key = Argon2.DeriveKey(passwordBytes, salt);
-            Arrays.Zero(passwordBytes);
+            CryptographicOperations.ZeroMemory(passwordBytes);
             byte[] nonce = Generate.Nonce();
             byte[] additionalData = Arrays.Concat(keyAlgorithm, Constants.PrivateKeyVersion);
             byte[] encryptedPrivateKey = XChaCha20BLAKE2b.Encrypt(privateKey, nonce, key, additionalData, TagLength.Medium);
-            Arrays.Zero(privateKey);
-            Arrays.Zero(key);
+            CryptographicOperations.ZeroMemory(privateKey);
+            CryptographicOperations.ZeroMemory(key);
             return Arrays.Concat(additionalData, salt, nonce, encryptedPrivateKey);
         }
 
@@ -62,9 +61,9 @@ namespace KryptorCLI
             byte[] encryptedPrivateKey = GetEncryptedPrivateKey(privateKey);
             byte[] additionalData = Arrays.Concat(keyAlgorithm, keyVersion);
             byte[] key = Argon2.DeriveKey(passwordBytes, salt);
-            Arrays.Zero(passwordBytes);
+            CryptographicOperations.ZeroMemory(passwordBytes);
             byte[] decryptedPrivateKey = XChaCha20BLAKE2b.Decrypt(encryptedPrivateKey, nonce, key, additionalData, TagLength.Medium);
-            Arrays.Zero(key);
+            CryptographicOperations.ZeroMemory(key);
             return decryptedPrivateKey;
         }
 

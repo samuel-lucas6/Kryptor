@@ -27,24 +27,6 @@ namespace KryptorCLI
     {
         private const int _index = 0;
 
-        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
-        public static void Zero(byte[] array)
-        {
-            if (array != null)
-            {
-                Array.Clear(array, _index, array.Length);
-            }
-        }
-
-        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
-        public static void Zero(char[] array)
-        {
-            if (array.Length > 0)
-            {
-                Array.Clear(array, _index, array.Length);
-            }
-        }
-
         public static byte[] Concat(byte[] a, byte[] b)
         {
             var concat = new byte[a.Length + b.Length];
@@ -89,6 +71,15 @@ namespace KryptorCLI
             byte[] aBytes = Blake2.Hash(Encoding.UTF8.GetBytes(a));
             byte[] bBytes = Blake2.Hash(Encoding.UTF8.GetBytes(b));
             return Utilities.Compare(aBytes, bBytes);
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+        public static void ZeroMemory(char[] array)
+        {
+            if (array.Length > 0)
+            {
+                Array.Clear(array, _index, array.Length);
+            }
         }
     }
 }

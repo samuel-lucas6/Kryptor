@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Security.Cryptography;
 
 /*
     Kryptor: A simple, modern, and secure encryption tool.
@@ -36,7 +37,7 @@ namespace KryptorCLI
                 }
                 UsingPassword(inputFilePath, passwordBytes);
             }
-            Arrays.Zero(passwordBytes);
+            CryptographicOperations.ZeroMemory(passwordBytes);
             DisplayMessage.SuccessfullyDecrypted();
         }
 
@@ -55,7 +56,7 @@ namespace KryptorCLI
                 byte[] keyEncryptionKey = Argon2.DeriveKey(passwordBytes, salt);
                 string outputFilePath = GetOutputFilePath(inputFilePath);
                 DecryptFile.Initialize(inputFile, outputFilePath, keyEncryptionKey);
-                Arrays.Zero(keyEncryptionKey);
+                CryptographicOperations.ZeroMemory(keyEncryptionKey);
                 DecryptionSuccessful(inputFilePath, outputFilePath);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -80,8 +81,8 @@ namespace KryptorCLI
                 }
                 UsingPublicKey(inputFilePath, sharedSecret, recipientPrivateKey);
             }
-            Arrays.Zero(recipientPrivateKey);
-            Arrays.Zero(sharedSecret);
+            CryptographicOperations.ZeroMemory(recipientPrivateKey);
+            CryptographicOperations.ZeroMemory(sharedSecret);
             DisplayMessage.SuccessfullyDecrypted();
         }
 
@@ -102,7 +103,7 @@ namespace KryptorCLI
                 byte[] keyEncryptionKey = Generate.KeyEncryptionKey(sharedSecret, ephemeralSharedSecret, salt);
                 string outputFilePath = GetOutputFilePath(inputFilePath);
                 DecryptFile.Initialize(inputFile, outputFilePath, keyEncryptionKey);
-                Arrays.Zero(keyEncryptionKey);
+                CryptographicOperations.ZeroMemory(keyEncryptionKey);
                 DecryptionSuccessful(inputFilePath, outputFilePath);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -126,7 +127,7 @@ namespace KryptorCLI
                 }
                 UsingPrivateKey(inputFilePath, privateKey);
             }
-            Arrays.Zero(privateKey);
+            CryptographicOperations.ZeroMemory(privateKey);
             DisplayMessage.SuccessfullyDecrypted();
         }
 
@@ -147,7 +148,7 @@ namespace KryptorCLI
                 byte[] keyEncryptionKey = Generate.KeyEncryptionKey(ephemeralSharedSecret, salt);
                 string outputFilePath = GetOutputFilePath(inputFilePath);
                 DecryptFile.Initialize(inputFile, outputFilePath, keyEncryptionKey);
-                Arrays.Zero(keyEncryptionKey);
+                CryptographicOperations.ZeroMemory(keyEncryptionKey);
                 DecryptionSuccessful(inputFilePath, outputFilePath);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))

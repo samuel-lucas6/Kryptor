@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Cryptography;
 
 /*
     Kryptor: A simple, modern, and secure encryption tool.
@@ -42,7 +43,7 @@ namespace KryptorCLI
                     DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to create signature.");
                 }
             }
-            Arrays.Zero(privateKey);
+            CryptographicOperations.ZeroMemory(privateKey);
         }
        
         public static void VerifyFile(string signatureFilePath, string filePath, byte[] publicKey)

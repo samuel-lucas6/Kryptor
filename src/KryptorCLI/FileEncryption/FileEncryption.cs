@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Cryptography;
 using System.Text;
 
 /*
@@ -36,7 +37,7 @@ namespace KryptorCLI
                 }
                 UsingPassword(inputFilePath, passwordBytes);
             }
-            Arrays.Zero(passwordBytes);
+            CryptographicOperations.ZeroMemory(passwordBytes);
             DisplayMessage.SuccessfullyEncrypted();
         }
 
@@ -57,7 +58,7 @@ namespace KryptorCLI
                 byte[] ephemeralPublicKey = Generate.EphemeralPublicKeyHeader();
                 string outputFilePath = GetOutputFilePath(inputFilePath);
                 EncryptFile.Initialize(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
-                Arrays.Zero(keyEncryptionKey);
+                CryptographicOperations.ZeroMemory(keyEncryptionKey);
                 EncryptionSuccessful(inputFilePath, outputFilePath);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -73,7 +74,7 @@ namespace KryptorCLI
             senderPrivateKey = PrivateKey.Decrypt(senderPrivateKey);
             if (senderPrivateKey == null) { return; }
             byte[] sharedSecret = KeyExchange.GetSharedSecret(senderPrivateKey, recipientPublicKey);
-            Arrays.Zero(senderPrivateKey);
+            CryptographicOperations.ZeroMemory(senderPrivateKey);
             foreach (string inputFilePath in filePaths)
             {
                 bool validFilePath = FilePathValidation.FileEncryption(inputFilePath);
@@ -84,7 +85,7 @@ namespace KryptorCLI
                 }
                 UsingPublicKey(inputFilePath, sharedSecret, recipientPublicKey);
             }
-            Arrays.Zero(sharedSecret);
+            CryptographicOperations.ZeroMemory(sharedSecret);
             DisplayMessage.SuccessfullyEncrypted();
         }
 
@@ -104,7 +105,7 @@ namespace KryptorCLI
                 byte[] keyEncryptionKey = Generate.KeyEncryptionKey(sharedSecret, ephemeralSharedSecret, salt);
                 string outputFilePath = GetOutputFilePath(inputFilePath);
                 EncryptFile.Initialize(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
-                Arrays.Zero(keyEncryptionKey);
+                CryptographicOperations.ZeroMemory(keyEncryptionKey);
                 EncryptionSuccessful(inputFilePath, outputFilePath);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -129,7 +130,7 @@ namespace KryptorCLI
                 }
                 UsingPrivateKey(inputFilePath, privateKey);
             }
-            Arrays.Zero(privateKey);
+            CryptographicOperations.ZeroMemory(privateKey);
             DisplayMessage.SuccessfullyEncrypted();
         }
 
@@ -149,7 +150,7 @@ namespace KryptorCLI
                 byte[] keyEncryptionKey = Generate.KeyEncryptionKey(ephemeralSharedSecret, salt);
                 string outputFilePath = GetOutputFilePath(inputFilePath);
                 EncryptFile.Initialize(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
-                Arrays.Zero(keyEncryptionKey);
+                CryptographicOperations.ZeroMemory(keyEncryptionKey);
                 EncryptionSuccessful(inputFilePath, outputFilePath);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
