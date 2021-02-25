@@ -47,6 +47,7 @@ namespace KryptorCLI
                 string directoryPath = obfuscatedDirectoryPath.Replace(obfuscatedDirectoryName, directoryName);
                 directoryPath = FileHandling.GetUniqueDirectoryPath(directoryPath);
                 Directory.Move(obfuscatedDirectoryPath, directoryPath);
+                DisplayMessage.FileEncryptionResult(obfuscatedDirectoryName, directoryName);
                 storageFilePath = Path.Combine(directoryPath, storageFileName);
                 FileHandling.DeleteFile(storageFilePath);
             }
