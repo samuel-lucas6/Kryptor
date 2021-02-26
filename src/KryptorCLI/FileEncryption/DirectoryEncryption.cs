@@ -28,6 +28,10 @@ namespace KryptorCLI
         {
             try
             {
+                // Always overwrite directories
+                CheckOverwrite(directoryPath);
+                bool overwriteSetting = Globals.Overwrite;
+                Globals.Overwrite = true;
                 string[] filePaths = GetFiles(ref directoryPath);
                 // Generate one salt for the entire directory
                 byte[] salt = Generate.Salt();
@@ -35,11 +39,22 @@ namespace KryptorCLI
                 // Perform password hashing once
                 byte[] keyEncryptionKey = Argon2.DeriveKey(passwordBytes, salt);
                 EncryptEachFileWithPassword(filePaths, salt, keyEncryptionKey);
+                Globals.Overwrite = overwriteSetting;
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.Error);
                 DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to encrypt the directory.");
+            }
+        }
+
+        private static void CheckOverwrite(string directoryPath)
+        {
+            if (!Globals.Overwrite)
+            {
+                string backupDirectoryPath = directoryPath + " - Copy";
+                DisplayMessage.FilePathMessage(directoryPath, $"This directory is being backed up to: {Path.GetFileName(backupDirectoryPath)}");
+                FileHandling.CopyDirectory(directoryPath, backupDirectoryPath, copySubdirectories: true);
             }
         }
 
@@ -106,8 +121,14 @@ namespace KryptorCLI
         {
             try
             {
+                // Always overwrite directories
+                CheckOverwrite(directoryPath);
+                bool overwriteSetting = Globals.Overwrite;
+                Globals.Overwrite = true;
+                CheckOverwrite(directoryPath);
                 string[] filePaths = GetFiles(ref directoryPath);
                 EncryptEachFileWithPublicKey(filePaths, sharedSecret, recipientPublicKey);
+                Globals.Overwrite = overwriteSetting;
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
@@ -140,8 +161,13 @@ namespace KryptorCLI
         {
             try
             {
+                // Always overwrite directories
+                CheckOverwrite(directoryPath);
+                bool overwriteSetting = Globals.Overwrite;
+                Globals.Overwrite = true;
                 string[] filePaths = GetFiles(ref directoryPath);
                 EncryptEachFileWithPrivateKey(filePaths, privateKey);
+                Globals.Overwrite = overwriteSetting;
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {

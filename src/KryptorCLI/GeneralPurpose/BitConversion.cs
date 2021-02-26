@@ -25,37 +25,35 @@ namespace KryptorCLI
         public static byte[] GetBytes(int value)
         {
             byte[] valueBytes = BitConverter.GetBytes(value);
-            ToLittleEndian(valueBytes);
-            return valueBytes;
+            return ToLittleEndian(valueBytes);
         }
 
         public static byte[] GetBytes(short value)
         {
             byte[] valueBytes = BitConverter.GetBytes(value);
-            ToLittleEndian(valueBytes);
-            return valueBytes;
+            return ToLittleEndian(valueBytes);
         }
 
         public static byte[] GetBytes(long value)
         {
             byte[] valueBytes = BitConverter.GetBytes(value);
-            ToLittleEndian(valueBytes);
-            return valueBytes;
+            return ToLittleEndian(valueBytes);
         }
 
         public static int ToInt32(byte[] value)
         {
-            ToLittleEndian(value);
+            value = ToLittleEndian(value);
             return BitConverter.ToInt32(value);
         }
 
-        private static void ToLittleEndian(byte[] value)
+        private static byte[] ToLittleEndian(byte[] value)
         {
             // Always use little endian
             if (!BitConverter.IsLittleEndian)
             {
                 Array.Reverse(value);
             }
+            return value;
         }
     }
 }

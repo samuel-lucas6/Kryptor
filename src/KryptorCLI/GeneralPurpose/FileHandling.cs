@@ -100,6 +100,32 @@ namespace KryptorCLI
             return fileInfo.Length;
         }
 
+        public static void CopyDirectory(string sourceDirectoryPath, string destinationDirectoryPath, bool copySubdirectories)
+        {
+            var directoryInfo = new DirectoryInfo(sourceDirectoryPath);
+            if (!directoryInfo.Exists)
+            {
+                throw new DirectoryNotFoundException($"Source directory does not exist or could not be found: {sourceDirectoryPath}");
+            }
+            DirectoryInfo[] directories = directoryInfo.GetDirectories();
+            destinationDirectoryPath = GetUniqueDirectoryPath(destinationDirectoryPath);
+            Directory.CreateDirectory(destinationDirectoryPath);
+            FileInfo[] files = directoryInfo.GetFiles();
+            foreach (FileInfo file in files)
+            {
+                string newFilePath = Path.Combine(destinationDirectoryPath, file.Name);
+                file.CopyTo(newFilePath, false);
+            }
+            if (copySubdirectories)
+            {
+                foreach (DirectoryInfo subdirectory in directories)
+                {
+                    string newSubdirectoryPath = Path.Combine(destinationDirectoryPath, subdirectory.Name);
+                    CopyDirectory(subdirectory.FullName, newSubdirectoryPath, copySubdirectories);
+                }
+            }
+        }
+
         public static void OverwriteFile(string fileToDelete, string fileToCopy)
         {
             try
