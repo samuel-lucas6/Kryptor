@@ -52,9 +52,8 @@ namespace KryptorCLI
         {
             if (!Globals.Overwrite)
             {
-                string backupDirectoryPath = directoryPath + " - Copy";
-                DisplayMessage.FilePathMessage(directoryPath, $"This directory is being backed up to: {Path.GetFileName(backupDirectoryPath)}");
-                FileHandling.CopyDirectory(directoryPath, backupDirectoryPath, copySubdirectories: true);
+                DisplayMessage.FilePathMessage(directoryPath, $"This directory is being backed up...");
+                FileHandling.CopyDirectory(directoryPath, directoryPath + " - Copy", copySubdirectories: true);
             }
         }
 

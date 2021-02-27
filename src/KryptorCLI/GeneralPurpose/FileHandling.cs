@@ -184,7 +184,7 @@ namespace KryptorCLI
                 directoryNumber++;
                 directoryPath = Path.Combine(parentDirectory, $"{directoryName} ({directoryNumber})");
             }
-            while (File.Exists(directoryPath));
+            while (Directory.Exists(directoryPath));
             return directoryPath;
         }
 
