@@ -174,7 +174,8 @@ namespace KryptorCLI
 
         private static void Finalize(string directoryPath, string saltFilePath)
         {
-            if (Globals.SuccessfulCount != 0 && Globals.SuccessfulCount == Globals.TotalCount)
+            string[] kryptorFiles = Directory.GetFiles(directoryPath, $"*{Constants.EncryptedExtension}", SearchOption.AllDirectories);
+            if (kryptorFiles.Length == 0)
             {
                 FileHandling.DeleteFile(saltFilePath);
             }
