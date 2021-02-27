@@ -208,12 +208,5 @@ namespace KryptorCLI
                 DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to make the file read-only.");
             }
         }
-
-        public static Encoding GetFileEncoding(string filePath)
-        {
-            using var streamReader = new StreamReader(filePath, Encoding.UTF8, detectEncodingFromByteOrderMarks: true);
-            streamReader.Peek();
-            return streamReader.CurrentEncoding;
-        }
     }
 }
