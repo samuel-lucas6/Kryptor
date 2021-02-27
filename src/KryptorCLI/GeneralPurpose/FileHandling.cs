@@ -162,12 +162,14 @@ namespace KryptorCLI
             int fileNumber = 1;
             string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
             string fileExtension = Path.GetExtension(filePath);
-            while (File.Exists(filePath))
+            string directoryPath = Path.GetDirectoryName(filePath);
+            do
             {
                 fileNumber++;
                 string newFileName = $"{fileNameWithoutExtension} ({fileNumber}){fileExtension}";
-                filePath = Path.Combine(Path.GetDirectoryName(filePath), newFileName);
+                filePath = Path.Combine(directoryPath, newFileName);
             }
+            while (File.Exists(filePath));
             return filePath;
         }
 
@@ -177,11 +179,12 @@ namespace KryptorCLI
             int directoryNumber = 1;
             string parentDirectory = Directory.GetParent(directoryPath).FullName;
             string directoryName = Path.GetFileName(directoryPath);
-            while (Directory.Exists(directoryPath))
+            do
             {
                 directoryNumber++;
                 directoryPath = Path.Combine(parentDirectory, $"{directoryName} ({directoryNumber})");
             }
+            while (File.Exists(directoryPath));
             return directoryPath;
         }
 
