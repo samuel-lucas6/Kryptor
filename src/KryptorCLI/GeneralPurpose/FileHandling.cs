@@ -2,7 +2,6 @@
 using System;
 using System.IO;
 using System.Text;
-using System.Text.RegularExpressions;
 
 /*
     Kryptor: A simple, modern, and secure encryption tool.
@@ -160,41 +159,29 @@ namespace KryptorCLI
         public static string GetUniqueFilePath(string filePath)
         {
             if (!File.Exists(filePath)) { return filePath; }
-            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
             int fileNumber = 1;
-            var regexMatch = Regex.Match(fileNameWithoutExtension, @"^(.+) \((\d+)\)$");
-            if (regexMatch.Success)
-            {
-                fileNameWithoutExtension = regexMatch.Groups[1].Value;
-                fileNumber = int.Parse(regexMatch.Groups[2].Value);
-            }
-            do
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
+            string fileExtension = Path.GetExtension(filePath);
+            while (File.Exists(filePath))
             {
                 fileNumber++;
-                string newFileName = $"{fileNameWithoutExtension} ({fileNumber}){Path.GetExtension(filePath)}";
+                string newFileName = $"{fileNameWithoutExtension} ({fileNumber}){fileExtension}";
                 filePath = Path.Combine(Path.GetDirectoryName(filePath), newFileName);
             }
-            while (File.Exists(filePath));
             return filePath;
         }
 
         public static string GetUniqueDirectoryPath(string directoryPath)
         {
             if (!Directory.Exists(directoryPath)) { return directoryPath; }
-            string directoryName = Path.GetFileName(directoryPath);
             int directoryNumber = 1;
-            var regexMatch = Regex.Match(directoryName, @"^(.+) \((\d+)\)$");
-            if (regexMatch.Success)
-            {
-                directoryName = regexMatch.Groups[1].Value;
-                directoryNumber = int.Parse(regexMatch.Groups[2].Value);
-            }
-            do
+            string parentDirectory = Directory.GetParent(directoryPath).FullName;
+            string directoryName = Path.GetFileName(directoryPath);
+            while (Directory.Exists(directoryPath))
             {
                 directoryNumber++;
-                directoryPath = directoryPath.Replace(directoryName, $"{directoryName} ({directoryNumber})");
+                directoryPath = Path.Combine(parentDirectory, $"{directoryName} ({directoryNumber})");
             }
-            while (Directory.Exists(directoryPath));
             return directoryPath;
         }
 
