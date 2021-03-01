@@ -34,7 +34,7 @@ Examples:
 
 Please report bugs to <https://github.com/samuel-lucas6/Kryptor/issues>.
 
-Still need help? Read the tutorial <https://kryptor.co.uk>.")]
+Stuck? Read the tutorial <https://kryptor.co.uk>.")]
     public class Program
     {
         [Option("-e|--encrypt", "encrypt files/folders", CommandOptionType.NoValue)]

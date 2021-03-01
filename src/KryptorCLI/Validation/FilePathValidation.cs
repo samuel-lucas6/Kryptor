@@ -52,8 +52,8 @@ namespace KryptorCLI
         {
             try
             {
-                const string keyfileExtension = ".key";
                 if (string.IsNullOrEmpty(keyfilePath) || File.Exists(keyfilePath)) { return keyfilePath; }
+                const string keyfileExtension = ".key";
                 // Generate a random keyfile
                 if (Directory.Exists(keyfilePath))
                 {

@@ -41,7 +41,7 @@ namespace KryptorCLI
         private static List<string> GetRandomWords(string[] wordlist, int length)
         {
             var words = new List<string>();
-            var textInfo = CultureInfo.CurrentCulture.TextInfo;
+            var textInfo = new CultureInfo("en-US", useUserOverride: false).TextInfo;
             for (int i = 0; i < length; i++)
             {
                 int randomLine = SodiumCore.GetRandomNumber(wordlist.Length);

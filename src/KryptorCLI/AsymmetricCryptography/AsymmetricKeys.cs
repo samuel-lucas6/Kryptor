@@ -95,6 +95,7 @@ namespace KryptorCLI
         public static byte[] GetEd25519PublicKey(byte[] privateKey)
         {
             byte[] publicKey = PublicKeyAuth.ExtractEd25519PublicKeyFromEd25519SecretKey(privateKey);
+            CryptographicOperations.ZeroMemory(privateKey);
             return Arrays.Concat(Constants.Ed25519KeyHeader, publicKey);
         }
     }

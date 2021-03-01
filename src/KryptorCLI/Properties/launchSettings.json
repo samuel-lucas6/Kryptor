@@ -2,7 +2,7 @@
   "profiles": {
     "KryptorCLI": {
       "commandName": "Project",
-      "commandLineArgs": "-e -p test.jpg",
+      "commandLineArgs": "-v -y RWSSUA+SpX1l3wRusyVnqiJbAbA4IdXQsk4z6gEabqikgA== test.jpg",
       "remoteDebugEnabled": false
     }
   }

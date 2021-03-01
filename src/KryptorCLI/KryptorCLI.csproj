@@ -13,7 +13,7 @@
     <Company />
     <Product>Kryptor</Product>
     <Copyright>Copyright © 2020-2021 Samuel Lucas</Copyright>
-    <Description>Free and open source file encryption software.</Description>
+    <Description>A simple, modern, and secure encryption tool.</Description>
     <PackageLicenseFile></PackageLicenseFile>
     <PackageLicenseExpression>GPLv3</PackageLicenseExpression>
     <PackageProjectUrl>https://kryptor.co.uk/</PackageProjectUrl>
