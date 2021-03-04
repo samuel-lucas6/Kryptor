@@ -66,7 +66,7 @@ Files in the same directory as the ```kryptor``` executable can be specified usi
 ```
 $ ./kryptor -e -p message.txt
 ```
-However, files that are not in the same directory as the kryptor executable must be specified using a file path:
+However, files that are not in the same directory as the ```kryptor``` executable must be specified using a file path:
 ```
 $ ./kryptor -e -p /home/samuel/Documents/message.txt
 ```
