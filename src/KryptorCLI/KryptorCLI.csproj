@@ -16,7 +16,7 @@
     <Description>A simple, modern, and secure encryption tool.</Description>
     <PackageLicenseFile></PackageLicenseFile>
     <PackageLicenseExpression>GPLv3</PackageLicenseExpression>
-    <PackageProjectUrl>https://kryptor.co.uk/</PackageProjectUrl>
+    <PackageProjectUrl>https://www.kryptor.co.uk/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/samuel-lucas6/Kryptor</RepositoryUrl>
     <PackageIcon>Kryptor Logo.png</PackageIcon>
     <NeutralLanguage>en-GB</NeutralLanguage>

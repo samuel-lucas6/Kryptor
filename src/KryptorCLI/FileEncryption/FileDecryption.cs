@@ -52,10 +52,11 @@ namespace KryptorCLI
                     return;
                 }
                 using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
+                byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
                 byte[] keyEncryptionKey = Argon2.DeriveKey(passwordBytes, salt);
                 string outputFilePath = GetOutputFilePath(inputFilePath);
-                DecryptFile.Initialize(inputFile, outputFilePath, keyEncryptionKey);
+                DecryptFile.Initialize(inputFile, outputFilePath, ephemeralPublicKey, keyEncryptionKey);
                 CryptographicOperations.ZeroMemory(keyEncryptionKey);
                 DecryptionSuccessful(inputFilePath, outputFilePath);
             }
@@ -102,7 +103,7 @@ namespace KryptorCLI
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
                 byte[] keyEncryptionKey = Generate.KeyEncryptionKey(sharedSecret, ephemeralSharedSecret, salt);
                 string outputFilePath = GetOutputFilePath(inputFilePath);
-                DecryptFile.Initialize(inputFile, outputFilePath, keyEncryptionKey);
+                DecryptFile.Initialize(inputFile, outputFilePath, ephemeralPublicKey, keyEncryptionKey);
                 CryptographicOperations.ZeroMemory(keyEncryptionKey);
                 DecryptionSuccessful(inputFilePath, outputFilePath);
             }
@@ -147,7 +148,7 @@ namespace KryptorCLI
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
                 byte[] keyEncryptionKey = Generate.KeyEncryptionKey(ephemeralSharedSecret, salt);
                 string outputFilePath = GetOutputFilePath(inputFilePath);
-                DecryptFile.Initialize(inputFile, outputFilePath, keyEncryptionKey);
+                DecryptFile.Initialize(inputFile, outputFilePath, ephemeralPublicKey, keyEncryptionKey);
                 CryptographicOperations.ZeroMemory(keyEncryptionKey);
                 DecryptionSuccessful(inputFilePath, outputFilePath);
             }

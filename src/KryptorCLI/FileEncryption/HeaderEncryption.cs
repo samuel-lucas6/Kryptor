@@ -25,11 +25,11 @@ namespace KryptorCLI
 {
     public static class HeaderEncryption
     {
-        public static byte[] ComputeAdditionalData(long fileLength)
+        public static byte[] ComputeAdditionalData(long fileLength, byte[] ephemeralPublicKey)
         {
             long chunkCount = (long)Math.Ceiling((double)fileLength / Constants.FileChunkSize);
             byte[] ciphertextLength = BitConversion.GetBytes(chunkCount * Constants.TotalChunkLength);
-            return Arrays.Concat(Constants.KryptorMagicBytes, Constants.EncryptionVersion, ciphertextLength);
+            return Arrays.Concat(ciphertextLength, Constants.KryptorMagicBytes, Constants.EncryptionVersion, ephemeralPublicKey);
         }
 
         public static byte[] Encrypt(byte[] fileHeader, byte[] nonce, byte[] keyEncryptionKey, byte[] additionalData)
@@ -37,14 +37,13 @@ namespace KryptorCLI
             return XChaCha20BLAKE2b.Encrypt(fileHeader, nonce, keyEncryptionKey, additionalData, TagLength.Medium);
         }
 
-        public static byte[] GetAdditionalData(FileStream inputFile)
+        public static byte[] GetAdditionalData(FileStream inputFile, byte[] ephemeralPublicKey)
         {
+            byte[] ciphertextLength = BitConversion.GetBytes(inputFile.Length - Constants.FileHeadersLength);
             byte[] magicBytes = FileHeaders.ReadMagicBytes(inputFile);
             byte[] formatVersion = FileHeaders.ReadFileFormatVersion(inputFile);
             FileHeaders.ValidateFormatVersion(formatVersion, Constants.EncryptionVersion);
-            int headersLength = FileHeaders.GetHeadersLength();
-            byte[] ciphertextLength = BitConversion.GetBytes(inputFile.Length - headersLength);
-            return Arrays.Concat(magicBytes, formatVersion, ciphertextLength);
+            return Arrays.Concat(ciphertextLength, magicBytes, formatVersion, ephemeralPublicKey);
         }
 
         public static byte[] Decrypt(byte[] encryptedFileHeader, byte[] nonce, byte[] keyEncryptionKey, byte[] additionalData)

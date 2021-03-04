@@ -39,6 +39,7 @@ namespace KryptorCLI
         public const int FileChunkSize = 16384;
         public const int IntBitConverterLength = 4;
         public const int EncryptedHeaderLength = 72;
+        public static readonly int FileHeadersLength = KryptorMagicBytes.Length + EncryptionVersion.Length + EphemeralPublicKeyLength + SaltLength + XChaChaNonceLength + EncryptedHeaderLength;
         public static readonly int TotalChunkLength = FileChunkSize + TagLength;
 
         // Cryptography

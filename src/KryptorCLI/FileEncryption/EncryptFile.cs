@@ -35,7 +35,7 @@ namespace KryptorCLI
                 using (var outputFile = new FileStream(outputFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
                 {
                     byte[] nonce = Generate.Nonce();
-                    byte[] encryptedHeader = EncryptFileHeader(inputFilePath, dataEncryptionKey, nonce, keyEncryptionKey);
+                    byte[] encryptedHeader = EncryptFileHeader(inputFilePath, ephemeralPublicKey, dataEncryptionKey, nonce, keyEncryptionKey);
                     FileHeaders.WriteHeaders(outputFile, ephemeralPublicKey, salt, nonce, encryptedHeader);
                     nonce = Utilities.Increment(nonce);
                     byte[] additionalData = ChunkHandling.GetPreviousTag(encryptedHeader);
@@ -51,13 +51,13 @@ namespace KryptorCLI
             }
         }
 
-        private static byte[] EncryptFileHeader(string inputFilePath, byte[] dataEncryptionKey, byte[] nonce, byte[] keyEncryptionKey)
+        private static byte[] EncryptFileHeader(string inputFilePath, byte[] ephemeralPublicKey, byte[] dataEncryptionKey, byte[] nonce, byte[] keyEncryptionKey)
         {
             long fileLength = FileHandling.GetFileLength(inputFilePath);
             byte[] lastChunkLength = BitConversion.GetBytes(Convert.ToInt32(fileLength % Constants.FileChunkSize));
             byte[] fileNameLength = FileHeaders.GetFileNameLength(inputFilePath);
             byte[] fileHeader = Arrays.Concat(lastChunkLength, fileNameLength, dataEncryptionKey);
-            byte[] additionalData = HeaderEncryption.ComputeAdditionalData(fileLength);
+            byte[] additionalData = HeaderEncryption.ComputeAdditionalData(fileLength, ephemeralPublicKey);
             return HeaderEncryption.Encrypt(fileHeader, nonce, keyEncryptionKey, additionalData);
         }
 

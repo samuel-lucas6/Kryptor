@@ -62,7 +62,8 @@ namespace KryptorCLI
                 try
                 {
                     using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
-                    DecryptInputFile(inputFile, keyEncryptionKey);
+                    byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
+                    DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey);
                 }
                 catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
                 {
@@ -80,11 +81,11 @@ namespace KryptorCLI
             return filePaths;
         }
 
-        private static void DecryptInputFile(FileStream inputFile, byte[] keyEncryptionKey)
+        private static void DecryptInputFile(FileStream inputFile, byte[] ephemeralPublicKey, byte[] keyEncryptionKey)
         {
             string inputFilePath = inputFile.Name;
             string outputFilePath = FileDecryption.GetOutputFilePath(inputFilePath);
-            DecryptFile.Initialize(inputFile, outputFilePath, keyEncryptionKey);
+            DecryptFile.Initialize(inputFile, outputFilePath, ephemeralPublicKey, keyEncryptionKey);
             FileDecryption.DecryptionSuccessful(inputFilePath, outputFilePath);
         }
 
@@ -120,7 +121,7 @@ namespace KryptorCLI
                     byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecret(recipientPrivateKey, ephemeralPublicKey);
                     byte[] salt = FileHeaders.ReadSalt(inputFile);
                     byte[] keyEncryptionKey = Generate.KeyEncryptionKey(sharedSecret, ephemeralSharedSecret, salt);
-                    DecryptInputFile(inputFile, keyEncryptionKey);
+                    DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey);
                     CryptographicOperations.ZeroMemory(keyEncryptionKey);
                 }
                 catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -162,7 +163,7 @@ namespace KryptorCLI
                     byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecret(privateKey, ephemeralPublicKey);
                     byte[] salt = FileHeaders.ReadSalt(inputFile);
                     byte[] keyEncryptionKey = Generate.KeyEncryptionKey(ephemeralSharedSecret, salt);
-                    DecryptInputFile(inputFile, keyEncryptionKey);
+                    DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey);
                     CryptographicOperations.ZeroMemory(keyEncryptionKey);
                 }
                 catch (Exception ex) when (ExceptionFilters.Cryptography(ex))

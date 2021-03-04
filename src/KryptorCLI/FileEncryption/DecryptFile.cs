@@ -26,14 +26,14 @@ namespace KryptorCLI
 {
     public static class DecryptFile
     {
-        public static void Initialize(FileStream inputFile, string outputFilePath, byte[] keyEncryptionKey)
+        public static void Initialize(FileStream inputFile, string outputFilePath, byte[] ephemeralPublicKey, byte[] keyEncryptionKey)
         {
             var dataEncryptionKey = new byte[Constants.EncryptionKeyLength];
             try
             {
                 byte[] encryptedHeader = FileHeaders.ReadEncryptedHeader(inputFile);
                 byte[] nonce = FileHeaders.ReadNonce(inputFile);
-                byte[] header = DecryptFileHeader(inputFile, encryptedHeader, nonce, keyEncryptionKey);
+                byte[] header = DecryptFileHeader(inputFile, ephemeralPublicKey, encryptedHeader, nonce, keyEncryptionKey);
                 if (header == null) { throw new ArgumentException("Incorrect password/key or this file has been tampered with."); }
                 int lastChunkLength = FileHeaders.GetLastChunkLength(header);
                 int fileNameLength = FileHeaders.GetFileNameLength(header);
@@ -60,16 +60,15 @@ namespace KryptorCLI
             }
         }
 
-        private static byte[] DecryptFileHeader(FileStream inputFile, byte[] encryptedHeader, byte[] nonce, byte[] keyEncryptionKey)
+        private static byte[] DecryptFileHeader(FileStream inputFile, byte[] ephemeralPublicKey, byte[] encryptedHeader, byte[] nonce, byte[] keyEncryptionKey)
         {
-            byte[] additionalData = HeaderEncryption.GetAdditionalData(inputFile);
+            byte[] additionalData = HeaderEncryption.GetAdditionalData(inputFile, ephemeralPublicKey);
             return HeaderEncryption.Decrypt(encryptedHeader, nonce, keyEncryptionKey, additionalData);
         }
 
         private static void Decrypt(FileStream inputFile, FileStream outputFile, byte[] nonce, byte[] dataEncryptionKey, byte[] additionalData, int lastChunkLength)
         {
-            int headersLength = FileHeaders.GetHeadersLength();
-            inputFile.Seek(headersLength, SeekOrigin.Begin);
+            inputFile.Seek(Constants.FileHeadersLength, SeekOrigin.Begin);
             const int offset = 0;
             byte[] ciphertextChunk = new byte[Constants.TotalChunkLength];
             while (inputFile.Read(ciphertextChunk, offset, ciphertextChunk.Length) > 0)

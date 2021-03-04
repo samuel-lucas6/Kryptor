@@ -44,11 +44,6 @@ namespace KryptorCLI
             return BitConversion.GetBytes(fileNameBytes.Length);
         }
 
-        public static int GetHeadersLength()
-        {
-            return Constants.KryptorMagicBytes.Length + Constants.EncryptionVersion.Length + Constants.EphemeralPublicKeyLength + Constants.SaltLength + Constants.XChaChaNonceLength + Constants.EncryptedHeaderLength;
-        }
-
         public static byte[] ReadMagicBytes(string inputFilePath)
         {
             return FileHandling.ReadFileHeader(inputFilePath, offset: 0, Constants.KryptorMagicBytes.Length);
