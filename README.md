@@ -59,14 +59,14 @@ Examples:
 ### Specifying files
 When referencing file paths/file names that contain spaces, you must surround them with 'apostrophes' on Linux/macOS and "speech marks" on Windows:
 ```
-$ ./kryptor -e -p 'GitHub Logo.png'
-$ ./kryptor -e -p '/home/samuel/Downloads/GitHub Logo.png'
+$ kryptor -e -p 'GitHub Logo.png'
+$ kryptor -e -p '/home/samuel/Downloads/GitHub Logo.png'
 ```
 Files in the same directory as the ```kryptor``` executable can be specified using their file name:
 ```
-$ ./kryptor -e -p message.txt
+$ kryptor -e -p message.txt
 ```
 However, files that are not in the same directory as the ```kryptor``` executable must be specified using a file path:
 ```
-$ ./kryptor -e -p /home/samuel/Documents/message.txt
+$ kryptor -e -p /home/samuel/Documents/message.txt
 ```
