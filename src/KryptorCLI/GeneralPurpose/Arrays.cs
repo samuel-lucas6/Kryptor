@@ -1,6 +1,7 @@
 ﻿using Sodium;
 using System;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Text;
 
 /*
@@ -68,9 +69,16 @@ namespace KryptorCLI
         public static bool Compare(char[] a, char[] b)
         {
             // Constant time comparison
-            byte[] aBytes = Blake2.Hash(Encoding.UTF8.GetBytes(a));
-            byte[] bBytes = Blake2.Hash(Encoding.UTF8.GetBytes(b));
-            return Utilities.Compare(aBytes, bBytes);
+            byte[] aBytes = Encoding.UTF8.GetBytes(a);
+            byte[] aHash = Blake2.Hash(aBytes);
+            CryptographicOperations.ZeroMemory(aBytes);
+            byte[] bBytes = Encoding.UTF8.GetBytes(b);
+            byte[] bHash = Blake2.Hash(bBytes);
+            CryptographicOperations.ZeroMemory(bBytes);
+            bool equal = Utilities.Compare(aHash, bHash);
+            CryptographicOperations.ZeroMemory(aHash);
+            CryptographicOperations.ZeroMemory(bHash);
+            return equal;
         }
 
         [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
