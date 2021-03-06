@@ -10,26 +10,28 @@ assignees: samuel-lucas6
 <!-- A clear and concise description of the bug. -->
 
 ### Steps to Reproduce
-1. Go to '...'
-2. Click on '....'
+1. Use the '...'
+2. Type in '....'
 3. See error
 
 ### Expected Behaviour
 <!-- A clear and concise description of what you expected to happen. -->
 
 ### Screenshots
-<!-- If applicable, add screenshots to help explain the bug. -->
+<!-- If applicable, add a screenshot to help explain the bug. Otherwise, delete this heading. -->
 
 ### Platform Info
  - OS: [e.g. Windows]
- - Version: [e.g. CLI v2.2.1 Beta]
+ - Version: [e.g. v3.0.0 Beta]
 
 ### Error Log
-Please attach your error log file so I can understand what is causing the problem. Here's where you can find the log file:
-
-- GUI Installed: ```%APPDATA%\Kryptor\error log.txt```
-- GUI Portable: ```Kryptor/error log.txt```
-- CLI: Run the ```--error-log``` command and attach ```error log.txt```
-
+<!-- Please reproduce the error and then attach your error log file to help me understand what is causing the problem. -->
+<!-- If you do not want to share your error log file, please remove this heading. -->
+<!-- 
+Here is where you can find the file:
+- Windows: ```C:\Users\USERNAME\AppData\Local\Kryptor\error log.txt```
+- Linux: ```/home/USERNAME/.local/share/Kryptor/error log.txt```
+- macOS: ```/Users/USERNAME/.local/share/Kryptor/error log.txt``` 
+-->
 
 
