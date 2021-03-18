@@ -10,7 +10,7 @@ It is a portable, cross-platform command line tool that makes use of modern and 
 
 ## Features
 
-- Encrypt files with a password, keyfile, or asymmetric keys.
+- Encrypt files/folders with a password, keyfile, or asymmetric keys.
 - Create and verify digital signatures. Supports an authenticated comment and prehashing for large files.
 - Generation of asymmetric key pairs. The private key is encrypted for protection at rest.
 - UNIX style password entry and random passphrase generation.
