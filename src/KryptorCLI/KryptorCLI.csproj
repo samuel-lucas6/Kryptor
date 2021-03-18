@@ -7,9 +7,9 @@
 	<PublishReadyToRunShowWarnings>true</PublishReadyToRunShowWarnings>
 	<StartupObject></StartupObject>
     <ApplicationIcon>Kryptor Icon.ico</ApplicationIcon>
-    <Platforms>AnyCPU;x64</Platforms>
+    <Platforms>x64</Platforms>
     <PackageId>Kryptor</PackageId>
-    <Version>3.0.1</Version>
+    <Version>3.0.2</Version>
     <Authors>Samuel Lucas</Authors>
     <Company />
     <Product>Kryptor</Product>

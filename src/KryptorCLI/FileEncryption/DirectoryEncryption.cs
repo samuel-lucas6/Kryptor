@@ -26,38 +26,46 @@ namespace KryptorCLI
     {
         public static void UsingPassword(string directoryPath, byte[] passwordBytes)
         {
+            bool overwriteOption = Globals.Overwrite;
             try
             {
                 // Always overwrite directories
-                CheckOverwrite(directoryPath);
-                bool overwriteSetting = Globals.Overwrite;
+                string backupDirectoryPath = BackupDirectory(directoryPath);
                 Globals.Overwrite = true;
-                string[] filePaths = GetFiles(ref directoryPath);
+                string[] filePaths = GetFiles(directoryPath, out string newDirectoryPath);
                 // Generate one salt for the entire directory
                 byte[] salt = Generate.Salt();
-                CreateSaltFile(directoryPath, salt);
+                CreateSaltFile(newDirectoryPath, salt);
                 // Perform password hashing once
                 byte[] keyEncryptionKey = Argon2.DeriveKey(passwordBytes, salt);
                 EncryptEachFileWithPassword(filePaths, salt, keyEncryptionKey);
-                Globals.Overwrite = overwriteSetting;
+                RenameBackupDirectory(backupDirectoryPath, directoryPath);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.Error);
                 DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to encrypt the directory.");
             }
-        }
-
-        private static void CheckOverwrite(string directoryPath)
-        {
-            if (!Globals.Overwrite)
+            finally
             {
-                DisplayMessage.FilePathMessage(directoryPath, $"This directory is being backed up...");
-                FileHandling.CopyDirectory(directoryPath, directoryPath + " - Copy", copySubdirectories: true);
+                Globals.Overwrite = overwriteOption;
             }
         }
 
-        private static string[] GetFiles(ref string directoryPath)
+        private static string BackupDirectory(string directoryPath)
+        {
+            if (Globals.Overwrite) { return null; }
+            DisplayMessage.FilePathMessage(directoryPath, "Copying directory because you didn't specify -o|--overwrite...");
+            string destinationDirectoryPath = FileHandling.GetUniqueDirectoryPath($"{directoryPath} - Copy");
+            FileHandling.CopyDirectory(directoryPath, destinationDirectoryPath, copySubdirectories: true);
+            if (!Globals.ObfuscateFileNames)
+            {
+                DisplayMessage.FileEncryptionResult(directoryPath, destinationDirectoryPath);
+            }
+            return destinationDirectoryPath;
+        }
+
+        private static string[] GetFiles(string directoryPath, out string newDirectoryPath)
         {
             try
             {
@@ -71,6 +79,7 @@ namespace KryptorCLI
                 Logging.LogException(ex.ToString(), Logging.Severity.Error);
                 DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to obfuscate the directory names.");
             }
+            newDirectoryPath = directoryPath;
             string[] filePaths = FileHandling.GetAllFiles(directoryPath);
             // -1 for the selected directory
             Globals.TotalCount += filePaths.Length - 1;
@@ -116,23 +125,34 @@ namespace KryptorCLI
             }
         }
 
+        private static void RenameBackupDirectory(string backupDirectoryPath, string originalDirectoryPath)
+        {
+            if (!string.IsNullOrEmpty(backupDirectoryPath) && !Directory.Exists(originalDirectoryPath))
+            {
+                Directory.Move(backupDirectoryPath, originalDirectoryPath);
+            }
+        }
+
         public static void UsingPublicKey(string directoryPath, byte[] sharedSecret, byte[] recipientPublicKey)
         {
+            bool overwriteOption = Globals.Overwrite;
             try
             {
                 // Always overwrite directories
-                CheckOverwrite(directoryPath);
-                bool overwriteSetting = Globals.Overwrite;
+                string backupDirectoryPath = BackupDirectory(directoryPath);
                 Globals.Overwrite = true;
-                CheckOverwrite(directoryPath);
-                string[] filePaths = GetFiles(ref directoryPath);
+                string[] filePaths = GetFiles(directoryPath, out _);
                 EncryptEachFileWithPublicKey(filePaths, sharedSecret, recipientPublicKey);
-                Globals.Overwrite = overwriteSetting;
+                RenameBackupDirectory(backupDirectoryPath, directoryPath);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.Error);
                 DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to encrypt the directory.");
+            }
+            finally
+            {
+                Globals.Overwrite = overwriteOption;
             }
         }
 
@@ -158,20 +178,24 @@ namespace KryptorCLI
 
         public static void UsingPrivateKey(string directoryPath, byte[] privateKey)
         {
+            bool overwriteOption = Globals.Overwrite;
             try
             {
                 // Always overwrite directories
-                CheckOverwrite(directoryPath);
-                bool overwriteSetting = Globals.Overwrite;
+                string backupDirectoryPath = BackupDirectory(directoryPath);
                 Globals.Overwrite = true;
-                string[] filePaths = GetFiles(ref directoryPath);
+                string[] filePaths = GetFiles(directoryPath, out _);
                 EncryptEachFileWithPrivateKey(filePaths, privateKey);
-                Globals.Overwrite = overwriteSetting;
+                RenameBackupDirectory(backupDirectoryPath, directoryPath);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
                 Logging.LogException(ex.ToString(), Logging.Severity.Error);
                 DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to encrypt the directory.");
+            }
+            finally
+            {
+                Globals.Overwrite = overwriteOption;
             }
         }
 
