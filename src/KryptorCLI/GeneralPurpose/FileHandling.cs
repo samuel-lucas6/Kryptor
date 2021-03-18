@@ -128,8 +128,9 @@ namespace KryptorCLI
         {
             try
             {
+                File.SetAttributes(fileToDelete, FileAttributes.Normal);
                 File.Copy(fileToCopy, fileToDelete, overwrite: true);
-                DeleteFile(fileToDelete);
+                File.Delete(fileToDelete);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {

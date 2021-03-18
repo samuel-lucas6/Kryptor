@@ -45,6 +45,7 @@ namespace KryptorCLI
         {
             string fileName = Path.GetFileName(filePath);
             byte[] fileNameBytes = Encoding.UTF8.GetBytes(fileName);
+            File.SetAttributes(filePath, FileAttributes.Normal);
             using var fileStream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
             fileStream.Write(fileNameBytes, offset: 0, fileNameBytes.Length);
         }
