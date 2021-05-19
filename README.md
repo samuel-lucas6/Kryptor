@@ -48,13 +48,14 @@ Options:
   -u|--update            check for updates
   -a|--about             view the program version and license
   -h|--help              show help information
-  
+
 Examples:
   --encrypt -p [file]
+  --encrypt -x [file]
   --encrypt -x [-y recipient public key] [file]
   --decrypt -x [-y sender recipient key] [file]
   --sign -x [-c comment] [file]
-  --verify [-y public key] [-t signature] [file] 
+  --verify [-y public key] [-t signature] [file]
   ```
 ### Specifying files
 When referencing file paths/file names that contain spaces, you must surround them with 'apostrophes' on Linux/macOS and "speech marks" on Windows:
