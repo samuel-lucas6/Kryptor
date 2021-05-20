@@ -39,7 +39,6 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
-                Logging.LogException(ex.ToString(), Logging.Severity.Error);
                 DisplayMessage.FilePathException(outputFilePath, ex.GetType().Name, "Unable to restore the original file name.");
             }
         }
@@ -66,7 +65,6 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
-                Logging.LogException(ex.ToString(), Logging.Severity.Error);
                 DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to remove appended file name.");
             }
         }

@@ -70,7 +70,6 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
-                Logging.LogException(ex.ToString(), Logging.Severity.Error);
                 DisplayMessage.FilePathException(keyfilePath, ex.GetType().Name, "Unable to randomly generate keyfile.");
                 return null;
             }

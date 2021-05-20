@@ -57,7 +57,6 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
-                Logging.LogException(ex.ToString(), Logging.Severity.Error);
                 DisplayMessage.Exception(ex.GetType().Name, "Unable to read keyfile. The keyfile has not been used.");
                 return passwordBytes;
             }

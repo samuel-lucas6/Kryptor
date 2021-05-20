@@ -175,7 +175,6 @@ namespace KryptorCLI
 
         private static void FileException(string inputFilePath, Exception ex)
         {
-            Logging.LogException(ex.ToString(), Logging.Severity.Error);
             if (ex is ArgumentException)
             {
                 DisplayMessage.FilePathMessage(inputFilePath, ex.Message);

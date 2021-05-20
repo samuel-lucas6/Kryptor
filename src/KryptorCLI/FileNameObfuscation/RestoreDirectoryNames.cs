@@ -53,7 +53,6 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
-                Logging.LogException(ex.ToString(), Logging.Severity.Error);
                 DisplayMessage.FilePathException(obfuscatedDirectoryPath, ex.GetType().Name, "Unable to restore the directory name.");
             }
         }

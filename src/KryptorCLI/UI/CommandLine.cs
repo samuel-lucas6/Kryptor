@@ -188,7 +188,6 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
-                Logging.LogException(ex.ToString(), Logging.Severity.Error);
                 DisplayMessage.FilePathException(exportDirectoryPath, ex.GetType().Name, "Unable to export key pair.");
             }
         }
@@ -287,7 +286,6 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.CheckForUpdates(ex))
             {
-                Logging.LogException(ex.ToString(), Logging.Severity.Warning);
                 DisplayMessage.Exception(ex.GetType().Name, "Unable to check for updates.");
             }
         }

@@ -39,7 +39,6 @@ namespace KryptorCLI
                 }
                 catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
                 {
-                    Logging.LogException(ex.ToString(), Logging.Severity.Error);
                     DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to create signature.");
                 }
             }
@@ -61,7 +60,6 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
-                Logging.LogException(ex.ToString(), Logging.Severity.Error);
                 if (ex is ArgumentException)
                 {
                     DisplayMessage.FilePathMessage(signatureFilePath, ex.Message);

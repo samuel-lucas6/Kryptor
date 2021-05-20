@@ -39,7 +39,6 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
-                Logging.LogException(ex.ToString(), Logging.Severity.Error);
                 if (ex is ArgumentException || ex is FileNotFoundException)
                 {
                     DisplayMessage.FilePathError(directoryPath, ex.Message);
@@ -99,7 +98,6 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
-                Logging.LogException(ex.ToString(), Logging.Severity.Error);
                 DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to decrypt the directory.");
             }
         }
@@ -141,7 +139,6 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
-                Logging.LogException(ex.ToString(), Logging.Severity.Error);
                 DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to decrypt the directory.");
             }
         }
@@ -191,14 +188,12 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
-                Logging.LogException(ex.ToString(), Logging.Severity.Error);
                 DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to restore the directory names.");
             }
         }
 
         private static void FileException(string inputFilePath, Exception ex)
         {
-            Logging.LogException(ex.ToString(), Logging.Severity.Error);
             if (ex is ArgumentException)
             {
                 DisplayMessage.FilePathMessage(inputFilePath, ex.Message);

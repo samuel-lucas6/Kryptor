@@ -47,7 +47,6 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
-                Logging.LogException(ex.ToString(), Logging.Severity.Error);
                 DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to obfuscate directory name.");
                 return directoryPath;
             }

@@ -134,7 +134,6 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
-                Logging.LogException(ex.ToString(), Logging.Severity.Warning);
                 DisplayMessage.FilePathException(fileToDelete, ex.GetType().Name, "Unable to overwrite the file.");
             }
         }
@@ -151,7 +150,6 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
-                Logging.LogException(ex.ToString(), Logging.Severity.Warning);
                 DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to delete the file.");
             }
         }
@@ -204,7 +202,6 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
-                Logging.LogException(ex.ToString(), Logging.Severity.Warning);
                 DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to make the file read-only.");
             }
         }
