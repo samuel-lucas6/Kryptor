@@ -33,9 +33,9 @@ Examples:
   --sign -x [-c comment] [file]
   --verify [-y public key] [-t signature] [file]
 
-Please report bugs to <https://github.com/samuel-lucas6/Kryptor/issues>.
+Stuck? Read the tutorial at <https://www.kryptor.co.uk/tutorial>.
 
-Stuck? Read the tutorial <https://www.kryptor.co.uk/tutorial>.")]
+Please report bugs at <https://github.com/samuel-lucas6/Kryptor/issues>.")]
     public class Program
     {
         [Option("-e|--encrypt", "encrypt files/folders", CommandOptionType.NoValue)]
