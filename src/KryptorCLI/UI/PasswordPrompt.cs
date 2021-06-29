@@ -57,7 +57,7 @@ namespace KryptorCLI
             char[] retypedPassword = GetPassword();
             if (!Arrays.Compare(password, retypedPassword))
             {
-                DisplayMessage.Error("Passwords do not match.");
+                DisplayMessage.Error("The passwords do not match.");
                 Environment.Exit(13);
             }
             Arrays.ZeroMemory(retypedPassword);
@@ -69,7 +69,7 @@ namespace KryptorCLI
             char[] password = GetPassword();
             if (password.Length == 0)
             {
-                DisplayMessage.Error("Password cannot be empty.");
+                DisplayMessage.Error("You did not enter a password.");
                 Environment.Exit(13);
             }
             return password;
