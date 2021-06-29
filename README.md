@@ -1,6 +1,6 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
 [![CodeQL](https://github.com/samuel-lucas6/Kryptor/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/samuel-lucas6/Kryptor/actions)
-[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=samuel-lucas6_Kryptor)](https://sonarcloud.io/dashboard?id=samuel-lucas6_Kryptor)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=samuel-lucas6_Kryptor&metric=security_rating)](https://sonarcloud.io/dashboard?id=samuel-lucas6_Kryptor)
 
 # Kryptor
 
