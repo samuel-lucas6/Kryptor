@@ -28,9 +28,9 @@ namespace KryptorCLI
 Examples:
   --encrypt -p [file]
   --encrypt -x [file]
-  --encrypt -x [-y recipient public key] [file]
-  --decrypt -x [-y sender public key] [file]
-  --sign -x [-c comment] [file]
+  --encrypt [-y recipient's public key] [file]
+  --decrypt [-y sender's public key] [file]
+  --sign [-c comment] [file]
   --verify [-y public key] [-t signature] [file]
 
 Stuck? Read the tutorial at <https://www.kryptor.co.uk/tutorial>.
