@@ -26,21 +26,17 @@ namespace KryptorCLI
         {
             if (usePassword || !string.IsNullOrEmpty(keyfile))
             {
-                char[] password = Array.Empty<char>();
-                if (usePassword)
-                {
-                    password = PasswordPrompt.EnterNewPassword();
-                }
-                FileEncryptionWithPassword(password, keyfile, filePaths);
+                FileEncryptionWithPassword(usePassword, keyfile, filePaths);
             }
             else if (!string.IsNullOrEmpty(publicKey) && !string.IsNullOrEmpty(privateKey))
             {
                 if (publicKey.EndsWith(Constants.PublicKeyExtension))
                 {
+                    // Use public key file
                     FileEncryptionWithPublicKey(privateKey, publicKey, filePaths);
                     return;
                 }
-                // Use private key string
+                // Use public key string
                 FileEncryptionWithPublicKey(privateKey, publicKey.ToCharArray(), filePaths);
             }
             else if (!string.IsNullOrEmpty(privateKey))
@@ -53,10 +49,15 @@ namespace KryptorCLI
             }
         }
 
-        private static void FileEncryptionWithPassword(char[] password, string keyfilePath, string[] filePaths)
+        private static void FileEncryptionWithPassword(bool usePassword, string keyfilePath, string[] filePaths)
         {
-            bool validUserInput = FileEncryptionValidation.FileEncryptionWithPassword(password, keyfilePath, filePaths);
+            bool validUserInput = FileEncryptionValidation.FileEncryptionWithPassword(usePassword, keyfilePath, filePaths);
             if (!validUserInput) { return; }
+            char[] password = Array.Empty<char>();
+            if (usePassword)
+            {
+                password = PasswordPrompt.EnterNewPassword();
+            }
             keyfilePath = FilePathValidation.KeyfilePath(keyfilePath);
             byte[] passwordBytes = Password.Hash(password, keyfilePath);
             if (passwordBytes == null) { return; }
@@ -98,12 +99,7 @@ namespace KryptorCLI
         {
             if (usePassword || !string.IsNullOrEmpty(keyfile))
             {
-                char[] password = Array.Empty<char>();
-                if (usePassword)
-                {
-                    password = PasswordPrompt.EnterYourPassword();
-                }
-                FileDecryptionWithPassword(password, keyfile, filePaths);
+                FileDecryptionWithPassword(usePassword, keyfile, filePaths);
             }
             else if (!string.IsNullOrEmpty(publicKey) && !string.IsNullOrEmpty(privateKey))
             {
@@ -126,10 +122,15 @@ namespace KryptorCLI
             }
         }
 
-        private static void FileDecryptionWithPassword(char[] password, string keyfilePath, string[] filePaths)
+        private static void FileDecryptionWithPassword(bool usePassword, string keyfilePath, string[] filePaths)
         {
-            bool validUserInput = FileEncryptionValidation.FileDecryptionWithPassword(password, keyfilePath, filePaths);
+            bool validUserInput = FileEncryptionValidation.FileDecryptionWithPassword(usePassword, keyfilePath, filePaths);
             if (!validUserInput) { return; }
+            char[] password = Array.Empty<char>();
+            if (usePassword)
+            {
+                password = PasswordPrompt.EnterYourPassword();
+            }
             byte[] passwordBytes = Password.Hash(password, keyfilePath);
             if (passwordBytes == null) { return; }
             FileDecryption.DecryptEachFileWithPassword(filePaths, passwordBytes);
@@ -137,7 +138,7 @@ namespace KryptorCLI
 
         private static void FileDecryptionWithPublicKey(string recipientPrivateKeyPath, string senderPublicKeyPath, string[] filePaths)
         {
-            bool validUserInput = FileEncryptionValidation.FileEncryptionWithPublicKey(recipientPrivateKeyPath, senderPublicKeyPath, filePaths);
+            bool validUserInput = FileEncryptionValidation.FileDecryptionWithPublicKey(recipientPrivateKeyPath, senderPublicKeyPath, filePaths);
             if (!validUserInput) { return; }
             byte[] recipientPrivateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(recipientPrivateKeyPath);
             if (recipientPrivateKey == null) { return; }
@@ -148,7 +149,7 @@ namespace KryptorCLI
 
         private static void FileDecryptionWithPublicKey(string recipientPrivateKeyPath, char[] senderPublicKeyString, string[] filePaths)
         {
-            bool validUserInput = FileEncryptionValidation.FileEncryptionWithPublicKey(recipientPrivateKeyPath, senderPublicKeyString, filePaths);
+            bool validUserInput = FileEncryptionValidation.FileDecryptionWithPublicKey(recipientPrivateKeyPath, senderPublicKeyString, filePaths);
             if (!validUserInput) { return; }
             byte[] recipientPrivateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(recipientPrivateKeyPath);
             if (recipientPrivateKey == null) { return; }
@@ -159,7 +160,7 @@ namespace KryptorCLI
 
         private static void FileDecryptionWithPrivateKey(string privateKeyPath, string[] filePaths)
         {
-            bool validUserInput = FileEncryptionValidation.FileEncryptionWithPrivateKey(privateKeyPath, filePaths);
+            bool validUserInput = FileEncryptionValidation.FileDecryptionWithPrivateKey(privateKeyPath, filePaths);
             if (!validUserInput) { return; }
             byte[] privateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(privateKeyPath);
             if (privateKey == null) { return; }
@@ -292,7 +293,7 @@ namespace KryptorCLI
 
         public static void DisplayAbout()
         {
-            Console.WriteLine($"Kryptor v{Program.GetVersion()} Beta");
+            Console.WriteLine($"Kryptor v{Program.GetVersion()}");
             Console.WriteLine("Copyright(C) 2020-2021 Samuel Lucas");
             Console.WriteLine("License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.");
             Console.WriteLine("This is free software: you are free to change and redistribute it.");

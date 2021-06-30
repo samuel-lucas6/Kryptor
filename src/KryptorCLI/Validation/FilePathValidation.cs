@@ -35,7 +35,7 @@ namespace KryptorCLI
             return false;
         }
 
-        private static string GetFileEncryptionError(string inputFilePath)
+        public static string GetFileEncryptionError(string inputFilePath)
         {
             if (Directory.Exists(inputFilePath)) { return null; }
             if (!File.Exists(inputFilePath)) { return _fileDoesNotExist; }
@@ -43,7 +43,7 @@ namespace KryptorCLI
             if (validMagicBytes == null) { return _fileInaccessible; }
             if (FileHandling.HasKryptorExtension(inputFilePath) || validMagicBytes == true)
             {
-                return "This file is already encrypted.";
+                return "This file has already been encrypted.";
             }
             return null;
         }
@@ -77,14 +77,18 @@ namespace KryptorCLI
 
         public static bool FileDecryption(string inputFilePath)
         {
-            if (inputFilePath.Contains(Constants.SaltFile)) { return false; }
+            if (inputFilePath.Contains(Constants.SaltFile)) 
+            {
+                --Globals.TotalCount;
+                return false; 
+            }
             string errorMessage = GetFileDecryptionError(inputFilePath);
             if (string.IsNullOrEmpty(errorMessage)) { return true; }
             DisplayMessage.FilePathError(inputFilePath, errorMessage);
             return false;
         }
 
-        private static string GetFileDecryptionError(string inputFilePath)
+        public static string GetFileDecryptionError(string inputFilePath)
         {
             if (Directory.Exists(inputFilePath)) { return null; }
             if (!File.Exists(inputFilePath)) { return _fileDoesNotExist; }

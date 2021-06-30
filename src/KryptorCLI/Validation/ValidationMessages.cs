@@ -1,4 +1,6 @@
-﻿/*
+﻿using System.IO;
+
+/*
     Kryptor: A simple, modern, and secure encryption tool.
     Copyright(C) 2020-2021 Samuel Lucas
 
@@ -25,5 +27,10 @@ namespace KryptorCLI
         public static readonly string PublicKeyFile = "Please specify a valid public key file.";
         public static readonly string PublicKeyString = "Please specify a valid public key.";
         public static readonly string PasswordOrKeyfile = "Please specify whether to use a password and/or keyfile.";
+
+        public static string GetFilePathError(string filePath, string message)
+        {
+            return $"{Path.GetFileName(filePath)} - {message}";
+        }
     }
 }

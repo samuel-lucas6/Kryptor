@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 /*
     Kryptor: A simple, modern, and secure encryption tool.
@@ -23,15 +24,15 @@ namespace KryptorCLI
 {
     public static class FileEncryptionValidation
     {
-        public static bool FileEncryptionWithPassword(char[] password, string keyfilePath, string[] filePaths)
+        public static bool FileEncryptionWithPassword(bool usePassword, string keyfilePath, string[] filePaths)
         {
-            IEnumerable<string> errorMessages = GetFileEncryptionErrors(password, keyfilePath, filePaths);
+            IEnumerable<string> errorMessages = GetFileEncryptionErrors(usePassword, keyfilePath).Concat(GetEncryptionFilePathErrors(filePaths));
             return DisplayMessage.AnyErrors(errorMessages);
         }
 
-        private static IEnumerable<string> GetFileEncryptionErrors(char[] password, string keyfilePath, string[] filePaths)
+        private static IEnumerable<string> GetFileEncryptionErrors(bool usePassword, string keyfilePath)
         {
-            if (password.Length == 0 && string.IsNullOrEmpty(keyfilePath))
+            if (!usePassword && string.IsNullOrEmpty(keyfilePath))
             {
                 yield return ValidationMessages.PasswordOrKeyfile;
             }
@@ -47,19 +48,31 @@ namespace KryptorCLI
             {
                 yield return "Please specify a valid keyfile directory.";
             }
+        }
+
+        private static IEnumerable<string> GetEncryptionFilePathErrors(string[] filePaths)
+        {
             if (filePaths == null)
             {
                 yield return ValidationMessages.FilePath;
+            }
+            else
+            {
+                foreach (string inputFilePath in filePaths)
+                {
+                    string errorMessage = FilePathValidation.GetFileEncryptionError(inputFilePath);
+                    if (!string.IsNullOrEmpty(errorMessage)) { yield return ValidationMessages.GetFilePathError(inputFilePath, errorMessage); }
+                }
             }
         }
 
         public static bool FileEncryptionWithPublicKey(string privateKeyPath, string publicKeyPath, string[] filePaths)
         {
-            IEnumerable<string> errorMessages = GetFileEncryptionErrors(privateKeyPath, publicKeyPath, filePaths);
+            IEnumerable<string> errorMessages = GetFileEncryptionErrors(privateKeyPath, publicKeyPath).Concat(GetEncryptionFilePathErrors(filePaths));
             return DisplayMessage.AnyErrors(errorMessages);
         }
 
-        private static IEnumerable<string> GetFileEncryptionErrors(string privateKeyPath, string publicKeyPath, string[] filePaths)
+        private static IEnumerable<string> GetFileEncryptionErrors(string privateKeyPath, string publicKeyPath)
         {
             if (string.IsNullOrEmpty(privateKeyPath))
             {
@@ -83,19 +96,15 @@ namespace KryptorCLI
             {
                 yield return ValidationMessages.PublicKeyFile;
             }
-            if (filePaths == null)
-            {
-                yield return ValidationMessages.FilePath;
-            }
         }
 
         public static bool FileEncryptionWithPublicKey(string privateKeyPath, char[] encodedPublicKey, string[] filePaths)
         {
-            IEnumerable<string> errorMessages = GetFileEncryptionErrors(privateKeyPath, encodedPublicKey, filePaths);
+            IEnumerable<string> errorMessages = GetFileEncryptionErrors(privateKeyPath, encodedPublicKey).Concat(GetEncryptionFilePathErrors(filePaths));
             return DisplayMessage.AnyErrors(errorMessages);
         }
 
-        private static IEnumerable<string> GetFileEncryptionErrors(string privateKeyPath, char[] encodedPublicKey, string[] filePaths)
+        private static IEnumerable<string> GetFileEncryptionErrors(string privateKeyPath, char[] encodedPublicKey)
         {
             if (string.IsNullOrEmpty(privateKeyPath))
             {
@@ -112,19 +121,15 @@ namespace KryptorCLI
             {
                 yield return ValidationMessages.PublicKeyString;
             }
-            if (filePaths == null)
-            {
-                yield return ValidationMessages.FilePath;
-            }
         }
 
         public static bool FileEncryptionWithPrivateKey(string privateKeyPath, string[] filePaths)
         {
-            IEnumerable<string> errorMessages = GetFileEncryptionErrors(privateKeyPath, filePaths);
+            IEnumerable<string> errorMessages = GetFileEncryptionErrors(privateKeyPath).Concat(GetEncryptionFilePathErrors(filePaths));
             return DisplayMessage.AnyErrors(errorMessages);
         }
 
-        private static IEnumerable<string> GetFileEncryptionErrors(string privateKeyPath, string[] filePaths)
+        private static IEnumerable<string> GetFileEncryptionErrors(string privateKeyPath)
         {
             if (string.IsNullOrEmpty(privateKeyPath))
             {
@@ -137,21 +142,17 @@ namespace KryptorCLI
             {
                 yield return ValidationMessages.PrivateKeyFile;
             }
-            if (filePaths == null)
-            {
-                yield return ValidationMessages.FilePath;
-            }
         }
 
-        public static bool FileDecryptionWithPassword(char[] password, string keyfilePath, string[] filePaths)
+        public static bool FileDecryptionWithPassword(bool usePassword, string keyfilePath, string[] filePaths)
         {
-            IEnumerable<string> errorMessages = GetFileDecryptionErrors(password, keyfilePath, filePaths);
+            IEnumerable<string> errorMessages = GetFileDecryptionErrors(usePassword, keyfilePath).Concat(GetDecryptionFilePathErrors(filePaths));
             return DisplayMessage.AnyErrors(errorMessages);
         }
 
-        private static IEnumerable<string> GetFileDecryptionErrors(char[] password, string keyfilePath, string[] filePaths)
+        private static IEnumerable<string> GetFileDecryptionErrors(bool usePassword, string keyfilePath)
         {
-            if (password.Length == 0 && string.IsNullOrEmpty(keyfilePath))
+            if (!usePassword && string.IsNullOrEmpty(keyfilePath))
             {
                 yield return ValidationMessages.PasswordOrKeyfile;
             }
@@ -159,10 +160,40 @@ namespace KryptorCLI
             {
                 yield return "Please specify a keyfile that exists.";
             }
+        }
+
+        private static IEnumerable<string> GetDecryptionFilePathErrors(string[] filePaths)
+        {
             if (filePaths == null)
             {
                 yield return ValidationMessages.FilePath;
             }
+            else
+            {
+                foreach (string inputFilePath in filePaths)
+                {
+                    string errorMessage = FilePathValidation.GetFileDecryptionError(inputFilePath);
+                    if (!string.IsNullOrEmpty(errorMessage)) { yield return ValidationMessages.GetFilePathError(inputFilePath, errorMessage); }
+                }
+            }
+        }
+
+        public static bool FileDecryptionWithPublicKey(string privateKeyPath, string publicKeyPath, string[] filePaths)
+        {
+            IEnumerable<string> errorMessages = GetFileEncryptionErrors(privateKeyPath, publicKeyPath).Concat(GetDecryptionFilePathErrors(filePaths));
+            return DisplayMessage.AnyErrors(errorMessages);
+        }
+
+        public static bool FileDecryptionWithPublicKey(string privateKeyPath, char[] encodedPublicKey, string[] filePaths)
+        {
+            IEnumerable<string> errorMessages = GetFileEncryptionErrors(privateKeyPath, encodedPublicKey).Concat(GetDecryptionFilePathErrors(filePaths));
+            return DisplayMessage.AnyErrors(errorMessages);
+        }
+
+        public static bool FileDecryptionWithPrivateKey(string privateKeyPath, string[] filePaths)
+        {
+            IEnumerable<string> errorMessages = GetFileEncryptionErrors(privateKeyPath).Concat(GetDecryptionFilePathErrors(filePaths));
+            return DisplayMessage.AnyErrors(errorMessages);
         }
     }
 }
