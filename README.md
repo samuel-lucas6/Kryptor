@@ -23,7 +23,7 @@ It is a portable, cross-platform command line tool that makes use of modern and 
 For more information, go to [kryptor.co.uk](https://www.kryptor.co.uk/).
 
 ## Usage
-If you are just getting started, I recommend reading the [tutorial](https://www.kryptor.co.uk/tutorial).
+If you are just getting started, then I recommend reading the [tutorial](https://www.kryptor.co.uk/tutorial).
 ```
 Usage: kryptor [options] [file]
 
@@ -51,13 +51,14 @@ Options:
   -h|--help              show help information
 
 Examples:
-  --encrypt -p [file]
-  --encrypt -x [file]
-  --encrypt -x [-y recipient public key] [file]
-  --decrypt -x [-y sender recipient key] [file]
-  --sign -x [-c comment] [file]
+  --encrypt -p [file]   
+  --encrypt -x [file]   
+  --encrypt [-y recipient's public key] [file]   
+  --decrypt [-y sender's public key] [file]   
+  --sign [-c comment] [file]   
   --verify [-y public key] [-t signature] [file]
   ```
+
 ### Specifying files
 When referencing file paths/file names that contain spaces, you must surround them with 'apostrophes' on Linux/macOS and "speech marks" on Windows:
 ```
@@ -71,4 +72,11 @@ $ kryptor -e -p message.txt
 However, files that are not in the same directory as the ```kryptor``` executable must be specified using a file path:
 ```
 $ kryptor -e -p /home/samuel/Documents/message.txt
+```
+### Specifying your private key
+You can use the `-x|--private` option without specifying a file path to use your default private key. This is the recommended approach, but it means your private keys must be kept in the default folder.
+
+To specify a non-default private key, you can use `-x|--private` followed by `=[file]` like so:
+```
+$ kryptor -e -x=C:\Users\Samuel\.kryptor\encryption.private message.txt
 ```
