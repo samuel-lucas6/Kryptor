@@ -39,12 +39,7 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
-                if (ex is ArgumentException || ex is FileNotFoundException)
-                {
-                    DisplayMessage.FilePathError(directoryPath, ex.Message);
-                    return;
-                }
-                DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to decrypt the directory.");
+                DirectoryException(directoryPath, ex);
             }
         }
 
@@ -53,11 +48,7 @@ namespace KryptorCLI
             foreach (string inputFilePath in filePaths)
             {
                 bool validFilePath = FilePathValidation.FileDecryption(inputFilePath);
-                if (!validFilePath)
-                {
-                    --Globals.TotalCount;
-                    continue;
-                }
+                if (!validFilePath) { continue; }
                 try
                 {
                     using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
@@ -92,13 +83,14 @@ namespace KryptorCLI
         {
             try
             {
+                FilePathValidation.DirectoryDecryption(directoryPath);
                 string[] filePaths = GetFiles(directoryPath);
                 DecryptEachFileWithPublicKey(filePaths, sharedSecret, recipientPrivateKey);
                 Finalize(directoryPath);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
-                DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to decrypt the directory.");
+                DirectoryException(directoryPath, ex);
             }
         }
 
@@ -107,11 +99,7 @@ namespace KryptorCLI
             foreach (string inputFilePath in filePaths)
             {
                 bool validFilePath = FilePathValidation.FileDecryption(inputFilePath);
-                if (!validFilePath)
-                {
-                    --Globals.TotalCount;
-                    continue;
-                }
+                if (!validFilePath) { continue; }
                 try
                 {
                     using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
@@ -133,13 +121,14 @@ namespace KryptorCLI
         {
             try
             {
+                FilePathValidation.DirectoryDecryption(directoryPath);
                 string[] filePaths = GetFiles(directoryPath);
                 DecryptEachFileWithPrivateKey(filePaths, privateKey);
                 Finalize(directoryPath);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
-                DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to decrypt the directory.");
+                DirectoryException(directoryPath, ex);
             }
         }
 
@@ -148,11 +137,7 @@ namespace KryptorCLI
             foreach (string inputFilePath in filePaths)
             {
                 bool validFilePath = FilePathValidation.FileDecryption(inputFilePath);
-                if (!validFilePath)
-                {
-                    --Globals.TotalCount;
-                    continue;
-                }
+                if (!validFilePath) { continue; }
                 try
                 {
                     using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
@@ -190,6 +175,16 @@ namespace KryptorCLI
             {
                 DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to restore the directory names.");
             }
+        }
+
+        private static void DirectoryException(string directoryPath, Exception ex)
+        {
+            if (ex is ArgumentException || ex is FileNotFoundException)
+            {
+                DisplayMessage.FilePathError(directoryPath, ex.Message);
+                return;
+            }
+            DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to decrypt the directory.");
         }
 
         private static void FileException(string inputFilePath, Exception ex)

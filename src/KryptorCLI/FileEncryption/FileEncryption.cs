@@ -29,12 +29,6 @@ namespace KryptorCLI
             Globals.TotalCount = filePaths.Length;
             foreach (string inputFilePath in filePaths)
             {
-                bool validFilePath = FilePathValidation.FileEncryption(inputFilePath);
-                if (!validFilePath)
-                {
-                    --Globals.TotalCount;
-                    continue;
-                }
                 UsingPassword(inputFilePath, passwordBytes);
             }
             CryptographicOperations.ZeroMemory(passwordBytes);
@@ -76,12 +70,6 @@ namespace KryptorCLI
             CryptographicOperations.ZeroMemory(senderPrivateKey);
             foreach (string inputFilePath in filePaths)
             {
-                bool validFilePath = FilePathValidation.FileEncryption(inputFilePath);
-                if (!validFilePath)
-                {
-                    --Globals.TotalCount;
-                    continue;
-                }
                 UsingPublicKey(inputFilePath, sharedSecret, recipientPublicKey);
             }
             CryptographicOperations.ZeroMemory(sharedSecret);
@@ -120,12 +108,6 @@ namespace KryptorCLI
             if (privateKey == null) { return; }
             foreach (string inputFilePath in filePaths)
             {
-                bool validFilePath = FilePathValidation.FileEncryption(inputFilePath);
-                if (!validFilePath)
-                {
-                    --Globals.TotalCount;
-                    continue;
-                }
                 UsingPrivateKey(inputFilePath, privateKey);
             }
             CryptographicOperations.ZeroMemory(privateKey);

@@ -29,12 +29,6 @@ namespace KryptorCLI
             Globals.TotalCount = filePaths.Length;
             foreach (string inputFilePath in filePaths)
             {
-                bool validFilePath = FilePathValidation.FileDecryption(inputFilePath);
-                if (!validFilePath)
-                {
-                    --Globals.TotalCount;
-                    continue;
-                }
                 UsingPassword(inputFilePath, passwordBytes);
             }
             CryptographicOperations.ZeroMemory(passwordBytes);
@@ -74,12 +68,6 @@ namespace KryptorCLI
             byte[] sharedSecret = KeyExchange.GetSharedSecret(recipientPrivateKey, senderPublicKey);
             foreach (string inputFilePath in filePaths)
             {
-                bool validFilePath = FilePathValidation.FileDecryption(inputFilePath);
-                if (!validFilePath)
-                {
-                    --Globals.TotalCount;
-                    continue;
-                }
                 UsingPublicKey(inputFilePath, sharedSecret, recipientPrivateKey);
             }
             CryptographicOperations.ZeroMemory(recipientPrivateKey);
@@ -120,12 +108,6 @@ namespace KryptorCLI
             if (privateKey == null) { return; }
             foreach (string inputFilePath in filePaths)
             {
-                bool validFilePath = FilePathValidation.FileDecryption(inputFilePath);
-                if (!validFilePath)
-                {
-                    --Globals.TotalCount;
-                    continue;
-                }
                 UsingPrivateKey(inputFilePath, privateKey);
             }
             CryptographicOperations.ZeroMemory(privateKey);

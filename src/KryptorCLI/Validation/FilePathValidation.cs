@@ -26,6 +26,7 @@ namespace KryptorCLI
     {
         private static readonly string _fileDoesNotExist = "This file/folder doesn't exist.";
         private static readonly string _fileInaccessible = "Unable to access the file.";
+        private static readonly string _directoryEmpty = "This directory is empty.";
 
         public static bool FileEncryption(string inputFilePath)
         {
@@ -37,7 +38,14 @@ namespace KryptorCLI
 
         public static string GetFileEncryptionError(string inputFilePath)
         {
-            if (Directory.Exists(inputFilePath)) { return null; }
+            if (Directory.Exists(inputFilePath)) 
+            { 
+                if (FileHandling.IsDirectoryEmpty(inputFilePath))
+                {
+                    return _directoryEmpty;
+                }
+                return null;
+            }
             if (!File.Exists(inputFilePath)) { return _fileDoesNotExist; }
             bool? validMagicBytes = FileHandling.IsKryptorFile(inputFilePath);
             if (validMagicBytes == null) { return _fileInaccessible; }
@@ -75,6 +83,18 @@ namespace KryptorCLI
             }
         }
 
+        public static void DirectoryEncryption(string directoryPath)
+        {
+            string saltFilePath = Path.Combine(directoryPath, Constants.SaltFile);
+            if (File.Exists(saltFilePath)) { throw new ArgumentException("This directory has already been encrypted."); }
+        }
+
+        public static void DirectoryDecryption(string directoryPath)
+        {
+            string saltFilePath = Path.Combine(directoryPath, Constants.SaltFile);
+            if (File.Exists(saltFilePath)) { throw new ArgumentException("This directory was encrypted using a password."); }
+        }
+
         public static bool FileDecryption(string inputFilePath)
         {
             if (inputFilePath.Contains(Constants.SaltFile)) 
@@ -90,7 +110,14 @@ namespace KryptorCLI
 
         public static string GetFileDecryptionError(string inputFilePath)
         {
-            if (Directory.Exists(inputFilePath)) { return null; }
+            if (Directory.Exists(inputFilePath))
+            {
+                if (FileHandling.IsDirectoryEmpty(inputFilePath))
+                {
+                    return _directoryEmpty;
+                }
+                return null;
+            }
             if (!File.Exists(inputFilePath)) { return _fileDoesNotExist; }
             bool? validMagicBytes = FileHandling.IsKryptorFile(inputFilePath);
             if (validMagicBytes == null) { return _fileInaccessible; }

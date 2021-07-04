@@ -29,6 +29,7 @@ namespace KryptorCLI
             bool overwriteOption = Globals.Overwrite;
             try
             {
+                FilePathValidation.DirectoryEncryption(directoryPath);
                 // Always overwrite directories
                 string backupDirectoryPath = BackupDirectory(directoryPath);
                 Globals.Overwrite = true;
@@ -43,7 +44,7 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
-                DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to encrypt the directory.");
+                DirectoryException(directoryPath, ex);
             }
             finally
             {
@@ -96,11 +97,7 @@ namespace KryptorCLI
             foreach (string inputFilePath in filePaths)
             {
                 bool validFilePath = FilePathValidation.FileEncryption(inputFilePath);
-                if (!validFilePath)
-                {
-                    --Globals.TotalCount;
-                    continue;
-                }
+                if (!validFilePath) { continue; }
                 // Fill unused header with random public key
                 byte[] ephemeralPublicKey = Generate.EphemeralPublicKeyHeader();
                 string outputFilePath = FileEncryption.GetOutputFilePath(inputFilePath);
@@ -135,6 +132,7 @@ namespace KryptorCLI
             bool overwriteOption = Globals.Overwrite;
             try
             {
+                FilePathValidation.DirectoryEncryption(directoryPath);
                 // Always overwrite directories
                 string backupDirectoryPath = BackupDirectory(directoryPath);
                 Globals.Overwrite = true;
@@ -144,7 +142,7 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
-                DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to encrypt the directory.");
+                DirectoryException(directoryPath, ex);
             }
             finally
             {
@@ -157,11 +155,7 @@ namespace KryptorCLI
             foreach (string inputFilePath in filePaths)
             {
                 bool validFilePath = FilePathValidation.FileEncryption(inputFilePath);
-                if (!validFilePath)
-                {
-                    --Globals.TotalCount;
-                    continue;
-                }
+                if (!validFilePath) { continue; }
                 // Derive a unique KEK per file
                 byte[] ephemeralSharedSecret = KeyExchange.GetEphemeralSharedSecret(recipientPublicKey, out byte[] ephemeralPublicKey);
                 byte[] salt = Generate.Salt();
@@ -177,6 +171,7 @@ namespace KryptorCLI
             bool overwriteOption = Globals.Overwrite;
             try
             {
+                FilePathValidation.DirectoryEncryption(directoryPath);
                 // Always overwrite directories
                 string backupDirectoryPath = BackupDirectory(directoryPath);
                 Globals.Overwrite = true;
@@ -186,7 +181,7 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
-                DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to encrypt the directory.");
+                DirectoryException(directoryPath, ex);
             }
             finally
             {
@@ -199,11 +194,7 @@ namespace KryptorCLI
             foreach (string inputFilePath in filePaths)
             {
                 bool validFilePath = FilePathValidation.FileEncryption(inputFilePath);
-                if (!validFilePath)
-                {
-                    --Globals.TotalCount;
-                    continue;
-                }
+                if (!validFilePath) { continue; }
                 // Derive a unique KEK per file
                 byte[] ephemeralSharedSecret = KeyExchange.GetPrivateKeySharedSecret(privateKey, out byte[] ephemeralPublicKey);
                 byte[] salt = Generate.Salt();
@@ -212,6 +203,16 @@ namespace KryptorCLI
                 EncryptInputFile(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
                 CryptographicOperations.ZeroMemory(keyEncryptionKey);
             }
+        }
+
+        private static void DirectoryException(string directoryPath, Exception ex)
+        {
+            if (ex is ArgumentException)
+            {
+                DisplayMessage.FilePathError(directoryPath, ex.Message);
+                return;
+            }
+            DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to encrypt the directory.");
         }
     }
 }
