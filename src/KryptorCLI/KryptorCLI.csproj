@@ -9,7 +9,7 @@
     <ApplicationIcon>Kryptor Icon.ico</ApplicationIcon>
     <Platforms>x64</Platforms>
     <PackageId>Kryptor</PackageId>
-    <Version>3.0.2</Version>
+    <Version>3.0.3</Version>
     <Authors>Samuel Lucas</Authors>
     <Company />
     <Product>Kryptor</Product>
@@ -17,7 +17,7 @@
     <Description>A simple, modern, and secure encryption tool.</Description>
     <PackageLicenseFile></PackageLicenseFile>
     <PackageLicenseExpression>GPLv3</PackageLicenseExpression>
-    <PackageProjectUrl>https://www.kryptor.co.uk/</PackageProjectUrl>
+    <PackageProjectUrl>https://www.kryptor.co.uk</PackageProjectUrl>
     <RepositoryUrl>https://github.com/samuel-lucas6/Kryptor</RepositoryUrl>
     <PackageIcon>Kryptor Logo.png</PackageIcon>
     <NeutralLanguage>en-GB</NeutralLanguage>
@@ -35,6 +35,10 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <PlatformTarget>x64</PlatformTarget>
     <Optimize>false</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
