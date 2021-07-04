@@ -1,6 +1,7 @@
 ﻿using Sodium;
 using System;
 using System.IO;
+using System.Linq;
 
 /*
     Kryptor: A simple, modern, and secure encryption tool.
@@ -49,6 +50,11 @@ namespace KryptorCLI
         {
             var fileAttributes = File.GetAttributes(filePath);
             return fileAttributes.HasFlag(FileAttributes.Directory);
+        }
+
+        public static bool IsDirectoryEmpty(string directoryPath)
+        {
+            return !Directory.EnumerateFileSystemEntries(directoryPath).Any();
         }
 
         public static string[] GetAllDirectories(string directoryPath)
