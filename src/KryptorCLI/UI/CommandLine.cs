@@ -45,7 +45,7 @@ namespace KryptorCLI
             }
             else
             {
-                DisplayMessage.Error("Please either specify a (password and/or keyfile), (private key and public key), or private key.");
+                DisplayMessage.Error("Please specify a password and/or keyfile, private key, or private key and public key.");
             }
         }
 
@@ -118,7 +118,7 @@ namespace KryptorCLI
             }
             else
             {
-                DisplayMessage.Error("Please either specify a (password and/or keyfile), (private key and public key), or private key.");
+                DisplayMessage.Error("Please specify a password and/or keyfile, private key, or private key and public key.");
             }
         }
 
