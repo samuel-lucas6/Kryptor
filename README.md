@@ -60,10 +60,10 @@ Examples:
   ```
 
 ### Specifying files
-When referencing file paths/file names that contain spaces, you must surround them with 'apostrophes' on Linux/macOS and "speech marks" on Windows:
+When referencing file paths/file names that contain spaces, you must surround them with "speech marks" on Windows and 'apostrophes' on Linux/macOS:
 ```
-$ kryptor -e -p 'GitHub Logo.png'
-$ kryptor -e -p '/home/samuel/Downloads/GitHub Logo.png'
+$ kryptor -e -p "GitHub Logo.png"
+$ kryptor -e -p "C:\Users\samuel-lucas6\Downloads\GitHub Logo.png"
 ```
 Files in the same directory as the ```kryptor``` executable can be specified using their file name:
 ```
@@ -71,12 +71,12 @@ $ kryptor -e -p message.txt
 ```
 However, files that are not in the same directory as the ```kryptor``` executable must be specified using a file path:
 ```
-$ kryptor -e -p /home/samuel/Documents/message.txt
+$ kryptor -e -p C:\Users\samuel-lucas6\Documents\message.txt
 ```
 ### Specifying your private key
 You can use the `-x|--private` option without specifying a file path to use your default private key. This is the recommended approach, but it means your private keys must be kept in the default folder.
 
 To specify a non-default private key, you can use `-x|--private` followed by `=[file]` like so:
 ```
-$ kryptor -e -x=C:\Users\Samuel\.kryptor\encryption.private message.txt
+$ kryptor -e -x=C:\Users\samuel-lucas6\Documents\encryption.private message.txt
 ```
