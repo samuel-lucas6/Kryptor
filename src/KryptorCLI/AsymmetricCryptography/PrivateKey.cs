@@ -47,7 +47,7 @@ namespace KryptorCLI
             }
             catch (CryptographicException)
             {
-                DisplayMessage.Error("Incorrect password or the private key has been tampered with.");
+                DisplayMessage.Error("Incorrect password, or the private key has been tampered with.");
                 return null;
             }
         }
