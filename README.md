@@ -5,7 +5,7 @@
 
 Kryptor is free and open source file encryption software for Windows, Linux, and macOS.
 
-It is a portable, cross-platform command line tool that makes use of modern and secure cryptographic algorithms. It aims to be a mixture of [age](https://github.com/FiloSottile/age) and [Minisign](https://github.com/jedisct1/minisign) in order to provide a simple, user friendly alternative to [GPG](https://gnupg.org/).
+It is a portable, cross-platform command line tool that makes use of modern and secure cryptographic algorithms. It aims to be a mixture of [age](https://github.com/FiloSottile/age) and [Minisign](https://github.com/jedisct1/minisign) in terms of functionality to provide a simple, user friendly alternative to [GPG](https://gnupg.org/).
 
 ![kryptor](https://user-images.githubusercontent.com/63159663/110021517-c0af3500-7d22-11eb-9acd-02ba9f24617c.gif)
 
@@ -20,7 +20,7 @@ It is a portable, cross-platform command line tool that makes use of modern and 
 - Optional obfuscation of output file names when encrypting files/folders.
 - Optional overwriting of input files.
 
-For more information, go to [kryptor.co.uk](https://www.kryptor.co.uk/).
+For more information, please go to [kryptor.co.uk](https://www.kryptor.co.uk/).
 
 ## Usage
 If you are just getting started, then I recommend reading the [tutorial](https://www.kryptor.co.uk/tutorial).
