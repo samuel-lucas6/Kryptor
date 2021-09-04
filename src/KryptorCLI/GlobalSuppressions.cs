@@ -5,5 +5,5 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-// False warnings
+// False warning(s)
 [assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>", Scope = "member", Target = "~M:KryptorCLI.Program.OnExecute")]

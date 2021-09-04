@@ -9,7 +9,7 @@
     <ApplicationIcon>Kryptor Icon.ico</ApplicationIcon>
     <Platforms>x64</Platforms>
     <PackageId>Kryptor</PackageId>
-    <Version>3.0.3</Version>
+    <Version>3.0.4</Version>
     <Authors>Samuel Lucas</Authors>
     <Company />
     <Product>Kryptor</Product>

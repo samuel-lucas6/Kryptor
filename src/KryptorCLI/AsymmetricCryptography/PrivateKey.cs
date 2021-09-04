@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Security.Cryptography;
+using Sodium;
 using ChaCha20BLAKE2;
 
 /*
     Kryptor: A simple, modern, and secure encryption tool.
-    Copyright(C) 2020-2021 Samuel Lucas
+    Copyright (C) 2020-2021 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,10 +27,10 @@ namespace KryptorCLI
     {
         public static byte[] Encrypt(byte[] passwordBytes, byte[] keyAlgorithm, byte[] privateKey)
         {
-            byte[] salt = Generate.Salt();
+            byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
             byte[] key = Argon2.DeriveKey(passwordBytes, salt);
             CryptographicOperations.ZeroMemory(passwordBytes);
-            byte[] nonce = Generate.Nonce();
+            byte[] nonce = SodiumCore.GetRandomBytes(Constants.XChaChaNonceLength);
             byte[] additionalData = Arrays.Concat(keyAlgorithm, Constants.PrivateKeyVersion);
             byte[] encryptedPrivateKey = XChaCha20BLAKE2b.Encrypt(privateKey, nonce, key, additionalData, TagLength.Medium);
             CryptographicOperations.ZeroMemory(privateKey);

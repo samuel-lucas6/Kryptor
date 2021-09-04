@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Security.Cryptography;
 using System.Text;
+using System.Security.Cryptography;
+using Sodium;
 
 /*
     Kryptor: A simple, modern, and secure encryption tool.
-    Copyright(C) 2020-2021 Samuel Lucas
+    Copyright (C) 2020-2021 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,12 +47,12 @@ namespace KryptorCLI
                     return;
                 }
                 // Derive a unique KEK per file
-                byte[] salt = Generate.Salt();
+                byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
                 byte[] keyEncryptionKey = Argon2.DeriveKey(passwordBytes, salt);
                 // Fill unused header with random public key
-                byte[] ephemeralPublicKey = Generate.EphemeralPublicKeyHeader();
+                using var ephemeralKeyPair = PublicKeyBox.GenerateKeyPair();
                 string outputFilePath = GetOutputFilePath(inputFilePath);
-                EncryptFile.Initialize(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
+                EncryptFile.Initialize(inputFilePath, outputFilePath, ephemeralKeyPair.PublicKey, salt, keyEncryptionKey);
                 CryptographicOperations.ZeroMemory(keyEncryptionKey);
                 EncryptionSuccessful(inputFilePath, outputFilePath);
             }
@@ -88,7 +89,7 @@ namespace KryptorCLI
                 }
                 // Derive a unique KEK per file
                 byte[] ephemeralSharedSecret = KeyExchange.GetEphemeralSharedSecret(recipientPublicKey, out byte[] ephemeralPublicKey);
-                byte[] salt = Generate.Salt();
+                byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
                 byte[] keyEncryptionKey = Generate.KeyEncryptionKey(sharedSecret, ephemeralSharedSecret, salt);
                 string outputFilePath = GetOutputFilePath(inputFilePath);
                 EncryptFile.Initialize(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
@@ -126,7 +127,7 @@ namespace KryptorCLI
                 }
                 // Derive a unique KEK per file
                 byte[] ephemeralSharedSecret = KeyExchange.GetPrivateKeySharedSecret(privateKey, out byte[] ephemeralPublicKey);
-                byte[] salt = Generate.Salt();
+                byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
                 byte[] keyEncryptionKey = Generate.KeyEncryptionKey(ephemeralSharedSecret, salt);
                 string outputFilePath = GetOutputFilePath(inputFilePath);
                 EncryptFile.Initialize(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);

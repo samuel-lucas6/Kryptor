@@ -1,9 +1,10 @@
 ﻿using System.IO;
 using System.Security.Cryptography;
+using Sodium;
 
 /*
     Kryptor: A simple, modern, and secure encryption tool.
-    Copyright(C) 2020-2021 Samuel Lucas
+    Copyright (C) 2020-2021 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,7 +26,7 @@ namespace KryptorCLI
     {
         public static void GenerateKeyfile(string keyfilePath)
         {
-            byte[] keyfileBytes = Generate.KeyfileBytes();
+            byte[] keyfileBytes = SodiumCore.GetRandomBytes(Constants.KeyfileLength);
             File.WriteAllBytes(keyfilePath, keyfileBytes);
             File.SetAttributes(keyfilePath, FileAttributes.ReadOnly);
             CryptographicOperations.ZeroMemory(keyfileBytes);

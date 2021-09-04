@@ -1,12 +1,12 @@
 ﻿using System;
-using Sodium;
 using System.IO;
-using ChaCha20BLAKE2;
 using System.Security.Cryptography;
+using Sodium;
+using ChaCha20BLAKE2;
 
 /*
     Kryptor: A simple, modern, and secure encryption tool.
-    Copyright(C) 2020-2021 Samuel Lucas
+    Copyright (C) 2020-2021 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

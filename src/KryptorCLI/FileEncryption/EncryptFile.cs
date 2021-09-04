@@ -1,12 +1,12 @@
 ﻿using System;
-using Sodium;
 using System.IO;
-using ChaCha20BLAKE2;
 using System.Security.Cryptography;
+using Sodium;
+using ChaCha20BLAKE2;
 
 /*
     Kryptor: A simple, modern, and secure encryption tool.
-    Copyright(C) 2020-2021 Samuel Lucas
+    Copyright (C) 2020-2021 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,13 +28,13 @@ namespace KryptorCLI
     {
         public static void Initialize(string inputFilePath, string outputFilePath, byte[] ephemeralPublicKey, byte[] salt, byte[] keyEncryptionKey)
         {
-            byte[] dataEncryptionKey = Generate.DataEncryptionKey();
+            byte[] dataEncryptionKey = SodiumCore.GetRandomBytes(Constants.EncryptionKeyLength);
             try
             {
                 using (var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
                 using (var outputFile = new FileStream(outputFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
                 {
-                    byte[] nonce = Generate.Nonce();
+                    byte[] nonce = SodiumCore.GetRandomBytes(Constants.XChaChaNonceLength);
                     byte[] encryptedHeader = EncryptFileHeader(inputFilePath, ephemeralPublicKey, dataEncryptionKey, nonce, keyEncryptionKey);
                     FileHeaders.WriteHeaders(outputFile, ephemeralPublicKey, salt, nonce, encryptedHeader);
                     nonce = Utilities.Increment(nonce);

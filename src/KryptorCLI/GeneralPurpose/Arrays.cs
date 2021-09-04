@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 using System.Text;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using Sodium;
 
 /*
     Kryptor: A simple, modern, and secure encryption tool.
-    Copyright(C) 2020-2021 Samuel Lucas
+    Copyright (C) 2020-2021 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
