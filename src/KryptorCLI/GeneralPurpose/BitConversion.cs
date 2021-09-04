@@ -48,7 +48,6 @@ namespace KryptorCLI
 
         private static byte[] ToLittleEndian(byte[] value)
         {
-            // Always use little endian
             if (!BitConverter.IsLittleEndian)
             {
                 Array.Reverse(value);
