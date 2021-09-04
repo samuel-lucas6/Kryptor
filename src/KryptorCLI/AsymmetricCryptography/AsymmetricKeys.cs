@@ -32,7 +32,7 @@ namespace KryptorCLI
             using var keyPair = PublicKeyBox.GenerateKeyPair();
             byte[] publicKey = Arrays.Concat(Constants.Curve25519KeyHeader, keyPair.PublicKey);
             byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, Constants.Curve25519KeyHeader, keyPair.PrivateKey);
-            return ConvertKeys(publicKey, encryptedPrivateKey);
+            return (Convert.ToBase64String(publicKey), Convert.ToBase64String(encryptedPrivateKey));
         }
 
         public static (string publicKey, string privateKey) GenerateSigningKeyPair()
@@ -42,40 +42,17 @@ namespace KryptorCLI
             using var keyPair = PublicKeyAuth.GenerateKeyPair();
             byte[] publicKey = Arrays.Concat(Constants.Ed25519KeyHeader, keyPair.PublicKey);
             byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, Constants.Ed25519KeyHeader, keyPair.PrivateKey);
-            return ConvertKeys(publicKey, encryptedPrivateKey);
-        }
-
-        private static (string publicKey, string privateKey) ConvertKeys(byte[] publicKey, byte[] encryptedPrivateKey)
-        {
             return (Convert.ToBase64String(publicKey), Convert.ToBase64String(encryptedPrivateKey));
         }
 
-        public static (string publicKeyPath, string privateKeyPath) ExportEncryptionKeyPair(string directoryPath, string publicKey, string privateKey)
+        public static (string publicKeyPath, string privateKeyPath) ExportKeyPair(string directoryPath, string fileName, string publicKey, string privateKey)
         {
-            CreateKeysDirectory(directoryPath);
-            string publicKeyPath = Path.Combine(directoryPath, Constants.DefaultEncryptionKeyFileName + Constants.PublicKeyExtension);
+            Directory.CreateDirectory(directoryPath);
+            string publicKeyPath = Path.Combine(directoryPath, fileName + Constants.PublicKeyExtension);
             CreateKeyFile(publicKeyPath, publicKey);
-            string privateKeyPath = Path.Combine(directoryPath, Constants.DefaultEncryptionKeyFileName + Constants.PrivateKeyExtension);
+            string privateKeyPath = Path.Combine(directoryPath, fileName + Constants.PrivateKeyExtension);
             CreateKeyFile(privateKeyPath, privateKey);
             return (publicKeyPath, privateKeyPath);
-        }
-
-        public static (string publicKeyPath, string privateKeyPath) ExportSigningKeyPair(string directoryPath, string publicKey, string privateKey)
-        {
-            CreateKeysDirectory(directoryPath);
-            string publicKeyPath = Path.Combine(directoryPath, Constants.DefaultSigningKeyFileName + Constants.PublicKeyExtension);
-            CreateKeyFile(publicKeyPath, publicKey);
-            string privateKeyPath = Path.Combine(directoryPath, Constants.DefaultSigningKeyFileName + Constants.PrivateKeyExtension);
-            CreateKeyFile(privateKeyPath, privateKey);
-            return (publicKeyPath, privateKeyPath);
-        }
-
-        private static void CreateKeysDirectory(string directoryPath)
-        {
-            if (!Directory.Exists(directoryPath))
-            {
-                Directory.CreateDirectory(directoryPath);
-            }
         }
 
         private static void CreateKeyFile(string filePath, string asymmetricKey)

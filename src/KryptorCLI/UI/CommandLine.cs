@@ -178,12 +178,12 @@ namespace KryptorCLI
                 if (keyPairType == 1)
                 {
                     (publicKey, privateKey) = AsymmetricKeys.GenerateEncryptionKeyPair();
-                    (publicKeyPath, privateKeyPath) = AsymmetricKeys.ExportEncryptionKeyPair(exportDirectoryPath, publicKey, privateKey);
+                    (publicKeyPath, privateKeyPath) = AsymmetricKeys.ExportKeyPair(exportDirectoryPath, Constants.DefaultEncryptionKeyFileName, publicKey, privateKey);
                 }
                 else
                 {
                     (publicKey, privateKey) = AsymmetricKeys.GenerateSigningKeyPair();
-                    (publicKeyPath, privateKeyPath) = AsymmetricKeys.ExportSigningKeyPair(exportDirectoryPath, publicKey, privateKey);
+                    (publicKeyPath, privateKeyPath) = AsymmetricKeys.ExportKeyPair(exportDirectoryPath, Constants.DefaultSigningKeyFileName, publicKey, privateKey);
                 }
                 DisplayKeyPair(publicKey, publicKeyPath, privateKeyPath);
             }
