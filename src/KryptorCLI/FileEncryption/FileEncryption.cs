@@ -46,20 +46,26 @@ namespace KryptorCLI
                     DirectoryEncryption.UsingPassword(inputFilePath, passwordBytes);
                     return;
                 }
-                // Derive a unique KEK per file
                 byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
                 byte[] keyEncryptionKey = Argon2.DeriveKey(passwordBytes, salt);
                 // Fill unused header with random public key
                 using var ephemeralKeyPair = PublicKeyBox.GenerateKeyPair();
                 string outputFilePath = GetOutputFilePath(inputFilePath);
-                EncryptFile.Initialize(inputFilePath, outputFilePath, ephemeralKeyPair.PublicKey, salt, keyEncryptionKey);
-                CryptographicOperations.ZeroMemory(keyEncryptionKey);
-                EncryptionSuccessful(inputFilePath, outputFilePath);
+                EncryptInputFile(inputFilePath, outputFilePath, ephemeralKeyPair.PublicKey, salt, keyEncryptionKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
                 DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to encrypt the file.");
             }
+        }
+
+        private static void EncryptInputFile(string inputFilePath, string outputFilePath, byte[] ephemeralPublicKey, byte[] salt, byte[] keyEncryptionKey)
+        {
+            DisplayMessage.EncryptingFile(inputFilePath, outputFilePath);
+            EncryptFile.Initialize(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
+            CryptographicOperations.ZeroMemory(keyEncryptionKey);
+            DisplayMessage.Done();
+            Globals.SuccessfulCount += 1;
         }
 
         public static void EncryptEachFileWithPublicKey(string[] filePaths, byte[] senderPrivateKey, byte[] recipientPublicKey)
@@ -92,9 +98,7 @@ namespace KryptorCLI
                 byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
                 byte[] keyEncryptionKey = Generate.KeyEncryptionKey(sharedSecret, ephemeralSharedSecret, salt);
                 string outputFilePath = GetOutputFilePath(inputFilePath);
-                EncryptFile.Initialize(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
-                CryptographicOperations.ZeroMemory(keyEncryptionKey);
-                EncryptionSuccessful(inputFilePath, outputFilePath);
+                EncryptInputFile(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
@@ -130,9 +134,7 @@ namespace KryptorCLI
                 byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
                 byte[] keyEncryptionKey = Generate.KeyEncryptionKey(ephemeralSharedSecret, salt);
                 string outputFilePath = GetOutputFilePath(inputFilePath);
-                EncryptFile.Initialize(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
-                CryptographicOperations.ZeroMemory(keyEncryptionKey);
-                EncryptionSuccessful(inputFilePath, outputFilePath);
+                EncryptInputFile(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
@@ -156,12 +158,6 @@ namespace KryptorCLI
             }
             string outputFilePath = inputFilePath + Constants.EncryptedExtension;
             return FileHandling.GetUniqueFilePath(outputFilePath);
-        }
-
-        public static void EncryptionSuccessful(string inputFilePath, string outputFilePath)
-        {
-            DisplayMessage.FileEncryptionResult(inputFilePath, outputFilePath);
-            Globals.SuccessfulCount += 1;
         }
     }
 }

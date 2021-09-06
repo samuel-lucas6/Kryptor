@@ -24,7 +24,7 @@ namespace KryptorCLI
 {
     public static class RestoreFileName
     {
-        public static void RenameFile(string inputFilePath, string outputFilePath, int fileNameLength)
+        public static void RenameFile(string outputFilePath, int fileNameLength)
         {
             try
             {
@@ -35,7 +35,7 @@ namespace KryptorCLI
                 string restoredFilePath = outputFilePath.Replace(obfuscatedFileName, originalFileName);
                 restoredFilePath = FileHandling.GetUniqueFilePath(restoredFilePath);
                 File.Move(outputFilePath, restoredFilePath);
-                DisplayMessage.FileEncryptionResult(inputFilePath, restoredFilePath);
+                DisplayMessage.MessageSameLine($" Renaming file to {Path.GetFileName(restoredFilePath)}...");
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {

@@ -75,8 +75,10 @@ namespace KryptorCLI
         {
             string inputFilePath = inputFile.Name;
             string outputFilePath = FileDecryption.GetOutputFilePath(inputFilePath);
+            DisplayMessage.DecryptingFile(inputFilePath, outputFilePath);
             DecryptFile.Initialize(inputFile, outputFilePath, ephemeralPublicKey, keyEncryptionKey);
-            FileDecryption.DecryptionSuccessful(inputFilePath, outputFilePath);
+            DisplayMessage.Done();
+            Globals.SuccessfulCount += 1;
         }
 
         public static void UsingPublicKey(string directoryPath, byte[] sharedSecret, byte[] recipientPrivateKey)

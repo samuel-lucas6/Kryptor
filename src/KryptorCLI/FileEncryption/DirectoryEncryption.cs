@@ -111,8 +111,10 @@ namespace KryptorCLI
         {
             try
             {
+                DisplayMessage.EncryptingFile(inputFilePath, outputFilePath);
                 EncryptFile.Initialize(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
-                FileEncryption.EncryptionSuccessful(inputFilePath, outputFilePath);
+                DisplayMessage.Done();
+                Globals.SuccessfulCount += 1;
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {

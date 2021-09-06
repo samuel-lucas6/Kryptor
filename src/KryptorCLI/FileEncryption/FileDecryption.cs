@@ -49,15 +49,22 @@ namespace KryptorCLI
                 byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
                 byte[] keyEncryptionKey = Argon2.DeriveKey(passwordBytes, salt);
-                string outputFilePath = GetOutputFilePath(inputFilePath);
-                DecryptFile.Initialize(inputFile, outputFilePath, ephemeralPublicKey, keyEncryptionKey);
-                CryptographicOperations.ZeroMemory(keyEncryptionKey);
-                DecryptionSuccessful(inputFilePath, outputFilePath);
+                DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
                 FileException(inputFilePath, ex);
             }
+        }
+
+        private static void DecryptInputFile(FileStream inputFile, byte[] ephemeralPublicKey, byte[] keyEncryptionKey)
+        {
+            string outputFilePath = GetOutputFilePath(inputFile.Name);
+            DisplayMessage.DecryptingFile(inputFile.Name, outputFilePath);
+            DecryptFile.Initialize(inputFile, outputFilePath, ephemeralPublicKey, keyEncryptionKey);
+            CryptographicOperations.ZeroMemory(keyEncryptionKey);
+            DisplayMessage.Done();
+            Globals.SuccessfulCount += 1;
         }
 
         public static void DecryptEachFileWithPublicKey(string[] filePaths, byte[] recipientPrivateKey, byte[] senderPublicKey)
@@ -90,10 +97,7 @@ namespace KryptorCLI
                 byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecret(recipientPrivateKey, ephemeralPublicKey);
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
                 byte[] keyEncryptionKey = Generate.KeyEncryptionKey(sharedSecret, ephemeralSharedSecret, salt);
-                string outputFilePath = GetOutputFilePath(inputFilePath);
-                DecryptFile.Initialize(inputFile, outputFilePath, ephemeralPublicKey, keyEncryptionKey);
-                CryptographicOperations.ZeroMemory(keyEncryptionKey);
-                DecryptionSuccessful(inputFilePath, outputFilePath);
+                DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
@@ -129,10 +133,7 @@ namespace KryptorCLI
                 byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecret(privateKey, ephemeralPublicKey);
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
                 byte[] keyEncryptionKey = Generate.KeyEncryptionKey(ephemeralSharedSecret, salt);
-                string outputFilePath = GetOutputFilePath(inputFilePath);
-                DecryptFile.Initialize(inputFile, outputFilePath, ephemeralPublicKey, keyEncryptionKey);
-                CryptographicOperations.ZeroMemory(keyEncryptionKey);
-                DecryptionSuccessful(inputFilePath, outputFilePath);
+                DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
@@ -144,15 +145,6 @@ namespace KryptorCLI
         {
             string outputFilePath = inputFilePath.Replace(Constants.EncryptedExtension, string.Empty);
             return FileHandling.GetUniqueFilePath(outputFilePath);
-        }
-
-        public static void DecryptionSuccessful(string inputFilePath, string outputFilePath)
-        {
-            if (!Globals.ObfuscateFileNames)
-            {
-                DisplayMessage.FileEncryptionResult(inputFilePath, outputFilePath);
-            }
-            Globals.SuccessfulCount += 1;
         }
 
         private static void FileException(string inputFilePath, Exception ex)
