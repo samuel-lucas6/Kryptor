@@ -56,7 +56,7 @@ namespace KryptorCLI
                     return;
                 }
                 DisplayMessage.FilePathMessage(filePath, "Good signature.");
-                DisplayMessage.Message($"Authenticated comment: {comment}");
+                DisplayMessage.MessageNewLine($"Authenticated comment: {comment}");
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
