@@ -52,9 +52,29 @@ namespace KryptorCLI
             Console.WriteLine($"{Path.GetFileName(filePath)} - {_error}: {message}");
         }
 
-        public static void Message(string message)
+        public static void MessageNewLine(string message)
         {
             Console.WriteLine(message);
+        }
+
+        public static void MessageSameLine(string message)
+        {
+            Console.Write(message);
+        }
+
+        public static void EncryptingFile(string inputFilePath, string outputFilePath)
+        {
+            Console.Write($"Encrypting {Path.GetFileName(inputFilePath)} => {Path.GetFileName(outputFilePath)}...");
+        }
+
+        public static void DecryptingFile(string inputFilePath, string outputFilePath)
+        {
+            Console.Write($"Decrypting {Path.GetFileName(inputFilePath)} => {Path.GetFileName(outputFilePath)}...");
+        }
+
+        public static void Done()
+        {
+            Console.WriteLine(" Done.");
         }
 
         public static void FileEncryptionResult(string inputFilePath, string outputFilePath)
