@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 
 /*
     Kryptor: A simple, modern, and secure encryption tool.
@@ -144,7 +145,8 @@ namespace KryptorCLI
         public static string GetOutputFilePath(string inputFilePath)
         {
             string outputFilePath = inputFilePath.Replace(Constants.EncryptedExtension, string.Empty);
-            return FileHandling.GetUniqueFilePath(outputFilePath);
+            string outputFilePathCleaned = Regex.Replace(outputFilePath, @"\(.*?\)", string.Empty);
+            return FileHandling.GetUniqueFilePath(outputFilePathCleaned);
         }
 
         private static void FileException(string inputFilePath, Exception ex)
