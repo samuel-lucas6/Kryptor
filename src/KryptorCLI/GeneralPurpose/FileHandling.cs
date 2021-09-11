@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using Sodium;
+using System.Text.RegularExpressions;
 
 /*
     Kryptor: A simple, modern, and secure encryption tool.
@@ -165,7 +166,7 @@ namespace KryptorCLI
             if (!File.Exists(filePath)) { return filePath; }
             int fileNumber = 1;
             string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
-            string fileExtension = Path.GetExtension(filePath);
+            string fileExtension = Regex.Replace(Path.GetExtension(filePath), @"\(.*?\)", string.Empty);
             string directoryPath = Path.GetDirectoryName(filePath);
             do
             {
