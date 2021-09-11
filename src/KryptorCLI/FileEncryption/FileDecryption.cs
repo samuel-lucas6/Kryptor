@@ -145,8 +145,7 @@ namespace KryptorCLI
         public static string GetOutputFilePath(string inputFilePath)
         {
             string outputFilePath = inputFilePath.Replace(Constants.EncryptedExtension, string.Empty);
-            string outputFilePathCleaned = Regex.Replace(outputFilePath, @"\(.*?\)", string.Empty);
-            return FileHandling.GetUniqueFilePath(outputFilePathCleaned);
+            return FileHandling.GetUniqueFilePath(Regex.Replace(outputFilePath, @"\(.*?\)", string.Empty));
         }
 
         private static void FileException(string inputFilePath, Exception ex)
