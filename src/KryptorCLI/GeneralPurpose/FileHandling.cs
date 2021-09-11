@@ -166,7 +166,26 @@ namespace KryptorCLI
             if (!File.Exists(filePath)) { return filePath; }
             int fileNumber = 1;
             string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
-            string fileExtension = Regex.Replace(Path.GetExtension(filePath), @"\(.*?\)", string.Empty);
+            string fileExtension = Path.GetExtension(filePath);
+            string directoryPath = Path.GetDirectoryName(filePath);
+            do
+            {
+                fileNumber++;
+                string newFileName = $"{fileNameWithoutExtension} ({fileNumber}){fileExtension}";
+                filePath = Path.Combine(directoryPath, newFileName);
+            }
+            while (File.Exists(filePath));
+            return filePath;
+        }
+
+        public static string GetUniqueDecryptedFilePath(string filePath)
+        {
+            if (!File.Exists(filePath)) { return filePath; }
+            int fileNumber = 1;
+            
+            string fileNameWithoutEncryptedExtension = filePath.Replace(Constants.EncryptedExtension, string.Empty);
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileNameWithoutEncryptedExtension);
+            string fileExtension = Regex.Replace(Path.GetExtension(fileNameWithoutEncryptedExtension), @"\(.*?\)", string.Empty);
             string directoryPath = Path.GetDirectoryName(filePath);
             do
             {
