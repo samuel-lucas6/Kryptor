@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Security.Cryptography;
 
@@ -140,13 +140,13 @@ namespace KryptorCLI
                 FileException(inputFilePath, ex);
             }
         }
-
+        
         public static string GetOutputFilePath(string inputFilePath)
         {
             string outputFilePath = inputFilePath.Replace(Constants.EncryptedExtension, string.Empty);
             return FileHandling.GetUniqueFilePath(outputFilePath);
         }
-
+        
         private static void FileException(string inputFilePath, Exception ex)
         {
             if (ex is ArgumentException)
