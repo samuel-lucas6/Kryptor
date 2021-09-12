@@ -163,35 +163,20 @@ namespace KryptorCLI
 
         public static string GetUniqueFilePath(string filePath)
         {
-            if (!File.Exists(filePath)) { return filePath; }
-            int fileNumber = 1;
-            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
             string fileExtension = Path.GetExtension(filePath);
-            string directoryPath = Path.GetDirectoryName(filePath);
-            do
+            if (!string.IsNullOrEmpty(fileExtension) && filePath.EndsWith(')') && filePath[^4].Equals(' ') && filePath[^3].Equals('(') && char.IsDigit(filePath[^2]))
             {
-                fileNumber++;
-                string newFileName = $"{fileNameWithoutExtension} ({fileNumber}){fileExtension}";
-                filePath = Path.Combine(directoryPath, newFileName);
+                filePath = filePath.Remove(startIndex: filePath.Length - 4);
             }
-            while (File.Exists(filePath));
-            return filePath;
-        }
-
-        public static string GetUniqueDecryptedFilePath(string filePath)
-        {
             if (!File.Exists(filePath)) { return filePath; }
-            int fileNumber = 1;
-            
-            string fileNameWithoutEncryptedExtension = filePath.Replace(Constants.EncryptedExtension, string.Empty);
-            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileNameWithoutEncryptedExtension);
-            string fileExtension = Regex.Replace(Path.GetExtension(fileNameWithoutEncryptedExtension), @"\(.*?\)", string.Empty);
+            int fileNumber = 2;
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
             string directoryPath = Path.GetDirectoryName(filePath);
             do
             {
-                fileNumber++;
                 string newFileName = $"{fileNameWithoutExtension} ({fileNumber}){fileExtension}";
                 filePath = Path.Combine(directoryPath, newFileName);
+                fileNumber++;
             }
             while (File.Exists(filePath));
             return filePath;
@@ -200,13 +185,13 @@ namespace KryptorCLI
         public static string GetUniqueDirectoryPath(string directoryPath)
         {
             if (!Directory.Exists(directoryPath)) { return directoryPath; }
-            int directoryNumber = 1;
+            int directoryNumber = 2;
             string parentDirectory = Directory.GetParent(directoryPath).FullName;
             string directoryName = Path.GetFileName(directoryPath);
             do
             {
-                directoryNumber++;
                 directoryPath = Path.Combine(parentDirectory, $"{directoryName} ({directoryNumber})");
+                directoryNumber++;
             }
             while (Directory.Exists(directoryPath));
             return directoryPath;
