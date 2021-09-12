@@ -140,12 +140,13 @@ namespace KryptorCLI
                 FileException(inputFilePath, ex);
             }
         }
-
+        
         public static string GetOutputFilePath(string inputFilePath)
         {
-            return FileHandling.GetUniqueDecryptedFilePath(inputFilePath);
+            string outputFilePath = inputFilePath.Replace(Constants.EncryptedExtension, string.Empty);
+            return FileHandling.GetUniqueFilePath(outputFilePath);
         }
-
+        
         private static void FileException(string inputFilePath, Exception ex)
         {
             if (ex is ArgumentException)
