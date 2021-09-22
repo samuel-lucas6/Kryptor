@@ -70,10 +70,10 @@ namespace KryptorCLI
         {
             // Constant time comparison
             byte[] aBytes = Encoding.UTF8.GetBytes(a);
-            byte[] aHash = Blake2.Hash(aBytes);
+            byte[] aHash = Blake2b.Hash(aBytes);
             CryptographicOperations.ZeroMemory(aBytes);
             byte[] bBytes = Encoding.UTF8.GetBytes(b);
-            byte[] bHash = Blake2.Hash(bBytes);
+            byte[] bHash = Blake2b.Hash(bBytes);
             CryptographicOperations.ZeroMemory(bBytes);
             bool equal = Utilities.Compare(aHash, bHash);
             CryptographicOperations.ZeroMemory(aHash);

@@ -1,4 +1,5 @@
 ﻿using System.Security.Cryptography;
+using Sodium;
 
 /*
     Kryptor: A simple, modern, and secure encryption tool.
@@ -20,20 +21,28 @@
 
 namespace KryptorCLI
 {
-    public static class Generate
+    public static class KeyDerivation
     {
-        public static byte[] KeyEncryptionKey(byte[] sharedSecret, byte[] ephemeralSharedSecret, byte[] salt)
+        public static byte[] Argon2id(byte[] passwordBytes, byte[] salt)
+        {
+            DisplayMessage.MessageSameLine("Deriving encryption key from password...");
+            byte[] key = PasswordHash.ArgonHashBinary(passwordBytes, salt, Constants.Iterations, Constants.MemorySize, Constants.EncryptionKeyLength, PasswordHash.ArgonAlgorithm.Argon_2ID13);
+            DisplayMessage.Done();
+            return key;
+        }
+
+        public static byte[] Blake2(byte[] sharedSecret, byte[] ephemeralSharedSecret, byte[] salt)
         {
             byte[] inputKeyingMaterial = Arrays.Concat(sharedSecret, ephemeralSharedSecret);
-            byte[] keyEncryptionKey = Blake2.KeyDerivation(inputKeyingMaterial, salt, Constants.EncryptionKeyLength);
+            byte[] keyEncryptionKey = Blake2b.KeyDerivation(inputKeyingMaterial, salt, Constants.EncryptionKeyLength);
             CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
             CryptographicOperations.ZeroMemory(inputKeyingMaterial);
             return keyEncryptionKey;
         }
 
-        public static byte[] KeyEncryptionKey(byte[] ephemeralSharedSecret, byte[] salt)
+        public static byte[] Blake2(byte[] ephemeralSharedSecret, byte[] salt)
         {
-            byte[] keyEncryptionKey = Blake2.KeyDerivation(ephemeralSharedSecret, salt, Constants.EncryptionKeyLength);
+            byte[] keyEncryptionKey = Blake2b.KeyDerivation(ephemeralSharedSecret, salt, Constants.EncryptionKeyLength);
             CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
             return keyEncryptionKey;
         }

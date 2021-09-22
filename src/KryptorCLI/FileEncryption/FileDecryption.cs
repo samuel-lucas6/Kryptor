@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Security.Cryptography;
 
@@ -48,7 +48,7 @@ namespace KryptorCLI
                 using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
                 byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
-                byte[] keyEncryptionKey = Argon2.DeriveKey(passwordBytes, salt);
+                byte[] keyEncryptionKey = KeyDerivation.Argon2id(passwordBytes, salt);
                 DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -96,7 +96,7 @@ namespace KryptorCLI
                 byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
                 byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecret(recipientPrivateKey, ephemeralPublicKey);
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
-                byte[] keyEncryptionKey = Generate.KeyEncryptionKey(sharedSecret, ephemeralSharedSecret, salt);
+                byte[] keyEncryptionKey = KeyDerivation.Blake2(sharedSecret, ephemeralSharedSecret, salt);
                 DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -132,7 +132,7 @@ namespace KryptorCLI
                 byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
                 byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecret(privateKey, ephemeralPublicKey);
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
-                byte[] keyEncryptionKey = Generate.KeyEncryptionKey(ephemeralSharedSecret, salt);
+                byte[] keyEncryptionKey = KeyDerivation.Blake2(ephemeralSharedSecret, salt);
                 DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -140,13 +140,13 @@ namespace KryptorCLI
                 FileException(inputFilePath, ex);
             }
         }
-        
+
         public static string GetOutputFilePath(string inputFilePath)
         {
             string outputFilePath = inputFilePath.Replace(Constants.EncryptedExtension, string.Empty);
             return FileHandling.GetUniqueFilePath(outputFilePath);
         }
-        
+
         private static void FileException(string inputFilePath, Exception ex)
         {
             if (ex is ArgumentException)

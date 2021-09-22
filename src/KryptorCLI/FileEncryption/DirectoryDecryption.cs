@@ -33,7 +33,7 @@ namespace KryptorCLI
                 if (!File.Exists(saltFilePath)) { throw new FileNotFoundException("No salt file found. Unable to decrypt the directory. Please decrypt these files individually."); }
                 byte[] salt = File.ReadAllBytes(saltFilePath);
                 if (salt.Length != Constants.SaltLength) { throw new ArgumentException("Invalid salt length."); }
-                byte[] keyEncryptionKey = Argon2.DeriveKey(passwordBytes, salt);
+                byte[] keyEncryptionKey = KeyDerivation.Argon2id(passwordBytes, salt);
                 DecryptEachFileWithPassword(filePaths, keyEncryptionKey);
                 Finalize(directoryPath, saltFilePath);
             }
@@ -108,7 +108,7 @@ namespace KryptorCLI
                     byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
                     byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecret(recipientPrivateKey, ephemeralPublicKey);
                     byte[] salt = FileHeaders.ReadSalt(inputFile);
-                    byte[] keyEncryptionKey = Generate.KeyEncryptionKey(sharedSecret, ephemeralSharedSecret, salt);
+                    byte[] keyEncryptionKey = KeyDerivation.Blake2(sharedSecret, ephemeralSharedSecret, salt);
                     DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey);
                     CryptographicOperations.ZeroMemory(keyEncryptionKey);
                 }
@@ -146,7 +146,7 @@ namespace KryptorCLI
                     byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
                     byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecret(privateKey, ephemeralPublicKey);
                     byte[] salt = FileHeaders.ReadSalt(inputFile);
-                    byte[] keyEncryptionKey = Generate.KeyEncryptionKey(ephemeralSharedSecret, salt);
+                    byte[] keyEncryptionKey = KeyDerivation.Blake2(ephemeralSharedSecret, salt);
                     DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey);
                     CryptographicOperations.ZeroMemory(keyEncryptionKey);
                 }

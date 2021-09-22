@@ -28,7 +28,7 @@ namespace KryptorCLI
         public static byte[] Encrypt(byte[] passwordBytes, byte[] keyAlgorithm, byte[] privateKey)
         {
             byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
-            byte[] key = Argon2.DeriveKey(passwordBytes, salt);
+            byte[] key = KeyDerivation.Argon2id(passwordBytes, salt);
             CryptographicOperations.ZeroMemory(passwordBytes);
             byte[] nonce = SodiumCore.GetRandomBytes(Constants.XChaChaNonceLength);
             byte[] additionalData = Arrays.Concat(keyAlgorithm, Constants.PrivateKeyVersion);
@@ -61,7 +61,7 @@ namespace KryptorCLI
             byte[] nonce = GetNonce(privateKey);
             byte[] encryptedPrivateKey = GetEncryptedPrivateKey(privateKey);
             byte[] additionalData = Arrays.Concat(keyAlgorithm, keyVersion);
-            byte[] key = Argon2.DeriveKey(passwordBytes, salt);
+            byte[] key = KeyDerivation.Argon2id(passwordBytes, salt);
             CryptographicOperations.ZeroMemory(passwordBytes);
             byte[] decryptedPrivateKey = XChaCha20BLAKE2b.Decrypt(encryptedPrivateKey, nonce, key, additionalData, TagLength.Medium);
             CryptographicOperations.ZeroMemory(key);

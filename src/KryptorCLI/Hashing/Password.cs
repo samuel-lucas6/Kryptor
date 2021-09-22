@@ -38,7 +38,7 @@ namespace KryptorCLI
         {
             if (password.Length == 0) { return null; }
             byte[] passwordBytes = GetPasswordBytes(password);
-            return Blake2.Hash(passwordBytes);
+            return Blake2b.Hash(passwordBytes);
         }
 
         private static byte[] GetPasswordBytes(char[] password)
@@ -64,7 +64,7 @@ namespace KryptorCLI
 
         private static byte[] CombineKeyfileAndPassword(byte[] passwordBytes, byte[] keyfileBytes)
         {
-            passwordBytes = Blake2.KeyedHash(passwordBytes, keyfileBytes);
+            passwordBytes = Blake2b.KeyedHash(passwordBytes, keyfileBytes);
             CryptographicOperations.ZeroMemory(keyfileBytes);
             return passwordBytes;
         }

@@ -39,7 +39,7 @@ namespace KryptorCLI
                 byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
                 CreateSaltFile(newDirectoryPath, salt);
                 // Perform password hashing once
-                byte[] keyEncryptionKey = Argon2.DeriveKey(passwordBytes, salt);
+                byte[] keyEncryptionKey = KeyDerivation.Argon2id(passwordBytes, salt);
                 EncryptEachFileWithPassword(filePaths, salt, keyEncryptionKey);
                 RenameBackupDirectory(backupDirectoryPath, directoryPath);
             }
@@ -160,9 +160,9 @@ namespace KryptorCLI
                 bool validFilePath = FilePathValidation.FileEncryption(inputFilePath);
                 if (!validFilePath) { continue; }
                 // Derive a unique KEK per file
-                byte[] ephemeralSharedSecret = KeyExchange.GetEphemeralSharedSecret(recipientPublicKey, out byte[] ephemeralPublicKey);
+                byte[] ephemeralSharedSecret = KeyExchange.GetPublicKeySharedSecret(recipientPublicKey, out byte[] ephemeralPublicKey);
                 byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
-                byte[] keyEncryptionKey = Generate.KeyEncryptionKey(sharedSecret, ephemeralSharedSecret, salt);
+                byte[] keyEncryptionKey = KeyDerivation.Blake2(sharedSecret, ephemeralSharedSecret, salt);
                 string outputFilePath = FileEncryption.GetOutputFilePath(inputFilePath);
                 EncryptInputFile(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
                 CryptographicOperations.ZeroMemory(keyEncryptionKey);
@@ -201,7 +201,7 @@ namespace KryptorCLI
                 // Derive a unique KEK per file
                 byte[] ephemeralSharedSecret = KeyExchange.GetPrivateKeySharedSecret(privateKey, out byte[] ephemeralPublicKey);
                 byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
-                byte[] keyEncryptionKey = Generate.KeyEncryptionKey(ephemeralSharedSecret, salt);
+                byte[] keyEncryptionKey = KeyDerivation.Blake2(ephemeralSharedSecret, salt);
                 string outputFilePath = FileEncryption.GetOutputFilePath(inputFilePath);
                 EncryptInputFile(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
                 CryptographicOperations.ZeroMemory(keyEncryptionKey);

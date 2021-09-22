@@ -23,7 +23,7 @@ using Sodium;
 
 namespace KryptorCLI
 {
-    public static class Blake2
+    public static class Blake2b
     {
         private static readonly byte[] _personal = Encoding.UTF8.GetBytes(Constants.BLAKE2Personal);
 

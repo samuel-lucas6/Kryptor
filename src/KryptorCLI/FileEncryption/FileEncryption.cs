@@ -47,7 +47,7 @@ namespace KryptorCLI
                     return;
                 }
                 byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
-                byte[] keyEncryptionKey = Argon2.DeriveKey(passwordBytes, salt);
+                byte[] keyEncryptionKey = KeyDerivation.Argon2id(passwordBytes, salt);
                 // Fill unused header with random public key
                 using var ephemeralKeyPair = PublicKeyBox.GenerateKeyPair();
                 string outputFilePath = GetOutputFilePath(inputFilePath);
@@ -94,9 +94,9 @@ namespace KryptorCLI
                     return;
                 }
                 // Derive a unique KEK per file
-                byte[] ephemeralSharedSecret = KeyExchange.GetEphemeralSharedSecret(recipientPublicKey, out byte[] ephemeralPublicKey);
+                byte[] ephemeralSharedSecret = KeyExchange.GetPublicKeySharedSecret(recipientPublicKey, out byte[] ephemeralPublicKey);
                 byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
-                byte[] keyEncryptionKey = Generate.KeyEncryptionKey(sharedSecret, ephemeralSharedSecret, salt);
+                byte[] keyEncryptionKey = KeyDerivation.Blake2(sharedSecret, ephemeralSharedSecret, salt);
                 string outputFilePath = GetOutputFilePath(inputFilePath);
                 EncryptInputFile(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
             }
@@ -132,7 +132,7 @@ namespace KryptorCLI
                 // Derive a unique KEK per file
                 byte[] ephemeralSharedSecret = KeyExchange.GetPrivateKeySharedSecret(privateKey, out byte[] ephemeralPublicKey);
                 byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
-                byte[] keyEncryptionKey = Generate.KeyEncryptionKey(ephemeralSharedSecret, salt);
+                byte[] keyEncryptionKey = KeyDerivation.Blake2(ephemeralSharedSecret, salt);
                 string outputFilePath = GetOutputFilePath(inputFilePath);
                 EncryptInputFile(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
             }

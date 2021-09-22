@@ -55,7 +55,7 @@ namespace KryptorCLI
         {
             if (!preHash) { return File.ReadAllBytes(filePath); }
             using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
-            return Blake2.Hash(fileStream);
+            return Blake2b.Hash(fileStream);
         }
 
         private static byte[] ComputeGlobalSignature(byte[] signatureFileBytes, byte[] privateKey)
