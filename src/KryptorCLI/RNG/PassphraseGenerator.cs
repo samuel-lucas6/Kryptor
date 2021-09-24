@@ -25,45 +25,37 @@ namespace KryptorCLI
 {
     public static class PassphraseGenerator
     {
-        public static char[] GetRandomPassphrase(int length)
+        public static char[] GetRandomPassphrase(int wordCount)
         {
             string[] wordlist = GetWordlist();
-            List<string> words = GetRandomWords(wordlist, length);
-            return FormatPassphrase(words, length);
+            List<string> words = GetRandomWords(wordlist, wordCount);
+            return FormatPassphrase(words, wordCount);
         }
 
         private static string[] GetWordlist()
         {
-            string wordlist = Properties.Resources.wordlist;
-            return wordlist.Split(new[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            return Properties.Resources.wordlist.Split(new[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
         }
 
-        private static List<string> GetRandomWords(string[] wordlist, int length)
+        private static List<string> GetRandomWords(string[] wordlist, int wordCount)
         {
             var words = new List<string>();
             var textInfo = new CultureInfo("en-US", useUserOverride: false).TextInfo;
-            for (int i = 0; i < length; i++)
+            for (int i = 0; i < wordCount; i++)
             {
-                int randomLine = SodiumCore.GetRandomNumber(wordlist.Length);
-                words.Add(textInfo.ToTitleCase(wordlist[randomLine]));
+                int randomIndex = SodiumCore.GetRandomNumber(wordlist.Length);
+                words.Add(textInfo.ToTitleCase(wordlist[randomIndex]));
             }
             return words;
         }
 
-        private static char[] FormatPassphrase(List<string> words, int length)
+        private static char[] FormatPassphrase(List<string> words, int wordCount)
         {
             var passphrase = new List<char>();
-            for (int i = 0; i < length; i++)
+            for (int i = 0; i < wordCount; i++)
             {
-                foreach (char character in words[i])
-                {
-                    passphrase.Add(character);
-                }
-                // Add word separator symbol
-                if (i != length - 1)
-                {
-                    passphrase.Add('-');
-                }
+                passphrase.AddRange(words[i]);
+                if (i != wordCount - 1) { passphrase.Add('-'); }
             }
             return passphrase.ToArray();
         }
