@@ -28,7 +28,7 @@ namespace KryptorCLI
         public static (string publicKey, string privateKey) GenerateEncryptionKeyPair()
         {
             char[] password = PasswordPrompt.EnterNewPassword();
-            byte[] passwordBytes = Password.Hash(password);
+            byte[] passwordBytes = Password.Prehash(password);
             using var keyPair = PublicKeyBox.GenerateKeyPair();
             byte[] publicKey = Arrays.Concat(Constants.Curve25519KeyHeader, keyPair.PublicKey);
             byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, Constants.Curve25519KeyHeader, keyPair.PrivateKey);
@@ -38,7 +38,7 @@ namespace KryptorCLI
         public static (string publicKey, string privateKey) GenerateSigningKeyPair()
         {
             char[] password = PasswordPrompt.EnterNewPassword();
-            byte[] passwordBytes = Password.Hash(password);
+            byte[] passwordBytes = Password.Prehash(password);
             using var keyPair = PublicKeyAuth.GenerateKeyPair();
             byte[] publicKey = Arrays.Concat(Constants.Ed25519KeyHeader, keyPair.PublicKey);
             byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, Constants.Ed25519KeyHeader, keyPair.PrivateKey);

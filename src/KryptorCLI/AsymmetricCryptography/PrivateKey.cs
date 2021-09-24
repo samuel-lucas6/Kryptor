@@ -43,7 +43,7 @@ namespace KryptorCLI
             try
             {
                 char[] password = PasswordPrompt.EnterYourPassword();
-                byte[] passwordBytes = Password.Hash(password);
+                byte[] passwordBytes = Password.Prehash(password);
                 return Decrypt(passwordBytes, privateKey);
             }
             catch (CryptographicException)

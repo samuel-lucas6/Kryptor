@@ -24,28 +24,19 @@ namespace KryptorCLI
 {
     public static class Password
     {
-        public static byte[] Hash(char[] password, string keyfilePath)
+        public static byte[] Prehash(char[] password, string keyfilePath)
         {
-            byte[] passwordBytes = Hash(password);
-            if (!string.IsNullOrEmpty(keyfilePath))
-            {
-                passwordBytes = UseKeyfile(passwordBytes, keyfilePath);
-            }
+            byte[] passwordBytes = Prehash(password);
+            if (!string.IsNullOrEmpty(keyfilePath)) { passwordBytes = UseKeyfile(passwordBytes, keyfilePath); }
             return passwordBytes;
         }
 
-        public static byte[] Hash(char[] password)
+        public static byte[] Prehash(char[] password)
         {
             if (password.Length == 0) { return null; }
-            byte[] passwordBytes = GetPasswordBytes(password);
-            return Blake2b.Hash(passwordBytes);
-        }
-
-        private static byte[] GetPasswordBytes(char[] password)
-        {
             byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
             Arrays.ZeroMemory(password);
-            return passwordBytes;
+            return Blake2b.Hash(passwordBytes);
         }
 
         private static byte[] UseKeyfile(byte[] passwordBytes, string keyfilePath)
@@ -53,7 +44,7 @@ namespace KryptorCLI
             try
             {
                 byte[] keyfileBytes = Keyfiles.ReadKeyfile(keyfilePath);
-                return passwordBytes == null ? keyfileBytes : CombineKeyfileAndPassword(passwordBytes, keyfileBytes);
+                return passwordBytes == null ? keyfileBytes : PepperPassword(passwordBytes, keyfileBytes);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
@@ -62,7 +53,7 @@ namespace KryptorCLI
             }
         }
 
-        private static byte[] CombineKeyfileAndPassword(byte[] passwordBytes, byte[] keyfileBytes)
+        private static byte[] PepperPassword(byte[] passwordBytes, byte[] keyfileBytes)
         {
             passwordBytes = Blake2b.KeyedHash(passwordBytes, keyfileBytes);
             CryptographicOperations.ZeroMemory(keyfileBytes);
