@@ -68,7 +68,6 @@ namespace KryptorCLI
 
         public static bool Compare(char[] a, char[] b)
         {
-            // Constant time comparison
             byte[] aBytes = Encoding.UTF8.GetBytes(a);
             byte[] aHash = Blake2b.Hash(aBytes);
             CryptographicOperations.ZeroMemory(aBytes);
