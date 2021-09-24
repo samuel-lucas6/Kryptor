@@ -24,32 +24,29 @@ namespace KryptorCLI
 {
     public static class Updates
     {
+        private const string _versionFileName = "version.txt";
+        private const string _versionFileLink = "https://raw.githubusercontent.com/samuel-lucas6/Kryptor/master/version.txt";
+
         public static bool CheckForUpdates()
         {
-            string downloadFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "version.txt");
-            DownloadVersionFile(downloadFilePath);
             string assemblyVersion = Program.GetVersion();
-            string latestVersion = GetLatestVersion(downloadFilePath);
-            return !CompareVersions(assemblyVersion, latestVersion);
+            string latestVersion = GetLatestVersion();
+            return !string.Equals(assemblyVersion, latestVersion, StringComparison.Ordinal);
         }
 
-        private static void DownloadVersionFile(string downloadFilePath)
+        private static string GetLatestVersion()
         {
-            using var webClient = new WebClient();
-            const string versionLink = "https://raw.githubusercontent.com/samuel-lucas6/Kryptor/master/version.txt";
-            webClient.DownloadFile(versionLink, downloadFilePath);
-        }
-
-        private static string GetLatestVersion(string downloadFilePath)
-        {
+            string downloadFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), _versionFileName);
+            DownloadVersionFile(downloadFilePath);
             string latestVersion = File.ReadAllText(downloadFilePath).Trim('\n').Trim();
             File.Delete(downloadFilePath);
             return latestVersion;
         }
 
-        private static bool CompareVersions(string assemblyVersion, string latestVersion)
+        private static void DownloadVersionFile(string downloadFilePath)
         {
-            return string.Equals(assemblyVersion, latestVersion, StringComparison.Ordinal);
+            using var webClient = new WebClient();
+            webClient.DownloadFile(_versionFileLink, downloadFilePath);
         }
     }
 }
