@@ -48,8 +48,7 @@ namespace KryptorCLI
 
         public static bool IsDirectory(string filePath)
         {
-            var fileAttributes = File.GetAttributes(filePath);
-            return fileAttributes.HasFlag(FileAttributes.Directory);
+            return File.GetAttributes(filePath).HasFlag(FileAttributes.Directory);
         }
 
         public static bool IsDirectoryEmpty(string directoryPath)
@@ -59,12 +58,12 @@ namespace KryptorCLI
 
         public static string[] GetAllDirectories(string directoryPath)
         {
-            return Directory.GetDirectories(directoryPath, "*", SearchOption.AllDirectories);
+            return Directory.GetDirectories(directoryPath, searchPattern: "*", SearchOption.AllDirectories);
         }
 
         public static string[] GetAllFiles(string directoryPath)
         {
-            return Directory.GetFiles(directoryPath, "*", SearchOption.AllDirectories);
+            return Directory.GetFiles(directoryPath, searchPattern: "*", SearchOption.AllDirectories);
         }
 
         public static bool? IsKryptorFile(string filePath)
@@ -74,9 +73,9 @@ namespace KryptorCLI
                 byte[] magicBytes = FileHeaders.ReadMagicBytes(filePath);
                 return Utilities.Compare(magicBytes, Constants.KryptorMagicBytes);
             }
-            catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
-            {
-                return null;
+            catch (Exception ex) when (ExceptionFilters.FileAccess(ex)) 
+            { 
+                return null; 
             }
         }
 
@@ -100,17 +99,13 @@ namespace KryptorCLI
 
         public static long GetFileLength(string filePath)
         {
-            var fileInfo = new FileInfo(filePath);
-            return fileInfo.Length;
+            return new FileInfo(filePath).Length;
         }
 
         public static void CopyDirectory(string sourceDirectoryPath, string destinationDirectoryPath, bool copySubdirectories)
         {
             var directoryInfo = new DirectoryInfo(sourceDirectoryPath);
-            if (!directoryInfo.Exists)
-            {
-                throw new DirectoryNotFoundException($"Source directory does not exist or could not be found: {sourceDirectoryPath}");
-            }
+            if (!directoryInfo.Exists) { throw new DirectoryNotFoundException("Source directory does not exist or could not be found."); }
             DirectoryInfo[] directories = directoryInfo.GetDirectories();
             destinationDirectoryPath = GetUniqueDirectoryPath(destinationDirectoryPath);
             Directory.CreateDirectory(destinationDirectoryPath);
@@ -118,7 +113,7 @@ namespace KryptorCLI
             foreach (FileInfo file in files)
             {
                 string newFilePath = Path.Combine(destinationDirectoryPath, file.Name);
-                file.CopyTo(newFilePath, false);
+                file.CopyTo(newFilePath, overwrite: false);
             }
             if (copySubdirectories)
             {
@@ -162,14 +157,11 @@ namespace KryptorCLI
 
         public static string GetUniqueFilePath(string filePath)
         {
-            string fileExtension = Path.GetExtension(filePath);
-            if (!string.IsNullOrEmpty(fileExtension) && filePath.EndsWith(')') && filePath[^4].Equals(' ') && filePath[^3].Equals('(') && char.IsDigit(filePath[^2]))
-            {
-                filePath = filePath.Remove(startIndex: filePath.Length - 4);
-            }
+            filePath = RemoveFileNameNumber(filePath);
             if (!File.Exists(filePath)) { return filePath; }
             int fileNumber = 2;
             string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
+            string fileExtension = Path.GetExtension(filePath);
             string directoryPath = Path.GetDirectoryName(filePath);
             do
             {
@@ -178,6 +170,15 @@ namespace KryptorCLI
                 fileNumber++;
             }
             while (File.Exists(filePath));
+            return filePath;
+        }
+
+        public static string RemoveFileNameNumber(string filePath)
+        {
+            if (!string.IsNullOrEmpty(Path.GetExtension(filePath)) && filePath.EndsWith(')') && filePath[^4].Equals(' ') && filePath[^3].Equals('(') && char.IsDigit(filePath[^2]))
+            {
+                filePath = filePath.Remove(startIndex: filePath.Length - 4);
+            }
             return filePath;
         }
 
@@ -198,10 +199,7 @@ namespace KryptorCLI
 
         public static void SetFileAttributesNormal(string filePath)
         {
-            if (File.Exists(filePath))
-            {
-                File.SetAttributes(filePath, FileAttributes.Normal);
-            }
+            if (File.Exists(filePath)) { File.SetAttributes(filePath, FileAttributes.Normal); }
         }
 
         public static void SetFileAttributesReadOnly(string filePath)
