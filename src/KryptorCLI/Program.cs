@@ -96,8 +96,9 @@ Please report bugs at <https://github.com/samuel-lucas6/Kryptor/issues>.")]
 
         private void OnExecute()
         {
+            Globals.Overwrite = Overwrite;
+            Globals.ObfuscateFileNames = ObfuscateFileNames;
             Console.WriteLine();
-            SetSettings(Overwrite, ObfuscateFileNames);
             if (Encrypt)
             {
                 string privateKey = GetEncryptionPrivateKey(PrivateKey.value);
@@ -137,13 +138,6 @@ Please report bugs at <https://github.com/samuel-lucas6/Kryptor/issues>.")]
             {
                 DisplayMessage.Error("Unknown command. Specify --help for a list of options and examples.");
             }
-        }
-
-        private static void SetSettings(bool overwrite, bool obfuscateFileNames)
-        {
-            // Don't overwrite or obfuscate by default
-            Globals.Overwrite = overwrite;
-            Globals.ObfuscateFileNames = obfuscateFileNames;
         }
 
         private static string GetEncryptionPrivateKey(string privateKey)
