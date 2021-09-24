@@ -77,9 +77,9 @@ namespace KryptorCLI
             Console.WriteLine(" Done.");
         }
 
-        public static void FileEncryptionResult(string inputFilePath, string outputFilePath)
+        public static void DirectoryRename(string inputDirectoryPath, string outputDirectoryPath)
         {
-            Console.WriteLine($"{Path.GetFileName(inputFilePath)} => {Path.GetFileName(outputFilePath)}");
+            Console.WriteLine($"{Path.GetFileName(inputDirectoryPath)} => {Path.GetFileName(outputDirectoryPath)}");
         }
 
         public static void SuccessfullyEncrypted()

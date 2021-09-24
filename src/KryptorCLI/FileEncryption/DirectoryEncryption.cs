@@ -61,7 +61,7 @@ namespace KryptorCLI
             FileHandling.CopyDirectory(directoryPath, destinationDirectoryPath, copySubdirectories: true);
             if (!Globals.ObfuscateFileNames)
             {
-                DisplayMessage.FileEncryptionResult(directoryPath, destinationDirectoryPath);
+                DisplayMessage.DirectoryRename(directoryPath, destinationDirectoryPath);
             }
             return destinationDirectoryPath;
         }
