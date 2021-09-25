@@ -12,13 +12,13 @@ It is a portable, cross-platform command line tool that makes use of modern and 
 ## Features
 
 - Encrypt files/folders with a password, keyfile, or asymmetric keys.
-- Create and verify digital signatures. Supports an authenticated comment and prehashing for large files.
+- Encrypting files using a recipient's public key allows for authenticated, one-way file sharing.
+- Create and verify digital signatures, with support for an authenticated comment and prehashing.
 - Generation of asymmetric key pairs. The private key is encrypted for protection at rest.
 - UNIX style password entry and random passphrase generation.
-- Encrypting files using a recipient's public key allows for authenticated file sharing.
 - Random keyfile generation. Any type of file can also be used as a keyfile.
-- Optional obfuscation of output file names when encrypting files/folders.
-- Optional overwriting of input files.
+- Obfuscate output file names when encrypting files/folders.
+- Overwrite input files when encrypting files/folders.
 
 For more information, please go to [kryptor.co.uk](https://www.kryptor.co.uk/).
 
@@ -65,16 +65,16 @@ When referencing file paths/file names that contain spaces, you must surround th
 $ kryptor -e -p "GitHub Logo.png"
 $ kryptor -e -p "C:\Users\samuel-lucas6\Downloads\GitHub Logo.png"
 ```
-Files in the same directory as the ```kryptor``` executable can be specified using their file name:
+Files in the same directory as the `kryptor` executable can be specified using their file name:
 ```
 $ kryptor -e -p message.txt
 ```
-However, files that are not in the same directory as the ```kryptor``` executable must be specified using a file path:
+However, files that are not in the same directory as the `kryptor` executable must be specified using a file path:
 ```
 $ kryptor -e -p C:\Users\samuel-lucas6\Documents\message.txt
 ```
 ### Specifying your private key
-You can use the `-x|--private` option without specifying a file path to use your default private key. This is the recommended approach, but it means your private keys must be kept in the default folder.
+You can use the `-x|--private` option without specifying a file path to use your default private key. This is the recommended approach, but it means your private keys must be kept in the default folder (`%USERPROFILE%/.kryptor` on Windows and `/home/.kryptor` on Linux/macOS).
 
 To specify a non-default private key, you can use `-x|--private` followed by `=[file]` like so:
 ```
