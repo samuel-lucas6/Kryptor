@@ -149,6 +149,7 @@ namespace KryptorCLI
 
         private static void FileException(string inputFilePath, Exception ex)
         {
+            DisplayMessage.Failed();
             if (ex is ArgumentException)
             {
                 DisplayMessage.FilePathMessage(inputFilePath, ex.Message);

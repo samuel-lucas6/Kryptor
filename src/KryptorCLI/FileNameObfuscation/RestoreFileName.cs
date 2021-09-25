@@ -29,13 +29,13 @@ namespace KryptorCLI
             try
             {
                 if (fileNameLength == 0) { return; }
-                Globals.ObfuscateFileNames = true;
                 string originalFileName = ReadFileName(outputFilePath, fileNameLength);
                 string obfuscatedFileName = Path.GetFileName(outputFilePath);
+                if (string.Equals(originalFileName, FileHandling.RemoveFileNameNumber(obfuscatedFileName))) { return; }
                 string restoredFilePath = outputFilePath.Replace(obfuscatedFileName, originalFileName);
                 restoredFilePath = FileHandling.GetUniqueFilePath(restoredFilePath);
                 File.Move(outputFilePath, restoredFilePath);
-                DisplayMessage.MessageSameLine($" Renaming file to {Path.GetFileName(restoredFilePath)}...");
+                DisplayMessage.MessageSameLine($" Renaming file => {Path.GetFileName(restoredFilePath)}...");
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {

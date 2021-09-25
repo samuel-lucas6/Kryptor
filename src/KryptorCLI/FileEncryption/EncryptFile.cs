@@ -31,17 +31,19 @@ namespace KryptorCLI
             byte[] dataEncryptionKey = SodiumCore.GetRandomBytes(Constants.EncryptionKeyLength);
             try
             {
+                bool zeroByteFile = FileHandling.GetFileLength(inputFilePath) == 0;
+                if (zeroByteFile) { ObfuscateFileName.AppendFileName(inputFilePath); }
                 using (var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
                 using (var outputFile = new FileStream(outputFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
                 {
                     byte[] nonce = SodiumCore.GetRandomBytes(Constants.XChaChaNonceLength);
-                    byte[] encryptedHeader = EncryptFileHeader(inputFilePath, ephemeralPublicKey, dataEncryptionKey, nonce, keyEncryptionKey);
+                    byte[] encryptedHeader = EncryptFileHeader(inputFilePath, zeroByteFile, ephemeralPublicKey, dataEncryptionKey, nonce, keyEncryptionKey);
                     FileHeaders.WriteHeaders(outputFile, ephemeralPublicKey, salt, nonce, encryptedHeader);
                     nonce = Utilities.Increment(nonce);
                     byte[] additionalData = ChunkHandling.GetPreviousTag(encryptedHeader);
                     Encrypt(inputFile, outputFile, nonce, dataEncryptionKey, additionalData);
                 }
-                Finalize(inputFilePath, outputFilePath);
+                Finalize(inputFilePath, outputFilePath, zeroByteFile);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
@@ -51,11 +53,11 @@ namespace KryptorCLI
             }
         }
 
-        private static byte[] EncryptFileHeader(string inputFilePath, byte[] ephemeralPublicKey, byte[] dataEncryptionKey, byte[] nonce, byte[] keyEncryptionKey)
+        private static byte[] EncryptFileHeader(string inputFilePath, bool zeroByteFile, byte[] ephemeralPublicKey, byte[] dataEncryptionKey, byte[] nonce, byte[] keyEncryptionKey)
         {
             long fileLength = FileHandling.GetFileLength(inputFilePath);
             byte[] lastChunkLength = BitConversion.GetBytes(Convert.ToInt32(fileLength % Constants.FileChunkSize));
-            byte[] fileNameLength = FileHeaders.GetFileNameLength(inputFilePath);
+            byte[] fileNameLength = FileHeaders.GetFileNameLength(inputFilePath, zeroByteFile);
             byte[] fileHeader = Arrays.Concat(lastChunkLength, fileNameLength, dataEncryptionKey);
             byte[] additionalData = HeaderEncryption.ComputeAdditionalData(fileLength, ephemeralPublicKey);
             return HeaderEncryption.Encrypt(fileHeader, nonce, keyEncryptionKey, additionalData);
@@ -75,13 +77,13 @@ namespace KryptorCLI
             CryptographicOperations.ZeroMemory(dataEncryptionKey);
         }
 
-        private static void Finalize(string inputFilePath, string outputFilePath)
+        private static void Finalize(string inputFilePath, string outputFilePath, bool zeroByteFile)
         {
             if (Globals.Overwrite)
             {
                 FileHandling.OverwriteFile(inputFilePath, outputFilePath);
             }
-            else if (Globals.ObfuscateFileNames)
+            else if (Globals.ObfuscateFileNames || zeroByteFile)
             {
                 RestoreFileName.RemoveAppendedFileName(inputFilePath);
             }

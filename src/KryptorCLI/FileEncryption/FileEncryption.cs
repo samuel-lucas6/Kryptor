@@ -55,6 +55,7 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
+                DisplayMessage.Failed();
                 DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to encrypt the file.");
             }
         }
@@ -102,6 +103,7 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
+                DisplayMessage.Failed();
                 DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to encrypt the file.");
             }
         }
@@ -138,6 +140,7 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
+                DisplayMessage.Failed();
                 DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to encrypt the file.");
             }
         }

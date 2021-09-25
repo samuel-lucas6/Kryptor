@@ -175,9 +175,14 @@ namespace KryptorCLI
 
         public static string RemoveFileNameNumber(string filePath)
         {
-            if (!string.IsNullOrEmpty(Path.GetExtension(filePath)) && filePath.EndsWith(')') && filePath[^4].Equals(' ') && filePath[^3].Equals('(') && char.IsDigit(filePath[^2]))
+            string fileExtension = Path.GetExtension(filePath);
+            if (!string.IsNullOrEmpty(fileExtension) && filePath.EndsWith(')') && filePath[^4].Equals(' ') && filePath[^3].Equals('(') && char.IsDigit(filePath[^2]))
             {
-                filePath = filePath.Remove(startIndex: filePath.Length - 4);
+                return filePath.Remove(startIndex: filePath.Length - 4);
+            }
+            else if (filePath[filePath.Length - fileExtension.Length - 1].Equals(')') && filePath[filePath.Length - fileExtension.Length - 4].Equals(' ') && filePath[filePath.Length - fileExtension.Length - 3].Equals('(') && char.IsDigit(filePath[filePath.Length - fileExtension.Length - 2]))
+            {
+                return filePath.Remove(startIndex: filePath.Length - fileExtension.Length - 4) + fileExtension;
             }
             return filePath;
         }

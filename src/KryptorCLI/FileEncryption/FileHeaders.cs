@@ -36,9 +36,9 @@ namespace KryptorCLI
             outputFile.Write(encryptedHeader, offset, encryptedHeader.Length);
         }
 
-        public static byte[] GetFileNameLength(string inputFilePath)
+        public static byte[] GetFileNameLength(string inputFilePath, bool zeroByteFile)
         {
-            if (!Globals.ObfuscateFileNames) { return BitConversion.GetBytes(0); }
+            if (!zeroByteFile && !Globals.ObfuscateFileNames) { return BitConversion.GetBytes(0); }
             string fileName = Path.GetFileName(inputFilePath);
             byte[] fileNameBytes = Encoding.UTF8.GetBytes(fileName);
             return BitConversion.GetBytes(fileNameBytes.Length);

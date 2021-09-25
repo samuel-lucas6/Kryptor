@@ -68,9 +68,9 @@ namespace KryptorCLI
 
         private static void Decrypt(FileStream inputFile, FileStream outputFile, byte[] nonce, byte[] dataEncryptionKey, byte[] additionalData, int lastChunkLength)
         {
-            inputFile.Seek(Constants.FileHeadersLength, SeekOrigin.Begin);
             const int offset = 0;
             byte[] ciphertextChunk = new byte[Constants.TotalChunkLength];
+            inputFile.Seek(Constants.FileHeadersLength, SeekOrigin.Begin);
             while (inputFile.Read(ciphertextChunk, offset, ciphertextChunk.Length) > 0)
             {
                 byte[] plaintextChunk = XChaCha20BLAKE2b.Decrypt(ciphertextChunk, nonce, dataEncryptionKey, additionalData, TagLength.Medium);

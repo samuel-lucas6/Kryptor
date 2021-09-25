@@ -56,13 +56,10 @@ namespace KryptorCLI
         private static string BackupDirectory(string directoryPath)
         {
             if (Globals.Overwrite) { return null; }
-            DisplayMessage.FilePathMessage(directoryPath, "Copying directory because you didn't specify -o|--overwrite...");
             string destinationDirectoryPath = FileHandling.GetUniqueDirectoryPath($"{directoryPath} - Copy");
+            DisplayMessage.MessageSameLine($"Copying {Path.GetFileName(directoryPath)} => {Path.GetFileName(destinationDirectoryPath)} because you didn't specify -o|--overwrite...");
             FileHandling.CopyDirectory(directoryPath, destinationDirectoryPath, copySubdirectories: true);
-            if (!Globals.ObfuscateFileNames)
-            {
-                DisplayMessage.DirectoryRename(directoryPath, destinationDirectoryPath);
-            }
+            DisplayMessage.Done();
             return destinationDirectoryPath;
         }
 

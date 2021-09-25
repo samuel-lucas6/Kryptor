@@ -159,11 +159,8 @@ namespace KryptorCLI
 
         private static void Finalize(string directoryPath, string saltFilePath)
         {
-            string[] kryptorFiles = Directory.GetFiles(directoryPath, $"*{Constants.EncryptedExtension}", SearchOption.AllDirectories);
-            if (kryptorFiles.Length == 0)
-            {
-                FileHandling.DeleteFile(saltFilePath);
-            }
+            string[] kryptorFiles = Directory.GetFiles(directoryPath, searchPattern: $"*{Constants.EncryptedExtension}", SearchOption.AllDirectories);
+            if (kryptorFiles.Length == 0) { FileHandling.DeleteFile(saltFilePath); }
             Finalize(directoryPath);
         }
 
@@ -191,6 +188,7 @@ namespace KryptorCLI
 
         private static void FileException(string inputFilePath, Exception ex)
         {
+            DisplayMessage.Failed();
             if (ex is ArgumentException)
             {
                 DisplayMessage.FilePathMessage(inputFilePath, ex.Message);
