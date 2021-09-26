@@ -29,25 +29,18 @@ namespace KryptorCLI
             char[] password = GetPassword();
             if (password.Length == 0)
             {
-                const int length = 8;
-                password = PassphraseGenerator.GetRandomPassphrase(length);
+                password = PassphraseGenerator.GetRandomPassphrase(wordCount: 8);
                 DisplayRandomPassphrase(password);
+                return password;
             }
-            else
-            {
-                RetypeNewPassword(password);
-            }
+            RetypeNewPassword(password);
             return password;
         }
 
         private static void DisplayRandomPassphrase(char[] password)
         {
             Console.Write($"Randomly generated passphrase: ");
-            foreach (char character in password)
-            {
-                Console.Write(character);
-            }
-            Console.WriteLine();
+            Console.WriteLine(password);
             Console.WriteLine();
         }
 
@@ -58,7 +51,7 @@ namespace KryptorCLI
             if (!Arrays.Compare(password, retypedPassword))
             {
                 DisplayMessage.Error("The passwords don't match.");
-                Environment.Exit(13);
+                Environment.Exit(exitCode: 13);
             }
             Arrays.ZeroMemory(retypedPassword);
         }
@@ -70,7 +63,7 @@ namespace KryptorCLI
             if (password.Length == 0)
             {
                 DisplayMessage.Error("You didn't enter a password.");
-                Environment.Exit(13);
+                Environment.Exit(exitCode: 13);
             }
             return password;
         }
