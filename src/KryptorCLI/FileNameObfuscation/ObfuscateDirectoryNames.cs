@@ -32,10 +32,7 @@ namespace KryptorCLI
                 ObfuscateDirectoryName(subdirectories[i]);
             }
             // Obfuscate parent directory name
-            string obfuscatedParentDirectoryPath = ObfuscateDirectoryName(directoryPath);
-            DisplayMessage.MessageSameLine($"Renaming {Path.GetFileName(directoryPath)} => {Path.GetFileName(obfuscatedParentDirectoryPath)}...");
-            DisplayMessage.Done();
-            return obfuscatedParentDirectoryPath;
+            return ObfuscateDirectoryName(directoryPath);
         }
 
         private static string ObfuscateDirectoryName(string directoryPath)
@@ -44,6 +41,7 @@ namespace KryptorCLI
             {
                 string directoryName = Path.GetFileName(directoryPath);
                 string obfuscatedPath = ObfuscateFileName.ReplaceFilePath(directoryPath);
+                DisplayMessage.MessageNewLine($"Renaming {directoryName} => {Path.GetFileName(obfuscatedPath)}...");
                 Directory.Move(directoryPath, obfuscatedPath);
                 StoreDirectoryName(directoryName, obfuscatedPath);
                 return obfuscatedPath;

@@ -52,10 +52,7 @@ namespace KryptorCLI
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
                 CryptographicOperations.ZeroMemory(dataEncryptionKey);
-                if (!(ex is ArgumentException))
-                {
-                    FileHandling.DeleteFile(outputFilePath);
-                }
+                if (ex is not ArgumentException) { FileHandling.DeleteFile(outputFilePath); }
                 throw;
             }
         }
@@ -84,6 +81,7 @@ namespace KryptorCLI
 
         private static void Finalize(string inputFilePath, string outputFilePath, int fileNameLength)
         {
+            Globals.SuccessfulCount += 1;
             RestoreFileName.RenameFile(outputFilePath, fileNameLength);
             FileHandling.DeleteFile(inputFilePath);
         }

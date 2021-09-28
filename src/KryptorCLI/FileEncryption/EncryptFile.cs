@@ -79,6 +79,7 @@ namespace KryptorCLI
 
         private static void Finalize(string inputFilePath, string outputFilePath, bool zeroByteFile)
         {
+            Globals.SuccessfulCount += 1;
             if (Globals.Overwrite)
             {
                 FileHandling.OverwriteFile(inputFilePath, outputFilePath);

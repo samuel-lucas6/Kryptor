@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Security.Cryptography;
 
 /*
@@ -27,6 +28,7 @@ namespace KryptorCLI
 
         public static void SignEachFile(string[] filePaths, string signatureFilePath, string comment, bool preHash, byte[] privateKey)
         {
+            Globals.TotalCount = filePaths.Length;
             privateKey = PrivateKey.Decrypt(privateKey);
             if (privateKey == null) { return; }
             if (string.IsNullOrEmpty(comment)) { comment = _defaultComment; }
@@ -34,8 +36,9 @@ namespace KryptorCLI
             {
                 try
                 {
+                    DisplayMessage.MessageNewLine($"Signing {Path.GetFileName(filePath)}...");
                     DigitalSignatures.SignFile(filePath, signatureFilePath, comment, preHash, privateKey);
-                    DisplayMessage.FilePathMessage(filePath, "File signed successfully.");
+                    Globals.SuccessfulCount += 1;
                 }
                 catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
                 {
@@ -43,19 +46,22 @@ namespace KryptorCLI
                 }
             }
             CryptographicOperations.ZeroMemory(privateKey);
+            DisplayMessage.SuccessfullySigned();
         }
        
         public static void VerifyFile(string signatureFilePath, string filePath, byte[] publicKey)
         {
             try
             {
+                DisplayMessage.MessageNewLine($"Verifying {Path.GetFileName(signatureFilePath)}...");
                 bool validSignature = DigitalSignatures.VerifySignature(signatureFilePath, filePath, publicKey, out string comment);
                 if (!validSignature)
                 {
-                    DisplayMessage.FilePathMessage(filePath, "Bad signature.");
+                    DisplayMessage.MessageNewLine("Bad signature.");
                     return;
                 }
-                DisplayMessage.FilePathMessage(filePath, "Good signature.");
+                DisplayMessage.MessageNewLine(string.Empty);
+                DisplayMessage.MessageNewLine("Good signature.");
                 DisplayMessage.MessageNewLine($"Authenticated comment: {comment}");
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))

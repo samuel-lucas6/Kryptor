@@ -46,9 +46,8 @@ namespace KryptorCLI
                 string directoryName = File.ReadAllText(storageFilePath);
                 string directoryPath = obfuscatedDirectoryPath.Replace(obfuscatedDirectoryName, directoryName);
                 directoryPath = FileHandling.GetUniqueDirectoryPath(directoryPath);
+                DisplayMessage.MessageNewLine($"Renaming {Path.GetFileName(obfuscatedDirectoryName)} directory => {Path.GetFileName(directoryName)}...");
                 Directory.Move(obfuscatedDirectoryPath, directoryPath);
-                DisplayMessage.DirectoryRename(obfuscatedDirectoryName, directoryName);
-                DisplayMessage.Done();
                 storageFilePath = Path.Combine(directoryPath, storageFileName);
                 FileHandling.DeleteFile(storageFilePath);
             }

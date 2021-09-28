@@ -31,14 +31,11 @@ namespace KryptorCLI
             try
             {
                 FilePathValidation.DirectoryEncryption(directoryPath);
-                // Always overwrite directories
                 string backupDirectoryPath = BackupDirectory(directoryPath);
                 Globals.Overwrite = true;
                 string[] filePaths = GetFiles(directoryPath, out string newDirectoryPath);
-                // Generate one salt for the entire directory
                 byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
                 CreateSaltFile(newDirectoryPath, salt);
-                // Perform password hashing once
                 byte[] keyEncryptionKey = KeyDerivation.Argon2id(passwordBytes, salt);
                 EncryptEachFileWithPassword(filePaths, salt, keyEncryptionKey);
                 RenameBackupDirectory(backupDirectoryPath, directoryPath);
@@ -57,27 +54,28 @@ namespace KryptorCLI
         {
             if (Globals.Overwrite) { return null; }
             string destinationDirectoryPath = FileHandling.GetUniqueDirectoryPath($"{directoryPath} - Copy");
-            DisplayMessage.MessageSameLine($"Copying {Path.GetFileName(directoryPath)} => {Path.GetFileName(destinationDirectoryPath)} because you didn't specify -o|--overwrite...");
+            DisplayMessage.MessageNewLine($"Copying {Path.GetFileName(directoryPath)} directory => {Path.GetFileName(destinationDirectoryPath)} because you didn't specify -o|--overwrite...");
             FileHandling.CopyDirectory(directoryPath, destinationDirectoryPath, copySubdirectories: true);
-            DisplayMessage.Done();
             return destinationDirectoryPath;
         }
 
         private static string[] GetFiles(string directoryPath, out string newDirectoryPath)
         {
+            newDirectoryPath = directoryPath;
             try
             {
                 if (Globals.ObfuscateFileNames)
                 {
-                    directoryPath = ObfuscateDirectoryNames.AllDirectories(directoryPath);
+                    DisplayMessage.MessageNewLine($"Renaming {Path.GetFileName(directoryPath)} and subdirectories...");
+                    newDirectoryPath = ObfuscateDirectoryNames.AllDirectories(directoryPath);
                 }
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
                 DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to obfuscate the directory names.");
             }
-            newDirectoryPath = directoryPath;
-            string[] filePaths = FileHandling.GetAllFiles(directoryPath);
+            DisplayMessage.MessageNewLine($"Encrypting {Path.GetFileName(newDirectoryPath)} directory...");
+            string[] filePaths = FileHandling.GetAllFiles(newDirectoryPath);
             // -1 for the selected directory
             Globals.TotalCount += filePaths.Length - 1;
             return filePaths;
@@ -110,8 +108,6 @@ namespace KryptorCLI
             {
                 DisplayMessage.EncryptingFile(inputFilePath, outputFilePath);
                 EncryptFile.Initialize(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
-                DisplayMessage.Done();
-                Globals.SuccessfulCount += 1;
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
@@ -123,6 +119,7 @@ namespace KryptorCLI
         {
             if (!string.IsNullOrEmpty(backupDirectoryPath) && !Directory.Exists(originalDirectoryPath))
             {
+                DisplayMessage.MessageNewLine($"Renaming {Path.GetFileName(backupDirectoryPath)} => {Path.GetFileName(originalDirectoryPath)}...");
                 Directory.Move(backupDirectoryPath, originalDirectoryPath);
             }
         }
@@ -133,10 +130,9 @@ namespace KryptorCLI
             try
             {
                 FilePathValidation.DirectoryEncryption(directoryPath);
-                // Always overwrite directories
                 string backupDirectoryPath = BackupDirectory(directoryPath);
                 Globals.Overwrite = true;
-                string[] filePaths = GetFiles(directoryPath, out _);
+                string[] filePaths = GetFiles(directoryPath, newDirectoryPath: out _);
                 EncryptEachFileWithPublicKey(filePaths, sharedSecret, recipientPublicKey);
                 RenameBackupDirectory(backupDirectoryPath, directoryPath);
             }
@@ -156,7 +152,6 @@ namespace KryptorCLI
             {
                 bool validFilePath = FilePathValidation.FileEncryption(inputFilePath);
                 if (!validFilePath) { continue; }
-                // Derive a unique KEK per file
                 byte[] ephemeralSharedSecret = KeyExchange.GetPublicKeySharedSecret(recipientPublicKey, out byte[] ephemeralPublicKey);
                 byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
                 byte[] keyEncryptionKey = KeyDerivation.Blake2(sharedSecret, ephemeralSharedSecret, salt);
@@ -172,10 +167,9 @@ namespace KryptorCLI
             try
             {
                 FilePathValidation.DirectoryEncryption(directoryPath);
-                // Always overwrite directories
                 string backupDirectoryPath = BackupDirectory(directoryPath);
                 Globals.Overwrite = true;
-                string[] filePaths = GetFiles(directoryPath, out _);
+                string[] filePaths = GetFiles(directoryPath, newDirectoryPath: out _);
                 EncryptEachFileWithPrivateKey(filePaths, privateKey);
                 RenameBackupDirectory(backupDirectoryPath, directoryPath);
             }
@@ -195,7 +189,6 @@ namespace KryptorCLI
             {
                 bool validFilePath = FilePathValidation.FileEncryption(inputFilePath);
                 if (!validFilePath) { continue; }
-                // Derive a unique KEK per file
                 byte[] ephemeralSharedSecret = KeyExchange.GetPrivateKeySharedSecret(privateKey, out byte[] ephemeralPublicKey);
                 byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
                 byte[] keyEncryptionKey = KeyDerivation.Blake2(ephemeralSharedSecret, salt);

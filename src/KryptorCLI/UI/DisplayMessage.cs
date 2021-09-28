@@ -57,34 +57,14 @@ namespace KryptorCLI
             Console.WriteLine(message);
         }
 
-        public static void MessageSameLine(string message)
-        {
-            Console.Write(message);
-        }
-
         public static void EncryptingFile(string inputFilePath, string outputFilePath)
         {
-            Console.Write($"Encrypting {Path.GetFileName(inputFilePath)} => {Path.GetFileName(outputFilePath)}...");
+            Console.WriteLine($"Encrypting {Path.GetFileName(inputFilePath)} => {Path.GetFileName(outputFilePath)}...");
         }
 
         public static void DecryptingFile(string inputFilePath, string outputFilePath)
         {
-            Console.Write($"Decrypting {Path.GetFileName(inputFilePath)} => {Path.GetFileName(outputFilePath)}...");
-        }
-
-        public static void Done()
-        {
-            Console.WriteLine(" Done.");
-        }
-
-        public static void Failed()
-        {
-            Console.WriteLine(" Failed.");
-        }
-
-        public static void DirectoryRename(string inputDirectoryPath, string outputDirectoryPath)
-        {
-            Console.Write($"Renaming {Path.GetFileName(inputDirectoryPath)} => {Path.GetFileName(outputDirectoryPath)}...");
+            Console.WriteLine($"Decrypting {Path.GetFileName(inputFilePath)} => {Path.GetFileName(outputFilePath)}...");
         }
 
         public static void SuccessfullyEncrypted()
@@ -102,6 +82,15 @@ namespace KryptorCLI
             {
                 Console.WriteLine();
                 Console.WriteLine($"Successfully decrypted: {Globals.SuccessfulCount}/{Globals.TotalCount}");
+            }
+        }
+
+        public static void SuccessfullySigned()
+        {
+            if (Globals.TotalCount > 0)
+            {
+                Console.WriteLine();
+                Console.WriteLine($"Successfully signed: {Globals.SuccessfulCount}/{Globals.TotalCount}");
             }
         }
 

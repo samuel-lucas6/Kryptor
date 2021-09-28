@@ -53,7 +53,9 @@ namespace KryptorCLI
                 {
                     using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
                     byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
-                    DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey);
+                    string outputFilePath = FileDecryption.GetOutputFilePath(inputFilePath);
+                    DisplayMessage.DecryptingFile(inputFilePath, outputFilePath);
+                    DecryptFile.Initialize(inputFile, outputFilePath, ephemeralPublicKey, keyEncryptionKey);
                 }
                 catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
                 {
@@ -65,20 +67,11 @@ namespace KryptorCLI
 
         private static string[] GetFiles(string directoryPath)
         {
+            DisplayMessage.MessageNewLine($"Decrypting {Path.GetFileName(directoryPath)} directory...");
             string[] filePaths = FileHandling.GetAllFiles(directoryPath);
             // -1 for the selected directory
             Globals.TotalCount += filePaths.Length - 1;
             return filePaths;
-        }
-
-        private static void DecryptInputFile(FileStream inputFile, byte[] ephemeralPublicKey, byte[] keyEncryptionKey)
-        {
-            string inputFilePath = inputFile.Name;
-            string outputFilePath = FileDecryption.GetOutputFilePath(inputFilePath);
-            DisplayMessage.DecryptingFile(inputFilePath, outputFilePath);
-            DecryptFile.Initialize(inputFile, outputFilePath, ephemeralPublicKey, keyEncryptionKey);
-            DisplayMessage.Done();
-            Globals.SuccessfulCount += 1;
         }
 
         public static void UsingPublicKey(string directoryPath, byte[] sharedSecret, byte[] recipientPrivateKey)
@@ -109,7 +102,9 @@ namespace KryptorCLI
                     byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecret(recipientPrivateKey, ephemeralPublicKey);
                     byte[] salt = FileHeaders.ReadSalt(inputFile);
                     byte[] keyEncryptionKey = KeyDerivation.Blake2(sharedSecret, ephemeralSharedSecret, salt);
-                    DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey);
+                    string outputFilePath = FileDecryption.GetOutputFilePath(inputFilePath);
+                    DisplayMessage.DecryptingFile(inputFilePath, outputFilePath);
+                    DecryptFile.Initialize(inputFile, outputFilePath, ephemeralPublicKey, keyEncryptionKey);
                     CryptographicOperations.ZeroMemory(keyEncryptionKey);
                 }
                 catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -147,7 +142,9 @@ namespace KryptorCLI
                     byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecret(privateKey, ephemeralPublicKey);
                     byte[] salt = FileHeaders.ReadSalt(inputFile);
                     byte[] keyEncryptionKey = KeyDerivation.Blake2(ephemeralSharedSecret, salt);
-                    DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey);
+                    string outputFilePath = FileDecryption.GetOutputFilePath(inputFilePath);
+                    DisplayMessage.DecryptingFile(inputFilePath, outputFilePath);
+                    DecryptFile.Initialize(inputFile, outputFilePath, ephemeralPublicKey, keyEncryptionKey);
                     CryptographicOperations.ZeroMemory(keyEncryptionKey);
                 }
                 catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -166,14 +163,8 @@ namespace KryptorCLI
 
         private static void Finalize(string directoryPath)
         {
-            try
-            {
-                RestoreDirectoryNames.AllDirectories(directoryPath);
-            }
-            catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
-            {
-                DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to restore the directory names.");
-            }
+            DisplayMessage.MessageNewLine($"Renaming {Path.GetFileName(directoryPath)} directory and subdirectories...");
+            RestoreDirectoryNames.AllDirectories(directoryPath);
         }
 
         private static void DirectoryException(string directoryPath, Exception ex)
@@ -188,7 +179,6 @@ namespace KryptorCLI
 
         private static void FileException(string inputFilePath, Exception ex)
         {
-            DisplayMessage.Failed();
             if (ex is ArgumentException)
             {
                 DisplayMessage.FilePathMessage(inputFilePath, ex.Message);

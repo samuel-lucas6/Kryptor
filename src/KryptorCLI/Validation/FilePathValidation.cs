@@ -73,6 +73,7 @@ namespace KryptorCLI
                 {
                     keyfilePath += keyfileExtension;
                 }
+                DisplayMessage.MessageNewLine($"Randomly generating keyfile {Path.GetFileName(keyfilePath)}...");
                 Keyfiles.GenerateKeyfile(keyfilePath);
                 return keyfilePath;
             }

@@ -34,8 +34,8 @@ namespace KryptorCLI
                 if (string.Equals(originalFileName, FileHandling.RemoveFileNameNumber(obfuscatedFileName))) { return; }
                 string restoredFilePath = outputFilePath.Replace(obfuscatedFileName, originalFileName);
                 restoredFilePath = FileHandling.GetUniqueFilePath(restoredFilePath);
+                DisplayMessage.MessageNewLine($"Renaming {Path.GetFileName(outputFilePath)} => {Path.GetFileName(restoredFilePath)}...");
                 File.Move(outputFilePath, restoredFilePath);
-                DisplayMessage.MessageSameLine($" Renaming file => {Path.GetFileName(restoredFilePath)}...");
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {

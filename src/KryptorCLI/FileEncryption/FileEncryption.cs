@@ -55,7 +55,6 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
-                DisplayMessage.Failed();
                 DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to encrypt the file.");
             }
         }
@@ -65,8 +64,6 @@ namespace KryptorCLI
             DisplayMessage.EncryptingFile(inputFilePath, outputFilePath);
             EncryptFile.Initialize(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
             CryptographicOperations.ZeroMemory(keyEncryptionKey);
-            DisplayMessage.Done();
-            Globals.SuccessfulCount += 1;
         }
 
         public static void EncryptEachFileWithPublicKey(string[] filePaths, byte[] senderPrivateKey, byte[] recipientPublicKey)
@@ -103,7 +100,6 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
-                DisplayMessage.Failed();
                 DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to encrypt the file.");
             }
         }
@@ -140,7 +136,6 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
-                DisplayMessage.Failed();
                 DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to encrypt the file.");
             }
         }

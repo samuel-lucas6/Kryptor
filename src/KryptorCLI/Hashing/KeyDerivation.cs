@@ -25,9 +25,8 @@ namespace KryptorCLI
     {
         public static byte[] Argon2id(byte[] passwordBytes, byte[] salt)
         {
-            DisplayMessage.MessageSameLine("Deriving encryption key from password...");
+            DisplayMessage.MessageNewLine("Deriving encryption key from password...");
             byte[] key = PasswordHash.ArgonHashBinary(passwordBytes, salt, Constants.Iterations, Constants.MemorySize, Constants.EncryptionKeyLength, PasswordHash.ArgonAlgorithm.Argon_2ID13);
-            DisplayMessage.Done();
             return key;
         }
 
