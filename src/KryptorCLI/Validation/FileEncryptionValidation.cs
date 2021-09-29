@@ -85,16 +85,9 @@ namespace KryptorCLI
             {
                 yield return ValidationMessages.PrivateKeyFile;
             }
-            if (string.IsNullOrEmpty(publicKeyPath))
+            if (string.IsNullOrEmpty(publicKeyPath) || !publicKeyPath.EndsWith(Constants.PublicKeyExtension) || !File.Exists(publicKeyPath))
             {
-                if (!File.Exists(Constants.DefaultEncryptionPublicKeyPath))
-                {
-                    yield return ValidationMessages.PublicKeyFile;
-                }
-            }
-            else if (!publicKeyPath.EndsWith(Constants.PublicKeyExtension) || !File.Exists(publicKeyPath))
-            {
-                yield return ValidationMessages.PublicKeyFile;
+                yield return ValidationMessages.PublicKey;
             }
         }
 
@@ -119,7 +112,7 @@ namespace KryptorCLI
             }
             if (encodedPublicKey.Length != Constants.PublicKeyLength)
             {
-                yield return ValidationMessages.PublicKeyString;
+                yield return ValidationMessages.PublicKey;
             }
         }
 

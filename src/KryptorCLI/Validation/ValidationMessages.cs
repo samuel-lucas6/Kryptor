@@ -24,8 +24,7 @@ namespace KryptorCLI
     {
         public static readonly string FilePath = "Please specify a file/folder.";
         public static readonly string PrivateKeyFile = "Please specify a valid private key file.";
-        public static readonly string PublicKeyFile = "Please specify a valid public key file.";
-        public static readonly string PublicKeyString = "Please specify a valid public key.";
+        public static readonly string PublicKey = "Please specify a valid public key.";
         public static readonly string PasswordOrKeyfile = "Please specify whether to use a password and/or keyfile.";
 
         public static string GetFilePathError(string filePath, string message)

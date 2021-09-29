@@ -65,7 +65,7 @@ namespace KryptorCLI
                 string encodedPublicKey = File.ReadAllText(publicKeyPath);
                 if (encodedPublicKey.Length != Constants.PublicKeyLength)
                 {
-                    DisplayMessage.Error(ValidationMessages.PublicKeyString);
+                    DisplayMessage.Error(ValidationMessages.PublicKey);
                     return null;
                 }
                 return Convert.FromBase64String(encodedPublicKey);

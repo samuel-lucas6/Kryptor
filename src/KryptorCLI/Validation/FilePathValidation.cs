@@ -190,12 +190,38 @@ namespace KryptorCLI
         {
             if (privateKeyPath == null)
             {
-                yield return "Please specify the private key using [-x=filepath].";
+                yield return "Please specify a private key using [-x=filepath].";
             }
             else if (!File.Exists(privateKeyPath) || !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
             {
                 yield return ValidationMessages.PrivateKeyFile;
             }
+        }
+
+        public static string GetFileSigningError(string inputFilePath)
+        {
+            if (Directory.Exists(inputFilePath)) { return "Please specify a file to sign."; }
+            if (!File.Exists(inputFilePath)) { return "This file doesn't exist."; }
+            bool? signatureFile = FileHandling.IsSignatureFile(inputFilePath);
+            if (signatureFile == null) { return _fileInaccessible; }
+            if (inputFilePath.EndsWith(Constants.SignatureExtension) || signatureFile == true)
+            {
+                return "Please specify a non-signature file to sign.";
+            }
+            return null;
+        }
+
+        public static string GetSignatureVerifyError(string inputFilePath)
+        {
+            if (Directory.Exists(inputFilePath)) { return "Please specify a file to verify."; }
+            if (!File.Exists(inputFilePath)) { return "This file doesn't exist."; }
+            bool? signatureFile = FileHandling.IsSignatureFile(inputFilePath);
+            if (signatureFile == null) { return _fileInaccessible; }
+            if (inputFilePath.EndsWith(Constants.SignatureExtension) || signatureFile == true)
+            {
+                return "Please specify a non-signature file to verify.";
+            }
+            return null;
         }
 
         public static string GetSignatureFilePath(string signatureFilePath, string[] filePaths)
