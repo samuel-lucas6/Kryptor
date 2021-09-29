@@ -39,6 +39,7 @@ namespace KryptorCLI
                 byte[] keyEncryptionKey = KeyDerivation.Argon2id(passwordBytes, salt);
                 EncryptEachFileWithPassword(filePaths, salt, keyEncryptionKey);
                 RenameBackupDirectory(backupDirectoryPath, directoryPath);
+                DisplayMessage.DirectoryEncryptionComplete(directoryPath);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
@@ -74,7 +75,7 @@ namespace KryptorCLI
             {
                 DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to obfuscate the directory names.");
             }
-            DisplayMessage.MessageNewLine($"Encrypting {Path.GetFileName(newDirectoryPath)} directory...");
+            DisplayMessage.MessageNewLine($"Commencing encryption of {Path.GetFileName(newDirectoryPath)} directory...");
             string[] filePaths = FileHandling.GetAllFiles(newDirectoryPath);
             // -1 for the selected directory
             Globals.TotalCount += filePaths.Length - 1;
@@ -119,7 +120,7 @@ namespace KryptorCLI
         {
             if (!string.IsNullOrEmpty(backupDirectoryPath) && !Directory.Exists(originalDirectoryPath))
             {
-                DisplayMessage.MessageNewLine($"Renaming {Path.GetFileName(backupDirectoryPath)} => {Path.GetFileName(originalDirectoryPath)}...");
+                DisplayMessage.MessageNewLine($"Renaming {Path.GetFileName(backupDirectoryPath)} backup directory => {Path.GetFileName(originalDirectoryPath)}...");
                 Directory.Move(backupDirectoryPath, originalDirectoryPath);
             }
         }
@@ -135,6 +136,7 @@ namespace KryptorCLI
                 string[] filePaths = GetFiles(directoryPath, newDirectoryPath: out _);
                 EncryptEachFileWithPublicKey(filePaths, sharedSecret, recipientPublicKey);
                 RenameBackupDirectory(backupDirectoryPath, directoryPath);
+                DisplayMessage.DirectoryEncryptionComplete(directoryPath);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
@@ -172,6 +174,7 @@ namespace KryptorCLI
                 string[] filePaths = GetFiles(directoryPath, newDirectoryPath: out _);
                 EncryptEachFileWithPrivateKey(filePaths, privateKey);
                 RenameBackupDirectory(backupDirectoryPath, directoryPath);
+                DisplayMessage.DirectoryEncryptionComplete(directoryPath);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {

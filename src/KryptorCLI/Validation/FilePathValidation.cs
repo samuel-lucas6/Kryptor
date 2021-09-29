@@ -61,20 +61,18 @@ namespace KryptorCLI
             try
             {
                 if (string.IsNullOrEmpty(keyfilePath) || File.Exists(keyfilePath)) { return keyfilePath; }
-                const string keyfileExtension = ".key";
                 // Generate a random keyfile
                 if (Directory.Exists(keyfilePath))
                 {
-                    string randomFileName = ObfuscateFileName.GetRandomFileName() + keyfileExtension;
+                    string randomFileName = ObfuscateFileName.GetRandomFileName() + Constants.KeyfileExtension;
                     keyfilePath = Path.Combine(keyfilePath, randomFileName);
                 }
                 // Append keyfile extension if missing
-                if (!keyfilePath.EndsWith(keyfileExtension, StringComparison.InvariantCulture))
-                {
-                    keyfilePath += keyfileExtension;
-                }
-                DisplayMessage.MessageNewLine($"Randomly generating keyfile {Path.GetFileName(keyfilePath)}...");
+                if (!keyfilePath.EndsWith(Constants.KeyfileExtension)) { keyfilePath += Constants.KeyfileExtension; }
+                if (File.Exists(keyfilePath)) { return keyfilePath; }
                 Keyfiles.GenerateKeyfile(keyfilePath);
+                DisplayMessage.MessageNewLine($"Randomly generated keyfile: {Path.GetFileName(keyfilePath)}");
+                DisplayMessage.MessageNewLine(string.Empty);
                 return keyfilePath;
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))

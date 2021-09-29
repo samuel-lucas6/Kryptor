@@ -67,6 +67,16 @@ namespace KryptorCLI
             Console.WriteLine($"Decrypting {Path.GetFileName(inputFilePath)} => {Path.GetFileName(outputFilePath)}...");
         }
 
+        public static void DirectoryEncryptionComplete(string directoryPath)
+        {
+            Console.WriteLine($"{Path.GetFileName(directoryPath)} directory encryption complete.");
+        }
+
+        public static void DirectoryDecryptionComplete(string directoryPath)
+        {
+            Console.WriteLine($"{Path.GetFileName(directoryPath)} directory decryption complete.");
+        }
+
         public static void SuccessfullyEncrypted()
         {
             if (Globals.TotalCount > 0)

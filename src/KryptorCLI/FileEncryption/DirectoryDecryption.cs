@@ -35,7 +35,10 @@ namespace KryptorCLI
                 if (salt.Length != Constants.SaltLength) { throw new ArgumentException("Invalid salt length."); }
                 byte[] keyEncryptionKey = KeyDerivation.Argon2id(passwordBytes, salt);
                 DecryptEachFileWithPassword(filePaths, keyEncryptionKey);
-                Finalize(directoryPath, saltFilePath);
+                string[] kryptorFiles = Directory.GetFiles(directoryPath, searchPattern: $"*{Constants.EncryptedExtension}", SearchOption.AllDirectories);
+                if (kryptorFiles.Length == 0) { FileHandling.DeleteFile(saltFilePath); }
+                RestoreDirectoryNames.AllDirectories(directoryPath);
+                DisplayMessage.DirectoryDecryptionComplete(directoryPath);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
@@ -67,7 +70,7 @@ namespace KryptorCLI
 
         private static string[] GetFiles(string directoryPath)
         {
-            DisplayMessage.MessageNewLine($"Decrypting {Path.GetFileName(directoryPath)} directory...");
+            DisplayMessage.MessageNewLine($"Commencing decryption of {Path.GetFileName(directoryPath)} directory...");
             string[] filePaths = FileHandling.GetAllFiles(directoryPath);
             // -1 for the selected directory
             Globals.TotalCount += filePaths.Length - 1;
@@ -81,7 +84,8 @@ namespace KryptorCLI
                 FilePathValidation.DirectoryDecryption(directoryPath);
                 string[] filePaths = GetFiles(directoryPath);
                 DecryptEachFileWithPublicKey(filePaths, sharedSecret, recipientPrivateKey);
-                Finalize(directoryPath);
+                RestoreDirectoryNames.AllDirectories(directoryPath);
+                DisplayMessage.DirectoryDecryptionComplete(directoryPath);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
@@ -121,7 +125,8 @@ namespace KryptorCLI
                 FilePathValidation.DirectoryDecryption(directoryPath);
                 string[] filePaths = GetFiles(directoryPath);
                 DecryptEachFileWithPrivateKey(filePaths, privateKey);
-                Finalize(directoryPath);
+                RestoreDirectoryNames.AllDirectories(directoryPath);
+                DisplayMessage.DirectoryDecryptionComplete(directoryPath);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
             {
@@ -152,19 +157,6 @@ namespace KryptorCLI
                     FileException(inputFilePath, ex);
                 }
             }
-        }
-
-        private static void Finalize(string directoryPath, string saltFilePath)
-        {
-            string[] kryptorFiles = Directory.GetFiles(directoryPath, searchPattern: $"*{Constants.EncryptedExtension}", SearchOption.AllDirectories);
-            if (kryptorFiles.Length == 0) { FileHandling.DeleteFile(saltFilePath); }
-            Finalize(directoryPath);
-        }
-
-        private static void Finalize(string directoryPath)
-        {
-            DisplayMessage.MessageNewLine($"Renaming {Path.GetFileName(directoryPath)} directory and subdirectories...");
-            RestoreDirectoryNames.AllDirectories(directoryPath);
         }
 
         private static void DirectoryException(string directoryPath, Exception ex)
