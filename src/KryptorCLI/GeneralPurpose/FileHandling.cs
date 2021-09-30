@@ -75,7 +75,7 @@ namespace KryptorCLI
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex)) 
             { 
-                return null; 
+                return null;
             }
         }
 

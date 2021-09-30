@@ -55,12 +55,12 @@ namespace KryptorCLI
             {
                 DisplayMessage.MessageNewLine($"Verifying {Path.GetFileName(signatureFilePath)}...");
                 bool validSignature = DigitalSignatures.VerifySignature(signatureFilePath, filePath, publicKey, out string comment);
+                DisplayMessage.MessageNewLine(string.Empty);
                 if (!validSignature)
                 {
                     DisplayMessage.MessageNewLine("Bad signature.");
                     return;
                 }
-                DisplayMessage.MessageNewLine(string.Empty);
                 DisplayMessage.MessageNewLine("Good signature.");
                 DisplayMessage.MessageNewLine($"Authenticated comment: {comment}");
             }

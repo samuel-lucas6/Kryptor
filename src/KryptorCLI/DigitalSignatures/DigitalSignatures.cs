@@ -70,7 +70,7 @@ namespace KryptorCLI
             {
                 signatureFilePath = filePath + Constants.SignatureExtension;
             }
-            if (File.Exists(filePath)) { File.SetAttributes(filePath, FileAttributes.Normal); }
+            if (File.Exists(signatureFilePath)) { File.SetAttributes(signatureFilePath, FileAttributes.Normal); }
             using var signatureFile = new FileStream(signatureFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
             signatureFile.Write(signatureFileBytes, offset, signatureFileBytes.Length);
             signatureFile.Write(globalSignature, offset, globalSignature.Length);

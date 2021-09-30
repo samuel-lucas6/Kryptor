@@ -69,12 +69,12 @@ namespace KryptorCLI
 
         public static void DirectoryEncryptionComplete(string directoryPath)
         {
-            Console.WriteLine($"{Path.GetFileName(directoryPath)} directory encryption complete.");
+            Console.WriteLine($"Encryption of {Path.GetFileName(directoryPath)} directory completed.");
         }
 
         public static void DirectoryDecryptionComplete(string directoryPath)
         {
-            Console.WriteLine($"{Path.GetFileName(directoryPath)} directory decryption complete.");
+            Console.WriteLine($"Decryption of {Path.GetFileName(directoryPath)} directory completed.");
         }
 
         public static void SuccessfullyEncrypted()
