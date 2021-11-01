@@ -30,9 +30,9 @@ namespace KryptorCLI
             {
                 byte[] publicKey = GetPublicKeyFromFile(publicKeyPath);
                 if (publicKey == null) { return null; }
-                byte[] keyAlgorithm = GetKeyAlgorithm(publicKey);
+                byte[] keyAlgorithm = Arrays.Copy(publicKey, sourceIndex: 0, Constants.Curve25519KeyHeader.Length);
                 ValidateEncryptionKey(keyAlgorithm);
-                return RemoveKeyAlgorithmHeader(publicKey);
+                return Arrays.Copy(publicKey, keyAlgorithm.Length, publicKey.Length - keyAlgorithm.Length);
             }
             catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
             {
@@ -47,9 +47,9 @@ namespace KryptorCLI
             {
                 byte[] publicKey = GetPublicKeyFromFile(publicKeyPath);
                 if (publicKey == null) { return null; }
-                byte[] keyAlgorithm = GetKeyAlgorithm(publicKey);
+                byte[] keyAlgorithm = Arrays.Copy(publicKey, sourceIndex: 0, Constants.Ed25519KeyHeader.Length);
                 ValidateSigningKey(keyAlgorithm);
-                return RemoveKeyAlgorithmHeader(publicKey);
+                return Arrays.Copy(publicKey, keyAlgorithm.Length, publicKey.Length - keyAlgorithm.Length);
             }
             catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
             {
@@ -83,9 +83,9 @@ namespace KryptorCLI
             {
                 byte[] publicKey = Convert.FromBase64CharArray(encodedPublicKey, offset: 0, encodedPublicKey.Length);
                 if (publicKey == null) { return null; }
-                byte[] keyAlgorithm = GetKeyAlgorithm(publicKey);
+                byte[] keyAlgorithm = Arrays.Copy(publicKey, sourceIndex: 0, Constants.Curve25519KeyHeader.Length);
                 ValidateEncryptionKey(keyAlgorithm);
-                return RemoveKeyAlgorithmHeader(publicKey);
+                return Arrays.Copy(publicKey, keyAlgorithm.Length, publicKey.Length - keyAlgorithm.Length);
             }
             catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
             {
@@ -100,22 +100,15 @@ namespace KryptorCLI
             {
                 byte[] publicKey = Convert.FromBase64CharArray(encodedPublicKey, offset: 0, encodedPublicKey.Length);
                 if (publicKey == null) { return null; }
-                byte[] keyAlgorithm = GetKeyAlgorithm(publicKey);
+                byte[] keyAlgorithm = Arrays.Copy(publicKey, sourceIndex: 0, Constants.Ed25519KeyHeader.Length);
                 ValidateSigningKey(keyAlgorithm);
-                return RemoveKeyAlgorithmHeader(publicKey);
+                return Arrays.Copy(publicKey, keyAlgorithm.Length, publicKey.Length - keyAlgorithm.Length);
             }
             catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
             {
                 DisplayMessage.Exception(ex.GetType().Name, "Please enter a valid signing public key.");
                 return null;
             }
-        }
-
-        private static byte[] GetKeyAlgorithm(byte[] asymmetricKey)
-        {
-            byte[] keyAlgorithm = new byte[Constants.Curve25519KeyHeader.Length];
-            Array.Copy(asymmetricKey, keyAlgorithm, keyAlgorithm.Length);
-            return keyAlgorithm;
         }
 
         private static void ValidateEncryptionKey(byte[] keyAlgorithm)
@@ -130,20 +123,13 @@ namespace KryptorCLI
             if (!validKey) { throw new ArgumentException("Please specify an asymmetric signing key."); }
         }
 
-        private static byte[] RemoveKeyAlgorithmHeader(byte[] asymmetricKey)
-        {
-            byte[] publicKey = new byte[asymmetricKey.Length - Constants.Curve25519KeyHeader.Length];
-            Array.Copy(asymmetricKey, Constants.Curve25519KeyHeader.Length, publicKey, destinationIndex: 0, publicKey.Length);
-            return publicKey;
-        }
-
         public static byte[] EncryptionPrivateKeyFile(string privateKeyPath)
         {
             try
             {
                 byte[] privateKey = GetPrivateKeyFromFile(privateKeyPath);
                 if (privateKey == null) { return null; }
-                byte[] keyAlgorithm = GetKeyAlgorithm(privateKey);
+                byte[] keyAlgorithm = Arrays.Copy(privateKey, sourceIndex: 0, Constants.Curve25519KeyHeader.Length);
                 ValidateEncryptionKey(keyAlgorithm);
                 return privateKey;
             }
@@ -160,7 +146,7 @@ namespace KryptorCLI
             {
                 byte[] privateKey = GetPrivateKeyFromFile(privateKeyPath);
                 if (privateKey == null) { return null; }
-                byte[] keyAlgorithm = GetKeyAlgorithm(privateKey);
+                byte[] keyAlgorithm = Arrays.Copy(privateKey, sourceIndex: 0, Constants.Ed25519KeyHeader.Length);
                 ValidateSigningKey(keyAlgorithm);
                 return privateKey;
             }
@@ -199,16 +185,9 @@ namespace KryptorCLI
 
         private static void ValidateKeyVersion(byte[] privateKey)
         {
-            byte[] keyVersion = GetKeyVersion(privateKey);
+            byte[] keyVersion = Arrays.Copy(privateKey, Constants.Curve25519KeyHeader.Length, Constants.PrivateKeyVersion.Length);
             bool validKeyVersion = Utilities.Compare(keyVersion, Constants.PrivateKeyVersion);
             if (!validKeyVersion) { throw new ArgumentException("Unsupported private key version."); }
-        }
-
-        private static byte[] GetKeyVersion(byte[] privateKey)
-        {
-            byte[] keyVersion = new byte[Constants.PrivateKeyVersion.Length];
-            Array.Copy(privateKey, Constants.Curve25519KeyHeader.Length, keyVersion, destinationIndex: 0, keyVersion.Length);
-            return keyVersion;
         }
     }
 }
