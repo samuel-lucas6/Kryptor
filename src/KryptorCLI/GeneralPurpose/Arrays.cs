@@ -66,6 +66,13 @@ namespace KryptorCLI
             return concat;
         }
 
+        public static byte[] Copy(byte[] sourceArray, int sourceIndex, int length)
+        {
+            byte[] destinationArray = new byte[length];
+            Array.Copy(sourceArray, sourceIndex, destinationArray, destinationIndex: 0, destinationArray.Length);
+            return destinationArray;
+        }
+
         public static bool Compare(char[] a, char[] b)
         {
             byte[] aBytes = Encoding.UTF8.GetBytes(a);
