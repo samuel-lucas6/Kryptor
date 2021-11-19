@@ -40,7 +40,7 @@ namespace KryptorCLI
                     byte[] encryptedHeader = EncryptFileHeader(inputFilePath, zeroByteFile, ephemeralPublicKey, dataEncryptionKey, nonce, keyEncryptionKey);
                     FileHeaders.WriteHeaders(outputFile, ephemeralPublicKey, salt, nonce, encryptedHeader);
                     nonce = Utilities.Increment(nonce);
-                    byte[] additionalData = ChunkHandling.GetPreviousTag(encryptedHeader);
+                    byte[] additionalData = Arrays.Copy(encryptedHeader, encryptedHeader.Length - Constants.TagLength, Constants.TagLength);
                     Encrypt(inputFile, outputFile, nonce, dataEncryptionKey, additionalData);
                 }
                 Finalize(inputFilePath, outputFilePath, zeroByteFile);
@@ -71,7 +71,7 @@ namespace KryptorCLI
             {
                 byte[] ciphertextChunk = XChaCha20BLAKE2b.Encrypt(plaintextChunk, nonce, dataEncryptionKey, additionalData, TagLength.Medium);
                 nonce = Utilities.Increment(nonce);
-                additionalData = ChunkHandling.GetPreviousTag(ciphertextChunk);
+                additionalData = Arrays.Copy(ciphertextChunk, ciphertextChunk.Length - Constants.TagLength, Constants.TagLength);
                 outputFile.Write(ciphertextChunk, offset, ciphertextChunk.Length);
             }
             CryptographicOperations.ZeroMemory(dataEncryptionKey);

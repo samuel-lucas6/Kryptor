@@ -42,7 +42,7 @@ namespace KryptorCLI
                 using (var outputFile = new FileStream(outputFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
                 {
                     nonce = Utilities.Increment(nonce);
-                    byte[] additionalData = ChunkHandling.GetPreviousTag(encryptedHeader);
+                    byte[] additionalData = Arrays.Copy(encryptedHeader, encryptedHeader.Length - Constants.TagLength, Constants.TagLength);
                     Decrypt(inputFile, outputFile, nonce, dataEncryptionKey, additionalData, lastChunkLength);
                 }
                 string inputFilePath = inputFile.Name;
@@ -72,7 +72,7 @@ namespace KryptorCLI
             {
                 byte[] plaintextChunk = XChaCha20BLAKE2b.Decrypt(ciphertextChunk, nonce, dataEncryptionKey, additionalData, TagLength.Medium);
                 nonce = Utilities.Increment(nonce);
-                additionalData = ChunkHandling.GetPreviousTag(ciphertextChunk);
+                additionalData = Arrays.Copy(ciphertextChunk, ciphertextChunk.Length - Constants.TagLength, Constants.TagLength);
                 outputFile.Write(plaintextChunk, offset, plaintextChunk.Length);
             }
             outputFile.SetLength(outputFile.Length - Constants.FileChunkSize + lastChunkLength);
