@@ -26,7 +26,6 @@ namespace KryptorCLI
         public static void AllDirectories(string directoryPath)
         {
             string[] subdirectories = FileHandling.GetAllDirectories(directoryPath);
-            // Deobfuscate subdirectory names - bottom most first
             for (int i = subdirectories.Length - 1; i >= 0; i--)
             {
                 RestoreDirectoryName(subdirectories[i]);
@@ -39,14 +38,13 @@ namespace KryptorCLI
             try
             {
                 string obfuscatedDirectoryName = Path.GetFileName(obfuscatedDirectoryPath);
-                // Get the path where the original directory name is stored
                 string storageFileName = $"{obfuscatedDirectoryName}.txt";
                 string storageFilePath = Path.Combine(obfuscatedDirectoryPath, storageFileName);
                 if (!File.Exists(storageFilePath)) { return; }
                 string directoryName = File.ReadAllText(storageFilePath);
                 string directoryPath = obfuscatedDirectoryPath.Replace(obfuscatedDirectoryName, directoryName);
                 directoryPath = FileHandling.GetUniqueDirectoryPath(directoryPath);
-                Console.WriteLine($"Renaming {Path.GetFileName(obfuscatedDirectoryName)} directory => {Path.GetFileName(directoryPath)}...");
+                Console.WriteLine($"Renaming {obfuscatedDirectoryName} directory => {Path.GetFileName(directoryPath)}...");
                 Directory.Move(obfuscatedDirectoryPath, directoryPath);
                 storageFilePath = Path.Combine(directoryPath, storageFileName);
                 FileHandling.DeleteFile(storageFilePath);
