@@ -25,28 +25,20 @@ namespace KryptorCLI
     {
         public static string ReplaceFilePath(string filePath)
         {
-            string originalFileName = Path.GetFileName(filePath);
-            string randomFileName = GetRandomFileName();
-            return filePath.Replace(originalFileName, randomFileName);
+            return filePath.Replace(Path.GetFileName(filePath), GetRandomFileName());
         }
 
         public static string GetRandomFileName()
         {
-            return GenerateRandomFileName() + GenerateRandomFileName();
-        }
-
-        private static string GenerateRandomFileName()
-        {
-            // Remove the generated extension
-            return Path.GetRandomFileName().Replace(".", string.Empty);
+            string randomFileName = Path.GetRandomFileName() + Path.GetRandomFileName();
+            return randomFileName.Replace(".", string.Empty);
         }
 
         public static void AppendFileName(string filePath)
         {
-            string fileName = Path.GetFileName(filePath);
-            byte[] fileNameBytes = Encoding.UTF8.GetBytes(fileName);
             File.SetAttributes(filePath, FileAttributes.Normal);
             using var fileStream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
+            byte[] fileNameBytes = Encoding.UTF8.GetBytes(Path.GetFileName(filePath));
             fileStream.Write(fileNameBytes, offset: 0, fileNameBytes.Length);
         }
     }
