@@ -45,9 +45,9 @@ namespace KryptorCLI
 
         private static string ReadFileName(string outputFilePath, int fileNameLength)
         {
-            byte[] fileName = new byte[fileNameLength];
             using var fileStream = new FileStream(outputFilePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
-            fileStream.Seek(-fileNameLength, SeekOrigin.End);
+            fileStream.Seek(offset: -fileNameLength, SeekOrigin.End);
+            byte[] fileName = new byte[fileNameLength];
             fileStream.Read(fileName, offset: 0, fileName.Length);
             fileStream.SetLength(fileStream.Length - fileNameLength);
             return Encoding.UTF8.GetString(fileName);
@@ -58,9 +58,8 @@ namespace KryptorCLI
             try
             {
                 File.SetAttributes(inputFilePath, FileAttributes.Normal);
-                string fileName = Path.GetFileName(inputFilePath);
-                byte[] fileNameBytes = Encoding.UTF8.GetBytes(fileName);
                 using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
+                byte[] fileNameBytes = Encoding.UTF8.GetBytes(Path.GetFileName(inputFilePath));
                 inputFile.SetLength(inputFile.Length - fileNameBytes.Length);
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
