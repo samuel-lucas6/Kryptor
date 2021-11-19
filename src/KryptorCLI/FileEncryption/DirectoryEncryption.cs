@@ -55,7 +55,7 @@ namespace KryptorCLI
         {
             if (Globals.Overwrite) { return null; }
             string destinationDirectoryPath = FileHandling.GetUniqueDirectoryPath($"{directoryPath} - Copy");
-            DisplayMessage.MessageNewLine($"Copying {Path.GetFileName(directoryPath)} directory => {Path.GetFileName(destinationDirectoryPath)} because you didn't specify -o|--overwrite...");
+            Console.WriteLine($"Copying {Path.GetFileName(directoryPath)} directory => {Path.GetFileName(destinationDirectoryPath)} because you didn't specify -o|--overwrite...");
             FileHandling.CopyDirectory(directoryPath, destinationDirectoryPath, copySubdirectories: true);
             return destinationDirectoryPath;
         }
@@ -67,7 +67,7 @@ namespace KryptorCLI
             {
                 if (Globals.ObfuscateFileNames)
                 {
-                    DisplayMessage.MessageNewLine($"Renaming {Path.GetFileName(directoryPath)} and subdirectories...");
+                    Console.WriteLine($"Renaming {Path.GetFileName(directoryPath)} and subdirectories...");
                     newDirectoryPath = ObfuscateDirectoryNames.AllDirectories(directoryPath);
                 }
             }
@@ -75,7 +75,7 @@ namespace KryptorCLI
             {
                 DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to obfuscate the directory names.");
             }
-            DisplayMessage.MessageNewLine($"Commencing encryption of {Path.GetFileName(newDirectoryPath)} directory...");
+            Console.WriteLine($"Commencing encryption of {Path.GetFileName(newDirectoryPath)} directory...");
             string[] filePaths = FileHandling.GetAllFiles(newDirectoryPath);
             // -1 for the selected directory
             Globals.TotalCount += filePaths.Length - 1;
@@ -120,7 +120,7 @@ namespace KryptorCLI
         {
             if (!string.IsNullOrEmpty(backupDirectoryPath) && !Directory.Exists(originalDirectoryPath))
             {
-                DisplayMessage.MessageNewLine($"Renaming {Path.GetFileName(backupDirectoryPath)} backup directory => {Path.GetFileName(originalDirectoryPath)}...");
+                Console.WriteLine($"Renaming {Path.GetFileName(backupDirectoryPath)} backup directory => {Path.GetFileName(originalDirectoryPath)}...");
                 Directory.Move(backupDirectoryPath, originalDirectoryPath);
             }
         }

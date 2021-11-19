@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System;
+using System.Security.Cryptography;
 using Sodium;
 
 /*
@@ -25,7 +26,7 @@ namespace KryptorCLI
     {
         public static byte[] Argon2id(byte[] passwordBytes, byte[] salt)
         {
-            DisplayMessage.MessageNewLine("Deriving encryption key from password...");
+            Console.WriteLine("Deriving encryption key from password...");
             byte[] key = PasswordHash.ArgonHashBinary(passwordBytes, salt, Constants.Iterations, Constants.MemorySize, Constants.EncryptionKeyLength, PasswordHash.ArgonAlgorithm.Argon_2ID13);
             return key;
         }

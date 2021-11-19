@@ -70,7 +70,7 @@ namespace KryptorCLI
 
         private static string[] GetFiles(string directoryPath)
         {
-            DisplayMessage.MessageNewLine($"Commencing decryption of {Path.GetFileName(directoryPath)} directory...");
+            Console.WriteLine($"Commencing decryption of {Path.GetFileName(directoryPath)} directory...");
             string[] filePaths = FileHandling.GetAllFiles(directoryPath);
             // -1 for the selected directory
             Globals.TotalCount += filePaths.Length - 1;

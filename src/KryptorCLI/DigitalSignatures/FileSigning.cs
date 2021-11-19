@@ -36,7 +36,7 @@ namespace KryptorCLI
             {
                 try
                 {
-                    DisplayMessage.MessageNewLine($"Signing {Path.GetFileName(filePath)}...");
+                    Console.WriteLine($"Signing {Path.GetFileName(filePath)}...");
                     DigitalSignatures.SignFile(filePath, signatureFilePath, comment, preHash, privateKey);
                     Globals.SuccessfulCount += 1;
                 }
@@ -53,16 +53,16 @@ namespace KryptorCLI
         {
             try
             {
-                DisplayMessage.MessageNewLine($"Verifying {Path.GetFileName(signatureFilePath)}...");
+                Console.WriteLine($"Verifying {Path.GetFileName(signatureFilePath)}...");
                 bool validSignature = DigitalSignatures.VerifySignature(signatureFilePath, filePath, publicKey, out string comment);
-                DisplayMessage.MessageNewLine(string.Empty);
+                Console.WriteLine(string.Empty);
                 if (!validSignature)
                 {
-                    DisplayMessage.MessageNewLine("Bad signature.");
+                    Console.WriteLine("Bad signature.");
                     return;
                 }
-                DisplayMessage.MessageNewLine("Good signature.");
-                DisplayMessage.MessageNewLine($"Authenticated comment: {comment}");
+                Console.WriteLine("Good signature.");
+                Console.WriteLine($"Authenticated comment: {comment}");
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {

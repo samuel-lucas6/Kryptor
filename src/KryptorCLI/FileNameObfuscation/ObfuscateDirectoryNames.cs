@@ -26,12 +26,10 @@ namespace KryptorCLI
         public static string AllDirectories(string directoryPath)
         {
             string[] subdirectories = FileHandling.GetAllDirectories(directoryPath);
-            // Obfuscate subdirectory names - bottom most first
             for (int i = subdirectories.Length - 1; i >= 0; i--)
             {
                 ObfuscateDirectoryName(subdirectories[i]);
             }
-            // Obfuscate parent directory name
             return ObfuscateDirectoryName(directoryPath);
         }
 
@@ -41,7 +39,7 @@ namespace KryptorCLI
             {
                 string directoryName = Path.GetFileName(directoryPath);
                 string obfuscatedPath = ObfuscateFileName.ReplaceFilePath(directoryPath);
-                DisplayMessage.MessageNewLine($"Renaming {directoryName} directory => {Path.GetFileName(obfuscatedPath)}...");
+                Console.WriteLine($"Renaming {directoryName} directory => {Path.GetFileName(obfuscatedPath)}...");
                 Directory.Move(directoryPath, obfuscatedPath);
                 StoreDirectoryName(directoryName, obfuscatedPath);
                 return obfuscatedPath;
@@ -55,7 +53,6 @@ namespace KryptorCLI
 
         private static void StoreDirectoryName(string directoryName, string obfuscatedPath)
         {
-            // Store the original directory name in a text file inside the directory
             string storageFilePath = Path.Combine(obfuscatedPath, $"{Path.GetFileName(obfuscatedPath)}.txt");
             File.WriteAllText(storageFilePath, directoryName);
         }

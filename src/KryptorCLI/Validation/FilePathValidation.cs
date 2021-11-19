@@ -71,8 +71,8 @@ namespace KryptorCLI
                 if (!keyfilePath.EndsWith(Constants.KeyfileExtension)) { keyfilePath += Constants.KeyfileExtension; }
                 if (File.Exists(keyfilePath)) { return keyfilePath; }
                 Keyfiles.GenerateKeyfile(keyfilePath);
-                DisplayMessage.MessageNewLine($"Randomly generated keyfile: {Path.GetFileName(keyfilePath)}");
-                DisplayMessage.MessageNewLine(string.Empty);
+                Console.WriteLine($"Randomly generated keyfile: {Path.GetFileName(keyfilePath)}");
+                Console.WriteLine(string.Empty);
                 return keyfilePath;
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
