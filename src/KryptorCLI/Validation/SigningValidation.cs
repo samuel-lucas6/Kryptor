@@ -35,20 +35,17 @@ namespace KryptorCLI
 
         private static IEnumerable<string> GetSignErrors(string privateKeyPath, string comment, string signatureFilePath, string[] filePaths)
         {
-            if (string.IsNullOrEmpty(privateKeyPath))
+            if (string.IsNullOrEmpty(privateKeyPath) && !File.Exists(Constants.DefaultSigningPrivateKeyPath))
             {
-                if (!File.Exists(Constants.DefaultSigningPrivateKeyPath))
-                {
-                    yield return ValidationMessages.PrivateKeyFile;
-                }
+                yield return ValidationMessages.PrivateKeyFile;
             }
-            else if (!File.Exists(privateKeyPath) || !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
+            else if (!string.IsNullOrEmpty(privateKeyPath) && (!File.Exists(privateKeyPath) || !privateKeyPath.EndsWith(Constants.PrivateKeyExtension)))
             {
                 yield return ValidationMessages.PrivateKeyFile;
             }
             if (!string.IsNullOrEmpty(comment) && comment.Length > 500)
             {
-                yield return "Please enter a shorter comment.";
+                yield return "Please enter a comment 500 or less characters long.";
             }
             if (!string.IsNullOrEmpty(signatureFilePath) && !signatureFilePath.EndsWith(Constants.SignatureExtension))
             {
@@ -151,9 +148,9 @@ namespace KryptorCLI
                 bool? validMagicBytes = FileHandling.IsSignatureFile(signatureFilePath);
                 if (validMagicBytes == null)
                 {
-                    yield return "Unable to access signature file.";
+                    yield return "Unable to access the signature file.";
                 }
-                if (validMagicBytes == false)
+                else if (validMagicBytes == false)
                 {
                     yield return _invalidSignatureFile;
                 }
