@@ -38,13 +38,9 @@ namespace KryptorCLI
 
         public static string GetFileEncryptionError(string inputFilePath)
         {
-            if (Directory.Exists(inputFilePath)) 
-            { 
-                if (FileHandling.IsDirectoryEmpty(inputFilePath))
-                {
-                    return _directoryEmpty;
-                }
-                return null;
+            if (Directory.Exists(inputFilePath))
+            {
+                return FileHandling.IsDirectoryEmpty(inputFilePath) ? _directoryEmpty : null;
             }
             if (!File.Exists(inputFilePath)) { return _fileDoesNotExist; }
             bool? validMagicBytes = FileHandling.IsKryptorFile(inputFilePath);
@@ -61,18 +57,15 @@ namespace KryptorCLI
             try
             {
                 if (string.IsNullOrEmpty(keyfilePath) || File.Exists(keyfilePath)) { return keyfilePath; }
-                // Generate a random keyfile
                 if (Directory.Exists(keyfilePath))
                 {
-                    string randomFileName = ObfuscateFileName.GetRandomFileName() + Constants.KeyfileExtension;
-                    keyfilePath = Path.Combine(keyfilePath, randomFileName);
+                    keyfilePath = Path.Combine(keyfilePath, ObfuscateFileName.GetRandomFileName());
                 }
-                // Append keyfile extension if missing
                 if (!keyfilePath.EndsWith(Constants.KeyfileExtension)) { keyfilePath += Constants.KeyfileExtension; }
                 if (File.Exists(keyfilePath)) { return keyfilePath; }
                 Keyfiles.GenerateKeyfile(keyfilePath);
                 Console.WriteLine($"Randomly generated keyfile: {Path.GetFileName(keyfilePath)}");
-                Console.WriteLine(string.Empty);
+                Console.WriteLine();
                 return keyfilePath;
             }
             catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
@@ -96,10 +89,10 @@ namespace KryptorCLI
 
         public static bool FileDecryption(string inputFilePath)
         {
-            if (inputFilePath.Contains(Constants.SaltFile)) 
+            if (inputFilePath.Contains(Constants.SaltFile))
             {
                 --Globals.TotalCount;
-                return false; 
+                return false;
             }
             string errorMessage = GetFileDecryptionError(inputFilePath);
             if (string.IsNullOrEmpty(errorMessage)) { return true; }
@@ -111,11 +104,7 @@ namespace KryptorCLI
         {
             if (Directory.Exists(inputFilePath))
             {
-                if (FileHandling.IsDirectoryEmpty(inputFilePath))
-                {
-                    return _directoryEmpty;
-                }
-                return null;
+                return FileHandling.IsDirectoryEmpty(inputFilePath) ? _directoryEmpty : null;
             }
             if (!File.Exists(inputFilePath)) { return _fileDoesNotExist; }
             bool? validMagicBytes = FileHandling.IsKryptorFile(inputFilePath);
@@ -144,18 +133,15 @@ namespace KryptorCLI
             {
                 yield return "This directory doesn't exist.";
             }
-            else if (defaultKeyDirectory && !Globals.Overwrite && keyPairType == 1)
+            else if (defaultKeyDirectory && !Globals.Overwrite)
             {
-                if (File.Exists(Constants.DefaultEncryptionPublicKeyPath) || File.Exists(Constants.DefaultEncryptionPrivateKeyPath))
+                if (keyPairType == 1 && (File.Exists(Constants.DefaultEncryptionPublicKeyPath) || File.Exists(Constants.DefaultEncryptionPrivateKeyPath)))
                 {
-                    yield return "An encryption key pair already exists. Please use -o|--overwrite if you want to overwrite your key pair.";
+                    yield return "An encryption key pair already exists. Please specify -o|--overwrite if you want to overwrite your key pair.";
                 }
-            }
-            else if (defaultKeyDirectory && !Globals.Overwrite && keyPairType == 2)
-            {
-                if (File.Exists(Constants.DefaultSigningPublicKeyPath) || File.Exists(Constants.DefaultSigningPrivateKeyPath))
+                else if (keyPairType == 2 && (File.Exists(Constants.DefaultSigningPublicKeyPath) || File.Exists(Constants.DefaultSigningPrivateKeyPath)))
                 {   
-                    yield return "A signing key pair already exists. Please use -o|--overwrite if you want to overwrite your key pair.";
+                    yield return "A signing key pair already exists. Please specify -o|--overwrite if you want to overwrite your key pair.";
                 }
             }
             else if (!defaultKeyDirectory && !Globals.Overwrite && keyPairType == 1)
@@ -164,7 +150,7 @@ namespace KryptorCLI
                 string privateKeyPath = Path.Combine(directoryPath, Constants.DefaultEncryptionKeyFileName + Constants.PrivateKeyExtension);
                 if (File.Exists(publicKeyPath) || File.Exists(privateKeyPath))
                 {
-                    yield return "An encryption key pair already exists in the specified directory. Please use -o|--overwrite if you want to overwrite your key pair.";
+                    yield return "An encryption key pair already exists in the specified directory. Please specify -o|--overwrite if you want to overwrite your key pair.";
                 }
             }
             else if (!defaultKeyDirectory && !Globals.Overwrite && keyPairType == 2)
@@ -173,7 +159,7 @@ namespace KryptorCLI
                 string privateKeyPath = Path.Combine(directoryPath, Constants.DefaultSigningKeyFileName + Constants.PrivateKeyExtension);
                 if (File.Exists(publicKeyPath) || File.Exists(privateKeyPath))
                 {
-                    yield return "A signing key pair already exists in the specified directory. Please use -o|--overwrite if you want to overwrite your key pair.";
+                    yield return "A signing key pair already exists in the specified directory. Please specify -o|--overwrite if you want to overwrite your key pair.";
                 }
             }
         }
@@ -200,12 +186,6 @@ namespace KryptorCLI
         {
             if (Directory.Exists(inputFilePath)) { return "Please specify a file to sign."; }
             if (!File.Exists(inputFilePath)) { return "This file doesn't exist."; }
-            bool? signatureFile = FileHandling.IsSignatureFile(inputFilePath);
-            if (signatureFile == null) { return _fileInaccessible; }
-            if (inputFilePath.EndsWith(Constants.SignatureExtension) || signatureFile == true)
-            {
-                return "Please specify a non-signature file to sign.";
-            }
             return null;
         }
 
@@ -227,10 +207,7 @@ namespace KryptorCLI
             if (string.IsNullOrEmpty(signatureFilePath) && filePaths != null)
             {
                 string possibleSignaturePath = filePaths[0] + Constants.SignatureExtension;
-                if (File.Exists(possibleSignaturePath))
-                {
-                    signatureFilePath = possibleSignaturePath;
-                }
+                if (File.Exists(possibleSignaturePath)) { return possibleSignaturePath; }
             }
             return signatureFilePath;
         }
