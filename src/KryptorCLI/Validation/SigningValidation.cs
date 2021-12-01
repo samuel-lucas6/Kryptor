@@ -23,7 +23,6 @@ namespace KryptorCLI
 {
     public static class SigningValidation
     {
-        private static readonly string _noFileToVerifyError = "Please specify a file to verify.";
         private static readonly string _invalidSignatureFile = "Please specify a valid signature file.";
         private static readonly string _singleFileToVerifyError = "Please specify a single file to verify.";
 
@@ -37,11 +36,11 @@ namespace KryptorCLI
         {
             if (string.IsNullOrEmpty(privateKeyPath) && !File.Exists(Constants.DefaultSigningPrivateKeyPath))
             {
-                yield return ValidationMessages.PrivateKeyFile;
+                yield return ErrorMessages.InvalidPrivateKeyFile;
             }
             else if (!string.IsNullOrEmpty(privateKeyPath) && (!File.Exists(privateKeyPath) || !privateKeyPath.EndsWith(Constants.PrivateKeyExtension)))
             {
-                yield return ValidationMessages.PrivateKeyFile;
+                yield return ErrorMessages.InvalidPrivateKeyFile;
             }
             if (!string.IsNullOrEmpty(comment) && comment.Length > 500)
             {
@@ -53,7 +52,7 @@ namespace KryptorCLI
             }
             if (filePaths == null)
             {
-                yield return "Please specify a file to sign.";
+                yield return ErrorMessages.NoFileToSign;
             }
             else if (filePaths.Length > 1 && !string.IsNullOrEmpty(signatureFilePath))
             {
@@ -64,7 +63,7 @@ namespace KryptorCLI
                 foreach (string inputFilePath in filePaths)
                 {
                     string errorMessage = FilePathValidation.GetFileSigningError(inputFilePath);
-                    if (!string.IsNullOrEmpty(errorMessage)) { yield return ValidationMessages.GetFilePathError(inputFilePath, errorMessage); }
+                    if (!string.IsNullOrEmpty(errorMessage)) { yield return ErrorMessages.GetFilePathError(inputFilePath, errorMessage); }
                 }
             }
         }
@@ -79,7 +78,7 @@ namespace KryptorCLI
         {
             if (encodedPublicKey.Length != Constants.PublicKeyLength)
             {
-                yield return ValidationMessages.PublicKey;
+                yield return ErrorMessages.InvalidPublicKey;
             }
             if (!string.IsNullOrEmpty(signatureFilePath) && (!signatureFilePath.EndsWith(Constants.SignatureExtension) || !File.Exists(signatureFilePath)))
             {
@@ -87,7 +86,7 @@ namespace KryptorCLI
             }
             if (filePaths == null)
             {
-                yield return _noFileToVerifyError;
+                yield return ErrorMessages.NoFileToVerify;
             }
             else if (filePaths.Length > 1)
             {
@@ -96,7 +95,7 @@ namespace KryptorCLI
             else
             {
                 string errorMessage = FilePathValidation.GetSignatureVerifyError(filePaths[0]);
-                if (!string.IsNullOrEmpty(errorMessage)) { yield return ValidationMessages.GetFilePathError(filePaths[0], errorMessage); }
+                if (!string.IsNullOrEmpty(errorMessage)) { yield return ErrorMessages.GetFilePathError(filePaths[0], errorMessage); }
             }
         }
 
@@ -110,7 +109,7 @@ namespace KryptorCLI
         {
             if (!File.Exists(publicKeyPath) || !publicKeyPath.EndsWith(Constants.PublicKeyExtension))
             {
-                yield return ValidationMessages.PublicKey;
+                yield return ErrorMessages.InvalidPublicKey;
             }
             if (!string.IsNullOrEmpty(signatureFilePath) && (!signatureFilePath.EndsWith(Constants.SignatureExtension) || !File.Exists(signatureFilePath)))
             {
@@ -118,7 +117,7 @@ namespace KryptorCLI
             }
             if (filePaths == null)
             {
-                yield return _noFileToVerifyError;
+                yield return ErrorMessages.NoFileToVerify;
             }
             else if (filePaths.Length > 1)
             {
@@ -127,7 +126,7 @@ namespace KryptorCLI
             else
             {
                 string errorMessage = FilePathValidation.GetSignatureVerifyError(filePaths[0]);
-                if (!string.IsNullOrEmpty(errorMessage)) { yield return ValidationMessages.GetFilePathError(filePaths[0], errorMessage); }
+                if (!string.IsNullOrEmpty(errorMessage)) { yield return ErrorMessages.GetFilePathError(filePaths[0], errorMessage); }
             }
         }
 

@@ -63,7 +63,7 @@ namespace KryptorCLI
                 string encodedPublicKey = File.ReadAllText(publicKeyPath);
                 if (encodedPublicKey.Length != Constants.PublicKeyLength)
                 {
-                    DisplayMessage.Error(ValidationMessages.PublicKey);
+                    DisplayMessage.Error(ErrorMessages.InvalidPublicKey);
                     return null;
                 }
                 return Convert.FromBase64String(encodedPublicKey);
@@ -158,7 +158,7 @@ namespace KryptorCLI
                 string encodedPrivateKey = File.ReadAllText(privateKeyPath);
                 if (encodedPrivateKey.Length != Constants.EncryptionPrivateKeyLength && encodedPrivateKey.Length != Constants.SigningPrivateKeyLength)
                 {
-                    DisplayMessage.Error(ValidationMessages.PrivateKeyFile);
+                    DisplayMessage.Error(ErrorMessages.InvalidPrivateKeyFile);
                     return null;
                 }
                 byte[] privateKey = Convert.FromBase64String(encodedPrivateKey);

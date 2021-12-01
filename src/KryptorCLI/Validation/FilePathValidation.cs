@@ -178,20 +178,20 @@ namespace KryptorCLI
             }
             else if (!File.Exists(privateKeyPath) || !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
             {
-                yield return ValidationMessages.PrivateKeyFile;
+                yield return ErrorMessages.InvalidPrivateKeyFile;
             }
         }
 
         public static string GetFileSigningError(string inputFilePath)
         {
-            if (Directory.Exists(inputFilePath)) { return "Please specify a file to sign."; }
+            if (Directory.Exists(inputFilePath)) { return ErrorMessages.NoFileToSign; }
             if (!File.Exists(inputFilePath)) { return "This file doesn't exist."; }
             return null;
         }
 
         public static string GetSignatureVerifyError(string inputFilePath)
         {
-            if (Directory.Exists(inputFilePath)) { return "Please specify a file to verify."; }
+            if (Directory.Exists(inputFilePath)) { return ErrorMessages.NoFileToVerify; }
             if (!File.Exists(inputFilePath)) { return "This file doesn't exist."; }
             bool? signatureFile = FileHandling.IsSignatureFile(inputFilePath);
             if (signatureFile == null) { return _fileInaccessible; }

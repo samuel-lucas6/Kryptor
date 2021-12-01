@@ -20,12 +20,12 @@
 
 namespace KryptorCLI
 {
-    public static class ValidationMessages
+    public static class ErrorMessages
     {
-        public static readonly string FilePath = "Please specify a file/folder.";
-        public static readonly string PrivateKeyFile = "Please specify a valid private key file.";
-        public static readonly string PublicKey = "Please specify a valid public key.";
-        public static readonly string PasswordOrKeyfile = "Please specify whether to use a password and/or keyfile.";
+        public static readonly string InvalidPrivateKeyFile = "Please specify a valid private key file.";
+        public static readonly string InvalidPublicKey = "Please specify a valid public key.";
+        public static readonly string NoFileToVerify = "Please specify a file to verify.";
+        public static readonly string NoFileToSign = "Please specify a file to sign.";
 
         public static string GetFilePathError(string filePath, string message)
         {
