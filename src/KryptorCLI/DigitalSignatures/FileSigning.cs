@@ -55,7 +55,7 @@ namespace KryptorCLI
             {
                 Console.WriteLine($"Verifying {Path.GetFileName(signatureFilePath)}...");
                 bool validSignature = DigitalSignatures.VerifySignature(signatureFilePath, filePath, publicKey, out string comment);
-                Console.WriteLine(string.Empty);
+                Console.WriteLine();
                 if (!validSignature)
                 {
                     Console.WriteLine("Bad signature.");

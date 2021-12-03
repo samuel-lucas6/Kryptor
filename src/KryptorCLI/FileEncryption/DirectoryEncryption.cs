@@ -75,7 +75,7 @@ namespace KryptorCLI
             {
                 DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to obfuscate the directory names.");
             }
-            Console.WriteLine($"Commencing encryption of {Path.GetFileName(newDirectoryPath)} directory...");
+            Console.WriteLine($"Beginning encryption of {Path.GetFileName(newDirectoryPath)} directory...");
             string[] filePaths = FileHandling.GetAllFiles(newDirectoryPath);
             // -1 for the selected directory
             Globals.TotalCount += filePaths.Length - 1;
