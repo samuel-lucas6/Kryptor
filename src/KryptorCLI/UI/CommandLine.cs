@@ -281,7 +281,7 @@ namespace KryptorCLI
                 bool updateAvailable = Updates.CheckForUpdates();
                 if (updateAvailable)
                 {
-                    Console.WriteLine("An update is available for Kryptor. Please visit <https://github.com/samuel-lucas6/Kryptor/releases> to update.");
+                    Console.WriteLine("An update is available for Kryptor. Please visit <https://www.kryptor.co.uk/#download-kryptor> to update.");
                     return;
                 }
                 Console.WriteLine("Kryptor is up-to-date.");
