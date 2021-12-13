@@ -1,16 +1,14 @@
-[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
+[![License: GPLv3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
 [![CodeQL](https://github.com/samuel-lucas6/Kryptor/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/samuel-lucas6/Kryptor/actions)
 
 # Kryptor
-
 Kryptor is free and open source file encryption software for Windows, Linux, and macOS.
 
-It is a portable, cross-platform command line tool that makes use of modern and secure cryptographic algorithms. It aims to be a mixture of [age](https://github.com/FiloSottile/age) and [Minisign](https://github.com/jedisct1/minisign) in terms of functionality to provide a simple, user friendly alternative to [GPG](https://gnupg.org/).
+It is a portable, cross-platform command line tool that makes use of modern and secure cryptographic algorithms. It aims to be a better version of [age](https://github.com/FiloSottile/age) and [Minisign](https://github.com/jedisct1/minisign) to provide a simple, user friendly alternative to [GPG](https://gnupg.org/).
 
 ![kryptor](https://user-images.githubusercontent.com/63159663/110021517-c0af3500-7d22-11eb-9acd-02ba9f24617c.gif)
 
 ## Features
-
 - Encrypt files/folders with a password, keyfile, or asymmetric keys.
 - Encrypting files using a recipient's public key allows for authenticated, one-way file sharing.
 - Create and verify digital signatures, with support for an authenticated comment and prehashing.
@@ -60,7 +58,7 @@ Examples:
   ```
 
 ### Specifying files
-When referencing file paths/file names that contain spaces, you must surround them with "speech marks" on Windows and 'apostrophes' on Linux/macOS:
+When referencing file paths/file names that contain spaces, you must surround them with "speech marks" on Windows and 'apostrophes' on Linux and macOS:
 ```
 $ kryptor -e -p "GitHub Logo.png"
 $ kryptor -e -p "C:\Users\samuel-lucas6\Downloads\GitHub Logo.png"
@@ -74,7 +72,7 @@ However, files that are not in the same directory as the `kryptor` executable mu
 $ kryptor -e -p C:\Users\samuel-lucas6\Documents\message.txt
 ```
 ### Specifying your private key
-You can use the `-x|--private` option without specifying a file path to use your default private key. This is the recommended approach, but it means your private keys must be kept in the default folder (`%USERPROFILE%/.kryptor` on Windows and `/home/.kryptor` on Linux/macOS).
+You can use the `-x|--private` option without specifying a file path to use your default private key. This is the recommended approach, but it means your private keys must be kept in the default folder (`%USERPROFILE%/.kryptor` on Windows and `/home/.kryptor` on Linux and macOS).
 
 To specify a non-default private key, you can use `-x|--private` followed by `=[file]` like so:
 ```
