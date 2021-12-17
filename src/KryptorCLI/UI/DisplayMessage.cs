@@ -25,21 +25,21 @@ namespace KryptorCLI
 {
     public static class DisplayMessage
     {
-        private const string _error = "Error";
+        private const string ErrorWord = "Error";
 
         public static void FilePathException(string filePath, string exceptionName, string errorMessage)
         {
-            Console.WriteLine($"{Path.GetFileName(filePath)} - {_error}: {exceptionName} - {errorMessage}");
+            Console.WriteLine($"{Path.GetFileName(filePath)} - {ErrorWord}: {exceptionName} - {errorMessage}");
         }
 
         public static void Exception(string exceptionName, string errorMessage)
         {
-            Console.WriteLine($"{_error}: {exceptionName} - {errorMessage}");
+            Console.WriteLine($"{ErrorWord}: {exceptionName} - {errorMessage}");
         }
 
         public static void Error(string errorMessage)
         {
-            Console.WriteLine($"{_error}: {errorMessage}");
+            Console.WriteLine($"{ErrorWord}: {errorMessage}");
         }
 
         public static void FilePathMessage(string filePath, string message)
@@ -49,7 +49,7 @@ namespace KryptorCLI
 
         public static void FilePathError(string filePath, string message)
         {
-            Console.WriteLine($"{Path.GetFileName(filePath)} - {_error}: {message}");
+            Console.WriteLine($"{Path.GetFileName(filePath)} - {ErrorWord}: {message}");
         }
 
         public static void EncryptingFile(string inputFilePath, string outputFilePath)

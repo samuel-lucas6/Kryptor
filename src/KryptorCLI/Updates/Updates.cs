@@ -24,8 +24,8 @@ namespace KryptorCLI
 {
     public static class Updates
     {
-        private const string _versionFileName = "version.txt";
-        private const string _versionFileLink = "https://raw.githubusercontent.com/samuel-lucas6/Kryptor/master/version.txt";
+        private const string VersionFileName = "version.txt";
+        private const string VersionFileLink = "https://raw.githubusercontent.com/samuel-lucas6/Kryptor/master/version.txt";
 
         public static bool CheckForUpdates()
         {
@@ -36,7 +36,7 @@ namespace KryptorCLI
 
         private static string GetLatestVersion()
         {
-            string downloadFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), _versionFileName);
+            string downloadFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), VersionFileName);
             DownloadVersionFile(downloadFilePath);
             string latestVersion = File.ReadAllText(downloadFilePath).Trim('\n').Trim();
             File.Delete(downloadFilePath);
@@ -46,7 +46,7 @@ namespace KryptorCLI
         private static void DownloadVersionFile(string downloadFilePath)
         {
             using var webClient = new WebClient();
-            webClient.DownloadFile(_versionFileLink, downloadFilePath);
+            webClient.DownloadFile(VersionFileLink, downloadFilePath);
         }
     }
 }

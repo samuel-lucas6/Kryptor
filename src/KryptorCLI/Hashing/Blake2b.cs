@@ -25,7 +25,7 @@ namespace KryptorCLI
 {
     public static class Blake2b
     {
-        private static readonly byte[] _personalisation = Encoding.UTF8.GetBytes(Constants.BLAKE2Personal);
+        private static readonly byte[] Personalisation = Encoding.UTF8.GetBytes(Constants.BLAKE2Personal);
 
         public static byte[] Hash(byte[] message)
         {
@@ -45,7 +45,7 @@ namespace KryptorCLI
 
         public static byte[] KeyDerivation(byte[] inputKeyingMaterial, byte[] salt, int outputLength)
         {
-            return GenericHash.HashSaltPersonal(message: Array.Empty<byte>(), inputKeyingMaterial, salt, _personalisation, outputLength);
+            return GenericHash.HashSaltPersonal(message: Array.Empty<byte>(), inputKeyingMaterial, salt, Personalisation, outputLength);
         }
     }
 }

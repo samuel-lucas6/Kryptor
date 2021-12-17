@@ -69,7 +69,7 @@ namespace KryptorCLI
             byte[] plaintextChunk = new byte[Constants.FileChunkSize];
             while (inputFile.Read(plaintextChunk, offset, plaintextChunk.Length) > 0)
             {
-                byte[] ciphertextChunk = XChaCha20BLAKE2b.Encrypt(plaintextChunk, nonce, dataEncryptionKey, additionalData, TagLength.Medium);
+                byte[] ciphertextChunk = XChaCha20BLAKE2b.Encrypt(plaintextChunk, nonce, dataEncryptionKey, additionalData);
                 nonce = Utilities.Increment(nonce);
                 additionalData = Arrays.Copy(ciphertextChunk, ciphertextChunk.Length - Constants.TagLength, Constants.TagLength);
                 outputFile.Write(ciphertextChunk, offset, ciphertextChunk.Length);

@@ -70,7 +70,7 @@ namespace KryptorCLI
             inputFile.Seek(Constants.FileHeadersLength, SeekOrigin.Begin);
             while (inputFile.Read(ciphertextChunk, offset, ciphertextChunk.Length) > 0)
             {
-                byte[] plaintextChunk = XChaCha20BLAKE2b.Decrypt(ciphertextChunk, nonce, dataEncryptionKey, additionalData, TagLength.Medium);
+                byte[] plaintextChunk = XChaCha20BLAKE2b.Decrypt(ciphertextChunk, nonce, dataEncryptionKey, additionalData);
                 nonce = Utilities.Increment(nonce);
                 additionalData = Arrays.Copy(ciphertextChunk, ciphertextChunk.Length - Constants.TagLength, Constants.TagLength);
                 outputFile.Write(plaintextChunk, offset, plaintextChunk.Length);

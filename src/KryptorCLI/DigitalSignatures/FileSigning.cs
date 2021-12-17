@@ -24,14 +24,14 @@ namespace KryptorCLI
 {
     public static class FileSigning
     {
-        private const string _defaultComment = "This file has not been tampered with.";
+        private const string DefaultComment = "This file has not been tampered with.";
 
         public static void SignEachFile(string[] filePaths, string signatureFilePath, string comment, bool preHash, byte[] privateKey)
         {
             Globals.TotalCount = filePaths.Length;
             privateKey = PrivateKey.Decrypt(privateKey);
             if (privateKey == null) { return; }
-            if (string.IsNullOrEmpty(comment)) { comment = _defaultComment; }
+            if (string.IsNullOrEmpty(comment)) { comment = DefaultComment; }
             foreach (string filePath in filePaths)
             {
                 try

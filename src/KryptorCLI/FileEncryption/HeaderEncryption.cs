@@ -34,7 +34,7 @@ namespace KryptorCLI
 
         public static byte[] Encrypt(byte[] fileHeader, byte[] nonce, byte[] keyEncryptionKey, byte[] additionalData)
         {
-            return XChaCha20BLAKE2b.Encrypt(fileHeader, nonce, keyEncryptionKey, additionalData, TagLength.Medium);
+            return XChaCha20BLAKE2b.Encrypt(fileHeader, nonce, keyEncryptionKey, additionalData);
         }
 
         public static byte[] GetAdditionalData(FileStream inputFile, byte[] ephemeralPublicKey)
@@ -50,7 +50,7 @@ namespace KryptorCLI
         {
             try
             {
-                return XChaCha20BLAKE2b.Decrypt(encryptedFileHeader, nonce, keyEncryptionKey, additionalData, TagLength.Medium);
+                return XChaCha20BLAKE2b.Decrypt(encryptedFileHeader, nonce, keyEncryptionKey, additionalData);
             }
             catch (CryptographicException)
             {

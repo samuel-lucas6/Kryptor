@@ -26,43 +26,43 @@ namespace KryptorCLI
 {
     public static class Arrays
     {
-        private const int _zeroIndex = 0;
+        private const int ZeroIndex = 0;
 
         public static byte[] Concat(byte[] a, byte[] b)
         {
             var concat = new byte[a.Length + b.Length];
-            Array.Copy(a, _zeroIndex, concat, _zeroIndex, a.Length);
-            Array.Copy(b, _zeroIndex, concat, a.Length, b.Length);
+            Array.Copy(a, ZeroIndex, concat, ZeroIndex, a.Length);
+            Array.Copy(b, ZeroIndex, concat, a.Length, b.Length);
             return concat;
         }
 
         public static byte[] Concat(byte[] a, byte[] b, byte[] c)
         {
             var concat = new byte[a.Length + b.Length + c.Length];
-            Array.Copy(a, _zeroIndex, concat, _zeroIndex, a.Length);
-            Array.Copy(b, _zeroIndex, concat, a.Length, b.Length);
-            Array.Copy(c, _zeroIndex, concat, a.Length + b.Length, c.Length);
+            Array.Copy(a, ZeroIndex, concat, ZeroIndex, a.Length);
+            Array.Copy(b, ZeroIndex, concat, a.Length, b.Length);
+            Array.Copy(c, ZeroIndex, concat, a.Length + b.Length, c.Length);
             return concat;
         }
 
         public static byte[] Concat(byte[] a, byte[] b, byte[] c, byte[] d)
         {
             var concat = new byte[a.Length + b.Length + c.Length + d.Length];
-            Array.Copy(a, _zeroIndex, concat, _zeroIndex, a.Length);
-            Array.Copy(b, _zeroIndex, concat, a.Length, b.Length);
-            Array.Copy(c, _zeroIndex, concat, a.Length + b.Length, c.Length);
-            Array.Copy(d, _zeroIndex, concat, a.Length + b.Length + c.Length, d.Length);
+            Array.Copy(a, ZeroIndex, concat, ZeroIndex, a.Length);
+            Array.Copy(b, ZeroIndex, concat, a.Length, b.Length);
+            Array.Copy(c, ZeroIndex, concat, a.Length + b.Length, c.Length);
+            Array.Copy(d, ZeroIndex, concat, a.Length + b.Length + c.Length, d.Length);
             return concat;
         }
 
         public static byte[] Concat(byte[] a, byte[] b, byte[] c, byte[] d, byte[] e)
         {
             var concat = new byte[a.Length + b.Length + c.Length + d.Length + e.Length];
-            Array.Copy(a, _zeroIndex, concat, _zeroIndex, a.Length);
-            Array.Copy(b, _zeroIndex, concat, a.Length, b.Length);
-            Array.Copy(c, _zeroIndex, concat, a.Length + b.Length, c.Length);
-            Array.Copy(d, _zeroIndex, concat, a.Length + b.Length + c.Length, d.Length);
-            Array.Copy(e, _zeroIndex, concat, a.Length + b.Length + c.Length + d.Length, e.Length);
+            Array.Copy(a, ZeroIndex, concat, ZeroIndex, a.Length);
+            Array.Copy(b, ZeroIndex, concat, a.Length, b.Length);
+            Array.Copy(c, ZeroIndex, concat, a.Length + b.Length, c.Length);
+            Array.Copy(d, ZeroIndex, concat, a.Length + b.Length + c.Length, d.Length);
+            Array.Copy(e, ZeroIndex, concat, a.Length + b.Length + c.Length + d.Length, e.Length);
             return concat;
         }
 
@@ -92,7 +92,7 @@ namespace KryptorCLI
         {
             if (array.Length > 0)
             {
-                Array.Clear(array, _zeroIndex, array.Length);
+                Array.Clear(array, ZeroIndex, array.Length);
             }
         }
     }
