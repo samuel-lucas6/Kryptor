@@ -43,6 +43,6 @@ public static class ExceptionFilters
 
     public static bool CheckForUpdates(Exception ex)
     {
-        return ex is WebException || FileAccess(ex);
+        return ex is WebException or PlatformNotSupportedException || FileAccess(ex);
     }
 }

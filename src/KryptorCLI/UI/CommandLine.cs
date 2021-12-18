@@ -278,17 +278,37 @@ public static class CommandLine
     {
         try
         {
-            bool updateAvailable = Updates.CheckForUpdates();
+            bool updateAvailable = Updates.CheckForUpdates(out string latestVersion);
             if (updateAvailable)
             {
-                Console.WriteLine("An update is available for Kryptor. Please visit <https://www.kryptor.co.uk/#download-kryptor> to update.");
-                return;
+                Console.WriteLine("An update is available for Kryptor. Would you like to update now? (type y or n)");
+                string userInput = Console.ReadLine()?.ToLower();
+                Console.WriteLine();
+                switch (userInput)
+                {
+                    case "y":
+                        Updates.Update(latestVersion);
+                        break;
+                    case "n":
+                        Console.WriteLine("Please specify -u|--update again when you're ready to update.");
+                        Console.WriteLine();
+                        Console.WriteLine("Alternatively, you can manually download the latest release at <https://www.kryptor.co.uk/#download-kryptor>.");
+                        return;
+                    default:
+                        Console.WriteLine("Please type either y or n next time.");
+                        return;
+                }
             }
             Console.WriteLine("Kryptor is up-to-date.");
         }
         catch (Exception ex) when (ExceptionFilters.CheckForUpdates(ex))
         {
-            DisplayMessage.Exception(ex.GetType().Name, "Unable to check for updates.");
+            if (ex is PlatformNotSupportedException)
+            {
+                DisplayMessage.Exception(ex.GetType().Name, ex.Message);
+                return;
+            }
+            DisplayMessage.Exception(ex.GetType().Name, "Unable to check for or download updates.");
         }
     }
 

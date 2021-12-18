@@ -28,26 +28,103 @@ public static class Updates
 {
     private const string VersionFileName = "version.txt";
     private const string VersionFileLink = "https://raw.githubusercontent.com/samuel-lucas6/Kryptor/master/version.txt";
+    private const string LatestReleaseFileName = "kryptor-latest.zip";
+    private const string WindowsDownloadFileName = "kryptor-windows.zip";
+    private const string LinuxDownloadFileName = "kryptor-linux.zip";
+    private const string MacOSDownloadFileName = "kryptor-macos.zip";
+    private const string ExecutableFileName = "kryptor";
+    private const string ExeExtension = ".exe";
 
-    public static bool CheckForUpdates()
+    public static bool CheckForUpdates(out string latestVersion)
     {
         string assemblyVersion = Program.GetVersion();
-        string latestVersion = GetLatestVersion();
+        latestVersion = GetLatestVersion();
         return !string.Equals(assemblyVersion, latestVersion, StringComparison.Ordinal);
     }
 
     private static string GetLatestVersion()
     {
         string downloadFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), VersionFileName);
-        DownloadVersionFile(downloadFilePath);
+        DownloadFile(VersionFileLink, downloadFilePath);
         string latestVersion = File.ReadAllText(downloadFilePath).Trim('\n').Trim();
         File.Delete(downloadFilePath);
         return latestVersion;
     }
 
-    private static void DownloadVersionFile(string downloadFilePath)
+    private static void DownloadFile(string link, string filePath)
     {
         using var webClient = new WebClient();
-        webClient.DownloadFile(VersionFileLink, downloadFilePath);
+        webClient.DownloadFile(link, filePath);
+    }
+
+    public static void Update(string latestVersion)
+    {
+        if (!OperatingSystem.IsWindows() & !OperatingSystem.IsLinux() & !OperatingSystem.IsMacOS())
+        {
+            throw new PlatformNotSupportedException("There are no official releases for your operating system.");
+        }
+        Console.WriteLine("Downloading update...");
+        byte[] downloadedExecutable = GetLatestExecutable(latestVersion);
+        Console.WriteLine("Applying update...");
+        ReplaceExecutable(downloadedExecutable);
+    }
+
+    private static byte[] GetLatestExecutable(string latestVersion)
+    {
+        string downloadFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), LatestReleaseFileName);
+        string downloadLink = $"https://github.com/samuel-lucas6/Kryptor/releases/download/v{latestVersion}/";
+        if (OperatingSystem.IsWindows())
+        {
+            downloadLink += WindowsDownloadFileName;
+        }
+        else if (OperatingSystem.IsLinux())
+        {
+            downloadLink += LinuxDownloadFileName;
+        }
+        else if (OperatingSystem.IsMacOS())
+        {
+            downloadLink += MacOSDownloadFileName;
+        }
+        DownloadFile(downloadLink, downloadFilePath);
+        string extractedDirectoryPath = Path.Combine(Path.GetDirectoryName(downloadFilePath), ExecutableFileName);
+        if (!Directory.Exists(extractedDirectoryPath)) { Directory.CreateDirectory(extractedDirectoryPath); }
+        ZipFile.ExtractToDirectory(downloadFilePath, extractedDirectoryPath, overwriteFiles: true);
+        File.Delete(downloadFilePath);
+        string executableFilePath = Path.Combine(extractedDirectoryPath, ExecutableFileName);
+        if (OperatingSystem.IsWindows()) { executableFilePath += ExeExtension; }
+        byte[] downloadedExecutable = File.ReadAllBytes(executableFilePath);
+        Directory.Delete(extractedDirectoryPath, recursive: true);
+        return downloadedExecutable;
+    }
+
+    private static void ReplaceExecutable(byte[] downloadedExecutable)
+    {
+        string executableFilePath = Process.GetCurrentProcess().MainModule.FileName;
+        if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
+        {
+            File.WriteAllBytes(executableFilePath, downloadedExecutable);
+        }
+        else
+        {
+            string newExecutableFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), ExecutableFileName + ExeExtension);
+            string batFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), $"{ExecutableFileName}.bat");
+            File.WriteAllBytes(newExecutableFilePath, downloadedExecutable);
+            using (var batFile = new StreamWriter(File.Create(batFilePath)))
+            {
+                batFile.WriteLine("@ECHO OFF");
+                batFile.WriteLine("TIMEOUT /t 1 /nobreak > NUL");
+                batFile.WriteLine("TASKKILL /IM \"{0}\" > NUL", Path.GetFileName(executableFilePath));
+                batFile.WriteLine("MOVE \"{0}\" \"{1}\"", newExecutableFilePath, executableFilePath);
+                batFile.WriteLine("DEL \"%~f0\"");
+            }
+            var startInfo = new ProcessStartInfo(batFilePath)
+            {
+                CreateNoWindow = true,
+                WorkingDirectory = Path.GetDirectoryName(executableFilePath)
+            };
+            Process.Start(startInfo);
+        }
+        Console.WriteLine("Update complete.");
+        Environment.Exit(0);
     }
 }
