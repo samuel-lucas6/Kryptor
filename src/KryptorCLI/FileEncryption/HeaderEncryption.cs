@@ -1,11 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Security.Cryptography;
-using ChaCha20BLAKE2;
-
-/*
+﻿/*
     Kryptor: A simple, modern, and secure encryption tool.
-    Copyright (C) 2020-2021 Samuel Lucas
+    Copyright (C) 2020-2022 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,41 +16,45 @@ using ChaCha20BLAKE2;
     along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
-namespace KryptorCLI
+using System;
+using System.IO;
+using System.Security.Cryptography;
+using ChaCha20BLAKE2;
+
+namespace KryptorCLI;
+
+public static class HeaderEncryption
 {
-    public static class HeaderEncryption
+    public static byte[] ComputeAdditionalData(long fileLength, byte[] ephemeralPublicKey)
     {
-        public static byte[] ComputeAdditionalData(long fileLength, byte[] ephemeralPublicKey)
-        {
-            long chunkCount = (long)Math.Ceiling((double)fileLength / Constants.FileChunkSize);
-            byte[] ciphertextLength = BitConversion.GetBytes(chunkCount * Constants.TotalChunkLength);
-            return Arrays.Concat(ciphertextLength, Constants.KryptorMagicBytes, Constants.EncryptionVersion, ephemeralPublicKey);
-        }
+        long chunkCount = (long)Math.Ceiling((double)fileLength / Constants.FileChunkSize);
+        byte[] ciphertextLength = BitConversion.GetBytes(chunkCount * Constants.TotalChunkLength);
+        return Arrays.Concat(ciphertextLength, Constants.KryptorMagicBytes, Constants.EncryptionVersion, ephemeralPublicKey);
+    }
 
-        public static byte[] Encrypt(byte[] fileHeader, byte[] nonce, byte[] keyEncryptionKey, byte[] additionalData)
-        {
-            return XChaCha20BLAKE2b.Encrypt(fileHeader, nonce, keyEncryptionKey, additionalData);
-        }
+    public static byte[] Encrypt(byte[] fileHeader, byte[] nonce, byte[] keyEncryptionKey, byte[] additionalData)
+    {
+        return XChaCha20BLAKE2b.Encrypt(fileHeader, nonce, keyEncryptionKey, additionalData);
+    }
 
-        public static byte[] GetAdditionalData(FileStream inputFile, byte[] ephemeralPublicKey)
-        {
-            byte[] ciphertextLength = BitConversion.GetBytes(inputFile.Length - Constants.FileHeadersLength);
-            byte[] magicBytes = FileHeaders.ReadMagicBytes(inputFile);
-            byte[] formatVersion = FileHeaders.ReadFileFormatVersion(inputFile);
-            FileHeaders.ValidateFormatVersion(formatVersion, Constants.EncryptionVersion);
-            return Arrays.Concat(ciphertextLength, magicBytes, formatVersion, ephemeralPublicKey);
-        }
+    public static byte[] GetAdditionalData(FileStream inputFile, byte[] ephemeralPublicKey)
+    {
+        byte[] ciphertextLength = BitConversion.GetBytes(inputFile.Length - Constants.FileHeadersLength);
+        byte[] magicBytes = FileHeaders.ReadMagicBytes(inputFile);
+        byte[] formatVersion = FileHeaders.ReadFileFormatVersion(inputFile);
+        FileHeaders.ValidateFormatVersion(formatVersion, Constants.EncryptionVersion);
+        return Arrays.Concat(ciphertextLength, magicBytes, formatVersion, ephemeralPublicKey);
+    }
 
-        public static byte[] Decrypt(byte[] encryptedFileHeader, byte[] nonce, byte[] keyEncryptionKey, byte[] additionalData)
+    public static byte[] Decrypt(byte[] encryptedFileHeader, byte[] nonce, byte[] keyEncryptionKey, byte[] additionalData)
+    {
+        try
         {
-            try
-            {
-                return XChaCha20BLAKE2b.Decrypt(encryptedFileHeader, nonce, keyEncryptionKey, additionalData);
-            }
-            catch (CryptographicException)
-            {
-                return null;
-            }
+            return XChaCha20BLAKE2b.Decrypt(encryptedFileHeader, nonce, keyEncryptionKey, additionalData);
+        }
+        catch (CryptographicException)
+        {
+            return null;
         }
     }
 }

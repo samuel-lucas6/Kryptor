@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-
-/*
+﻿/*
     Kryptor: A simple, modern, and secure encryption tool.
-    Copyright (C) 2020-2021 Samuel Lucas
+    Copyright (C) 2020-2022 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,72 +16,74 @@ using System.Collections.Generic;
     along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
-namespace KryptorCLI
+using System;
+using System.Collections.Generic;
+
+namespace KryptorCLI;
+
+public static class PasswordPrompt
 {
-    public static class PasswordPrompt
+    public static char[] EnterNewPassword()
     {
-        public static char[] EnterNewPassword()
+        Console.WriteLine("Enter a password (leave empty for a random passphrase):");
+        char[] password = GetPassword();
+        if (password.Length == 0)
         {
-            Console.WriteLine("Enter a password (leave empty for a random passphrase):");
-            char[] password = GetPassword();
-            if (password.Length == 0)
-            {
-                password = PassphraseGenerator.GetRandomPassphrase(wordCount: 8);
-                DisplayRandomPassphrase(password);
-                return password;
-            }
-            RetypeNewPassword(password);
+            password = PassphraseGenerator.GetRandomPassphrase(wordCount: 8);
+            DisplayRandomPassphrase(password);
             return password;
         }
+        RetypeNewPassword(password);
+        return password;
+    }
 
-        private static void DisplayRandomPassphrase(char[] password)
+    private static void DisplayRandomPassphrase(char[] password)
+    {
+        Console.Write($"Randomly generated passphrase: ");
+        Console.WriteLine(password);
+        Console.WriteLine();
+    }
+
+    private static void RetypeNewPassword(char[] password)
+    {
+        Console.WriteLine("Retype password:");
+        char[] retypedPassword = GetPassword();
+        if (!Arrays.Compare(password, retypedPassword))
         {
-            Console.Write($"Randomly generated passphrase: ");
-            Console.WriteLine(password);
-            Console.WriteLine();
+            DisplayMessage.Error("The passwords don't match.");
+            Environment.Exit(exitCode: 13);
         }
+        Arrays.ZeroMemory(retypedPassword);
+    }
 
-        private static void RetypeNewPassword(char[] password)
+    public static char[] EnterYourPassword()
+    {
+        Console.WriteLine("Enter your password:");
+        char[] password = GetPassword();
+        if (password.Length == 0)
         {
-            Console.WriteLine("Retype password:");
-            char[] retypedPassword = GetPassword();
-            if (!Arrays.Compare(password, retypedPassword))
+            DisplayMessage.Error("You didn't enter a password.");
+            Environment.Exit(exitCode: 13);
+        }
+        return password;
+    }
+
+    private static char[] GetPassword()
+    {
+        var password = new List<char>();
+        ConsoleKeyInfo consoleKeyInfo;
+        while ((consoleKeyInfo = Console.ReadKey(intercept: true)).Key != ConsoleKey.Enter)
+        {
+            if (!char.IsControl(consoleKeyInfo.KeyChar))
             {
-                DisplayMessage.Error("The passwords don't match.");
-                Environment.Exit(exitCode: 13);
+                password.Add(consoleKeyInfo.KeyChar);
             }
-            Arrays.ZeroMemory(retypedPassword);
-        }
-
-        public static char[] EnterYourPassword()
-        {
-            Console.WriteLine("Enter your password:");
-            char[] password = GetPassword();
-            if (password.Length == 0)
+            else if (consoleKeyInfo.Key == ConsoleKey.Backspace && password.Count > 0)
             {
-                DisplayMessage.Error("You didn't enter a password.");
-                Environment.Exit(exitCode: 13);
+                password.RemoveAt(password.Count - 1);
             }
-            return password;
         }
-
-        private static char[] GetPassword()
-        {
-            var password = new List<char>();
-            ConsoleKeyInfo consoleKeyInfo;
-            while ((consoleKeyInfo = Console.ReadKey(intercept: true)).Key != ConsoleKey.Enter)
-            {
-                if (!char.IsControl(consoleKeyInfo.KeyChar))
-                {
-                    password.Add(consoleKeyInfo.KeyChar);
-                }
-                else if (consoleKeyInfo.Key == ConsoleKey.Backspace && password.Count > 0)
-                {
-                    password.RemoveAt(password.Count - 1);
-                }
-            }
-            Console.WriteLine();
-            return password.ToArray();
-        }
+        Console.WriteLine();
+        return password.ToArray();
     }
 }

@@ -1,10 +1,6 @@
-﻿using System;
-using System.Security.Cryptography;
-using Sodium;
-
-/*
+﻿/*
     Kryptor: A simple, modern, and secure encryption tool.
-    Copyright (C) 2020-2021 Samuel Lucas
+    Copyright (C) 2020-2022 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,31 +16,34 @@ using Sodium;
     along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
-namespace KryptorCLI
+using System;
+using System.Security.Cryptography;
+using Sodium;
+
+namespace KryptorCLI;
+
+public static class KeyDerivation
 {
-    public static class KeyDerivation
+    public static byte[] Argon2id(byte[] passwordBytes, byte[] salt)
     {
-        public static byte[] Argon2id(byte[] passwordBytes, byte[] salt)
-        {
-            Console.WriteLine("Deriving encryption key from password...");
-            byte[] key = PasswordHash.ArgonHashBinary(passwordBytes, salt, Constants.Iterations, Constants.MemorySize, Constants.EncryptionKeyLength, PasswordHash.ArgonAlgorithm.Argon_2ID13);
-            return key;
-        }
+        Console.WriteLine("Deriving encryption key from password...");
+        byte[] key = PasswordHash.ArgonHashBinary(passwordBytes, salt, Constants.Iterations, Constants.MemorySize, Constants.EncryptionKeyLength, PasswordHash.ArgonAlgorithm.Argon_2ID13);
+        return key;
+    }
 
-        public static byte[] Blake2(byte[] sharedSecret, byte[] ephemeralSharedSecret, byte[] salt)
-        {
-            byte[] inputKeyingMaterial = Arrays.Concat(sharedSecret, ephemeralSharedSecret);
-            byte[] keyEncryptionKey = Blake2b.KeyDerivation(inputKeyingMaterial, salt, Constants.EncryptionKeyLength);
-            CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
-            CryptographicOperations.ZeroMemory(inputKeyingMaterial);
-            return keyEncryptionKey;
-        }
+    public static byte[] Blake2(byte[] sharedSecret, byte[] ephemeralSharedSecret, byte[] salt)
+    {
+        byte[] inputKeyingMaterial = Arrays.Concat(sharedSecret, ephemeralSharedSecret);
+        byte[] keyEncryptionKey = Blake2b.KeyDerivation(inputKeyingMaterial, salt, Constants.EncryptionKeyLength);
+        CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
+        CryptographicOperations.ZeroMemory(inputKeyingMaterial);
+        return keyEncryptionKey;
+    }
 
-        public static byte[] Blake2(byte[] ephemeralSharedSecret, byte[] salt)
-        {
-            byte[] keyEncryptionKey = Blake2b.KeyDerivation(ephemeralSharedSecret, salt, Constants.EncryptionKeyLength);
-            CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
-            return keyEncryptionKey;
-        }
+    public static byte[] Blake2(byte[] ephemeralSharedSecret, byte[] salt)
+    {
+        byte[] keyEncryptionKey = Blake2b.KeyDerivation(ephemeralSharedSecret, salt, Constants.EncryptionKeyLength);
+        CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
+        return keyEncryptionKey;
     }
 }

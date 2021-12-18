@@ -1,11 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Collections.Generic;
-
-/*
+﻿/*
     Kryptor: A simple, modern, and secure encryption tool.
-    Copyright (C) 2020-2021 Samuel Lucas
+    Copyright (C) 2020-2022 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,91 +16,95 @@ using System.Collections.Generic;
     along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
-namespace KryptorCLI
+using System;
+using System.IO;
+using System.Linq;
+using System.Collections.Generic;
+
+namespace KryptorCLI;
+
+public static class DisplayMessage
 {
-    public static class DisplayMessage
+    private const string ErrorWord = "Error";
+
+    public static void FilePathException(string filePath, string exceptionName, string errorMessage)
     {
-        private const string ErrorWord = "Error";
+        Console.WriteLine($"{Path.GetFileName(filePath)} - {ErrorWord}: {exceptionName} - {errorMessage}");
+    }
 
-        public static void FilePathException(string filePath, string exceptionName, string errorMessage)
-        {
-            Console.WriteLine($"{Path.GetFileName(filePath)} - {ErrorWord}: {exceptionName} - {errorMessage}");
-        }
+    public static void Exception(string exceptionName, string errorMessage)
+    {
+        Console.WriteLine($"{ErrorWord}: {exceptionName} - {errorMessage}");
+    }
 
-        public static void Exception(string exceptionName, string errorMessage)
-        {
-            Console.WriteLine($"{ErrorWord}: {exceptionName} - {errorMessage}");
-        }
+    public static void Error(string errorMessage)
+    {
+        Console.WriteLine($"{ErrorWord}: {errorMessage}");
+    }
 
-        public static void Error(string errorMessage)
-        {
-            Console.WriteLine($"{ErrorWord}: {errorMessage}");
-        }
+    public static void FilePathMessage(string filePath, string message)
+    {
+        Console.WriteLine($"{Path.GetFileName(filePath)}: {message}");
+    }
 
-        public static void FilePathMessage(string filePath, string message)
-        {
-            Console.WriteLine($"{Path.GetFileName(filePath)}: {message}");
-        }
+    public static void FilePathError(string filePath, string message)
+    {
+        Console.WriteLine($"{Path.GetFileName(filePath)} - {ErrorWord}: {message}");
+    }
 
-        public static void FilePathError(string filePath, string message)
-        {
-            Console.WriteLine($"{Path.GetFileName(filePath)} - {ErrorWord}: {message}");
-        }
+    public static void EncryptingFile(string inputFilePath, string outputFilePath)
+    {
+        Console.WriteLine($"Encrypting {Path.GetFileName(inputFilePath)} => {Path.GetFileName(outputFilePath)}...");
+    }
 
-        public static void EncryptingFile(string inputFilePath, string outputFilePath)
-        {
-            Console.WriteLine($"Encrypting {Path.GetFileName(inputFilePath)} => {Path.GetFileName(outputFilePath)}...");
-        }
+    public static void DecryptingFile(string inputFilePath, string outputFilePath)
+    {
+        Console.WriteLine($"Decrypting {Path.GetFileName(inputFilePath)} => {Path.GetFileName(outputFilePath)}...");
+    }
 
-        public static void DecryptingFile(string inputFilePath, string outputFilePath)
-        {
-            Console.WriteLine($"Decrypting {Path.GetFileName(inputFilePath)} => {Path.GetFileName(outputFilePath)}...");
-        }
+    public static void DirectoryEncryptionComplete(string directoryPath)
+    {
+        Console.WriteLine($"Encryption of {Path.GetFileName(directoryPath)} directory completed.");
+    }
 
-        public static void DirectoryEncryptionComplete(string directoryPath)
-        {
-            Console.WriteLine($"Encryption of {Path.GetFileName(directoryPath)} directory completed.");
-        }
+    public static void DirectoryDecryptionComplete(string directoryPath)
+    {
+        Console.WriteLine($"Decryption of {Path.GetFileName(directoryPath)} directory completed.");
+    }
 
-        public static void DirectoryDecryptionComplete(string directoryPath)
+    public static void SuccessfullyEncrypted()
+    {
+        if (Globals.TotalCount > 0)
         {
-            Console.WriteLine($"Decryption of {Path.GetFileName(directoryPath)} directory completed.");
+            Console.WriteLine();
+            Console.WriteLine($"Successfully encrypted: {Globals.SuccessfulCount}/{Globals.TotalCount}");
         }
+    }
 
-        public static void SuccessfullyEncrypted()
+    public static void SuccessfullyDecrypted()
+    {
+        if (Globals.TotalCount > 0)
         {
-            if (Globals.TotalCount > 0)
-            {
-                Console.WriteLine();
-                Console.WriteLine($"Successfully encrypted: {Globals.SuccessfulCount}/{Globals.TotalCount}");
-            }
+            Console.WriteLine();
+            Console.WriteLine($"Successfully decrypted: {Globals.SuccessfulCount}/{Globals.TotalCount}");
         }
+    }
 
-        public static void SuccessfullyDecrypted()
+    public static void SuccessfullySigned()
+    {
+        if (Globals.TotalCount > 0)
         {
-            if (Globals.TotalCount > 0)
-            {
-                Console.WriteLine();
-                Console.WriteLine($"Successfully decrypted: {Globals.SuccessfulCount}/{Globals.TotalCount}");
-            }
+            Console.WriteLine();
+            Console.WriteLine($"Successfully signed: {Globals.SuccessfulCount}/{Globals.TotalCount}");
         }
+    }
 
-        public static void SuccessfullySigned()
+    public static bool AnyErrors(IEnumerable<string> errorMessages)
+    {
+        foreach (string errorMessage in errorMessages)
         {
-            if (Globals.TotalCount > 0)
-            {
-                Console.WriteLine();
-                Console.WriteLine($"Successfully signed: {Globals.SuccessfulCount}/{Globals.TotalCount}");
-            }
+            Error(errorMessage);
         }
-
-        public static bool AnyErrors(IEnumerable<string> errorMessages)
-        {
-            foreach (string errorMessage in errorMessages)
-            {
-                Error(errorMessage);
-            }
-            return !errorMessages.Any();
-        }
+        return !errorMessages.Any();
     }
 }

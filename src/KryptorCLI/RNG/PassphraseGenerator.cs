@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using Sodium;
-
-/*
+﻿/*
     Kryptor: A simple, modern, and secure encryption tool.
-    Copyright (C) 2020-2021 Samuel Lucas
+    Copyright (C) 2020-2022 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,43 +16,47 @@ using Sodium;
     along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
-namespace KryptorCLI
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using Sodium;
+
+namespace KryptorCLI;
+
+public static class PassphraseGenerator
 {
-    public static class PassphraseGenerator
+    public static char[] GetRandomPassphrase(int wordCount)
     {
-        public static char[] GetRandomPassphrase(int wordCount)
-        {
-            string[] wordlist = GetWordlist();
-            List<string> words = GetRandomWords(wordlist, wordCount);
-            return FormatPassphrase(words, wordCount);
-        }
+        string[] wordlist = GetWordlist();
+        List<string> words = GetRandomWords(wordlist, wordCount);
+        return FormatPassphrase(words, wordCount);
+    }
 
-        private static string[] GetWordlist()
-        {
-            return Properties.Resources.wordlist.Split(new[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
-        }
+    private static string[] GetWordlist()
+    {
+        return Properties.Resources.wordlist.Split(new[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
+    }
 
-        private static List<string> GetRandomWords(string[] wordlist, int wordCount)
+    private static List<string> GetRandomWords(string[] wordlist, int wordCount)
+    {
+        var words = new List<string>();
+        var textInfo = new CultureInfo("en-US", useUserOverride: false).TextInfo;
+        for (int i = 0; i < wordCount; i++)
         {
-            var words = new List<string>();
-            var textInfo = new CultureInfo("en-US", useUserOverride: false).TextInfo;
-            for (int i = 0; i < wordCount; i++)
-            {
-                int randomIndex = SodiumCore.GetRandomNumber(wordlist.Length);
-                words.Add(textInfo.ToTitleCase(wordlist[randomIndex]));
-            }
-            return words;
+            int randomIndex = SodiumCore.GetRandomNumber(wordlist.Length);
+            words.Add(textInfo.ToTitleCase(wordlist[randomIndex]));
         }
+        return words;
+    }
 
-        private static char[] FormatPassphrase(List<string> words, int wordCount)
+    private static char[] FormatPassphrase(List<string> words, int wordCount)
+    {
+        var passphrase = new List<char>();
+        for (int i = 0; i < wordCount; i++)
         {
-            var passphrase = new List<char>();
-            for (int i = 0; i < wordCount; i++)
-            {
-                passphrase.AddRange(words[i]);
-                if (i != wordCount - 1) { passphrase.Add('-'); }
-            }
-            return passphrase.ToArray();
+            passphrase.AddRange(words[i]);
+            if (i != wordCount - 1) { passphrase.Add('-'); }
         }
+        return passphrase.ToArray();
     }
 }

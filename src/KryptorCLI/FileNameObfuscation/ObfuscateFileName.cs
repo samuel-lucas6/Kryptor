@@ -1,9 +1,6 @@
-﻿using System.IO;
-using System.Text;
-
-/*
+﻿/*
     Kryptor: A simple, modern, and secure encryption tool.
-    Copyright (C) 2020-2021 Samuel Lucas
+    Copyright (C) 2020-2022 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,27 +16,29 @@ using System.Text;
     along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
-namespace KryptorCLI
+using System.IO;
+using System.Text;
+
+namespace KryptorCLI;
+
+public static class ObfuscateFileName
 {
-    public static class ObfuscateFileName
+    public static string ReplaceFilePath(string filePath)
     {
-        public static string ReplaceFilePath(string filePath)
-        {
-            return filePath.Replace(Path.GetFileName(filePath), GetRandomFileName());
-        }
+        return filePath.Replace(Path.GetFileName(filePath), GetRandomFileName());
+    }
 
-        public static string GetRandomFileName()
-        {
-            string randomFileName = Path.GetRandomFileName() + Path.GetRandomFileName();
-            return randomFileName.Replace(".", string.Empty);
-        }
+    public static string GetRandomFileName()
+    {
+        string randomFileName = Path.GetRandomFileName() + Path.GetRandomFileName();
+        return randomFileName.Replace(".", string.Empty);
+    }
 
-        public static void AppendFileName(string filePath)
-        {
-            File.SetAttributes(filePath, FileAttributes.Normal);
-            using var fileStream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
-            byte[] fileNameBytes = Encoding.UTF8.GetBytes(Path.GetFileName(filePath));
-            fileStream.Write(fileNameBytes, offset: 0, fileNameBytes.Length);
-        }
+    public static void AppendFileName(string filePath)
+    {
+        File.SetAttributes(filePath, FileAttributes.Normal);
+        using var fileStream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
+        byte[] fileNameBytes = Encoding.UTF8.GetBytes(Path.GetFileName(filePath));
+        fileStream.Write(fileNameBytes, offset: 0, fileNameBytes.Length);
     }
 }

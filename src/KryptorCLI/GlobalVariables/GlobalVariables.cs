@@ -1,6 +1,6 @@
 ﻿/*
     Kryptor: A simple, modern, and secure encryption tool.
-    Copyright (C) 2020-2021 Samuel Lucas
+    Copyright (C) 2020-2022 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,14 +16,13 @@
     along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
-namespace KryptorCLI
+namespace KryptorCLI;
+
+public static class Globals
 {
-    public static class Globals
-    {
-        // File Encryption
-        public static int SuccessfulCount { get; set; }
-        public static int TotalCount { get; set; }
-        public static bool Overwrite { get; set; }
-        public static bool ObfuscateFileNames { get; set; }
-    }
+    // File encryption
+    public static int SuccessfulCount { get; set; }
+    public static int TotalCount { get; set; }
+    public static bool Overwrite { get; set; }
+    public static bool ObfuscateFileNames { get; set; }
 }

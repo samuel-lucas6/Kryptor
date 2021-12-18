@@ -1,8 +1,6 @@
-﻿using System.IO;
-
-/*
+﻿/*
     Kryptor: A simple, modern, and secure encryption tool.
-    Copyright (C) 2020-2021 Samuel Lucas
+    Copyright (C) 2020-2022 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,18 +16,19 @@
     along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
-namespace KryptorCLI
-{
-    public static class ErrorMessages
-    {
-        public static readonly string InvalidPrivateKeyFile = "Please specify a valid private key file.";
-        public static readonly string InvalidPublicKey = "Please specify a valid public key.";
-        public static readonly string NoFileToVerify = "Please specify a file to verify.";
-        public static readonly string NoFileToSign = "Please specify a file to sign.";
+using System.IO;
 
-        public static string GetFilePathError(string filePath, string message)
-        {
-            return $"{Path.GetFileName(filePath)} - {message}";
-        }
+namespace KryptorCLI;
+
+public static class ErrorMessages
+{
+    public const string InvalidPrivateKeyFile = "Please specify a valid private key file.";
+    public const string InvalidPublicKey = "Please specify a valid public key.";
+    public const string NoFileToVerify = "Please specify a file to verify.";
+    public const string NoFileToSign = "Please specify a file to sign.";
+
+    public static string GetFilePathError(string filePath, string message)
+    {
+        return $"{Path.GetFileName(filePath)} - {message}";
     }
 }

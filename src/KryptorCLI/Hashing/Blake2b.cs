@@ -1,11 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Text;
-using Sodium;
-
-/*
+﻿/*
     Kryptor: A simple, modern, and secure encryption tool.
-    Copyright (C) 2020-2021 Samuel Lucas
+    Copyright (C) 2020-2022 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,31 +16,35 @@ using Sodium;
     along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
-namespace KryptorCLI
+using System;
+using System.IO;
+using System.Text;
+using Sodium;
+
+namespace KryptorCLI;
+
+public static class Blake2b
 {
-    public static class Blake2b
+    private static readonly byte[] Personalisation = Encoding.UTF8.GetBytes(Constants.BLAKE2Personal);
+
+    public static byte[] Hash(byte[] message)
     {
-        private static readonly byte[] Personalisation = Encoding.UTF8.GetBytes(Constants.BLAKE2Personal);
+        return GenericHash.Hash(message, key: null, Constants.BLAKE2Length);
+    }
 
-        public static byte[] Hash(byte[] message)
-        {
-            return GenericHash.Hash(message, key: null, Constants.BLAKE2Length);
-        }
+    public static byte[] Hash(FileStream fileStream)
+    {
+        using var blake2 = new GenericHash.GenericHashAlgorithm(key: (byte[])null, Constants.BLAKE2Length);
+        return blake2.ComputeHash(fileStream);
+    }
 
-        public static byte[] Hash(FileStream fileStream)
-        {
-            using var blake2 = new GenericHash.GenericHashAlgorithm(key: (byte[])null, Constants.BLAKE2Length);
-            return blake2.ComputeHash(fileStream);
-        }
+    public static byte[] KeyedHash(byte[] message, byte[] key)
+    {
+        return GenericHash.Hash(message, key, Constants.BLAKE2Length);
+    }
 
-        public static byte[] KeyedHash(byte[] message, byte[] key)
-        {
-            return GenericHash.Hash(message, key, Constants.BLAKE2Length);
-        }
-
-        public static byte[] KeyDerivation(byte[] inputKeyingMaterial, byte[] salt, int outputLength)
-        {
-            return GenericHash.HashSaltPersonal(message: Array.Empty<byte>(), inputKeyingMaterial, salt, Personalisation, outputLength);
-        }
+    public static byte[] KeyDerivation(byte[] inputKeyingMaterial, byte[] salt, int outputLength)
+    {
+        return GenericHash.HashSaltPersonal(message: Array.Empty<byte>(), inputKeyingMaterial, salt, Personalisation, outputLength);
     }
 }

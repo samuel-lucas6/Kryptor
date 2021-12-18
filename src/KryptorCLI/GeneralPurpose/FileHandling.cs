@@ -1,11 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using Sodium;
-
-/*
+﻿/*
     Kryptor: A simple, modern, and secure encryption tool.
-    Copyright (C) 2020-2021 Samuel Lucas
+    Copyright (C) 2020-2022 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,197 +16,201 @@ using Sodium;
     along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
-namespace KryptorCLI
+using System;
+using System.IO;
+using System.Linq;
+using Sodium;
+
+namespace KryptorCLI;
+
+public static class FileHandling
 {
-    public static class FileHandling
+    public static byte[] ReadFileHeader(string filePath, long offset, int length)
     {
-        public static byte[] ReadFileHeader(string filePath, long offset, int length)
-        {
-            using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
-            return ReadFileHeader(fileStream, offset, length);
-        }
+        using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
+        return ReadFileHeader(fileStream, offset, length);
+    }
 
-        public static byte[] ReadFileHeader(FileStream fileStream, long offset, int length)
-        {
-            var header = new byte[length];
-            fileStream.Seek(offset, SeekOrigin.Begin);
-            fileStream.Read(header, offset: 0, header.Length);
-            return header;
-        }
+    public static byte[] ReadFileHeader(FileStream fileStream, long offset, int length)
+    {
+        var header = new byte[length];
+        fileStream.Seek(offset, SeekOrigin.Begin);
+        fileStream.Read(header, offset: 0, header.Length);
+        return header;
+    }
 
-        public static byte[] ReadFileHeader(FileStream fileStream, int length)
-        {
-            var header = new byte[length];
-            fileStream.Read(header, offset: 0, header.Length);
-            return header;
-        }
+    public static byte[] ReadFileHeader(FileStream fileStream, int length)
+    {
+        var header = new byte[length];
+        fileStream.Read(header, offset: 0, header.Length);
+        return header;
+    }
 
-        public static bool IsDirectory(string filePath)
-        {
-            return File.GetAttributes(filePath).HasFlag(FileAttributes.Directory);
-        }
+    public static bool IsDirectory(string filePath)
+    {
+        return File.GetAttributes(filePath).HasFlag(FileAttributes.Directory);
+    }
 
-        public static bool IsDirectoryEmpty(string directoryPath)
-        {
-            return !Directory.EnumerateFileSystemEntries(directoryPath).Any();
-        }
+    public static bool IsDirectoryEmpty(string directoryPath)
+    {
+        return !Directory.EnumerateFileSystemEntries(directoryPath).Any();
+    }
 
-        public static string[] GetAllDirectories(string directoryPath)
-        {
-            return Directory.GetDirectories(directoryPath, searchPattern: "*", SearchOption.AllDirectories);
-        }
+    public static string[] GetAllDirectories(string directoryPath)
+    {
+        return Directory.GetDirectories(directoryPath, searchPattern: "*", SearchOption.AllDirectories);
+    }
 
-        public static string[] GetAllFiles(string directoryPath)
-        {
-            return Directory.GetFiles(directoryPath, searchPattern: "*", SearchOption.AllDirectories);
-        }
+    public static string[] GetAllFiles(string directoryPath)
+    {
+        return Directory.GetFiles(directoryPath, searchPattern: "*", SearchOption.AllDirectories);
+    }
 
-        public static bool? IsKryptorFile(string filePath)
+    public static bool? IsKryptorFile(string filePath)
+    {
+        try
         {
-            try
+            byte[] magicBytes = FileHeaders.ReadMagicBytes(filePath);
+            return Utilities.Compare(magicBytes, Constants.KryptorMagicBytes);
+        }
+        catch (Exception ex) when (ExceptionFilters.FileAccess(ex)) 
+        { 
+            return null;
+        }
+    }
+
+    public static bool HasKryptorExtension(string filePath)
+    {
+        return filePath.EndsWith(Constants.EncryptedExtension, StringComparison.Ordinal);
+    }
+
+    public static bool? IsSignatureFile(string filePath)
+    {
+        try
+        {
+            byte[] magicBytes = ReadFileHeader(filePath, offset: 0, Constants.SignatureMagicBytes.Length);
+            return Utilities.Compare(magicBytes, Constants.SignatureMagicBytes);
+        }
+        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
+        {
+            return null;
+        }
+    }
+
+    public static long GetFileLength(string filePath)
+    {
+        return new FileInfo(filePath).Length;
+    }
+
+    public static void CopyDirectory(string sourceDirectoryPath, string destinationDirectoryPath, bool copySubdirectories)
+    {
+        var directoryInfo = new DirectoryInfo(sourceDirectoryPath);
+        if (!directoryInfo.Exists) { throw new DirectoryNotFoundException("Source directory does not exist or could not be found."); }
+        DirectoryInfo[] directories = directoryInfo.GetDirectories();
+        destinationDirectoryPath = GetUniqueDirectoryPath(destinationDirectoryPath);
+        Directory.CreateDirectory(destinationDirectoryPath);
+        FileInfo[] files = directoryInfo.GetFiles();
+        foreach (FileInfo file in files)
+        {
+            string newFilePath = Path.Combine(destinationDirectoryPath, file.Name);
+            file.CopyTo(newFilePath, overwrite: false);
+        }
+        if (copySubdirectories)
+        {
+            foreach (DirectoryInfo subdirectory in directories)
             {
-                byte[] magicBytes = FileHeaders.ReadMagicBytes(filePath);
-                return Utilities.Compare(magicBytes, Constants.KryptorMagicBytes);
-            }
-            catch (Exception ex) when (ExceptionFilters.FileAccess(ex)) 
-            { 
-                return null;
+                string newSubdirectoryPath = Path.Combine(destinationDirectoryPath, subdirectory.Name);
+                CopyDirectory(subdirectory.FullName, newSubdirectoryPath, copySubdirectories);
             }
         }
+    }
 
-        public static bool HasKryptorExtension(string filePath)
+    public static void OverwriteFile(string fileToDelete, string fileToCopy)
+    {
+        try
         {
-            return filePath.EndsWith(Constants.EncryptedExtension, StringComparison.Ordinal);
+            File.SetAttributes(fileToDelete, FileAttributes.Normal);
+            File.Copy(fileToCopy, fileToDelete, overwrite: true);
+            File.Delete(fileToDelete);
         }
-
-        public static bool? IsSignatureFile(string filePath)
+        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
-            try
-            {
-                byte[] magicBytes = ReadFileHeader(filePath, offset: 0, Constants.SignatureMagicBytes.Length);
-                return Utilities.Compare(magicBytes, Constants.SignatureMagicBytes);
-            }
-            catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
-            {
-                return null;
-            }
+            DisplayMessage.FilePathException(fileToDelete, ex.GetType().Name, "Unable to overwrite the file.");
         }
+    }
 
-        public static long GetFileLength(string filePath)
+    public static void DeleteFile(string filePath)
+    {
+        try
         {
-            return new FileInfo(filePath).Length;
-        }
-
-        public static void CopyDirectory(string sourceDirectoryPath, string destinationDirectoryPath, bool copySubdirectories)
-        {
-            var directoryInfo = new DirectoryInfo(sourceDirectoryPath);
-            if (!directoryInfo.Exists) { throw new DirectoryNotFoundException("Source directory does not exist or could not be found."); }
-            DirectoryInfo[] directories = directoryInfo.GetDirectories();
-            destinationDirectoryPath = GetUniqueDirectoryPath(destinationDirectoryPath);
-            Directory.CreateDirectory(destinationDirectoryPath);
-            FileInfo[] files = directoryInfo.GetFiles();
-            foreach (FileInfo file in files)
+            if (File.Exists(filePath))
             {
-                string newFilePath = Path.Combine(destinationDirectoryPath, file.Name);
-                file.CopyTo(newFilePath, overwrite: false);
-            }
-            if (copySubdirectories)
-            {
-                foreach (DirectoryInfo subdirectory in directories)
-                {
-                    string newSubdirectoryPath = Path.Combine(destinationDirectoryPath, subdirectory.Name);
-                    CopyDirectory(subdirectory.FullName, newSubdirectoryPath, copySubdirectories);
-                }
+                File.SetAttributes(filePath, FileAttributes.Normal);
+                File.Delete(filePath);
             }
         }
-
-        public static void OverwriteFile(string fileToDelete, string fileToCopy)
+        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
-            try
-            {
-                File.SetAttributes(fileToDelete, FileAttributes.Normal);
-                File.Copy(fileToCopy, fileToDelete, overwrite: true);
-                File.Delete(fileToDelete);
-            }
-            catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
-            {
-                DisplayMessage.FilePathException(fileToDelete, ex.GetType().Name, "Unable to overwrite the file.");
-            }
+            DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to delete the file.");
         }
+    }
 
-        public static void DeleteFile(string filePath)
+    public static string GetUniqueFilePath(string filePath)
+    {
+        filePath = RemoveFileNameNumber(filePath);
+        if (!File.Exists(filePath)) { return filePath; }
+        int fileNumber = 2;
+        string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
+        string fileExtension = Path.GetExtension(filePath);
+        string directoryPath = Path.GetDirectoryName(filePath);
+        do
         {
-            try
-            {
-                if (File.Exists(filePath))
-                {
-                    File.SetAttributes(filePath, FileAttributes.Normal);
-                    File.Delete(filePath);
-                }
-            }
-            catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
-            {
-                DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to delete the file.");
-            }
+            string newFileName = $"{fileNameWithoutExtension} ({fileNumber}){fileExtension}";
+            filePath = Path.Combine(directoryPath, newFileName);
+            fileNumber++;
         }
+        while (File.Exists(filePath));
+        return filePath;
+    }
 
-        public static string GetUniqueFilePath(string filePath)
+    public static string RemoveFileNameNumber(string filePath)
+    {
+        string fileExtension = Path.GetExtension(filePath);
+        if (!string.IsNullOrEmpty(fileExtension) && filePath.EndsWith(')') && filePath[^4].Equals(' ') && filePath[^3].Equals('(') && char.IsDigit(filePath[^2]))
         {
-            filePath = RemoveFileNameNumber(filePath);
-            if (!File.Exists(filePath)) { return filePath; }
-            int fileNumber = 2;
-            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
-            string fileExtension = Path.GetExtension(filePath);
-            string directoryPath = Path.GetDirectoryName(filePath);
-            do
-            {
-                string newFileName = $"{fileNameWithoutExtension} ({fileNumber}){fileExtension}";
-                filePath = Path.Combine(directoryPath, newFileName);
-                fileNumber++;
-            }
-            while (File.Exists(filePath));
-            return filePath;
+            return filePath.Remove(startIndex: filePath.Length - 4);
         }
-
-        public static string RemoveFileNameNumber(string filePath)
+        else if (filePath[filePath.Length - fileExtension.Length - 1].Equals(')') && filePath[filePath.Length - fileExtension.Length - 4].Equals(' ') && filePath[filePath.Length - fileExtension.Length - 3].Equals('(') && char.IsDigit(filePath[filePath.Length - fileExtension.Length - 2]))
         {
-            string fileExtension = Path.GetExtension(filePath);
-            if (!string.IsNullOrEmpty(fileExtension) && filePath.EndsWith(')') && filePath[^4].Equals(' ') && filePath[^3].Equals('(') && char.IsDigit(filePath[^2]))
-            {
-                return filePath.Remove(startIndex: filePath.Length - 4);
-            }
-            else if (filePath[filePath.Length - fileExtension.Length - 1].Equals(')') && filePath[filePath.Length - fileExtension.Length - 4].Equals(' ') && filePath[filePath.Length - fileExtension.Length - 3].Equals('(') && char.IsDigit(filePath[filePath.Length - fileExtension.Length - 2]))
-            {
-                return filePath.Remove(startIndex: filePath.Length - fileExtension.Length - 4) + fileExtension;
-            }
-            return filePath;
+            return filePath.Remove(startIndex: filePath.Length - fileExtension.Length - 4) + fileExtension;
         }
+        return filePath;
+    }
 
-        public static string GetUniqueDirectoryPath(string directoryPath)
+    public static string GetUniqueDirectoryPath(string directoryPath)
+    {
+        if (!Directory.Exists(directoryPath)) { return directoryPath; }
+        int directoryNumber = 2;
+        string parentDirectory = Directory.GetParent(directoryPath).FullName;
+        string directoryName = Path.GetFileName(directoryPath);
+        do
         {
-            if (!Directory.Exists(directoryPath)) { return directoryPath; }
-            int directoryNumber = 2;
-            string parentDirectory = Directory.GetParent(directoryPath).FullName;
-            string directoryName = Path.GetFileName(directoryPath);
-            do
-            {
-                directoryPath = Path.Combine(parentDirectory, $"{directoryName} ({directoryNumber})");
-                directoryNumber++;
-            }
-            while (Directory.Exists(directoryPath));
-            return directoryPath;
+            directoryPath = Path.Combine(parentDirectory, $"{directoryName} ({directoryNumber})");
+            directoryNumber++;
         }
+        while (Directory.Exists(directoryPath));
+        return directoryPath;
+    }
 
-        public static void SetFileAttributesReadOnly(string filePath)
+    public static void SetFileAttributesReadOnly(string filePath)
+    {
+        try
         {
-            try
-            {
-                File.SetAttributes(filePath, FileAttributes.ReadOnly);
-            }
-            catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
-            {
-                DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to make the file read-only.");
-            }
+            File.SetAttributes(filePath, FileAttributes.ReadOnly);
+        }
+        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
+        {
+            DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to make the file read-only.");
         }
     }
 }

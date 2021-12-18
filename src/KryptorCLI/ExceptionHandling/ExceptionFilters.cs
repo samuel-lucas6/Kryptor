@@ -1,12 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Security;
-using System.Security.Cryptography;
-using System.Net;
-
-/*
+﻿/*
     Kryptor: A simple, modern, and secure encryption tool.
-    Copyright (C) 2020-2021 Samuel Lucas
+    Copyright (C) 2020-2022 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,28 +16,33 @@ using System.Net;
     along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
-namespace KryptorCLI
+using System;
+using System.IO;
+using System.Security;
+using System.Security.Cryptography;
+using System.Net;
+
+namespace KryptorCLI;
+
+public static class ExceptionFilters
 {
-    public static class ExceptionFilters
+    public static bool FileAccess(Exception ex)
     {
-        public static bool FileAccess(Exception ex)
-        {
-            return ex is IOException || ex is UnauthorizedAccessException || ex is ArgumentException || ex is SecurityException || ex is NotSupportedException;
-        }
+        return ex is IOException or UnauthorizedAccessException or ArgumentException or SecurityException or NotSupportedException;
+    }
 
-        public static bool Cryptography(Exception ex)
-        {
-            return ex is CryptographicException || FileAccess(ex);
-        }
+    public static bool Cryptography(Exception ex)
+    {
+        return ex is CryptographicException || FileAccess(ex);
+    }
 
-        public static bool AsymmetricKeyHandling(Exception ex)
-        {
-            return ex is FormatException || FileAccess(ex);
-        }
+    public static bool AsymmetricKeyHandling(Exception ex)
+    {
+        return ex is FormatException || FileAccess(ex);
+    }
 
-        public static bool CheckForUpdates(Exception ex)
-        {
-            return ex is WebException || FileAccess(ex);
-        }
+    public static bool CheckForUpdates(Exception ex)
+    {
+        return ex is WebException || FileAccess(ex);
     }
 }

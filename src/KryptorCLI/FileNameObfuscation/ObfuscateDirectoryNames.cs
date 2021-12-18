@@ -1,9 +1,6 @@
-﻿using System;
-using System.IO;
-
-/*
+﻿/*
     Kryptor: A simple, modern, and secure encryption tool.
-    Copyright (C) 2020-2021 Samuel Lucas
+    Copyright (C) 2020-2022 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,42 +16,44 @@ using System.IO;
     along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
-namespace KryptorCLI
+using System;
+using System.IO;
+
+namespace KryptorCLI;
+
+public static class ObfuscateDirectoryNames
 {
-    public static class ObfuscateDirectoryNames
+    public static string AllDirectories(string directoryPath)
     {
-        public static string AllDirectories(string directoryPath)
+        string[] subdirectories = FileHandling.GetAllDirectories(directoryPath);
+        for (int i = subdirectories.Length - 1; i >= 0; i--)
         {
-            string[] subdirectories = FileHandling.GetAllDirectories(directoryPath);
-            for (int i = subdirectories.Length - 1; i >= 0; i--)
-            {
-                ObfuscateDirectoryName(subdirectories[i]);
-            }
-            return ObfuscateDirectoryName(directoryPath);
+            ObfuscateDirectoryName(subdirectories[i]);
         }
+        return ObfuscateDirectoryName(directoryPath);
+    }
 
-        private static string ObfuscateDirectoryName(string directoryPath)
+    private static string ObfuscateDirectoryName(string directoryPath)
+    {
+        try
         {
-            try
-            {
-                string directoryName = Path.GetFileName(directoryPath);
-                string obfuscatedPath = ObfuscateFileName.ReplaceFilePath(directoryPath);
-                Console.WriteLine($"Renaming {directoryName} directory => {Path.GetFileName(obfuscatedPath)}...");
-                Directory.Move(directoryPath, obfuscatedPath);
-                StoreDirectoryName(directoryName, obfuscatedPath);
-                return obfuscatedPath;
-            }
-            catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
-            {
-                DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to obfuscate directory name.");
-                return directoryPath;
-            }
+            string directoryName = Path.GetFileName(directoryPath);
+            string obfuscatedPath = ObfuscateFileName.ReplaceFilePath(directoryPath);
+            Console.WriteLine($"Renaming {directoryName} directory => {Path.GetFileName(obfuscatedPath)}...");
+            Directory.Move(directoryPath, obfuscatedPath);
+            StoreDirectoryName(directoryName, obfuscatedPath);
+            return obfuscatedPath;
         }
+        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
+        {
+            DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to obfuscate directory name.");
+            return directoryPath;
+        }
+    }
 
-        private static void StoreDirectoryName(string directoryName, string obfuscatedPath)
-        {
-            string storageFilePath = Path.Combine(obfuscatedPath, $"{Path.GetFileName(obfuscatedPath)}.txt");
-            File.WriteAllText(storageFilePath, directoryName);
-        }
+    private static void StoreDirectoryName(string directoryName, string obfuscatedPath)
+    {
+        string storageFilePath = Path.Combine(obfuscatedPath, $"{Path.GetFileName(obfuscatedPath)}.txt");
+        File.WriteAllText(storageFilePath, directoryName);
     }
 }

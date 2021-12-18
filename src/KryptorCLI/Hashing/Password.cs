@@ -1,10 +1,6 @@
-﻿using System;
-using System.Text;
-using System.Security.Cryptography;
-
-/*
+﻿/*
     Kryptor: A simple, modern, and secure encryption tool.
-    Copyright (C) 2020-2021 Samuel Lucas
+    Copyright (C) 2020-2022 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,44 +16,47 @@ using System.Security.Cryptography;
     along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
-namespace KryptorCLI
+using System;
+using System.Text;
+using System.Security.Cryptography;
+
+namespace KryptorCLI;
+
+public static class Password
 {
-    public static class Password
+    public static byte[] Prehash(char[] password, string keyfilePath)
     {
-        public static byte[] Prehash(char[] password, string keyfilePath)
+        var passwordBytes = Prehash(password);
+        if (!string.IsNullOrEmpty(keyfilePath)) { passwordBytes = UseKeyfile(passwordBytes, keyfilePath); }
+        return passwordBytes;
+    }
+
+    public static byte[] Prehash(char[] password)
+    {
+        if (password.Length == 0) { return null; }
+        var passwordBytes = Encoding.UTF8.GetBytes(password);
+        Arrays.ZeroMemory(password);
+        return Blake2b.Hash(passwordBytes);
+    }
+
+    private static byte[] UseKeyfile(byte[] passwordBytes, string keyfilePath)
+    {
+        try
         {
-            byte[] passwordBytes = Prehash(password);
-            if (!string.IsNullOrEmpty(keyfilePath)) { passwordBytes = UseKeyfile(passwordBytes, keyfilePath); }
+            var keyfileBytes = Keyfiles.ReadKeyfile(keyfilePath);
+            return passwordBytes == null ? keyfileBytes : PepperPassword(passwordBytes, keyfileBytes);
+        }
+        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
+        {
+            DisplayMessage.Exception(ex.GetType().Name, "Unable to read keyfile. The keyfile has not been used.");
             return passwordBytes;
         }
+    }
 
-        public static byte[] Prehash(char[] password)
-        {
-            if (password.Length == 0) { return null; }
-            byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
-            Arrays.ZeroMemory(password);
-            return Blake2b.Hash(passwordBytes);
-        }
-
-        private static byte[] UseKeyfile(byte[] passwordBytes, string keyfilePath)
-        {
-            try
-            {
-                byte[] keyfileBytes = Keyfiles.ReadKeyfile(keyfilePath);
-                return passwordBytes == null ? keyfileBytes : PepperPassword(passwordBytes, keyfileBytes);
-            }
-            catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
-            {
-                DisplayMessage.Exception(ex.GetType().Name, "Unable to read keyfile. The keyfile has not been used.");
-                return passwordBytes;
-            }
-        }
-
-        private static byte[] PepperPassword(byte[] passwordBytes, byte[] keyfileBytes)
-        {
-            passwordBytes = Blake2b.KeyedHash(passwordBytes, keyfileBytes);
-            CryptographicOperations.ZeroMemory(keyfileBytes);
-            return passwordBytes;
-        }
+    private static byte[] PepperPassword(byte[] passwordBytes, byte[] keyfileBytes)
+    {
+        passwordBytes = Blake2b.KeyedHash(passwordBytes, keyfileBytes);
+        CryptographicOperations.ZeroMemory(keyfileBytes);
+        return passwordBytes;
     }
 }

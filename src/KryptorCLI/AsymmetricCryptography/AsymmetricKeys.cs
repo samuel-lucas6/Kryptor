@@ -1,11 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Security.Cryptography;
-using Sodium;
-
-/*
+﻿/*
     Kryptor: A simple, modern, and secure encryption tool.
-    Copyright (C) 2020-2021 Samuel Lucas
+    Copyright (C) 2020-2022 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,59 +16,66 @@ using Sodium;
     along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
-namespace KryptorCLI
+using System;
+using System.IO;
+using System.Security.Cryptography;
+using Sodium;
+
+namespace KryptorCLI;
+
+public static class AsymmetricKeys
 {
-    public static class AsymmetricKeys
+    public static (string publicKey, string privateKey) GenerateEncryptionKeyPair()
     {
-        public static (string publicKey, string privateKey) GenerateEncryptionKeyPair()
-        {
-            char[] password = PasswordPrompt.EnterNewPassword();
-            byte[] passwordBytes = Password.Prehash(password);
-            using var keyPair = PublicKeyBox.GenerateKeyPair();
-            byte[] publicKey = Arrays.Concat(Constants.Curve25519KeyHeader, keyPair.PublicKey);
-            byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, Constants.Curve25519KeyHeader, keyPair.PrivateKey);
-            return (Convert.ToBase64String(publicKey), Convert.ToBase64String(encryptedPrivateKey));
-        }
+        char[] password = PasswordPrompt.EnterNewPassword();
+        byte[] passwordBytes = Password.Prehash(password);
+        using var keyPair = PublicKeyBox.GenerateKeyPair();
+        byte[] publicKey = Arrays.Concat(Constants.Curve25519KeyHeader, keyPair.PublicKey);
+        byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, Constants.Curve25519KeyHeader, keyPair.PrivateKey);
+        return (Convert.ToBase64String(publicKey), Convert.ToBase64String(encryptedPrivateKey));
+    }
 
-        public static (string publicKey, string privateKey) GenerateSigningKeyPair()
-        {
-            char[] password = PasswordPrompt.EnterNewPassword();
-            byte[] passwordBytes = Password.Prehash(password);
-            using var keyPair = PublicKeyAuth.GenerateKeyPair();
-            byte[] publicKey = Arrays.Concat(Constants.Ed25519KeyHeader, keyPair.PublicKey);
-            byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, Constants.Ed25519KeyHeader, keyPair.PrivateKey);
-            return (Convert.ToBase64String(publicKey), Convert.ToBase64String(encryptedPrivateKey));
-        }
+    public static (string publicKey, string privateKey) GenerateSigningKeyPair()
+    {
+        char[] password = PasswordPrompt.EnterNewPassword();
+        byte[] passwordBytes = Password.Prehash(password);
+        using var keyPair = PublicKeyAuth.GenerateKeyPair();
+        byte[] publicKey = Arrays.Concat(Constants.Ed25519KeyHeader, keyPair.PublicKey);
+        byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, Constants.Ed25519KeyHeader, keyPair.PrivateKey);
+        return (Convert.ToBase64String(publicKey), Convert.ToBase64String(encryptedPrivateKey));
+    }
 
-        public static (string publicKeyPath, string privateKeyPath) ExportKeyPair(string directoryPath, string fileName, string publicKey, string privateKey)
-        {
-            Directory.CreateDirectory(directoryPath);
-            string publicKeyPath = Path.Combine(directoryPath, fileName + Constants.PublicKeyExtension);
-            CreateKeyFile(publicKeyPath, publicKey);
-            string privateKeyPath = Path.Combine(directoryPath, fileName + Constants.PrivateKeyExtension);
-            CreateKeyFile(privateKeyPath, privateKey);
-            return (publicKeyPath, privateKeyPath);
-        }
+    public static (string publicKeyPath, string privateKeyPath) ExportKeyPair(string directoryPath, string fileName, string publicKey, string privateKey)
+    {
+        Directory.CreateDirectory(directoryPath);
+        string publicKeyPath = Path.Combine(directoryPath, fileName + Constants.PublicKeyExtension);
+        CreateKeyFile(publicKeyPath, publicKey);
+        string privateKeyPath = Path.Combine(directoryPath, fileName + Constants.PrivateKeyExtension);
+        CreateKeyFile(privateKeyPath, privateKey);
+        return (publicKeyPath, privateKeyPath);
+    }
 
-        private static void CreateKeyFile(string filePath, string asymmetricKey)
+    private static void CreateKeyFile(string filePath, string asymmetricKey)
+    {
+        if (File.Exists(filePath))
         {
-            if (File.Exists(filePath)) { File.SetAttributes(filePath, FileAttributes.Normal); }
-            File.WriteAllText(filePath, asymmetricKey);
-            File.SetAttributes(filePath, FileAttributes.ReadOnly);
+            File.SetAttributes(filePath, FileAttributes.Normal);
         }
+        File.WriteAllText(filePath, asymmetricKey);
+        File.SetAttributes(filePath, FileAttributes.ReadOnly);
+    }
 
-        public static byte[] GetCurve25519PublicKey(byte[] privateKey)
-        {
-            byte[] publicKey = ScalarMult.Base(privateKey);
-            CryptographicOperations.ZeroMemory(privateKey);
-            return Arrays.Concat(Constants.Curve25519KeyHeader, publicKey);
-        }
+    public static byte[] GetCurve25519PublicKey(byte[] privateKey)
+    {
+        byte[] publicKey = ScalarMult.Base(privateKey);
+        CryptographicOperations.ZeroMemory(privateKey);
+        return Arrays.Concat(Constants.Curve25519KeyHeader, publicKey);
+    }
 
-        public static byte[] GetEd25519PublicKey(byte[] privateKey)
-        {
-            byte[] publicKey = PublicKeyAuth.ExtractEd25519PublicKeyFromEd25519SecretKey(privateKey);
-            CryptographicOperations.ZeroMemory(privateKey);
-            return Arrays.Concat(Constants.Ed25519KeyHeader, publicKey);
-        }
+    public static byte[] GetEd25519PublicKey(byte[] privateKey)
+    {
+        byte[] publicKey = PublicKeyAuth.ExtractEd25519PublicKeyFromEd25519SecretKey(privateKey);
+        CryptographicOperations.ZeroMemory(privateKey);
+        return Arrays.Concat(Constants.Ed25519KeyHeader, publicKey);
     }
 }

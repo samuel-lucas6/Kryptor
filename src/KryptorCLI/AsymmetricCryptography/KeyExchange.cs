@@ -1,8 +1,6 @@
-﻿using Sodium;
-
-/*
+﻿/*
     Kryptor: A simple, modern, and secure encryption tool.
-    Copyright (C) 2020-2021 Samuel Lucas
+    Copyright (C) 2020-2022 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,27 +16,28 @@
     along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
-namespace KryptorCLI
+using Sodium;
+
+namespace KryptorCLI;
+
+public static class KeyExchange
 {
-    public static class KeyExchange
+    public static byte[] GetSharedSecret(byte[] privateKey, byte[] publicKey)
     {
-        public static byte[] GetSharedSecret(byte[] privateKey, byte[] publicKey)
-        {
-            return ScalarMult.Mult(privateKey, publicKey);
-        }
+        return ScalarMult.Mult(privateKey, publicKey);
+    }
 
-        public static byte[] GetPublicKeySharedSecret(byte[] publicKey, out byte[] ephemeralPublicKey)
-        {
-            using var ephemeralKeyPair = PublicKeyBox.GenerateKeyPair();
-            ephemeralPublicKey = ephemeralKeyPair.PublicKey;
-            return ScalarMult.Mult(ephemeralKeyPair.PrivateKey, publicKey);
-        }
+    public static byte[] GetPublicKeySharedSecret(byte[] publicKey, out byte[] ephemeralPublicKey)
+    {
+        using var ephemeralKeyPair = PublicKeyBox.GenerateKeyPair();
+        ephemeralPublicKey = ephemeralKeyPair.PublicKey;
+        return ScalarMult.Mult(ephemeralKeyPair.PrivateKey, publicKey);
+    }
 
-        public static byte[] GetPrivateKeySharedSecret(byte[] privateKey, out byte[] ephemeralPublicKey)
-        {
-            using var ephemeralKeyPair = PublicKeyBox.GenerateKeyPair();
-            ephemeralPublicKey = ephemeralKeyPair.PublicKey;
-            return ScalarMult.Mult(privateKey, ephemeralKeyPair.PublicKey);
-        }
+    public static byte[] GetPrivateKeySharedSecret(byte[] privateKey, out byte[] ephemeralPublicKey)
+    {
+        using var ephemeralKeyPair = PublicKeyBox.GenerateKeyPair();
+        ephemeralPublicKey = ephemeralKeyPair.PublicKey;
+        return ScalarMult.Mult(privateKey, ephemeralKeyPair.PublicKey);
     }
 }

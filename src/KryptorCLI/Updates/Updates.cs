@@ -1,10 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Net;
-
-/*
+﻿/*
     Kryptor: A simple, modern, and secure encryption tool.
-    Copyright (C) 2020-2021 Samuel Lucas
+    Copyright (C) 2020-2022 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,33 +16,38 @@ using System.Net;
     along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
-namespace KryptorCLI
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.IO.Compression;
+using System.Net;
+
+namespace KryptorCLI;
+
+public static class Updates
 {
-    public static class Updates
+    private const string VersionFileName = "version.txt";
+    private const string VersionFileLink = "https://raw.githubusercontent.com/samuel-lucas6/Kryptor/master/version.txt";
+
+    public static bool CheckForUpdates()
     {
-        private const string VersionFileName = "version.txt";
-        private const string VersionFileLink = "https://raw.githubusercontent.com/samuel-lucas6/Kryptor/master/version.txt";
+        string assemblyVersion = Program.GetVersion();
+        string latestVersion = GetLatestVersion();
+        return !string.Equals(assemblyVersion, latestVersion, StringComparison.Ordinal);
+    }
 
-        public static bool CheckForUpdates()
-        {
-            string assemblyVersion = Program.GetVersion();
-            string latestVersion = GetLatestVersion();
-            return !string.Equals(assemblyVersion, latestVersion, StringComparison.Ordinal);
-        }
+    private static string GetLatestVersion()
+    {
+        string downloadFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), VersionFileName);
+        DownloadVersionFile(downloadFilePath);
+        string latestVersion = File.ReadAllText(downloadFilePath).Trim('\n').Trim();
+        File.Delete(downloadFilePath);
+        return latestVersion;
+    }
 
-        private static string GetLatestVersion()
-        {
-            string downloadFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), VersionFileName);
-            DownloadVersionFile(downloadFilePath);
-            string latestVersion = File.ReadAllText(downloadFilePath).Trim('\n').Trim();
-            File.Delete(downloadFilePath);
-            return latestVersion;
-        }
-
-        private static void DownloadVersionFile(string downloadFilePath)
-        {
-            using var webClient = new WebClient();
-            webClient.DownloadFile(VersionFileLink, downloadFilePath);
-        }
+    private static void DownloadVersionFile(string downloadFilePath)
+    {
+        using var webClient = new WebClient();
+        webClient.DownloadFile(VersionFileLink, downloadFilePath);
     }
 }

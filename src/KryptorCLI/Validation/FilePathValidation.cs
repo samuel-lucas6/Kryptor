@@ -1,10 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
-
-/*
+﻿/*
     Kryptor: A simple, modern, and secure encryption tool.
-    Copyright (C) 2020-2021 Samuel Lucas
+    Copyright (C) 2020-2022 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,196 +16,199 @@ using System.Collections.Generic;
     along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
-namespace KryptorCLI
+using System;
+using System.IO;
+using System.Collections.Generic;
+
+namespace KryptorCLI;
+
+public static class FilePathValidation
 {
-    public static class FilePathValidation
+    private const string FileDoesNotExist = "This file/folder doesn't exist.";
+    private const string FileInaccessible = "Unable to access the file.";
+    private const string DirectoryEmpty = "This directory is empty.";
+
+    public static bool FileEncryption(string inputFilePath)
     {
-        private static readonly string _fileDoesNotExist = "This file/folder doesn't exist.";
-        private static readonly string _fileInaccessible = "Unable to access the file.";
-        private static readonly string _directoryEmpty = "This directory is empty.";
+        string errorMessage = GetFileEncryptionError(inputFilePath);
+        if (string.IsNullOrEmpty(errorMessage)) { return true; }
+        DisplayMessage.FilePathError(inputFilePath, errorMessage);
+        return false;
+    }
 
-        public static bool FileEncryption(string inputFilePath)
+    public static string GetFileEncryptionError(string inputFilePath)
+    {
+        if (Directory.Exists(inputFilePath))
         {
-            string errorMessage = GetFileEncryptionError(inputFilePath);
-            if (string.IsNullOrEmpty(errorMessage)) { return true; }
-            DisplayMessage.FilePathError(inputFilePath, errorMessage);
+            return FileHandling.IsDirectoryEmpty(inputFilePath) ? DirectoryEmpty : null;
+        }
+        if (!File.Exists(inputFilePath)) { return FileDoesNotExist; }
+        bool? validMagicBytes = FileHandling.IsKryptorFile(inputFilePath);
+        if (validMagicBytes == null) { return FileInaccessible; }
+        if (FileHandling.HasKryptorExtension(inputFilePath) || validMagicBytes == true)
+        {
+            return "This file has already been encrypted.";
+        }
+        return null;
+    }
+
+    public static string KeyfilePath(string keyfilePath)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(keyfilePath) || File.Exists(keyfilePath)) { return keyfilePath; }
+            if (Directory.Exists(keyfilePath))
+            {
+                keyfilePath = Path.Combine(keyfilePath, ObfuscateFileName.GetRandomFileName());
+            }
+            if (!keyfilePath.EndsWith(Constants.KeyfileExtension)) { keyfilePath += Constants.KeyfileExtension; }
+            if (File.Exists(keyfilePath)) { return keyfilePath; }
+            Keyfiles.GenerateKeyfile(keyfilePath);
+            Console.WriteLine($"Randomly generated keyfile: {Path.GetFileName(keyfilePath)}");
+            Console.WriteLine();
+            return keyfilePath;
+        }
+        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
+        {
+            DisplayMessage.FilePathException(keyfilePath, ex.GetType().Name, "Unable to randomly generate keyfile.");
+            return null;
+        }
+    }
+
+    public static void DirectoryEncryption(string directoryPath)
+    {
+        string saltFilePath = Path.Combine(directoryPath, Constants.SaltFile);
+        if (File.Exists(saltFilePath)) { throw new ArgumentException("This directory has already been encrypted."); }
+    }
+
+    public static void DirectoryDecryption(string directoryPath)
+    {
+        string saltFilePath = Path.Combine(directoryPath, Constants.SaltFile);
+        if (File.Exists(saltFilePath)) { throw new ArgumentException("This directory was encrypted using a password."); }
+    }
+
+    public static bool FileDecryption(string inputFilePath)
+    {
+        if (inputFilePath.Contains(Constants.SaltFile))
+        {
+            --Globals.TotalCount;
             return false;
         }
+        string errorMessage = GetFileDecryptionError(inputFilePath);
+        if (string.IsNullOrEmpty(errorMessage)) { return true; }
+        DisplayMessage.FilePathError(inputFilePath, errorMessage);
+        return false;
+    }
 
-        public static string GetFileEncryptionError(string inputFilePath)
+    public static string GetFileDecryptionError(string inputFilePath)
+    {
+        if (Directory.Exists(inputFilePath))
         {
-            if (Directory.Exists(inputFilePath))
-            {
-                return FileHandling.IsDirectoryEmpty(inputFilePath) ? _directoryEmpty : null;
-            }
-            if (!File.Exists(inputFilePath)) { return _fileDoesNotExist; }
-            bool? validMagicBytes = FileHandling.IsKryptorFile(inputFilePath);
-            if (validMagicBytes == null) { return _fileInaccessible; }
-            if (FileHandling.HasKryptorExtension(inputFilePath) || validMagicBytes == true)
-            {
-                return "This file has already been encrypted.";
-            }
-            return null;
+            return FileHandling.IsDirectoryEmpty(inputFilePath) ? DirectoryEmpty : null;
         }
-
-        public static string KeyfilePath(string keyfilePath)
+        if (!File.Exists(inputFilePath)) { return FileDoesNotExist; }
+        bool? validMagicBytes = FileHandling.IsKryptorFile(inputFilePath);
+        if (validMagicBytes == null) { return FileInaccessible; }
+        if (!FileHandling.HasKryptorExtension(inputFilePath) || validMagicBytes == false)
         {
-            try
-            {
-                if (string.IsNullOrEmpty(keyfilePath) || File.Exists(keyfilePath)) { return keyfilePath; }
-                if (Directory.Exists(keyfilePath))
-                {
-                    keyfilePath = Path.Combine(keyfilePath, ObfuscateFileName.GetRandomFileName());
-                }
-                if (!keyfilePath.EndsWith(Constants.KeyfileExtension)) { keyfilePath += Constants.KeyfileExtension; }
-                if (File.Exists(keyfilePath)) { return keyfilePath; }
-                Keyfiles.GenerateKeyfile(keyfilePath);
-                Console.WriteLine($"Randomly generated keyfile: {Path.GetFileName(keyfilePath)}");
-                Console.WriteLine();
-                return keyfilePath;
-            }
-            catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
-            {
-                DisplayMessage.FilePathException(keyfilePath, ex.GetType().Name, "Unable to randomly generate keyfile.");
-                return null;
-            }
+            return "This file hasn't been encrypted.";
         }
+        return null;
+    }
 
-        public static void DirectoryEncryption(string directoryPath)
+    public static bool GenerateKeyPair(string directoryPath, int keyPairType)
+    {
+        IEnumerable<string> errorMessages = GetGenerateKeyPairError(directoryPath, keyPairType);
+        return DisplayMessage.AnyErrors(errorMessages);
+    }
+
+    private static IEnumerable<string> GetGenerateKeyPairError(string directoryPath, int keyPairType)
+    {
+        if (keyPairType is < 1 or > 2)
         {
-            string saltFilePath = Path.Combine(directoryPath, Constants.SaltFile);
-            if (File.Exists(saltFilePath)) { throw new ArgumentException("This directory has already been encrypted."); }
+            yield return "Please enter a valid number.";
         }
-
-        public static void DirectoryDecryption(string directoryPath)
+        bool defaultKeyDirectory = string.Equals(directoryPath, Constants.DefaultKeyDirectory);
+        if (!defaultKeyDirectory && !Directory.Exists(directoryPath))
         {
-            string saltFilePath = Path.Combine(directoryPath, Constants.SaltFile);
-            if (File.Exists(saltFilePath)) { throw new ArgumentException("This directory was encrypted using a password."); }
+            yield return "This directory doesn't exist.";
         }
-
-        public static bool FileDecryption(string inputFilePath)
+        else if (defaultKeyDirectory && !Globals.Overwrite)
         {
-            if (inputFilePath.Contains(Constants.SaltFile))
+            if (keyPairType == 1 && (File.Exists(Constants.DefaultEncryptionPublicKeyPath) || File.Exists(Constants.DefaultEncryptionPrivateKeyPath)))
             {
-                --Globals.TotalCount;
-                return false;
+                yield return "An encryption key pair already exists. Please specify -o|--overwrite if you want to overwrite your key pair.";
             }
-            string errorMessage = GetFileDecryptionError(inputFilePath);
-            if (string.IsNullOrEmpty(errorMessage)) { return true; }
-            DisplayMessage.FilePathError(inputFilePath, errorMessage);
-            return false;
-        }
-
-        public static string GetFileDecryptionError(string inputFilePath)
-        {
-            if (Directory.Exists(inputFilePath))
-            {
-                return FileHandling.IsDirectoryEmpty(inputFilePath) ? _directoryEmpty : null;
-            }
-            if (!File.Exists(inputFilePath)) { return _fileDoesNotExist; }
-            bool? validMagicBytes = FileHandling.IsKryptorFile(inputFilePath);
-            if (validMagicBytes == null) { return _fileInaccessible; }
-            if (!FileHandling.HasKryptorExtension(inputFilePath) || validMagicBytes == false)
-            {
-                return "This file hasn't been encrypted.";
-            }
-            return null;
-        }
-
-        public static bool GenerateKeyPair(string directoryPath, int keyPairType)
-        {
-            IEnumerable<string> errorMessages = GetGenerateKeyPairError(directoryPath, keyPairType);
-            return DisplayMessage.AnyErrors(errorMessages);
-        }
-
-        private static IEnumerable<string> GetGenerateKeyPairError(string directoryPath, int keyPairType)
-        {
-            if (keyPairType < 1 || keyPairType > 2)
-            {
-                yield return "Please enter a valid number.";
-            }
-            bool defaultKeyDirectory = string.Equals(directoryPath, Constants.DefaultKeyDirectory);
-            if (!defaultKeyDirectory && !Directory.Exists(directoryPath))
-            {
-                yield return "This directory doesn't exist.";
-            }
-            else if (defaultKeyDirectory && !Globals.Overwrite)
-            {
-                if (keyPairType == 1 && (File.Exists(Constants.DefaultEncryptionPublicKeyPath) || File.Exists(Constants.DefaultEncryptionPrivateKeyPath)))
-                {
-                    yield return "An encryption key pair already exists. Please specify -o|--overwrite if you want to overwrite your key pair.";
-                }
-                else if (keyPairType == 2 && (File.Exists(Constants.DefaultSigningPublicKeyPath) || File.Exists(Constants.DefaultSigningPrivateKeyPath)))
-                {   
-                    yield return "A signing key pair already exists. Please specify -o|--overwrite if you want to overwrite your key pair.";
-                }
-            }
-            else if (!defaultKeyDirectory && !Globals.Overwrite && keyPairType == 1)
-            {
-                string publicKeyPath = Path.Combine(directoryPath, Constants.DefaultEncryptionKeyFileName + Constants.PublicKeyExtension);
-                string privateKeyPath = Path.Combine(directoryPath, Constants.DefaultEncryptionKeyFileName + Constants.PrivateKeyExtension);
-                if (File.Exists(publicKeyPath) || File.Exists(privateKeyPath))
-                {
-                    yield return "An encryption key pair already exists in the specified directory. Please specify -o|--overwrite if you want to overwrite your key pair.";
-                }
-            }
-            else if (!defaultKeyDirectory && !Globals.Overwrite && keyPairType == 2)
-            {
-                string publicKeyPath = Path.Combine(directoryPath, Constants.DefaultSigningKeyFileName + Constants.PublicKeyExtension);
-                string privateKeyPath = Path.Combine(directoryPath, Constants.DefaultSigningKeyFileName + Constants.PrivateKeyExtension);
-                if (File.Exists(publicKeyPath) || File.Exists(privateKeyPath))
-                {
-                    yield return "A signing key pair already exists in the specified directory. Please specify -o|--overwrite if you want to overwrite your key pair.";
-                }
+            else if (keyPairType == 2 && (File.Exists(Constants.DefaultSigningPublicKeyPath) || File.Exists(Constants.DefaultSigningPrivateKeyPath)))
+            {   
+                yield return "A signing key pair already exists. Please specify -o|--overwrite if you want to overwrite your key pair.";
             }
         }
-
-        public static bool RecoverPublicKey(string privateKeyPath)
+        else if (!defaultKeyDirectory && !Globals.Overwrite && keyPairType == 1)
         {
-            IEnumerable<string> errorMessages = GetRecoverPublicKeyError(privateKeyPath);
-            return DisplayMessage.AnyErrors(errorMessages);
-        }
-
-        private static IEnumerable<string> GetRecoverPublicKeyError(string privateKeyPath)
-        {
-            if (privateKeyPath == null)
+            string publicKeyPath = Path.Combine(directoryPath, Constants.DefaultEncryptionKeyFileName + Constants.PublicKeyExtension);
+            string privateKeyPath = Path.Combine(directoryPath, Constants.DefaultEncryptionKeyFileName + Constants.PrivateKeyExtension);
+            if (File.Exists(publicKeyPath) || File.Exists(privateKeyPath))
             {
-                yield return "Please specify a private key using [-x=filepath].";
-            }
-            else if (!File.Exists(privateKeyPath) || !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
-            {
-                yield return ErrorMessages.InvalidPrivateKeyFile;
+                yield return "An encryption key pair already exists in the specified directory. Please specify -o|--overwrite if you want to overwrite your key pair.";
             }
         }
-
-        public static string GetFileSigningError(string inputFilePath)
+        else if (!defaultKeyDirectory && !Globals.Overwrite && keyPairType == 2)
         {
-            if (Directory.Exists(inputFilePath)) { return ErrorMessages.NoFileToSign; }
-            if (!File.Exists(inputFilePath)) { return "This file doesn't exist."; }
-            return null;
-        }
-
-        public static string GetSignatureVerifyError(string inputFilePath)
-        {
-            if (Directory.Exists(inputFilePath)) { return ErrorMessages.NoFileToVerify; }
-            if (!File.Exists(inputFilePath)) { return "This file doesn't exist."; }
-            bool? signatureFile = FileHandling.IsSignatureFile(inputFilePath);
-            if (signatureFile == null) { return _fileInaccessible; }
-            if (inputFilePath.EndsWith(Constants.SignatureExtension) || signatureFile == true)
+            string publicKeyPath = Path.Combine(directoryPath, Constants.DefaultSigningKeyFileName + Constants.PublicKeyExtension);
+            string privateKeyPath = Path.Combine(directoryPath, Constants.DefaultSigningKeyFileName + Constants.PrivateKeyExtension);
+            if (File.Exists(publicKeyPath) || File.Exists(privateKeyPath))
             {
-                return "Please specify a non-signature file to verify.";
+                yield return "A signing key pair already exists in the specified directory. Please specify -o|--overwrite if you want to overwrite your key pair.";
             }
-            return null;
         }
+    }
 
-        public static string GetSignatureFilePath(string signatureFilePath, string[] filePaths)
+    public static bool RecoverPublicKey(string privateKeyPath)
+    {
+        IEnumerable<string> errorMessages = GetRecoverPublicKeyError(privateKeyPath);
+        return DisplayMessage.AnyErrors(errorMessages);
+    }
+
+    private static IEnumerable<string> GetRecoverPublicKeyError(string privateKeyPath)
+    {
+        if (privateKeyPath == null)
         {
-            if (string.IsNullOrEmpty(signatureFilePath) && filePaths != null)
-            {
-                string possibleSignaturePath = filePaths[0] + Constants.SignatureExtension;
-                if (File.Exists(possibleSignaturePath)) { return possibleSignaturePath; }
-            }
-            return signatureFilePath;
+            yield return "Please specify a private key using [-x=filepath].";
         }
+        else if (!File.Exists(privateKeyPath) || !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
+        {
+            yield return ErrorMessages.InvalidPrivateKeyFile;
+        }
+    }
+
+    public static string GetFileSigningError(string inputFilePath)
+    {
+        if (Directory.Exists(inputFilePath)) { return ErrorMessages.NoFileToSign; }
+        if (!File.Exists(inputFilePath)) { return "This file doesn't exist."; }
+        return null;
+    }
+
+    public static string GetSignatureVerifyError(string inputFilePath)
+    {
+        if (Directory.Exists(inputFilePath)) { return ErrorMessages.NoFileToVerify; }
+        if (!File.Exists(inputFilePath)) { return "This file doesn't exist."; }
+        bool? signatureFile = FileHandling.IsSignatureFile(inputFilePath);
+        if (signatureFile == null) { return FileInaccessible; }
+        if (inputFilePath.EndsWith(Constants.SignatureExtension) || signatureFile == true)
+        {
+            return "Please specify a non-signature file to verify.";
+        }
+        return null;
+    }
+
+    public static string GetSignatureFilePath(string signatureFilePath, string[] filePaths)
+    {
+        if (string.IsNullOrEmpty(signatureFilePath) && filePaths != null)
+        {
+            string possibleSignaturePath = filePaths[0] + Constants.SignatureExtension;
+            if (File.Exists(possibleSignaturePath)) { return possibleSignaturePath; }
+        }
+        return signatureFilePath;
     }
 }

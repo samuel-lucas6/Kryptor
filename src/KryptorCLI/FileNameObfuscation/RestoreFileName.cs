@@ -1,10 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Text;
-
-/*
+﻿/*
     Kryptor: A simple, modern, and secure encryption tool.
-    Copyright (C) 2020-2021 Samuel Lucas
+    Copyright (C) 2020-2022 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,52 +16,55 @@ using System.Text;
     along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
-namespace KryptorCLI
+using System;
+using System.IO;
+using System.Text;
+
+namespace KryptorCLI;
+
+public static class RestoreFileName
 {
-    public static class RestoreFileName
+    public static void RenameFile(string outputFilePath, int fileNameLength)
     {
-        public static void RenameFile(string outputFilePath, int fileNameLength)
+        try
         {
-            try
-            {
-                if (fileNameLength == 0) { return; }
-                string originalFileName = ReadFileName(outputFilePath, fileNameLength);
-                string obfuscatedFileName = Path.GetFileName(outputFilePath);
-                if (string.Equals(originalFileName, FileHandling.RemoveFileNameNumber(obfuscatedFileName))) { return; }
-                string restoredFilePath = outputFilePath.Replace(obfuscatedFileName, originalFileName);
-                restoredFilePath = FileHandling.GetUniqueFilePath(restoredFilePath);
-                Console.WriteLine($"Renaming {Path.GetFileName(outputFilePath)} => {Path.GetFileName(restoredFilePath)}...");
-                File.Move(outputFilePath, restoredFilePath);
-            }
-            catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
-            {
-                DisplayMessage.FilePathException(outputFilePath, ex.GetType().Name, "Unable to restore the original file name.");
-            }
+            if (fileNameLength == 0) { return; }
+            string originalFileName = ReadFileName(outputFilePath, fileNameLength);
+            string obfuscatedFileName = Path.GetFileName(outputFilePath);
+            if (string.Equals(originalFileName, FileHandling.RemoveFileNameNumber(obfuscatedFileName))) { return; }
+            string restoredFilePath = outputFilePath.Replace(obfuscatedFileName, originalFileName);
+            restoredFilePath = FileHandling.GetUniqueFilePath(restoredFilePath);
+            Console.WriteLine($"Renaming {Path.GetFileName(outputFilePath)} => {Path.GetFileName(restoredFilePath)}...");
+            File.Move(outputFilePath, restoredFilePath);
         }
-
-        private static string ReadFileName(string outputFilePath, int fileNameLength)
+        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
-            using var fileStream = new FileStream(outputFilePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
-            fileStream.Seek(offset: -fileNameLength, SeekOrigin.End);
-            byte[] fileName = new byte[fileNameLength];
-            fileStream.Read(fileName, offset: 0, fileName.Length);
-            fileStream.SetLength(fileStream.Length - fileNameLength);
-            return Encoding.UTF8.GetString(fileName);
+            DisplayMessage.FilePathException(outputFilePath, ex.GetType().Name, "Unable to restore the original file name.");
         }
+    }
 
-        public static void RemoveAppendedFileName(string inputFilePath)
+    private static string ReadFileName(string outputFilePath, int fileNameLength)
+    {
+        using var fileStream = new FileStream(outputFilePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
+        fileStream.Seek(offset: -fileNameLength, SeekOrigin.End);
+        byte[] fileName = new byte[fileNameLength];
+        fileStream.Read(fileName, offset: 0, fileName.Length);
+        fileStream.SetLength(fileStream.Length - fileNameLength);
+        return Encoding.UTF8.GetString(fileName);
+    }
+
+    public static void RemoveAppendedFileName(string inputFilePath)
+    {
+        try
         {
-            try
-            {
-                File.SetAttributes(inputFilePath, FileAttributes.Normal);
-                using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
-                byte[] fileNameBytes = Encoding.UTF8.GetBytes(Path.GetFileName(inputFilePath));
-                inputFile.SetLength(inputFile.Length - fileNameBytes.Length);
-            }
-            catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
-            {
-                DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to remove appended file name.");
-            }
+            File.SetAttributes(inputFilePath, FileAttributes.Normal);
+            using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
+            byte[] fileNameBytes = Encoding.UTF8.GetBytes(Path.GetFileName(inputFilePath));
+            inputFile.SetLength(inputFile.Length - fileNameBytes.Length);
+        }
+        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
+        {
+            DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to remove appended file name.");
         }
     }
 }

@@ -1,10 +1,6 @@
-﻿using System.IO;
-using System.Security.Cryptography;
-using Sodium;
-
-/*
+﻿/*
     Kryptor: A simple, modern, and secure encryption tool.
-    Copyright (C) 2020-2021 Samuel Lucas
+    Copyright (C) 2020-2022 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,22 +16,25 @@ using Sodium;
     along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
-namespace KryptorCLI
-{
-    public static class Keyfiles
-    {
-        public static void GenerateKeyfile(string keyfilePath)
-        {
-            byte[] keyfileBytes = SodiumCore.GetRandomBytes(Constants.KeyfileLength);
-            File.WriteAllBytes(keyfilePath, keyfileBytes);
-            File.SetAttributes(keyfilePath, FileAttributes.ReadOnly);
-            CryptographicOperations.ZeroMemory(keyfileBytes);
-        }
+using System.IO;
+using System.Security.Cryptography;
+using Sodium;
 
-        public static byte[] ReadKeyfile(string keyfilePath)
-        {
-            using var keyfile = new FileStream(keyfilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
-            return Blake2b.Hash(keyfile);
-        }
+namespace KryptorCLI;
+
+public static class Keyfiles
+{
+    public static void GenerateKeyfile(string keyfilePath)
+    {
+        var keyfileBytes = SodiumCore.GetRandomBytes(Constants.KeyfileLength);
+        File.WriteAllBytes(keyfilePath, keyfileBytes);
+        File.SetAttributes(keyfilePath, FileAttributes.ReadOnly);
+        CryptographicOperations.ZeroMemory(keyfileBytes);
+    }
+
+    public static byte[] ReadKeyfile(string keyfilePath)
+    {
+        using var keyfile = new FileStream(keyfilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
+        return Blake2b.Hash(keyfile);
     }
 }
