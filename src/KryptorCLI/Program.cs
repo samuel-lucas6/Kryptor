@@ -17,6 +17,8 @@
 */
 
 using System;
+using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using McMaster.Extensions.CommandLineUtils;
 
@@ -96,6 +98,7 @@ public class Program
 
     private void OnExecute()
     {
+        ExtractVisualCRuntime();
         Globals.Overwrite = Overwrite;
         Globals.ObfuscateFileNames = ObfuscateFileNames;
         Console.WriteLine();
@@ -111,7 +114,7 @@ public class Program
         }
         else if (GenerateKeys)
         {
-            CommandLine.GenerateNewKeyPair((FilePaths == null) ? Constants.DefaultKeyDirectory : FilePaths[0]);
+            CommandLine.GenerateNewKeyPair(FilePaths == null ? Constants.DefaultKeyDirectory : FilePaths[0]);
         }
         else if (RecoverPublicKey)
         {
@@ -137,6 +140,26 @@ public class Program
         else
         {
             DisplayMessage.Error("Unknown command. Specify --help for a list of options and examples.");
+        }
+    }
+    
+    private static void ExtractVisualCRuntime()
+    {
+        try
+        {
+            string executableDirectory = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
+            string vcruntimeFilePath = Path.Combine(executableDirectory, "vcruntime140.dll");
+            if (!OperatingSystem.IsWindows() || File.Exists(vcruntimeFilePath)) return;
+            if (Environment.Is64BitOperatingSystem)
+            {
+                File.WriteAllBytes(vcruntimeFilePath, Properties.Resources.vcruntime140_x64);
+                return;
+            }
+            File.WriteAllBytes(vcruntimeFilePath, Properties.Resources.vcruntime140_x86);
+        }
+        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
+        {
+            DisplayMessage.Exception(ex.GetType().Name, "Unable to extract the vcruntime140.dll file, which is required for libsodium to function on Windows.");
         }
     }
 
