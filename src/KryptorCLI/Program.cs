@@ -104,13 +104,11 @@ public class Program
         Console.WriteLine();
         if (Encrypt)
         {
-            string privateKey = GetEncryptionPrivateKey(PrivateKey.value);
-            CommandLine.Encrypt(Password, Keyfile, privateKey, PublicKey, FilePaths);
+            CommandLine.Encrypt(Password, Keyfile, GetEncryptionPrivateKey(PrivateKey.value), PublicKey, FilePaths);
         }
         else if (Decrypt)
         {
-            string privateKey = GetEncryptionPrivateKey(PrivateKey.value);
-            CommandLine.Decrypt(Password, Keyfile, privateKey, PublicKey, FilePaths);
+            CommandLine.Decrypt(Password, Keyfile, GetEncryptionPrivateKey(PrivateKey.value), PublicKey, FilePaths);
         }
         else if (GenerateKeys)
         {
@@ -122,8 +120,7 @@ public class Program
         }
         else if (Sign)
         {
-            string privateKey = GetSigningPrivateKey(PrivateKey.value);
-            CommandLine.Sign(privateKey, Comment, Prehash, Signature, FilePaths);
+            CommandLine.Sign(GetSigningPrivateKey(PrivateKey.value), Comment, Prehash, Signature, FilePaths);
         }
         else if (Verify)
         {
@@ -152,10 +149,10 @@ public class Program
             if (!OperatingSystem.IsWindows() || File.Exists(vcruntimeFilePath)) return;
             if (Environment.Is64BitOperatingSystem)
             {
-                File.WriteAllBytes(vcruntimeFilePath, Properties.Resources.vcruntime140_x64);
+                File.WriteAllBytes(vcruntimeFilePath, Properties.Resources.vcruntime140x64);
                 return;
             }
-            File.WriteAllBytes(vcruntimeFilePath, Properties.Resources.vcruntime140_x86);
+            File.WriteAllBytes(vcruntimeFilePath, Properties.Resources.vcruntime140x86);
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
@@ -176,6 +173,6 @@ public class Program
     public static string GetVersion()
     {
         string assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-        return assemblyVersion.Substring(startIndex: 0, assemblyVersion.Length - 2);
+        return assemblyVersion[..^2];
     }
 }
