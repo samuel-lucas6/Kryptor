@@ -17,7 +17,6 @@
 */
 
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using McMaster.Extensions.CommandLineUtils;
@@ -144,9 +143,9 @@ public class Program
     {
         try
         {
-            string executableDirectory = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
+            string executableDirectory = Path.GetDirectoryName(Environment.ProcessPath);
             string vcruntimeFilePath = Path.Combine(executableDirectory, "vcruntime140.dll");
-            if (!OperatingSystem.IsWindows() || File.Exists(vcruntimeFilePath)) return;
+            if (!OperatingSystem.IsWindows() || File.Exists(vcruntimeFilePath)) { return; }
             if (Environment.Is64BitOperatingSystem)
             {
                 File.WriteAllBytes(vcruntimeFilePath, Properties.Resources.vcruntime140x64);

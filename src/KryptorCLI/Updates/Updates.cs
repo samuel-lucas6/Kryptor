@@ -99,7 +99,7 @@ public static class Updates
 
     private static void ReplaceExecutable(byte[] downloadedExecutable)
     {
-        string executableFilePath = Process.GetCurrentProcess().MainModule.FileName;
+        string executableFilePath = Environment.ProcessPath;
         if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
         {
             File.WriteAllBytes(executableFilePath, downloadedExecutable);
