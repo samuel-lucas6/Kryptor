@@ -22,29 +22,13 @@ namespace KryptorCLI;
 
 public static class BitConversion
 {
-    public static byte[] GetBytes(short value)
-    {
-        var valueBytes = BitConverter.GetBytes(value);
-        return ToLittleEndian(valueBytes);
-    }
+    public static byte[] GetBytes(short value) => ToLittleEndian(BitConverter.GetBytes(value));
 
-    public static byte[] GetBytes(int value)
-    {
-        var valueBytes = BitConverter.GetBytes(value);
-        return ToLittleEndian(valueBytes);
-    }
+    public static byte[] GetBytes(int value) => ToLittleEndian(BitConverter.GetBytes(value));
 
-    public static byte[] GetBytes(long value)
-    {
-        var valueBytes = BitConverter.GetBytes(value);
-        return ToLittleEndian(valueBytes);
-    }
+    public static byte[] GetBytes(long value) => ToLittleEndian(BitConverter.GetBytes(value));
 
-    public static int ToInt32(byte[] value)
-    {
-        value = ToLittleEndian(value);
-        return BitConverter.ToInt32(value);
-    }
+    public static int ToInt32(byte[] value) => BitConverter.ToInt32(ToLittleEndian(value));
 
     private static byte[] ToLittleEndian(byte[] value)
     {
