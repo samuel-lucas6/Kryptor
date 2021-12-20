@@ -17,6 +17,7 @@
 */
 
 using System;
+using System.Linq;
 using System.Text;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
@@ -26,46 +27,18 @@ namespace KryptorCLI;
 
 public static class Arrays
 {
-    private const int ZeroIndex = 0;
-
-    public static byte[] Concat(byte[] a, byte[] b)
+    public static T[] Concat<T>(params T[][] arrays)
     {
-        var concat = new byte[a.Length + b.Length];
-        Array.Copy(a, ZeroIndex, concat, ZeroIndex, a.Length);
-        Array.Copy(b, ZeroIndex, concat, a.Length, b.Length);
-        return concat;
+        int offset = 0;
+        var result = new T[arrays.Sum(array => array.Length)];
+        foreach (var array in arrays)
+        {
+            Array.Copy(array, sourceIndex: 0, result, offset, array.Length);
+            offset += array.Length;
+        }
+        return result;
     }
-
-    public static byte[] Concat(byte[] a, byte[] b, byte[] c)
-    {
-        var concat = new byte[a.Length + b.Length + c.Length];
-        Array.Copy(a, ZeroIndex, concat, ZeroIndex, a.Length);
-        Array.Copy(b, ZeroIndex, concat, a.Length, b.Length);
-        Array.Copy(c, ZeroIndex, concat, a.Length + b.Length, c.Length);
-        return concat;
-    }
-
-    public static byte[] Concat(byte[] a, byte[] b, byte[] c, byte[] d)
-    {
-        var concat = new byte[a.Length + b.Length + c.Length + d.Length];
-        Array.Copy(a, ZeroIndex, concat, ZeroIndex, a.Length);
-        Array.Copy(b, ZeroIndex, concat, a.Length, b.Length);
-        Array.Copy(c, ZeroIndex, concat, a.Length + b.Length, c.Length);
-        Array.Copy(d, ZeroIndex, concat, a.Length + b.Length + c.Length, d.Length);
-        return concat;
-    }
-
-    public static byte[] Concat(byte[] a, byte[] b, byte[] c, byte[] d, byte[] e)
-    {
-        var concat = new byte[a.Length + b.Length + c.Length + d.Length + e.Length];
-        Array.Copy(a, ZeroIndex, concat, ZeroIndex, a.Length);
-        Array.Copy(b, ZeroIndex, concat, a.Length, b.Length);
-        Array.Copy(c, ZeroIndex, concat, a.Length + b.Length, c.Length);
-        Array.Copy(d, ZeroIndex, concat, a.Length + b.Length + c.Length, d.Length);
-        Array.Copy(e, ZeroIndex, concat, a.Length + b.Length + c.Length + d.Length, e.Length);
-        return concat;
-    }
-
+    
     public static byte[] Copy(byte[] sourceArray, int sourceIndex, int length)
     {
         var destinationArray = new byte[length];
@@ -76,23 +49,18 @@ public static class Arrays
     public static bool Compare(char[] a, char[] b)
     {
         var aBytes = Encoding.UTF8.GetBytes(a);
-        byte[] aHash = Blake2b.Hash(aBytes);
-        CryptographicOperations.ZeroMemory(aBytes);
         var bBytes = Encoding.UTF8.GetBytes(b);
-        byte[] bHash = Blake2b.Hash(bBytes);
-        CryptographicOperations.ZeroMemory(bBytes);
-        bool equal = Utilities.Compare(aHash, bHash);
-        CryptographicOperations.ZeroMemory(aHash);
-        CryptographicOperations.ZeroMemory(bHash);
-        return equal;
+        var key = SodiumCore.GetRandomBytes(Constants.BLAKE2Length);
+        aBytes = Blake2b.KeyedHash(aBytes, key);
+        bBytes = Blake2b.KeyedHash(bBytes, key);
+        CryptographicOperations.ZeroMemory(key);
+        return Utilities.Compare(aBytes, bBytes);
     }
 
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
     public static void ZeroMemory(char[] array)
     {
-        if (array.Length > 0)
-        {
-            Array.Clear(array, ZeroIndex, array.Length);
-        }
+        if (array.Length <= 0) { return; }
+        Array.Clear(array, index: 0, array.Length);
     }
 }
