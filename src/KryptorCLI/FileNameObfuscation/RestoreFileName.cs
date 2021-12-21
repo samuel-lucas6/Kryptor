@@ -47,7 +47,7 @@ public static class RestoreFileName
     {
         using var fileStream = new FileStream(outputFilePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
         fileStream.Seek(offset: -fileNameLength, SeekOrigin.End);
-        byte[] fileName = new byte[fileNameLength];
+        var fileName = new byte[fileNameLength];
         fileStream.Read(fileName, offset: 0, fileName.Length);
         fileStream.SetLength(fileStream.Length - fileNameLength);
         return Encoding.UTF8.GetString(fileName);
@@ -59,7 +59,7 @@ public static class RestoreFileName
         {
             File.SetAttributes(inputFilePath, FileAttributes.Normal);
             using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
-            byte[] fileNameBytes = Encoding.UTF8.GetBytes(Path.GetFileName(inputFilePath));
+            var fileNameBytes = Encoding.UTF8.GetBytes(Path.GetFileName(inputFilePath));
             inputFile.SetLength(inputFile.Length - fileNameBytes.Length);
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
