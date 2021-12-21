@@ -27,21 +27,16 @@ public static class PasswordPrompt
     {
         Console.WriteLine("Enter a password (leave empty for a random passphrase):");
         char[] password = GetPassword();
-        if (password.Length == 0)
+        if (password.Length != 0)
         {
-            password = PassphraseGenerator.GetRandomPassphrase(wordCount: 8);
-            DisplayRandomPassphrase(password);
+            RetypeNewPassword(password);
             return password;
         }
-        RetypeNewPassword(password);
-        return password;
-    }
-
-    private static void DisplayRandomPassphrase(char[] password)
-    {
+        password = PassphraseGenerator.GetRandomPassphrase(wordCount: 8);
         Console.Write($"Randomly generated passphrase: ");
         Console.WriteLine(password);
         Console.WriteLine();
+        return password;
     }
 
     private static void RetypeNewPassword(char[] password)
@@ -60,11 +55,9 @@ public static class PasswordPrompt
     {
         Console.WriteLine("Enter your password:");
         char[] password = GetPassword();
-        if (password.Length == 0)
-        {
-            DisplayMessage.Error("You didn't enter a password.");
-            Environment.Exit(exitCode: 13);
-        }
+        if (password.Length != 0) { return password; }
+        DisplayMessage.Error("You didn't enter a password.");
+        Environment.Exit(exitCode: 13);
         return password;
     }
 
