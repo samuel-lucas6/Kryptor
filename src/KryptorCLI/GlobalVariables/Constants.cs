@@ -41,7 +41,7 @@ public static class Constants
     public const int IntBitConverterLength = 4;
     public const int EncryptedHeaderLength = 72;
     public static readonly int FileHeadersLength = KryptorMagicBytes.Length + EncryptionVersion.Length + EphemeralPublicKeyLength + SaltLength + XChaChaNonceLength + EncryptedHeaderLength;
-    public const int TotalChunkLength = FileChunkSize + TagLength;
+    public const int CiphertextChunkLength = FileChunkSize + TagLength;
 
     // Cryptography
     public const int EncryptionKeyLength = 32;
@@ -49,8 +49,7 @@ public static class Constants
     public const int SaltLength = 16;
     public const int XChaChaNonceLength = 24;
     public const int TagLength = 32;
-    public const int BLAKE2Length = 64;
-    public const string BLAKE2Personal = "Kryptor.Personal";
+    public const int HashLength = 64;
 
     // Asymmetric keys
     public static readonly string DefaultKeyDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), EncryptedExtension);

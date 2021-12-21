@@ -51,7 +51,7 @@ public static class FileDecryption
             byte[] keyEncryptionKey = KeyDerivation.Argon2id(passwordBytes, salt);
             string outputFilePath = GetOutputFilePath(inputFilePath);
             DisplayMessage.DecryptingFile(inputFilePath, outputFilePath);
-            DecryptFile.Initialize(inputFile, outputFilePath, ephemeralPublicKey, keyEncryptionKey);
+            DecryptFile.Decrypt(inputFile, outputFilePath, ephemeralPublicKey, keyEncryptionKey);
             CryptographicOperations.ZeroMemory(keyEncryptionKey);
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -92,7 +92,7 @@ public static class FileDecryption
             byte[] keyEncryptionKey = KeyDerivation.Blake2(sharedSecret, ephemeralSharedSecret, salt);
             string outputFilePath = GetOutputFilePath(inputFilePath);
             DisplayMessage.DecryptingFile(inputFilePath, outputFilePath);
-            DecryptFile.Initialize(inputFile, outputFilePath, ephemeralPublicKey, keyEncryptionKey);
+            DecryptFile.Decrypt(inputFile, outputFilePath, ephemeralPublicKey, keyEncryptionKey);
             CryptographicOperations.ZeroMemory(keyEncryptionKey);
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -131,7 +131,7 @@ public static class FileDecryption
             byte[] keyEncryptionKey = KeyDerivation.Blake2(ephemeralSharedSecret, salt);
             string outputFilePath = GetOutputFilePath(inputFilePath);
             DisplayMessage.DecryptingFile(inputFilePath, outputFilePath);
-            DecryptFile.Initialize(inputFile, outputFilePath, ephemeralPublicKey, keyEncryptionKey);
+            DecryptFile.Decrypt(inputFile, outputFilePath, ephemeralPublicKey, keyEncryptionKey);
             CryptographicOperations.ZeroMemory(keyEncryptionKey);
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))

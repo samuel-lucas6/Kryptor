@@ -26,7 +26,7 @@ namespace KryptorCLI;
 
 public static class DecryptFile
 {
-    public static void Initialize(FileStream inputFile, string outputFilePath, byte[] ephemeralPublicKey, byte[] keyEncryptionKey)
+    public static void Decrypt(FileStream inputFile, string outputFilePath, byte[] ephemeralPublicKey, byte[] keyEncryptionKey)
     {
         var dataEncryptionKey = new byte[Constants.EncryptionKeyLength];
         try
@@ -34,7 +34,6 @@ public static class DecryptFile
             byte[] encryptedHeader = FileHeaders.ReadEncryptedHeader(inputFile);
             byte[] nonce = FileHeaders.ReadNonce(inputFile);
             byte[] header = DecryptFileHeader(inputFile, ephemeralPublicKey, encryptedHeader, nonce, keyEncryptionKey);
-            if (header == null) { throw new ArgumentException("Incorrect password/key, or this file has been tampered with."); }
             int lastChunkLength = FileHeaders.GetLastChunkLength(header);
             int fileNameLength = FileHeaders.GetFileNameLength(header);
             dataEncryptionKey = FileHeaders.GetDataEncryptionKey(header);
@@ -43,11 +42,12 @@ public static class DecryptFile
             {
                 nonce = Utilities.Increment(nonce);
                 byte[] additionalData = Arrays.Copy(encryptedHeader, encryptedHeader.Length - Constants.TagLength, Constants.TagLength);
-                Decrypt(inputFile, outputFile, nonce, dataEncryptionKey, additionalData, lastChunkLength);
+                DecryptChunks(inputFile, outputFile, nonce, dataEncryptionKey, additionalData, lastChunkLength);
             }
-            string inputFilePath = inputFile.Name;
             inputFile.Dispose();
-            Finalize(inputFilePath, outputFilePath, fileNameLength);
+            Globals.SuccessfulCount += 1;
+            RestoreFileName.RenameFile(outputFilePath, fileNameLength);
+            FileHandling.DeleteFile(inputFile.Name);
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
         {
@@ -63,26 +63,18 @@ public static class DecryptFile
         return HeaderEncryption.Decrypt(encryptedHeader, nonce, keyEncryptionKey, additionalData);
     }
 
-    private static void Decrypt(FileStream inputFile, FileStream outputFile, byte[] nonce, byte[] dataEncryptionKey, byte[] additionalData, int lastChunkLength)
+    private static void DecryptChunks(FileStream inputFile, FileStream outputFile, byte[] nonce, byte[] dataEncryptionKey, byte[] additionalData, int lastChunkLength)
     {
-        const int offset = 0;
-        byte[] ciphertextChunk = new byte[Constants.TotalChunkLength];
+        var ciphertextChunk = new byte[Constants.CiphertextChunkLength];
         inputFile.Seek(Constants.FileHeadersLength, SeekOrigin.Begin);
-        while (inputFile.Read(ciphertextChunk, offset, ciphertextChunk.Length) > 0)
+        while (inputFile.Read(ciphertextChunk, offset: 0, ciphertextChunk.Length) > 0)
         {
             byte[] plaintextChunk = XChaCha20BLAKE2b.Decrypt(ciphertextChunk, nonce, dataEncryptionKey, additionalData);
             nonce = Utilities.Increment(nonce);
             additionalData = Arrays.Copy(ciphertextChunk, ciphertextChunk.Length - Constants.TagLength, Constants.TagLength);
-            outputFile.Write(plaintextChunk, offset, plaintextChunk.Length);
+            outputFile.Write(plaintextChunk, offset: 0, plaintextChunk.Length);
         }
         outputFile.SetLength(outputFile.Length - Constants.FileChunkSize + lastChunkLength);
         CryptographicOperations.ZeroMemory(dataEncryptionKey);
-    }
-
-    private static void Finalize(string inputFilePath, string outputFilePath, int fileNameLength)
-    {
-        Globals.SuccessfulCount += 1;
-        RestoreFileName.RenameFile(outputFilePath, fileNameLength);
-        FileHandling.DeleteFile(inputFilePath);
     }
 }

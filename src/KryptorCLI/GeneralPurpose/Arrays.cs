@@ -50,7 +50,7 @@ public static class Arrays
     {
         var aBytes = Encoding.UTF8.GetBytes(a);
         var bBytes = Encoding.UTF8.GetBytes(b);
-        var key = SodiumCore.GetRandomBytes(Constants.BLAKE2Length);
+        var key = SodiumCore.GetRandomBytes(Constants.HashLength);
         aBytes = Blake2b.KeyedHash(aBytes, key);
         bBytes = Blake2b.KeyedHash(bBytes, key);
         CryptographicOperations.ZeroMemory(key);

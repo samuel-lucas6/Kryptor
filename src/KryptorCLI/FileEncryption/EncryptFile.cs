@@ -26,9 +26,9 @@ namespace KryptorCLI;
 
 public static class EncryptFile
 {
-    public static void Initialize(string inputFilePath, string outputFilePath, byte[] ephemeralPublicKey, byte[] salt, byte[] keyEncryptionKey)
+    public static void Encrypt(string inputFilePath, string outputFilePath, byte[] ephemeralPublicKey, byte[] salt, byte[] keyEncryptionKey)
     {
-        byte[] dataEncryptionKey = SodiumCore.GetRandomBytes(Constants.EncryptionKeyLength);
+        var dataEncryptionKey = SodiumCore.GetRandomBytes(Constants.EncryptionKeyLength);
         try
         {
             bool zeroByteFile = FileHandling.GetFileLength(inputFilePath) == 0;
@@ -36,14 +36,23 @@ public static class EncryptFile
             using (var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
             using (var outputFile = new FileStream(outputFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
             {
-                byte[] nonce = SodiumCore.GetRandomBytes(Constants.XChaChaNonceLength);
+                var nonce = SodiumCore.GetRandomBytes(Constants.XChaChaNonceLength);
                 byte[] encryptedHeader = EncryptFileHeader(inputFilePath, zeroByteFile, ephemeralPublicKey, dataEncryptionKey, nonce, keyEncryptionKey);
                 FileHeaders.WriteHeaders(outputFile, ephemeralPublicKey, salt, nonce, encryptedHeader);
                 nonce = Utilities.Increment(nonce);
                 byte[] additionalData = Arrays.Copy(encryptedHeader, encryptedHeader.Length - Constants.TagLength, Constants.TagLength);
-                Encrypt(inputFile, outputFile, nonce, dataEncryptionKey, additionalData);
+                EncryptChunks(inputFile, outputFile, nonce, dataEncryptionKey, additionalData);
             }
-            Finalize(inputFilePath, outputFilePath, zeroByteFile);
+            Globals.SuccessfulCount += 1;
+            if (Globals.Overwrite)
+            {
+                FileHandling.OverwriteFile(inputFilePath, outputFilePath);
+            }
+            else if (Globals.ObfuscateFileNames || zeroByteFile)
+            {
+                RestoreFileName.RemoveAppendedFileName(inputFilePath);
+            }
+            FileHandling.SetFileAttributesReadOnly(outputFilePath);
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
         {
@@ -63,31 +72,16 @@ public static class EncryptFile
         return HeaderEncryption.Encrypt(fileHeader, nonce, keyEncryptionKey, additionalData);
     }
 
-    private static void Encrypt(FileStream inputFile, FileStream outputFile, byte[] nonce, byte[] dataEncryptionKey, byte[] additionalData)
+    private static void EncryptChunks(FileStream inputFile, FileStream outputFile, byte[] nonce, byte[] dataEncryptionKey, byte[] additionalData)
     {
-        const int offset = 0;
-        byte[] plaintextChunk = new byte[Constants.FileChunkSize];
-        while (inputFile.Read(plaintextChunk, offset, plaintextChunk.Length) > 0)
+        var plaintextChunk = new byte[Constants.FileChunkSize];
+        while (inputFile.Read(plaintextChunk, offset: 0, plaintextChunk.Length) > 0)
         {
             byte[] ciphertextChunk = XChaCha20BLAKE2b.Encrypt(plaintextChunk, nonce, dataEncryptionKey, additionalData);
             nonce = Utilities.Increment(nonce);
             additionalData = Arrays.Copy(ciphertextChunk, ciphertextChunk.Length - Constants.TagLength, Constants.TagLength);
-            outputFile.Write(ciphertextChunk, offset, ciphertextChunk.Length);
+            outputFile.Write(ciphertextChunk, offset: 0, ciphertextChunk.Length);
         }
         CryptographicOperations.ZeroMemory(dataEncryptionKey);
-    }
-
-    private static void Finalize(string inputFilePath, string outputFilePath, bool zeroByteFile)
-    {
-        Globals.SuccessfulCount += 1;
-        if (Globals.Overwrite)
-        {
-            FileHandling.OverwriteFile(inputFilePath, outputFilePath);
-        }
-        else if (Globals.ObfuscateFileNames || zeroByteFile)
-        {
-            RestoreFileName.RemoveAppendedFileName(inputFilePath);
-        }
-        FileHandling.SetFileAttributesReadOnly(outputFilePath);
     }
 }

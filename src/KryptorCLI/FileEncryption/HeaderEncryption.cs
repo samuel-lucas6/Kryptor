@@ -28,7 +28,7 @@ public static class HeaderEncryption
     public static byte[] ComputeAdditionalData(long fileLength, byte[] ephemeralPublicKey)
     {
         long chunkCount = (long)Math.Ceiling((double)fileLength / Constants.FileChunkSize);
-        byte[] ciphertextLength = BitConversion.GetBytes(chunkCount * Constants.TotalChunkLength);
+        byte[] ciphertextLength = BitConversion.GetBytes(chunkCount * Constants.CiphertextChunkLength);
         return Arrays.Concat(ciphertextLength, Constants.KryptorMagicBytes, Constants.EncryptionVersion, ephemeralPublicKey);
     }
 
@@ -52,9 +52,9 @@ public static class HeaderEncryption
         {
             return XChaCha20BLAKE2b.Decrypt(encryptedFileHeader, nonce, keyEncryptionKey, additionalData);
         }
-        catch (CryptographicException)
+        catch (CryptographicException ex)
         {
-            return null;
+            throw new ArgumentException("Incorrect password/key, or this file has been tampered with.", ex);
         }
     }
 }

@@ -25,22 +25,16 @@ namespace KryptorCLI;
 
 public static class Blake2b
 {
-    private static readonly byte[] Personalisation = Encoding.UTF8.GetBytes(Constants.BLAKE2Personal);
+    private static readonly byte[] Personalisation = Encoding.UTF8.GetBytes("Kryptor.Personal");
 
-    public static byte[] Hash(byte[] message)
-    {
-        return GenericHash.Hash(message, key: null, Constants.BLAKE2Length);
-    }
+    public static byte[] Hash(byte[] message) => GenericHash.Hash(message, key: null, Constants.HashLength);
 
+    public static byte[] KeyedHash(byte[] message, byte[] key) => GenericHash.Hash(message, key, Constants.HashLength);
+    
     public static byte[] Hash(FileStream fileStream)
     {
-        using var blake2 = new GenericHash.GenericHashAlgorithm(key: (byte[])null, Constants.BLAKE2Length);
+        using var blake2 = new GenericHash.GenericHashAlgorithm(key: (byte[])null, Constants.HashLength);
         return blake2.ComputeHash(fileStream);
-    }
-
-    public static byte[] KeyedHash(byte[] message, byte[] key)
-    {
-        return GenericHash.Hash(message, key, Constants.BLAKE2Length);
     }
 
     public static byte[] KeyDerivation(byte[] inputKeyingMaterial, byte[] salt, int outputLength)

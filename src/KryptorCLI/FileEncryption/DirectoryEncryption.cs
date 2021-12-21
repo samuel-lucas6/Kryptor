@@ -108,7 +108,7 @@ public static class DirectoryEncryption
         try
         {
             DisplayMessage.EncryptingFile(inputFilePath, outputFilePath);
-            EncryptFile.Initialize(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
+            EncryptFile.Encrypt(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
         {

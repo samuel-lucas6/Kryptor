@@ -62,7 +62,7 @@ public static class FileEncryption
     private static void EncryptInputFile(string inputFilePath, string outputFilePath, byte[] ephemeralPublicKey, byte[] salt, byte[] keyEncryptionKey)
     {
         DisplayMessage.EncryptingFile(inputFilePath, outputFilePath);
-        EncryptFile.Initialize(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
+        EncryptFile.Encrypt(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
         CryptographicOperations.ZeroMemory(keyEncryptionKey);
     }
 
