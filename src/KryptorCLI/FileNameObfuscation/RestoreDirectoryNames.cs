@@ -46,8 +46,7 @@ public static class RestoreDirectoryNames
             directoryPath = FileHandling.GetUniqueDirectoryPath(directoryPath);
             Console.WriteLine($"Renaming {obfuscatedDirectoryName} directory => {Path.GetFileName(directoryPath)}...");
             Directory.Move(obfuscatedDirectoryPath, directoryPath);
-            storageFilePath = Path.Combine(directoryPath, storageFileName);
-            FileHandling.DeleteFile(storageFilePath);
+            FileHandling.DeleteFile(Path.Combine(directoryPath, storageFileName));
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
