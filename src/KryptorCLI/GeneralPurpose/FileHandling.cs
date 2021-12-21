@@ -62,7 +62,7 @@ public static class FileHandling
     {
         try
         {
-            var magicBytes = FileHeaders.ReadMagicBytes(filePath);
+            var magicBytes = ReadFileHeader(filePath, offset: 0, Constants.KryptorMagicBytes.Length);
             return Utilities.Compare(magicBytes, Constants.KryptorMagicBytes);
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex)) 

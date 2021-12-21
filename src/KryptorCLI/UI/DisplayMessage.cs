@@ -74,29 +74,23 @@ public static class DisplayMessage
 
     public static void SuccessfullyEncrypted()
     {
-        if (Globals.TotalCount > 0)
-        {
-            Console.WriteLine();
-            Console.WriteLine($"Successfully encrypted: {Globals.SuccessfulCount}/{Globals.TotalCount}");
-        }
+        if (Globals.TotalCount <= 0) { return; }
+        Console.WriteLine();
+        Console.WriteLine($"Successfully encrypted: {Globals.SuccessfulCount}/{Globals.TotalCount}");
     }
 
     public static void SuccessfullyDecrypted()
     {
-        if (Globals.TotalCount > 0)
-        {
-            Console.WriteLine();
-            Console.WriteLine($"Successfully decrypted: {Globals.SuccessfulCount}/{Globals.TotalCount}");
-        }
+        if (Globals.TotalCount <= 0) { return; }
+        Console.WriteLine();
+        Console.WriteLine($"Successfully decrypted: {Globals.SuccessfulCount}/{Globals.TotalCount}");
     }
 
     public static void SuccessfullySigned()
     {
-        if (Globals.TotalCount > 0)
-        {
-            Console.WriteLine();
-            Console.WriteLine($"Successfully signed: {Globals.SuccessfulCount}/{Globals.TotalCount}");
-        }
+        if (Globals.TotalCount <= 0) { return; }
+        Console.WriteLine();
+        Console.WriteLine($"Successfully signed: {Globals.SuccessfulCount}/{Globals.TotalCount}");
     }
 
     public static bool AnyErrors(IEnumerable<string> errorMessages)
