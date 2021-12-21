@@ -72,7 +72,7 @@ public static class DirectoryDecryption
     {
         Console.WriteLine($"Beginning decryption of {Path.GetFileName(directoryPath)} directory...");
         string[] filePaths = FileHandling.GetAllFiles(directoryPath);
-        // -1 for the selected directory
+        // -1 for the specified directory
         Globals.TotalCount += filePaths.Length - 1;
         return filePaths;
     }
