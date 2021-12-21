@@ -20,7 +20,6 @@ namespace KryptorCLI;
 
 public static class Globals
 {
-    // File encryption
     public static int SuccessfulCount { get; set; }
     public static int TotalCount { get; set; }
     public static bool Overwrite { get; set; }
