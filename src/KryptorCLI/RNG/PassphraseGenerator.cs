@@ -27,14 +27,9 @@ public static class PassphraseGenerator
 {
     public static char[] GetRandomPassphrase(int wordCount)
     {
-        string[] wordlist = GetWordlist();
+        string[] wordlist = Properties.Resources.wordlist.Split(new[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
         List<string> words = GetRandomWords(wordlist, wordCount);
         return FormatPassphrase(words, wordCount);
-    }
-
-    private static string[] GetWordlist()
-    {
-        return Properties.Resources.wordlist.Split(new[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
     }
 
     private static List<string> GetRandomWords(string[] wordlist, int wordCount)
