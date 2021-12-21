@@ -39,25 +39,8 @@ public static class FileHeaders
     public static byte[] GetFileNameLength(string inputFilePath, bool zeroByteFile)
     {
         if (!zeroByteFile && !Globals.ObfuscateFileNames) { return BitConversion.GetBytes(0); }
-        string fileName = Path.GetFileName(inputFilePath);
-        byte[] fileNameBytes = Encoding.UTF8.GetBytes(fileName);
+        var fileNameBytes = Encoding.UTF8.GetBytes(Path.GetFileName(inputFilePath));
         return BitConversion.GetBytes(fileNameBytes.Length);
-    }
-
-    public static byte[] ReadMagicBytes(string inputFilePath)
-    {
-        return FileHandling.ReadFileHeader(inputFilePath, offset: 0, Constants.KryptorMagicBytes.Length);
-    }
-
-    public static byte[] ReadMagicBytes(FileStream inputFile)
-    {
-        return FileHandling.ReadFileHeader(inputFile, offset: 0, Constants.KryptorMagicBytes.Length);
-    }
-
-    public static byte[] ReadFileFormatVersion(FileStream inputFile)
-    {
-        int offset = Constants.KryptorMagicBytes.Length;
-        return FileHandling.ReadFileHeader(inputFile, offset, Constants.EncryptionVersion.Length);
     }
 
     public static void ValidateFormatVersion(byte[] formatVersion, byte[] currentFormatVersion)
@@ -88,27 +71,5 @@ public static class FileHeaders
     {
         int offset = Constants.KryptorMagicBytes.Length + Constants.EncryptionVersion.Length + Constants.EphemeralPublicKeyLength + Constants.SaltLength + Constants.XChaChaNonceLength;
         return FileHandling.ReadFileHeader(inputFile, offset, Constants.EncryptedHeaderLength);
-    }
-
-    public static int GetLastChunkLength(byte[] header)
-    {
-        byte[] lastChunkLength = new byte[Constants.IntBitConverterLength];
-        Array.Copy(header, lastChunkLength, lastChunkLength.Length);
-        return BitConversion.ToInt32(lastChunkLength);
-    }
-
-    public static int GetFileNameLength(byte[] header)
-    {
-        byte[] fileNameLength = new byte[Constants.IntBitConverterLength];
-        Array.Copy(header, Constants.IntBitConverterLength, fileNameLength, destinationIndex: 0, fileNameLength.Length);
-        return BitConversion.ToInt32(fileNameLength);
-    }
-
-    public static byte[] GetDataEncryptionKey(byte[] header)
-    {
-        byte[] dataEncryptionKey = new byte[Constants.EncryptionKeyLength];
-        int sourceIndex = header.Length - dataEncryptionKey.Length;
-        Array.Copy(header, sourceIndex, dataEncryptionKey, destinationIndex: 0, dataEncryptionKey.Length);
-        return dataEncryptionKey;
     }
 }

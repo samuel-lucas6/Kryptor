@@ -34,9 +34,9 @@ public static class DecryptFile
             byte[] encryptedHeader = FileHeaders.ReadEncryptedHeader(inputFile);
             byte[] nonce = FileHeaders.ReadNonce(inputFile);
             byte[] fileHeader = DecryptFileHeader(inputFile, ephemeralPublicKey, encryptedHeader, nonce, keyEncryptionKey);
-            int lastChunkLength = FileHeaders.GetLastChunkLength(fileHeader);
-            int fileNameLength = FileHeaders.GetFileNameLength(fileHeader);
-            dataEncryptionKey = FileHeaders.GetDataEncryptionKey(fileHeader);
+            int lastChunkLength = BitConversion.ToInt32(Arrays.Copy(fileHeader, sourceIndex: 0, Constants.IntBitConverterLength));
+            int fileNameLength = BitConversion.ToInt32(Arrays.Copy(fileHeader, Constants.IntBitConverterLength, Constants.IntBitConverterLength));
+            dataEncryptionKey = Arrays.Copy(fileHeader, fileHeader.Length - dataEncryptionKey.Length, Constants.EncryptionKeyLength);
             CryptographicOperations.ZeroMemory(fileHeader);
             using (var outputFile = new FileStream(outputFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
             {
@@ -62,8 +62,8 @@ public static class DecryptFile
         try
         {
             byte[] ciphertextLength = BitConversion.GetBytes(inputFile.Length - Constants.FileHeadersLength);
-            byte[] magicBytes = FileHeaders.ReadMagicBytes(inputFile);
-            byte[] formatVersion = FileHeaders.ReadFileFormatVersion(inputFile);
+            byte[] magicBytes = FileHandling.ReadFileHeader(inputFile, offset: 0, Constants.KryptorMagicBytes.Length);
+            byte[] formatVersion = FileHandling.ReadFileHeader(inputFile, Constants.KryptorMagicBytes.Length, Constants.EncryptionVersion.Length);
             FileHeaders.ValidateFormatVersion(formatVersion, Constants.EncryptionVersion);
             byte[] additionalData = Arrays.Concat(ciphertextLength, magicBytes, formatVersion, ephemeralPublicKey);
             return XChaCha20BLAKE2b.Decrypt(encryptedFileHeader, nonce, keyEncryptionKey, additionalData);
