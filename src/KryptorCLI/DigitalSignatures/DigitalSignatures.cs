@@ -41,9 +41,8 @@ public static class DigitalSignatures
 
     private static bool IsPreHashingRequired(string filePath)
     {
-        int oneGibibyte = Constants.Mebibyte * 1024;
-        long fileSize = FileHandling.GetFileLength(filePath);
-        return fileSize >= oneGibibyte;
+        const int oneGibibyte = Constants.Mebibyte * 1024;
+        return FileHandling.GetFileLength(filePath) >= oneGibibyte;
     }
 
     private static byte[] GetFileBytes(string filePath, bool preHash)
@@ -89,7 +88,6 @@ public static class DigitalSignatures
     private static byte[] GetCommentBytes(FileStream signatureFile)
     {
         int offset = Constants.SignatureMagicBytes.Length + Constants.SignatureVersion.Length + PreHashedHeaderLength + Constants.SignatureLength;
-        int length = (int)(signatureFile.Length - offset - Constants.SignatureLength);
-        return FileHandling.ReadFileHeader(signatureFile, length);
+        return FileHandling.ReadFileHeader(signatureFile, (int)(signatureFile.Length - offset - Constants.SignatureLength));
     }
 }
