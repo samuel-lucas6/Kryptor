@@ -33,11 +33,11 @@ public static class DecryptFile
         {
             byte[] encryptedHeader = FileHeaders.ReadEncryptedHeader(inputFile);
             byte[] nonce = FileHeaders.ReadNonce(inputFile);
-            byte[] header = DecryptFileHeader(inputFile, ephemeralPublicKey, encryptedHeader, nonce, keyEncryptionKey);
-            int lastChunkLength = FileHeaders.GetLastChunkLength(header);
-            int fileNameLength = FileHeaders.GetFileNameLength(header);
-            dataEncryptionKey = FileHeaders.GetDataEncryptionKey(header);
-            CryptographicOperations.ZeroMemory(header);
+            byte[] fileHeader = DecryptFileHeader(inputFile, ephemeralPublicKey, encryptedHeader, nonce, keyEncryptionKey);
+            int lastChunkLength = FileHeaders.GetLastChunkLength(fileHeader);
+            int fileNameLength = FileHeaders.GetFileNameLength(fileHeader);
+            dataEncryptionKey = FileHeaders.GetDataEncryptionKey(fileHeader);
+            CryptographicOperations.ZeroMemory(fileHeader);
             using (var outputFile = new FileStream(outputFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
             {
                 nonce = Utilities.Increment(nonce);
@@ -57,10 +57,21 @@ public static class DecryptFile
         }
     }
 
-    private static byte[] DecryptFileHeader(FileStream inputFile, byte[] ephemeralPublicKey, byte[] encryptedHeader, byte[] nonce, byte[] keyEncryptionKey)
+    private static byte[] DecryptFileHeader(FileStream inputFile, byte[] ephemeralPublicKey, byte[] encryptedFileHeader, byte[] nonce, byte[] keyEncryptionKey)
     {
-        byte[] additionalData = HeaderEncryption.GetAdditionalData(inputFile, ephemeralPublicKey);
-        return HeaderEncryption.Decrypt(encryptedHeader, nonce, keyEncryptionKey, additionalData);
+        try
+        {
+            byte[] ciphertextLength = BitConversion.GetBytes(inputFile.Length - Constants.FileHeadersLength);
+            byte[] magicBytes = FileHeaders.ReadMagicBytes(inputFile);
+            byte[] formatVersion = FileHeaders.ReadFileFormatVersion(inputFile);
+            FileHeaders.ValidateFormatVersion(formatVersion, Constants.EncryptionVersion);
+            byte[] additionalData = Arrays.Concat(ciphertextLength, magicBytes, formatVersion, ephemeralPublicKey);
+            return XChaCha20BLAKE2b.Decrypt(encryptedFileHeader, nonce, keyEncryptionKey, additionalData);
+        }
+        catch (CryptographicException ex)
+        {
+            throw new ArgumentException("Incorrect password/key, or this file has been tampered with.", ex);
+        }
     }
 
     private static void DecryptChunks(FileStream inputFile, FileStream outputFile, byte[] nonce, byte[] dataEncryptionKey, byte[] additionalData, int lastChunkLength)

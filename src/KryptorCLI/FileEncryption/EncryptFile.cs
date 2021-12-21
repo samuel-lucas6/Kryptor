@@ -68,8 +68,10 @@ public static class EncryptFile
         byte[] lastChunkLength = BitConversion.GetBytes(Convert.ToInt32(fileLength % Constants.FileChunkSize));
         byte[] fileNameLength = FileHeaders.GetFileNameLength(inputFilePath, zeroByteFile);
         byte[] fileHeader = Arrays.Concat(lastChunkLength, fileNameLength, dataEncryptionKey);
-        byte[] additionalData = HeaderEncryption.ComputeAdditionalData(fileLength, ephemeralPublicKey);
-        return HeaderEncryption.Encrypt(fileHeader, nonce, keyEncryptionKey, additionalData);
+        long chunkCount = (long)Math.Ceiling((double)fileLength / Constants.FileChunkSize);
+        byte[] ciphertextLength = BitConversion.GetBytes(chunkCount * Constants.CiphertextChunkLength);
+        byte[] additionalData = Arrays.Concat(ciphertextLength, Constants.KryptorMagicBytes, Constants.EncryptionVersion, ephemeralPublicKey);
+        return XChaCha20BLAKE2b.Encrypt(fileHeader, nonce, keyEncryptionKey, additionalData);
     }
 
     private static void EncryptChunks(FileStream inputFile, FileStream outputFile, byte[] nonce, byte[] dataEncryptionKey, byte[] additionalData)
