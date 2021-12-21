@@ -23,22 +23,15 @@ namespace KryptorCLI;
 
 public static class ObfuscateFileName
 {
-    public static string ReplaceFilePath(string filePath)
-    {
-        return filePath.Replace(Path.GetFileName(filePath), GetRandomFileName());
-    }
+    public static string ReplaceFilePath(string filePath) => filePath.Replace(Path.GetFileName(filePath), GetRandomFileName());
 
-    public static string GetRandomFileName()
-    {
-        string randomFileName = Path.GetRandomFileName() + Path.GetRandomFileName();
-        return randomFileName.Replace(".", string.Empty);
-    }
+    public static string GetRandomFileName() => string.Concat(Path.GetRandomFileName(), Path.GetRandomFileName()).Replace(".", string.Empty);
 
     public static void AppendFileName(string filePath)
     {
         File.SetAttributes(filePath, FileAttributes.Normal);
         using var fileStream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
-        byte[] fileNameBytes = Encoding.UTF8.GetBytes(Path.GetFileName(filePath));
+        var fileNameBytes = Encoding.UTF8.GetBytes(Path.GetFileName(filePath));
         fileStream.Write(fileNameBytes, offset: 0, fileNameBytes.Length);
     }
 }
