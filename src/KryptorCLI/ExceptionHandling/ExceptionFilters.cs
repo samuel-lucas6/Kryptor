@@ -26,23 +26,11 @@ namespace KryptorCLI;
 
 public static class ExceptionFilters
 {
-    public static bool FileAccess(Exception ex)
-    {
-        return ex is IOException or UnauthorizedAccessException or ArgumentException or SecurityException or NotSupportedException;
-    }
+    public static bool FileAccess(Exception ex) => ex is IOException or UnauthorizedAccessException or ArgumentException or SecurityException or NotSupportedException;
 
-    public static bool Cryptography(Exception ex)
-    {
-        return ex is CryptographicException || FileAccess(ex);
-    }
+    public static bool Cryptography(Exception ex) => ex is CryptographicException || FileAccess(ex);
 
-    public static bool AsymmetricKeyHandling(Exception ex)
-    {
-        return ex is FormatException || FileAccess(ex);
-    }
+    public static bool AsymmetricKeyHandling(Exception ex) => ex is FormatException || FileAccess(ex);
 
-    public static bool CheckForUpdates(Exception ex)
-    {
-        return ex is WebException or PlatformNotSupportedException || FileAccess(ex);
-    }
+    public static bool CheckForUpdates(Exception ex) => ex is WebException or PlatformNotSupportedException || FileAccess(ex);
 }
