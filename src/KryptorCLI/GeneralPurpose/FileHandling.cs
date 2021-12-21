@@ -25,6 +25,18 @@ namespace KryptorCLI;
 
 public static class FileHandling
 {
+    public static bool IsDirectory(string filePath) => File.GetAttributes(filePath).HasFlag(FileAttributes.Directory);
+
+    public static bool IsDirectoryEmpty(string directoryPath) => !Directory.EnumerateFileSystemEntries(directoryPath).Any();
+
+    public static string[] GetAllDirectories(string directoryPath) => Directory.GetDirectories(directoryPath, searchPattern: "*", SearchOption.AllDirectories);
+
+    public static string[] GetAllFiles(string directoryPath) => Directory.GetFiles(directoryPath, searchPattern: "*", SearchOption.AllDirectories);
+
+    public static long GetFileLength(string filePath) => new FileInfo(filePath).Length;
+    
+    public static bool HasKryptorExtension(string filePath) => filePath.EndsWith(Constants.EncryptedExtension, StringComparison.Ordinal);
+    
     public static byte[] ReadFileHeader(string filePath, long offset, int length)
     {
         using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
@@ -46,31 +58,11 @@ public static class FileHandling
         return header;
     }
 
-    public static bool IsDirectory(string filePath)
-    {
-        return File.GetAttributes(filePath).HasFlag(FileAttributes.Directory);
-    }
-
-    public static bool IsDirectoryEmpty(string directoryPath)
-    {
-        return !Directory.EnumerateFileSystemEntries(directoryPath).Any();
-    }
-
-    public static string[] GetAllDirectories(string directoryPath)
-    {
-        return Directory.GetDirectories(directoryPath, searchPattern: "*", SearchOption.AllDirectories);
-    }
-
-    public static string[] GetAllFiles(string directoryPath)
-    {
-        return Directory.GetFiles(directoryPath, searchPattern: "*", SearchOption.AllDirectories);
-    }
-
     public static bool? IsKryptorFile(string filePath)
     {
         try
         {
-            byte[] magicBytes = FileHeaders.ReadMagicBytes(filePath);
+            var magicBytes = FileHeaders.ReadMagicBytes(filePath);
             return Utilities.Compare(magicBytes, Constants.KryptorMagicBytes);
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex)) 
@@ -78,28 +70,18 @@ public static class FileHandling
             return null;
         }
     }
-
-    public static bool HasKryptorExtension(string filePath)
-    {
-        return filePath.EndsWith(Constants.EncryptedExtension, StringComparison.Ordinal);
-    }
-
+    
     public static bool? IsSignatureFile(string filePath)
     {
         try
         {
-            byte[] magicBytes = ReadFileHeader(filePath, offset: 0, Constants.SignatureMagicBytes.Length);
+            var magicBytes = ReadFileHeader(filePath, offset: 0, Constants.SignatureMagicBytes.Length);
             return Utilities.Compare(magicBytes, Constants.SignatureMagicBytes);
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
             return null;
         }
-    }
-
-    public static long GetFileLength(string filePath)
-    {
-        return new FileInfo(filePath).Length;
     }
 
     public static void CopyDirectory(string sourceDirectoryPath, string destinationDirectoryPath, bool copySubdirectories)
@@ -115,13 +97,11 @@ public static class FileHandling
             string newFilePath = Path.Combine(destinationDirectoryPath, file.Name);
             file.CopyTo(newFilePath, overwrite: false);
         }
-        if (copySubdirectories)
+        if (!copySubdirectories) { return; }
+        foreach (DirectoryInfo subdirectory in directories)
         {
-            foreach (DirectoryInfo subdirectory in directories)
-            {
-                string newSubdirectoryPath = Path.Combine(destinationDirectoryPath, subdirectory.Name);
-                CopyDirectory(subdirectory.FullName, newSubdirectoryPath, copySubdirectories);
-            }
+            string newSubdirectoryPath = Path.Combine(destinationDirectoryPath, subdirectory.Name);
+            CopyDirectory(subdirectory.FullName, newSubdirectoryPath, copySubdirectories);
         }
     }
 
@@ -143,11 +123,9 @@ public static class FileHandling
     {
         try
         {
-            if (File.Exists(filePath))
-            {
-                File.SetAttributes(filePath, FileAttributes.Normal);
-                File.Delete(filePath);
-            }
+            if (!File.Exists(filePath)) { return; }
+            File.SetAttributes(filePath, FileAttributes.Normal);
+            File.Delete(filePath);
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
@@ -157,10 +135,11 @@ public static class FileHandling
 
     public static string GetUniqueFilePath(string filePath)
     {
+        if (filePath.IndexOfAny(Path.GetInvalidPathChars()) != -1) { throw new ArgumentException("Invalid characters in file path."); }
         filePath = RemoveFileNameNumber(filePath);
         if (!File.Exists(filePath)) { return filePath; }
-        int fileNumber = 2;
         string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
+        int fileNumber = 2;
         string fileExtension = Path.GetExtension(filePath);
         string directoryPath = Path.GetDirectoryName(filePath);
         do
@@ -180,22 +159,24 @@ public static class FileHandling
         {
             return filePath.Remove(startIndex: filePath.Length - 4);
         }
-        else if (filePath[filePath.Length - fileExtension.Length - 1].Equals(')') && filePath[filePath.Length - fileExtension.Length - 4].Equals(' ') && filePath[filePath.Length - fileExtension.Length - 3].Equals('(') && char.IsDigit(filePath[filePath.Length - fileExtension.Length - 2]))
+        int lengthMinusExtension = filePath.Length - fileExtension.Length;
+        if (filePath[lengthMinusExtension - 1].Equals(')') && filePath[lengthMinusExtension - 4].Equals(' ') && filePath[lengthMinusExtension - 3].Equals('(') && char.IsDigit(filePath[lengthMinusExtension - 2]))
         {
-            return filePath.Remove(startIndex: filePath.Length - fileExtension.Length - 4) + fileExtension;
+            return filePath.Remove(startIndex: lengthMinusExtension - 4) + fileExtension;
         }
         return filePath;
     }
 
     public static string GetUniqueDirectoryPath(string directoryPath)
     {
+        if (directoryPath.IndexOfAny(Path.GetInvalidPathChars()) != -1) { throw new ArgumentException("Invalid characters in file path."); }
         if (!Directory.Exists(directoryPath)) { return directoryPath; }
-        int directoryNumber = 2;
-        string parentDirectory = Directory.GetParent(directoryPath).FullName;
+        string parentDirectory = Directory.GetParent(directoryPath)?.FullName;
         string directoryName = Path.GetFileName(directoryPath);
+        int directoryNumber = 2;
         do
         {
-            directoryPath = Path.Combine(parentDirectory, $"{directoryName} ({directoryNumber})");
+            directoryPath = Path.Combine(parentDirectory ?? string.Empty, $"{directoryName} ({directoryNumber})");
             directoryNumber++;
         }
         while (Directory.Exists(directoryPath));
