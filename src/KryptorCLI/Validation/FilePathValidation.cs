@@ -189,10 +189,10 @@ public static class FilePathValidation
         return !File.Exists(inputFilePath) ? FileDoesNotExist : null;
     }
 
-    public static string GetVerifyError(string inputFilePath)
+    public static string GetSignatureVerifyError(string inputFilePath)
     {
         if (Directory.Exists(inputFilePath)) { return ErrorMessages.NoFileToVerify; }
-        return !File.Exists(inputFilePath) ? FileDoesNotExist : null;
+        return !File.Exists(inputFilePath) ? "This file doesn't exist." : null;
     }
 
     public static string GetSignatureFilePath(string signatureFilePath, string[] filePaths)

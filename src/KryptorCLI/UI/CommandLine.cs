@@ -234,19 +234,16 @@ public static class CommandLine
         bool validUserInput = SigningValidation.Sign(privateKeyPath, comment, signatureFilePath, filePaths);
         if (!validUserInput) { return; }
         byte[] privateKey = AsymmetricKeyValidation.SigningPrivateKeyFile(privateKeyPath);
-        if (privateKey == null) { return; }
-        FileSigning.SignEachFile(filePaths, signatureFilePath, comment, preHash, privateKey);
+        if (privateKey != null) { FileSigning.SignEachFile(filePaths, signatureFilePath, comment, preHash, privateKey); }
     }
 
     public static void Verify(string publicKey, string signatureFilePath, string[] filePaths)
     {
         if (string.IsNullOrEmpty(publicKey) || publicKey.EndsWith(Constants.PublicKeyExtension))
         {
-            // Use public key file
             VerifySignature(publicKey, signatureFilePath, filePaths);
             return;
         }
-        // Use public key string
         VerifySignature(publicKey.ToCharArray(), signatureFilePath, filePaths);
     }
 
@@ -258,20 +255,18 @@ public static class CommandLine
         bool validSignatureFile = SigningValidation.SignatureFile(signatureFilePath);
         if (!validSignatureFile) { return; }
         byte[] publicKey = AsymmetricKeyValidation.SigningPublicKeyString(encodedPublicKey);
-        if (publicKey == null) { return; }
-        FileSigning.VerifyFile(signatureFilePath, filePaths[0], publicKey);
+        if (publicKey != null) { FileSigning.VerifyFile(signatureFilePath, filePaths[0], publicKey); }
     }
 
     private static void VerifySignature(string publicKeyPath, string signatureFilePath, string[] filePaths)
     {
+        signatureFilePath = FilePathValidation.GetSignatureFilePath(signatureFilePath, filePaths);
         bool validUserInput = SigningValidation.Verify(publicKeyPath, signatureFilePath, filePaths);
         if (!validUserInput) { return; }
-        signatureFilePath = FilePathValidation.GetSignatureFilePath(signatureFilePath, filePaths);
         bool validSignatureFile = SigningValidation.SignatureFile(signatureFilePath);
         if (!validSignatureFile) { return; }
         byte[] publicKey = AsymmetricKeyValidation.SigningPublicKeyFile(publicKeyPath);
-        if (publicKey == null) { return; }
-        FileSigning.VerifyFile(signatureFilePath, filePaths[0], publicKey);
+        if (publicKey != null) { FileSigning.VerifyFile(signatureFilePath, filePaths[0], publicKey); }
     }
         
     public static void CheckForUpdates()
@@ -279,27 +274,28 @@ public static class CommandLine
         try
         {
             bool updateAvailable = Updates.CheckForUpdates(out string latestVersion);
-            if (updateAvailable)
+            if (!updateAvailable)
             {
-                Console.WriteLine("An update is available for Kryptor. Would you like to update now? (type y or n)");
-                string userInput = Console.ReadLine()?.ToLower();
-                Console.WriteLine();
-                switch (userInput)
-                {
-                    case "y":
-                        Updates.Update(latestVersion);
-                        break;
-                    case "n":
-                        Console.WriteLine("Please specify -u|--update again when you're ready to update.");
-                        Console.WriteLine();
-                        Console.WriteLine("Alternatively, you can manually download the latest release at <https://www.kryptor.co.uk/#download-kryptor>.");
-                        return;
-                    default:
-                        Console.WriteLine("Please type either y or n next time.");
-                        return;
-                }
+                Console.WriteLine("Kryptor is up-to-date.");
+                return;
             }
-            Console.WriteLine("Kryptor is up-to-date.");
+            Console.WriteLine("An update is available for Kryptor. Would you like to update now? (type y or n)");
+            string userInput = Console.ReadLine()?.ToLower();
+            if (!string.IsNullOrEmpty(userInput)) { Console.WriteLine(); }
+            switch (userInput)
+            {
+                case "y":
+                    Updates.Update(latestVersion);
+                    break;
+                case "n":
+                    Console.WriteLine("Please specify -u|--update again when you're ready to update.");
+                    Console.WriteLine();
+                    Console.WriteLine("Alternatively, you can manually download the latest release at <https://www.kryptor.co.uk/#download-kryptor>.");
+                    return;
+                default:
+                    Console.WriteLine("Please type either y or n next time.");
+                    return;
+            }
         }
         catch (Exception ex) when (ExceptionFilters.CheckForUpdates(ex))
         {
