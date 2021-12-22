@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Program feedback
+    url: https://github.com/samuel-lucas6/Kryptor/discussions/new
+    about: Suggest program improvements
+  - name: Documentation feedback
+    url: https://github.com/samuel-lucas6/Kryptor/discussions/new
+    about: Suggest documentation improvements
+  - name: Ask a question
+    url: https://github.com/samuel-lucas6/Kryptor/discussions/new
+    about: Let me know if you're stuck or unsure about something
+  - name: Feature request
+    url: https://github.com/samuel-lucas6/Kryptor/discussions/new
+    about: Suggest a new feature

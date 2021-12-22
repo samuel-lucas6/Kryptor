@@ -9,17 +9,17 @@ assignees: samuel-lucas6
 ### Description
 <!-- A clear and concise description of the bug. -->
 
-### Steps to Reproduce
+### Steps to reproduce
 1. Use the '...'
-2. Type in '....'
-3. See error
+2. Type in '...'
+3. See '...' error
 
-### Expected Behaviour
+### Expected behaviour
 <!-- A clear and concise description of what you expected to happen. -->
 
 ### Screenshot
 <!-- If applicable, add a screenshot to help explain the bug. Otherwise, please delete this heading. -->
 
-### Platform Info
+### Platform info
  - OS: [e.g. Windows]
- - Version: [e.g. v3.0.3]
+ - Kryptor version: [e.g. v3.1.0]
