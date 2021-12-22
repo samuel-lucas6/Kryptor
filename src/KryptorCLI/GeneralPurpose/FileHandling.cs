@@ -19,6 +19,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Sodium;
 
 namespace KryptorCLI;
@@ -37,11 +38,24 @@ public static class FileHandling
     
     public static bool HasKryptorExtension(string filePath) => filePath.EndsWith(Constants.EncryptedExtension, StringComparison.Ordinal);
     
-    public static byte[] ReadFileHeader(string filePath, long offset, int length)
+    public static string GetEncryptedOutputFilePath(string inputFilePath)
     {
-        using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
-        return ReadFileHeader(fileStream, offset, length);
+        try
+        {
+            if (Globals.ObfuscateFileNames)
+            {
+                ObfuscateFileName.AppendFileName(inputFilePath);
+                inputFilePath = ObfuscateFileName.ReplaceFilePath(inputFilePath);
+            }
+        }
+        catch (Exception ex) when (ExceptionFilters.FileAccess(ex) || ex is EncoderFallbackException)
+        {
+            DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to store file name.");
+        }
+        return GetUniqueFilePath(inputFilePath + Constants.EncryptedExtension);
     }
+    
+    public static string GetDecryptedOutputFilePath(string inputFilePath) => GetUniqueFilePath(Path.ChangeExtension(inputFilePath, extension: null));
 
     public static byte[] ReadFileHeader(FileStream fileStream, long offset, int length)
     {
@@ -82,6 +96,12 @@ public static class FileHandling
         {
             return null;
         }
+    }
+    
+    private static byte[] ReadFileHeader(string filePath, long offset, int length)
+    {
+        using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
+        return ReadFileHeader(fileStream, offset, length);
     }
 
     public static void CopyDirectory(string sourceDirectoryPath, string destinationDirectoryPath, bool copySubdirectories)

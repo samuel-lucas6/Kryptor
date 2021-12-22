@@ -32,7 +32,6 @@ public static class DirectoryEncryption
         {
             FilePathValidation.DirectoryEncryption(directoryPath);
             string backupDirectoryPath = BackupDirectory(directoryPath);
-            Globals.Overwrite = true;
             string[] filePaths = GetFiles(directoryPath, out string newDirectoryPath);
             byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
             CreateSaltFile(newDirectoryPath, salt);
@@ -57,6 +56,7 @@ public static class DirectoryEncryption
         string destinationDirectoryPath = FileHandling.GetUniqueDirectoryPath($"{directoryPath} - Copy");
         Console.WriteLine($"Copying {Path.GetFileName(directoryPath)} directory => {Path.GetFileName(destinationDirectoryPath)} because you didn't specify -o|--overwrite...");
         FileHandling.CopyDirectory(directoryPath, destinationDirectoryPath, copySubdirectories: true);
+        Globals.Overwrite = true;
         return destinationDirectoryPath;
     }
 
@@ -77,14 +77,14 @@ public static class DirectoryEncryption
         }
         Console.WriteLine($"Beginning encryption of {Path.GetFileName(newDirectoryPath)} directory...");
         string[] filePaths = FileHandling.GetAllFiles(newDirectoryPath);
-        // -1 for the selected directory
+        // -1 for the specified directory
         Globals.TotalCount += filePaths.Length - 1;
         return filePaths;
     }
 
     private static void CreateSaltFile(string directoryPath, byte[] salt)
     {
-        string saltFilePath = Path.Combine(directoryPath, Constants.SaltFile);
+        string saltFilePath = Path.Combine(directoryPath, Constants.SaltFileName);
         File.WriteAllBytes(saltFilePath, salt);
         FileHandling.SetFileAttributesReadOnly(saltFilePath);
     }
@@ -93,20 +93,19 @@ public static class DirectoryEncryption
     {
         foreach (string inputFilePath in filePaths)
         {
-            bool validFilePath = FilePathValidation.FileEncryption(inputFilePath);
-            if (!validFilePath) { continue; }
-            // Fill unused header with random public key
+            if (!FilePathValidation.FileEncryption(inputFilePath)) { continue; }
+            // Fill unused file header with random public key
             using var ephemeralKeyPair = PublicKeyBox.GenerateKeyPair();
-            string outputFilePath = FileEncryption.GetOutputFilePath(inputFilePath);
-            EncryptInputFile(inputFilePath, outputFilePath, ephemeralKeyPair.PublicKey, salt, keyEncryptionKey);
+            EncryptInputFile(inputFilePath, ephemeralKeyPair.PublicKey, salt, keyEncryptionKey);
         }
         CryptographicOperations.ZeroMemory(keyEncryptionKey);
     }
 
-    private static void EncryptInputFile(string inputFilePath, string outputFilePath, byte[] ephemeralPublicKey, byte[] salt, byte[] keyEncryptionKey)
+    private static void EncryptInputFile(string inputFilePath, byte[] ephemeralPublicKey, byte[] salt, byte[] keyEncryptionKey)
     {
         try
         {
+            string outputFilePath = FileHandling.GetEncryptedOutputFilePath(inputFilePath);
             DisplayMessage.EncryptingFile(inputFilePath, outputFilePath);
             EncryptFile.Encrypt(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
         }
@@ -118,11 +117,9 @@ public static class DirectoryEncryption
 
     private static void RenameBackupDirectory(string backupDirectoryPath, string originalDirectoryPath)
     {
-        if (!string.IsNullOrEmpty(backupDirectoryPath) && !Directory.Exists(originalDirectoryPath))
-        {
-            Console.WriteLine($"Renaming {Path.GetFileName(backupDirectoryPath)} backup directory => {Path.GetFileName(originalDirectoryPath)}...");
-            Directory.Move(backupDirectoryPath, originalDirectoryPath);
-        }
+        if (string.IsNullOrEmpty(backupDirectoryPath) || Directory.Exists(originalDirectoryPath)) { return; }
+        Console.WriteLine($"Renaming {Path.GetFileName(backupDirectoryPath)} backup directory => {Path.GetFileName(originalDirectoryPath)}...");
+        Directory.Move(backupDirectoryPath, originalDirectoryPath);
     }
 
     public static void UsingPublicKey(string directoryPath, byte[] sharedSecret, byte[] recipientPublicKey)
@@ -132,7 +129,6 @@ public static class DirectoryEncryption
         {
             FilePathValidation.DirectoryEncryption(directoryPath);
             string backupDirectoryPath = BackupDirectory(directoryPath);
-            Globals.Overwrite = true;
             string[] filePaths = GetFiles(directoryPath, newDirectoryPath: out _);
             EncryptEachFileWithPublicKey(filePaths, sharedSecret, recipientPublicKey);
             RenameBackupDirectory(backupDirectoryPath, directoryPath);
@@ -152,13 +148,11 @@ public static class DirectoryEncryption
     {
         foreach (string inputFilePath in filePaths)
         {
-            bool validFilePath = FilePathValidation.FileEncryption(inputFilePath);
-            if (!validFilePath) { continue; }
+            if (!FilePathValidation.FileEncryption(inputFilePath)) { continue; }
             byte[] ephemeralSharedSecret = KeyExchange.GetPublicKeySharedSecret(recipientPublicKey, out byte[] ephemeralPublicKey);
             byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
             byte[] keyEncryptionKey = KeyDerivation.Blake2(sharedSecret, ephemeralSharedSecret, salt);
-            string outputFilePath = FileEncryption.GetOutputFilePath(inputFilePath);
-            EncryptInputFile(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
+            EncryptInputFile(inputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
             CryptographicOperations.ZeroMemory(keyEncryptionKey);
         }
     }
@@ -170,7 +164,6 @@ public static class DirectoryEncryption
         {
             FilePathValidation.DirectoryEncryption(directoryPath);
             string backupDirectoryPath = BackupDirectory(directoryPath);
-            Globals.Overwrite = true;
             string[] filePaths = GetFiles(directoryPath, newDirectoryPath: out _);
             EncryptEachFileWithPrivateKey(filePaths, privateKey);
             RenameBackupDirectory(backupDirectoryPath, directoryPath);
@@ -190,13 +183,11 @@ public static class DirectoryEncryption
     {
         foreach (string inputFilePath in filePaths)
         {
-            bool validFilePath = FilePathValidation.FileEncryption(inputFilePath);
-            if (!validFilePath) { continue; }
+            if (!FilePathValidation.FileEncryption(inputFilePath)) { continue; }
             byte[] ephemeralSharedSecret = KeyExchange.GetPrivateKeySharedSecret(privateKey, out byte[] ephemeralPublicKey);
             byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
             byte[] keyEncryptionKey = KeyDerivation.Blake2(ephemeralSharedSecret, salt);
-            string outputFilePath = FileEncryption.GetOutputFilePath(inputFilePath);
-            EncryptInputFile(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
+            EncryptInputFile(inputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
             CryptographicOperations.ZeroMemory(keyEncryptionKey);
         }
     }

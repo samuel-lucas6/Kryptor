@@ -29,7 +29,7 @@ public static class DirectoryDecryption
         try
         {
             string[] filePaths = GetFiles(directoryPath);
-            string saltFilePath = Path.Combine(directoryPath, Constants.SaltFile);
+            string saltFilePath = Path.Combine(directoryPath, Constants.SaltFileName);
             if (!File.Exists(saltFilePath)) { throw new FileNotFoundException("No salt file found. Unable to decrypt the directory. Please decrypt these files individually."); }
             byte[] salt = File.ReadAllBytes(saltFilePath);
             if (salt.Length != Constants.SaltLength) { throw new ArgumentException("Invalid salt length."); }
@@ -45,6 +45,15 @@ public static class DirectoryDecryption
             DirectoryException(directoryPath, ex);
         }
     }
+    
+    private static string[] GetFiles(string directoryPath)
+    {
+        Console.WriteLine($"Beginning decryption of {Path.GetFileName(directoryPath)} directory...");
+        string[] filePaths = FileHandling.GetAllFiles(directoryPath);
+        // -1 for the specified directory
+        Globals.TotalCount += filePaths.Length - 1;
+        return filePaths;
+    }
 
     private static void DecryptEachFileWithPassword(string[] filePaths, byte[] keyEncryptionKey)
     {
@@ -56,9 +65,7 @@ public static class DirectoryDecryption
             {
                 using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
                 byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
-                string outputFilePath = FileDecryption.GetOutputFilePath(inputFilePath);
-                DisplayMessage.DecryptingFile(inputFilePath, outputFilePath);
-                DecryptFile.Decrypt(inputFile, outputFilePath, ephemeralPublicKey, keyEncryptionKey);
+                DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
@@ -67,14 +74,12 @@ public static class DirectoryDecryption
         }
         CryptographicOperations.ZeroMemory(keyEncryptionKey);
     }
-
-    private static string[] GetFiles(string directoryPath)
+    
+    private static void DecryptInputFile(FileStream inputFile, byte[] ephemeralPublicKey, byte[] keyEncryptionKey)
     {
-        Console.WriteLine($"Beginning decryption of {Path.GetFileName(directoryPath)} directory...");
-        string[] filePaths = FileHandling.GetAllFiles(directoryPath);
-        // -1 for the specified directory
-        Globals.TotalCount += filePaths.Length - 1;
-        return filePaths;
+        string outputFilePath = FileHandling.GetDecryptedOutputFilePath(inputFile.Name);
+        DisplayMessage.DecryptingFile(inputFile.Name, outputFilePath);
+        DecryptFile.Decrypt(inputFile, outputFilePath, ephemeralPublicKey, keyEncryptionKey);
     }
 
     public static void UsingPublicKey(string directoryPath, byte[] sharedSecret, byte[] recipientPrivateKey)
@@ -106,9 +111,7 @@ public static class DirectoryDecryption
                 byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecret(recipientPrivateKey, ephemeralPublicKey);
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
                 byte[] keyEncryptionKey = KeyDerivation.Blake2(sharedSecret, ephemeralSharedSecret, salt);
-                string outputFilePath = FileDecryption.GetOutputFilePath(inputFilePath);
-                DisplayMessage.DecryptingFile(inputFilePath, outputFilePath);
-                DecryptFile.Decrypt(inputFile, outputFilePath, ephemeralPublicKey, keyEncryptionKey);
+                DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey);
                 CryptographicOperations.ZeroMemory(keyEncryptionKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -147,9 +150,7 @@ public static class DirectoryDecryption
                 byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecret(privateKey, ephemeralPublicKey);
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
                 byte[] keyEncryptionKey = KeyDerivation.Blake2(ephemeralSharedSecret, salt);
-                string outputFilePath = FileDecryption.GetOutputFilePath(inputFilePath);
-                DisplayMessage.DecryptingFile(inputFilePath, outputFilePath);
-                DecryptFile.Decrypt(inputFile, outputFilePath, ephemeralPublicKey, keyEncryptionKey);
+                DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey);
                 CryptographicOperations.ZeroMemory(keyEncryptionKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))

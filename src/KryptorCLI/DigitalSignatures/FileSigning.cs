@@ -28,7 +28,6 @@ public static class FileSigning
 
     public static void SignEachFile(string[] filePaths, string signatureFilePath, string comment, bool preHash, byte[] privateKey)
     {
-        Globals.TotalCount = filePaths.Length;
         privateKey = PrivateKey.Decrypt(privateKey);
         if (privateKey == null) { return; }
         if (string.IsNullOrEmpty(comment)) { comment = DefaultComment; }

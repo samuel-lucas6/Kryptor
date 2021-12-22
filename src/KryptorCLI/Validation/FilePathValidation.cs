@@ -24,7 +24,8 @@ namespace KryptorCLI;
 
 public static class FilePathValidation
 {
-    private const string FileDoesNotExist = "This file/folder doesn't exist.";
+    private const string FileDoesNotExist = "This file doesn't exist.";
+    private const string FileOrFolderDoesNotExist = "This file/folder doesn't exist.";
     private const string FileInaccessible = "Unable to access the file.";
     private const string DirectoryEmpty = "This directory is empty.";
 
@@ -42,7 +43,7 @@ public static class FilePathValidation
         {
             return FileHandling.IsDirectoryEmpty(inputFilePath) ? DirectoryEmpty : null;
         }
-        if (!File.Exists(inputFilePath)) { return FileDoesNotExist; }
+        if (!File.Exists(inputFilePath)) { return FileOrFolderDoesNotExist; }
         bool? validMagicBytes = FileHandling.IsKryptorFile(inputFilePath);
         if (validMagicBytes == null) { return FileInaccessible; }
         if (FileHandling.HasKryptorExtension(inputFilePath) || validMagicBytes == true)
@@ -77,19 +78,19 @@ public static class FilePathValidation
 
     public static void DirectoryEncryption(string directoryPath)
     {
-        string saltFilePath = Path.Combine(directoryPath, Constants.SaltFile);
+        string saltFilePath = Path.Combine(directoryPath, Constants.SaltFileName);
         if (File.Exists(saltFilePath)) { throw new ArgumentException("This directory has already been encrypted."); }
     }
 
     public static void DirectoryDecryption(string directoryPath)
     {
-        string saltFilePath = Path.Combine(directoryPath, Constants.SaltFile);
+        string saltFilePath = Path.Combine(directoryPath, Constants.SaltFileName);
         if (File.Exists(saltFilePath)) { throw new ArgumentException("This directory was encrypted using a password."); }
     }
 
     public static bool FileDecryption(string inputFilePath)
     {
-        if (inputFilePath.Contains(Constants.SaltFile))
+        if (inputFilePath.Contains(Constants.SaltFileName))
         {
             --Globals.TotalCount;
             return false;
@@ -106,7 +107,7 @@ public static class FilePathValidation
         {
             return FileHandling.IsDirectoryEmpty(inputFilePath) ? DirectoryEmpty : null;
         }
-        if (!File.Exists(inputFilePath)) { return FileDoesNotExist; }
+        if (!File.Exists(inputFilePath)) { return FileOrFolderDoesNotExist; }
         bool? validMagicBytes = FileHandling.IsKryptorFile(inputFilePath);
         if (validMagicBytes == null) { return FileInaccessible; }
         if (!FileHandling.HasKryptorExtension(inputFilePath) || validMagicBytes == false)
@@ -185,30 +186,19 @@ public static class FilePathValidation
     public static string GetFileSigningError(string inputFilePath)
     {
         if (Directory.Exists(inputFilePath)) { return ErrorMessages.NoFileToSign; }
-        if (!File.Exists(inputFilePath)) { return "This file doesn't exist."; }
-        return null;
+        return !File.Exists(inputFilePath) ? FileDoesNotExist : null;
     }
 
-    public static string GetSignatureVerifyError(string inputFilePath)
+    public static string GetVerifyError(string inputFilePath)
     {
         if (Directory.Exists(inputFilePath)) { return ErrorMessages.NoFileToVerify; }
-        if (!File.Exists(inputFilePath)) { return "This file doesn't exist."; }
-        bool? signatureFile = FileHandling.IsSignatureFile(inputFilePath);
-        if (signatureFile == null) { return FileInaccessible; }
-        if (inputFilePath.EndsWith(Constants.SignatureExtension) || signatureFile == true)
-        {
-            return "Please specify a non-signature file to verify.";
-        }
-        return null;
+        return !File.Exists(inputFilePath) ? FileDoesNotExist : null;
     }
 
     public static string GetSignatureFilePath(string signatureFilePath, string[] filePaths)
     {
-        if (string.IsNullOrEmpty(signatureFilePath) && filePaths != null)
-        {
-            string possibleSignaturePath = filePaths[0] + Constants.SignatureExtension;
-            if (File.Exists(possibleSignaturePath)) { return possibleSignaturePath; }
-        }
-        return signatureFilePath;
+        if (!string.IsNullOrEmpty(signatureFilePath) || filePaths == null) { return signatureFilePath; }
+        string possibleSignatureFilePath = filePaths[0] + Constants.SignatureExtension;
+        return File.Exists(possibleSignatureFilePath) ? possibleSignatureFilePath : signatureFilePath;
     }
 }
