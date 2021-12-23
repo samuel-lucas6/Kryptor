@@ -18,6 +18,7 @@
 
 using System;
 using System.Net;
+using System.Security.Cryptography;
 
 namespace KryptorCLI;
 
@@ -299,9 +300,9 @@ public static class CommandLine
                     return;
             }
         }
-        catch (Exception ex) when (ex is WebException or PlatformNotSupportedException || ExceptionFilters.FileAccess(ex))
+        catch (Exception ex) when (ex is WebException or PlatformNotSupportedException || ExceptionFilters.Cryptography(ex))
         {
-            if (ex is PlatformNotSupportedException)
+            if (ex is PlatformNotSupportedException or CryptographicException)
             {
                 DisplayMessage.Exception(ex.GetType().Name, ex.Message);
                 return;

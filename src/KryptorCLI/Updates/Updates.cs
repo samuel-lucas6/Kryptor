@@ -21,6 +21,7 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
+using System.Security.Cryptography;
 
 namespace KryptorCLI;
 
@@ -86,6 +87,7 @@ public static class Updates
             downloadLink += MacOSDownloadFileName;
         }
         DownloadFile(downloadLink, downloadFilePath);
+        VerifyDownloadSignature(downloadLink, downloadFilePath, latestVersion);
         string extractedDirectoryPath = Path.Combine(Path.GetDirectoryName(downloadFilePath), ExecutableFileName);
         if (!Directory.Exists(extractedDirectoryPath)) { Directory.CreateDirectory(extractedDirectoryPath); }
         ZipFile.ExtractToDirectory(downloadFilePath, extractedDirectoryPath, overwriteFiles: true);
@@ -95,6 +97,18 @@ public static class Updates
         byte[] downloadedExecutable = File.ReadAllBytes(executableFilePath);
         Directory.Delete(extractedDirectoryPath, recursive: true);
         return downloadedExecutable;
+    }
+
+    private static void VerifyDownloadSignature(string downloadLink, string downloadFilePath, string latestVersion)
+    {
+        string signatureFilePath = downloadFilePath + Constants.SignatureExtension;
+        DownloadFile(downloadLink + Constants.SignatureExtension, signatureFilePath);
+        byte[] publicKey = AsymmetricKeyValidation.SigningPublicKeyString("RWRudj7GpRdUxpojSmgHBOoNGUoD37H0WOUMAcT0yZcobg==".ToCharArray());
+        bool validSignature = DigitalSignatures.VerifySignature(signatureFilePath, downloadFilePath, publicKey, out string comment);
+        File.Delete(signatureFilePath);
+        if (validSignature && string.Equals(comment, $"Kryptor v{latestVersion}")) { return; }
+        File.Delete(downloadFilePath);
+        throw new CryptographicException("Bad signature. Update aborted.");
     }
 
     private static void ReplaceExecutable(byte[] downloadedExecutable)
@@ -113,8 +127,8 @@ public static class Updates
             {
                 batFile.WriteLine("@ECHO OFF");
                 batFile.WriteLine("TIMEOUT /t 1 /nobreak > NUL");
-                batFile.WriteLine("TASKKILL /IM \"{0}\" > NUL", Path.GetFileName(executableFilePath));
-                batFile.WriteLine("MOVE \"{0}\" \"{1}\"", newExecutableFilePath, executableFilePath);
+                batFile.WriteLine($"TASKKILL /IM \"{Path.GetFileName(executableFilePath)}\" > NUL");
+                batFile.WriteLine($"MOVE \"{newExecutableFilePath}\" \"{executableFilePath}\"");
                 batFile.WriteLine("DEL \"%~f0\"");
             }
             var startInfo = new ProcessStartInfo(batFilePath)
