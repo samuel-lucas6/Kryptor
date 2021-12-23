@@ -207,6 +207,7 @@ public static class CommandLine
 
     private static void DisplayKeyPair(string publicKey, string publicKeyPath, string privateKeyPath)
     {
+        Console.WriteLine();
         Console.WriteLine($"Public key: {publicKey}");
         Console.WriteLine($"Public key file: {publicKeyPath}");
         Console.WriteLine();
