@@ -40,58 +40,58 @@ Please report bugs at <https://github.com/samuel-lucas6/Kryptor/issues>.")]
 public class Program
 {
     [Option("-e|--encrypt", "encrypt files/folders", CommandOptionType.NoValue)]
-    public bool Encrypt { get; }
+    private bool Encrypt { get; }
 
     [Option("-d|--decrypt", "decrypt files/folders", CommandOptionType.NoValue)]
-    public bool Decrypt { get; }
+    private bool Decrypt { get; }
 
     [Option("-p|--password", "use a password", CommandOptionType.NoValue)]
-    public bool Password { get; }
+    private bool Password { get; }
 
     [Option("-k|--keyfile", "specify a keyfile", CommandOptionType.SingleValue)]
-    public string Keyfile { get; }
+    private string Keyfile { get; }
 
     [Option("-x|--private", "specify your private key (blank for default)", CommandOptionType.SingleOrNoValue)]
-    public (bool hasValue, string value) PrivateKey { get; }
+    private (bool hasValue, string value) PrivateKey { get; }
 
     [Option("-y|--public", "specify a public key", CommandOptionType.SingleValue)]
-    public string PublicKey { get; }
+    private string PublicKey { get; }
 
     [Option("-f|--obfuscate", "obfuscate file names", CommandOptionType.NoValue)]
-    public bool ObfuscateFileNames { get; }
+    private bool ObfuscateFileNames { get; }
 
     [Option("-o|--overwrite", "overwrite input files", CommandOptionType.NoValue)]
-    public bool Overwrite { get; }
+    private bool Overwrite { get; }
 
     [Option("-g|--generate", "generate a new key pair", CommandOptionType.NoValue)]
-    public bool GenerateKeys { get; }
+    private bool GenerateKeys { get; }
 
     [Option("-r|--recover", "recover your public key from your private key", CommandOptionType.NoValue)]
-    public bool RecoverPublicKey { get; }
+    private bool RecoverPublicKey { get; }
 
     [Option("-s|--sign", "create a signature", CommandOptionType.NoValue)]
-    public bool Sign { get; }
+    private bool Sign { get; }
 
     [Option("-c|--comment", "add a comment to a signature", CommandOptionType.SingleValue)]
-    public string Comment { get; }
+    private string Comment { get; }
 
     [Option("-l|--prehash", "sign large files by prehashing", CommandOptionType.NoValue)]
-    public bool Prehash { get; }
+    private bool Prehash { get; }
 
     [Option("-v|--verify", "verify a signature", CommandOptionType.NoValue)]
-    public bool Verify { get; }
+    private bool Verify { get; }
 
     [Option("-t|--signature", "specify a signature file", CommandOptionType.SingleValue)]
-    public string Signature { get; }
+    private string Signature { get; }
 
     [Option("-u|--update", "check for updates", CommandOptionType.NoValue)]
-    public bool CheckForUpdates { get; }
+    private bool CheckForUpdates { get; }
 
     [Option("-a|--about", "view the program version and license", CommandOptionType.NoValue)]
-    public bool About { get; }
+    private bool About { get; }
 
     [Argument(0, Name = "file", Description = "specify a file path")]
-    public string[] FilePaths { get; }
+    private string[] FilePaths { get; }
 
     public static int Main(string[] args) => CommandLineApplication.Execute<Program>(args);
 
@@ -144,8 +144,7 @@ public class Program
     {
         try
         {
-            string executableDirectory = Path.GetDirectoryName(Environment.ProcessPath);
-            string vcruntimeFilePath = Path.Combine(executableDirectory, "vcruntime140.dll");
+            string vcruntimeFilePath = Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), "vcruntime140.dll");
             if (!OperatingSystem.IsWindows() || File.Exists(vcruntimeFilePath)) { return; }
             if (Environment.Is64BitOperatingSystem)
             {
@@ -160,19 +159,9 @@ public class Program
         }
     }
 
-    private static string GetEncryptionPrivateKey(string privateKey)
-    {
-        return string.IsNullOrEmpty(privateKey) ? Constants.DefaultEncryptionPrivateKeyPath : privateKey;
-    }
+    private static string GetEncryptionPrivateKey(string privateKey) => string.IsNullOrEmpty(privateKey) ? Constants.DefaultEncryptionPrivateKeyPath : privateKey;
 
-    private static string GetSigningPrivateKey(string privateKey)
-    {
-        return string.IsNullOrEmpty(privateKey) ? Constants.DefaultSigningPrivateKeyPath : privateKey;
-    }
+    private static string GetSigningPrivateKey(string privateKey) => string.IsNullOrEmpty(privateKey) ? Constants.DefaultSigningPrivateKeyPath : privateKey;
 
-    public static string GetVersion()
-    {
-        string assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-        return assemblyVersion[..^2];
-    }
+    public static string GetVersion() => Assembly.GetExecutingAssembly().GetName().Version?.ToString()[..^2];
 }
