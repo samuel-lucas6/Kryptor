@@ -100,7 +100,7 @@ public class Program
         ExtractVisualCRuntime();
         Globals.Overwrite = Overwrite;
         Globals.ObfuscateFileNames = ObfuscateFileNames;
-        Globals.TotalCount = FilePaths.Length;
+        Globals.TotalCount = FilePaths?.Length ?? 0;
         Console.WriteLine();
         if (Encrypt)
         {
