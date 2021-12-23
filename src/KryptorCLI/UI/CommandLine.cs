@@ -17,6 +17,7 @@
 */
 
 using System;
+using System.Net;
 
 namespace KryptorCLI;
 
@@ -297,7 +298,7 @@ public static class CommandLine
                     return;
             }
         }
-        catch (Exception ex) when (ExceptionFilters.CheckForUpdates(ex))
+        catch (Exception ex) when (ex is WebException or PlatformNotSupportedException || ExceptionFilters.FileAccess(ex))
         {
             if (ex is PlatformNotSupportedException)
             {

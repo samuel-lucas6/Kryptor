@@ -20,7 +20,6 @@ using System;
 using System.IO;
 using System.Security;
 using System.Security.Cryptography;
-using System.Net;
 
 namespace KryptorCLI;
 
@@ -31,6 +30,4 @@ public static class ExceptionFilters
     public static bool Cryptography(Exception ex) => ex is CryptographicException || FileAccess(ex);
 
     public static bool AsymmetricKeyHandling(Exception ex) => ex is FormatException || FileAccess(ex);
-
-    public static bool CheckForUpdates(Exception ex) => ex is WebException or PlatformNotSupportedException || FileAccess(ex);
 }
