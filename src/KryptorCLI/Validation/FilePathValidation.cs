@@ -58,10 +58,7 @@ public static class FilePathValidation
         try
         {
             if (string.IsNullOrEmpty(keyfilePath) || File.Exists(keyfilePath)) { return keyfilePath; }
-            if (Directory.Exists(keyfilePath))
-            {
-                keyfilePath = Path.Combine(keyfilePath, ObfuscateFileName.GetRandomFileName());
-            }
+            if (Directory.Exists(keyfilePath)) { keyfilePath = Path.Combine(keyfilePath, FileHandling.GetRandomFileName()); }
             if (!keyfilePath.EndsWith(Constants.KeyfileExtension)) { keyfilePath += Constants.KeyfileExtension; }
             if (File.Exists(keyfilePath)) { return keyfilePath; }
             Keyfiles.GenerateKeyfile(keyfilePath);

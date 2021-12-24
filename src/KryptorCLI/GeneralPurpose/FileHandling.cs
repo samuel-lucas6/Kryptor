@@ -36,16 +36,20 @@ public static class FileHandling
 
     public static long GetFileLength(string filePath) => new FileInfo(filePath).Length;
     
+    public static string ReplaceFileName(string originalFilePath, string newFileName) => Path.Combine(Path.GetDirectoryName(originalFilePath), newFileName);
+
     public static bool HasKryptorExtension(string filePath) => filePath.EndsWith(Constants.EncryptedExtension, StringComparison.Ordinal);
     
+    public static string GetRandomFileName() => string.Concat(Path.GetRandomFileName(), Path.GetRandomFileName()).Replace(".", string.Empty);
+
     public static string GetEncryptedOutputFilePath(string inputFilePath)
     {
         try
         {
             if (Globals.ObfuscateFileNames)
             {
-                ObfuscateFileName.AppendFileName(inputFilePath);
-                inputFilePath = ObfuscateFileName.ReplaceFilePath(inputFilePath);
+                AppendFileName(inputFilePath);
+                inputFilePath = ReplaceFileName(inputFilePath, GetRandomFileName());
             }
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex) || ex is EncoderFallbackException)
@@ -53,6 +57,14 @@ public static class FileHandling
             DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to store file name.");
         }
         return GetUniqueFilePath(inputFilePath + Constants.EncryptedExtension);
+    }
+    
+    public static void AppendFileName(string filePath)
+    {
+        File.SetAttributes(filePath, FileAttributes.Normal);
+        using var fileStream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
+        var fileNameBytes = Encoding.UTF8.GetBytes(Path.GetFileName(filePath));
+        fileStream.Write(fileNameBytes, offset: 0, fileNameBytes.Length);
     }
     
     public static string GetDecryptedOutputFilePath(string inputFilePath) => GetUniqueFilePath(Path.ChangeExtension(inputFilePath, extension: null));

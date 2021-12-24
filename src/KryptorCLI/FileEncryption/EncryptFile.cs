@@ -32,7 +32,7 @@ public static class EncryptFile
         try
         {
             bool zeroByteFile = FileHandling.GetFileLength(inputFilePath) == 0;
-            if (zeroByteFile) { ObfuscateFileName.AppendFileName(inputFilePath); }
+            if (zeroByteFile) { FileHandling.AppendFileName(inputFilePath); }
             using (var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
             using (var outputFile = new FileStream(outputFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
             {

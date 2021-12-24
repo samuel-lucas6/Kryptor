@@ -38,7 +38,7 @@ public static class ObfuscateDirectoryNames
         try
         {
             string directoryName = Path.GetFileName(directoryPath);
-            string obfuscatedPath = ObfuscateFileName.ReplaceFilePath(directoryPath);
+            string obfuscatedPath = FileHandling.ReplaceFileName(directoryPath, FileHandling.GetRandomFileName());
             Console.WriteLine($"Renaming {directoryName} directory => {Path.GetFileName(obfuscatedPath)}...");
             Directory.Move(directoryPath, obfuscatedPath);
             StoreDirectoryName(directoryName, obfuscatedPath);
