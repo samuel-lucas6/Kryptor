@@ -176,22 +176,22 @@ public static class CommandLine
             int keyPairType = GetKeyPairType();
             bool validUserInput = FilePathValidation.GenerateKeyPair(exportDirectoryPath, keyPairType);
             if (!validUserInput) { return; }
-            string publicKey, privateKey, publicKeyPath, privateKeyPath;
+            string publicKey, privateKey, publicKeyFilePath, privateKeyFilePath;
             if (keyPairType == 1)
             {
                 (publicKey, privateKey) = AsymmetricKeys.GenerateEncryptionKeyPair();
-                (publicKeyPath, privateKeyPath) = AsymmetricKeys.ExportKeyPair(exportDirectoryPath, Constants.DefaultEncryptionKeyFileName, publicKey, privateKey);
+                (publicKeyFilePath, privateKeyFilePath) = AsymmetricKeys.ExportKeyPair(exportDirectoryPath, Constants.DefaultEncryptionKeyFileName, publicKey, privateKey);
             }
             else
             {
                 (publicKey, privateKey) = AsymmetricKeys.GenerateSigningKeyPair();
-                (publicKeyPath, privateKeyPath) = AsymmetricKeys.ExportKeyPair(exportDirectoryPath, Constants.DefaultSigningKeyFileName, publicKey, privateKey);
+                (publicKeyFilePath, privateKeyFilePath) = AsymmetricKeys.ExportKeyPair(exportDirectoryPath, Constants.DefaultSigningKeyFileName, publicKey, privateKey);
             }
-            DisplayKeyPair(publicKey, publicKeyPath, privateKeyPath);
+            DisplayMessage.KeyPair(publicKey, publicKeyFilePath, privateKeyFilePath);
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
-            DisplayMessage.FilePathException(exportDirectoryPath, ex.GetType().Name, "Unable to export key pair.");
+            DisplayMessage.FilePathException(exportDirectoryPath, ex.GetType().Name, "Unable to create key pair files.");
         }
     }
 
@@ -206,30 +206,22 @@ public static class CommandLine
         return keyPairType;
     }
 
-    private static void DisplayKeyPair(string publicKey, string publicKeyPath, string privateKeyPath)
+    public static void RecoverPublicKey(string privateKeyFilePath)
     {
-        Console.WriteLine();
-        Console.WriteLine($"Public key: {publicKey}");
-        Console.WriteLine($"Public key file: {publicKeyPath}");
-        Console.WriteLine();
-        Console.WriteLine($"Private key file: {privateKeyPath} - Keep this secret!");
-    }
-
-    public static void RecoverPublicKey(string privateKeyPath)
-    {
-        bool validUserInput = FilePathValidation.RecoverPublicKey(privateKeyPath);
+        bool validUserInput = FilePathValidation.RecoverPublicKey(privateKeyFilePath);
         if (!validUserInput) { return; }
-        byte[] privateKey = AsymmetricKeyValidation.GetPrivateKeyFromFile(privateKeyPath);
+        byte[] privateKey = AsymmetricKeyValidation.GetPrivateKeyFromFile(privateKeyFilePath);
         if (privateKey == null) { return; }
         privateKey = PrivateKey.Decrypt(privateKey);
         if (privateKey == null) { return; }
         byte[] publicKey = privateKey.Length switch
         {
             Constants.EncryptionKeyLength => AsymmetricKeys.GetCurve25519PublicKey(privateKey),
-            _ => AsymmetricKeys.GetEd25519PublicKey(privateKey),
+            _ => AsymmetricKeys.GetEd25519PublicKey(privateKey)
         };
-        Console.WriteLine();
-        Console.WriteLine($"Public key: {Convert.ToBase64String(publicKey)}");
+        string publicKeyString = Convert.ToBase64String(publicKey);
+        string publicKeyFilePath = AsymmetricKeys.ExportPublicKey(privateKeyFilePath, publicKeyString);
+        DisplayMessage.PublicKey(publicKeyString, publicKeyFilePath);
     }
 
     public static void Sign(string privateKeyPath, string comment, bool preHash, string signatureFilePath, string[] filePaths)

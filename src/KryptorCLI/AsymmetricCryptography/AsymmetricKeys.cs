@@ -55,6 +55,22 @@ public static class AsymmetricKeys
         return (publicKeyPath, privateKeyPath);
     }
 
+    public static string ExportPublicKey(string privateKeyFilePath, string publicKey)
+    {
+        string publicKeyFilePath = Path.ChangeExtension(privateKeyFilePath, extension: null) + Constants.PublicKeyExtension;
+        try
+        {
+            if (File.Exists(publicKeyFilePath)) { return null; }
+            CreateKeyFile(publicKeyFilePath, publicKey);
+            return publicKeyFilePath;
+        }
+        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
+        {
+            DisplayMessage.FilePathException(publicKeyFilePath, ex.GetType().Name, "Unable to create a public key file.");
+            return null;
+        }
+    }
+
     private static void CreateKeyFile(string filePath, string asymmetricKey)
     {
         if (File.Exists(filePath)) { File.SetAttributes(filePath, FileAttributes.Normal); }
