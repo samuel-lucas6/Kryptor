@@ -40,7 +40,7 @@ public static class Updates
     {
         string assemblyVersion = Program.GetVersion();
         latestVersion = GetLatestVersion();
-        return !string.Equals(assemblyVersion, latestVersion, StringComparison.Ordinal);
+        return new Version(latestVersion).CompareTo(new Version(assemblyVersion)) == 1;
     }
 
     private static string GetLatestVersion()
