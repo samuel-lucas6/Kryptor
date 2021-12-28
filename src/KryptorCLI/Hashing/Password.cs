@@ -27,8 +27,7 @@ public static class Password
     public static byte[] Prehash(char[] password, string keyfilePath)
     {
         var passwordBytes = Prehash(password);
-        if (!string.IsNullOrEmpty(keyfilePath)) { passwordBytes = UseKeyfile(passwordBytes, keyfilePath); }
-        return passwordBytes;
+        return string.IsNullOrEmpty(keyfilePath) ? passwordBytes : UseKeyfile(passwordBytes, keyfilePath);
     }
 
     public static byte[] Prehash(char[] password)
