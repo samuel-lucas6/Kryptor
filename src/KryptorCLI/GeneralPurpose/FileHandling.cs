@@ -40,7 +40,7 @@ public static class FileHandling
 
     public static bool HasKryptorExtension(string filePath) => filePath.EndsWith(Constants.EncryptedExtension, StringComparison.Ordinal);
     
-    public static string GetRandomFileName() => string.Concat(Path.GetRandomFileName(), Path.GetRandomFileName()).Replace(".", string.Empty);
+    public static string GetRandomFileName() => Utilities.BinaryToBase64(SodiumCore.GetRandomBytes(count: 16), Utilities.Base64Variant.UrlSafeNoPadding);
 
     public static string GetEncryptedOutputFilePath(string inputFilePath)
     {
