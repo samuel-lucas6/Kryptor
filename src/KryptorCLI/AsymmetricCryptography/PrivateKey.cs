@@ -39,6 +39,7 @@ public static class PrivateKey
 
     public static byte[] Decrypt(byte[] privateKey)
     {
+        if (privateKey == null) { return null; }
         try
         {
             char[] password = PasswordPrompt.EnterYourPassword();

@@ -34,11 +34,9 @@ public static class CommandLine
         {
             if (publicKey.EndsWith(Constants.PublicKeyExtension))
             {
-                // Use public key file
                 FileEncryptionWithPublicKey(privateKey, publicKey, filePaths);
                 return;
             }
-            // Use public key string
             FileEncryptionWithPublicKey(privateKey, publicKey.ToCharArray(), filePaths);
         }
         else if (!string.IsNullOrEmpty(privateKey))
@@ -56,13 +54,8 @@ public static class CommandLine
         bool validUserInput = FileEncryptionValidation.FileEncryptionWithPassword(usePassword, keyfilePath, filePaths);
         if (!validUserInput) { return; }
         char[] password = Array.Empty<char>();
-        if (usePassword)
-        {
-            password = PasswordPrompt.EnterNewPassword();
-        }
-        keyfilePath = FilePathValidation.KeyfilePath(keyfilePath);
-        byte[] passwordBytes = Password.Prehash(password, keyfilePath);
-        if (passwordBytes == null) { return; }
+        if (usePassword) { password = PasswordPrompt.EnterNewPassword(); }
+        var passwordBytes = Password.Prehash(password, FilePathValidation.KeyfilePath(keyfilePath));
         FileEncryption.EncryptEachFileWithPassword(filePaths, passwordBytes);
     }
 
@@ -71,9 +64,7 @@ public static class CommandLine
         bool validUserInput = FileEncryptionValidation.FileEncryptionWithPublicKey(senderPrivateKeyPath, recipientPublicKeyPath, filePaths);
         if (!validUserInput) { return; }
         byte[] senderPrivateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(senderPrivateKeyPath);
-        if (senderPrivateKey == null) { return; }
         byte[] recipientPublicKey = AsymmetricKeyValidation.EncryptionPublicKeyFile(recipientPublicKeyPath);
-        if (recipientPublicKey == null) { return; }
         FileEncryption.EncryptEachFileWithPublicKey(filePaths, senderPrivateKey, recipientPublicKey);
     }
 
@@ -82,9 +73,7 @@ public static class CommandLine
         bool validUserInput = FileEncryptionValidation.FileEncryptionWithPublicKey(senderPrivateKeyPath, recipientPublicKeyString, filePaths);
         if (!validUserInput) { return; }
         byte[] senderPrivateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(senderPrivateKeyPath);
-        if (senderPrivateKey == null) { return; }
         byte[] recipientPublicKey = AsymmetricKeyValidation.EncryptionPublicKeyString(recipientPublicKeyString);
-        if (recipientPublicKey == null) { return; }
         FileEncryption.EncryptEachFileWithPublicKey(filePaths, senderPrivateKey, recipientPublicKey);
     }
 
@@ -93,7 +82,6 @@ public static class CommandLine
         bool validUserInput = FileEncryptionValidation.FileEncryptionWithPrivateKey(privateKeyPath, filePaths);
         if (!validUserInput) { return; }
         byte[] privateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(privateKeyPath);
-        if (privateKey == null) { return; }
         FileEncryption.EncryptEachFileWithPrivateKey(filePaths, privateKey);
     }
 
@@ -107,11 +95,9 @@ public static class CommandLine
         {
             if (publicKey.EndsWith(Constants.PublicKeyExtension))
             {
-                // Use public key file
                 FileDecryptionWithPublicKey(privateKey, publicKey, filePaths);
                 return;
             }
-            // Use public key string
             FileDecryptionWithPublicKey(privateKey, publicKey.ToCharArray(), filePaths);
         }
         else if (!string.IsNullOrEmpty(privateKey))
@@ -129,12 +115,8 @@ public static class CommandLine
         bool validUserInput = FileEncryptionValidation.FileDecryptionWithPassword(usePassword, keyfilePath, filePaths);
         if (!validUserInput) { return; }
         char[] password = Array.Empty<char>();
-        if (usePassword)
-        {
-            password = PasswordPrompt.EnterYourPassword();
-        }
-        byte[] passwordBytes = Password.Prehash(password, keyfilePath);
-        if (passwordBytes == null) { return; }
+        if (usePassword) { password = PasswordPrompt.EnterYourPassword(); }
+        var passwordBytes = Password.Prehash(password, keyfilePath);
         FileDecryption.DecryptEachFileWithPassword(filePaths, passwordBytes);
     }
 
@@ -143,9 +125,7 @@ public static class CommandLine
         bool validUserInput = FileEncryptionValidation.FileDecryptionWithPublicKey(recipientPrivateKeyPath, senderPublicKeyPath, filePaths);
         if (!validUserInput) { return; }
         byte[] recipientPrivateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(recipientPrivateKeyPath);
-        if (recipientPrivateKey == null) { return; }
         byte[] senderPublicKey = AsymmetricKeyValidation.EncryptionPublicKeyFile(senderPublicKeyPath);
-        if (senderPublicKey == null) { return; }
         FileDecryption.DecryptEachFileWithPublicKey(filePaths, recipientPrivateKey, senderPublicKey);
     }
 
@@ -154,9 +134,7 @@ public static class CommandLine
         bool validUserInput = FileEncryptionValidation.FileDecryptionWithPublicKey(recipientPrivateKeyPath, senderPublicKeyString, filePaths);
         if (!validUserInput) { return; }
         byte[] recipientPrivateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(recipientPrivateKeyPath);
-        if (recipientPrivateKey == null) { return; }
         byte[] senderPublicKey = AsymmetricKeyValidation.EncryptionPublicKeyString(senderPublicKeyString);
-        if (senderPublicKey == null) { return; }
         FileDecryption.DecryptEachFileWithPublicKey(filePaths, recipientPrivateKey, senderPublicKey);
     }
 
@@ -165,7 +143,6 @@ public static class CommandLine
         bool validUserInput = FileEncryptionValidation.FileDecryptionWithPrivateKey(privateKeyPath, filePaths);
         if (!validUserInput) { return; }
         byte[] privateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(privateKeyPath);
-        if (privateKey == null) { return; }
         FileDecryption.DecryptEachFileWithPrivateKey(filePaths, privateKey);
     }
 
@@ -211,7 +188,6 @@ public static class CommandLine
         bool validUserInput = FilePathValidation.RecoverPublicKey(privateKeyFilePath);
         if (!validUserInput) { return; }
         byte[] privateKey = AsymmetricKeyValidation.GetPrivateKeyFromFile(privateKeyFilePath);
-        if (privateKey == null) { return; }
         privateKey = PrivateKey.Decrypt(privateKey);
         if (privateKey == null) { return; }
         byte[] publicKey = privateKey.Length switch
@@ -229,7 +205,7 @@ public static class CommandLine
         bool validUserInput = SigningValidation.Sign(privateKeyPath, comment, signatureFilePath, filePaths);
         if (!validUserInput) { return; }
         byte[] privateKey = AsymmetricKeyValidation.SigningPrivateKeyFile(privateKeyPath);
-        if (privateKey != null) { FileSigning.SignEachFile(filePaths, signatureFilePath, comment, preHash, privateKey); }
+        FileSigning.SignEachFile(filePaths, signatureFilePath, comment, preHash, privateKey);
     }
 
     public static void Verify(string publicKey, string signatureFilePath, string[] filePaths)
@@ -250,7 +226,7 @@ public static class CommandLine
         bool validSignatureFile = SigningValidation.SignatureFile(signatureFilePath);
         if (!validSignatureFile) { return; }
         byte[] publicKey = AsymmetricKeyValidation.SigningPublicKeyString(encodedPublicKey);
-        if (publicKey != null) { FileSigning.VerifyFile(signatureFilePath, filePaths[0], publicKey); }
+        FileSigning.VerifyFile(signatureFilePath, filePaths[0], publicKey);
     }
 
     private static void VerifySignature(string publicKeyPath, string signatureFilePath, string[] filePaths)
@@ -261,7 +237,7 @@ public static class CommandLine
         bool validSignatureFile = SigningValidation.SignatureFile(signatureFilePath);
         if (!validSignatureFile) { return; }
         byte[] publicKey = AsymmetricKeyValidation.SigningPublicKeyFile(publicKeyPath);
-        if (publicKey != null) { FileSigning.VerifyFile(signatureFilePath, filePaths[0], publicKey); }
+        FileSigning.VerifyFile(signatureFilePath, filePaths[0], publicKey);
     }
         
     public static void CheckForUpdates()

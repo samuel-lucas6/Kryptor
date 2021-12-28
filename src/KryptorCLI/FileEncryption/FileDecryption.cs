@@ -26,6 +26,7 @@ public static class FileDecryption
 {
     public static void DecryptEachFileWithPassword(string[] filePaths, byte[] passwordBytes)
     {
+        if (filePaths == null || passwordBytes == null) { return; }
         foreach (string inputFilePath in filePaths)
         {
             UsingPassword(inputFilePath, passwordBytes);
@@ -65,6 +66,7 @@ public static class FileDecryption
 
     public static void DecryptEachFileWithPublicKey(string[] filePaths, byte[] recipientPrivateKey, byte[] senderPublicKey)
     {
+        if (filePaths == null || recipientPrivateKey == null || senderPublicKey == null) { return; }
         recipientPrivateKey = PrivateKey.Decrypt(recipientPrivateKey);
         if (recipientPrivateKey == null) { return; }
         byte[] sharedSecret = KeyExchange.GetSharedSecret(recipientPrivateKey, senderPublicKey);
@@ -101,6 +103,7 @@ public static class FileDecryption
 
     public static void DecryptEachFileWithPrivateKey(string[] filePaths, byte[] privateKey)
     {
+        if (filePaths == null || privateKey == null) { return; }
         privateKey = PrivateKey.Decrypt(privateKey);
         if (privateKey == null) { return; }
         foreach (string inputFilePath in filePaths)

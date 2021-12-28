@@ -17,7 +17,6 @@
 */
 
 using System;
-using System.Text;
 using System.Security.Cryptography;
 using Sodium;
 
@@ -27,6 +26,7 @@ public static class FileEncryption
 {
     public static void EncryptEachFileWithPassword(string[] filePaths, byte[] passwordBytes)
     {
+        if (filePaths == null || passwordBytes == null) { return; }
         foreach (string inputFilePath in filePaths)
         {
             UsingPassword(inputFilePath, passwordBytes);
@@ -66,6 +66,7 @@ public static class FileEncryption
 
     public static void EncryptEachFileWithPublicKey(string[] filePaths, byte[] senderPrivateKey, byte[] recipientPublicKey)
     {
+        if (filePaths == null || senderPrivateKey == null || recipientPublicKey == null) { return; }
         senderPrivateKey = PrivateKey.Decrypt(senderPrivateKey);
         if (senderPrivateKey == null) { return; }
         byte[] sharedSecret = KeyExchange.GetSharedSecret(senderPrivateKey, recipientPublicKey);
@@ -100,6 +101,7 @@ public static class FileEncryption
 
     public static void EncryptEachFileWithPrivateKey(string[] filePaths, byte[] privateKey)
     {
+        if (filePaths == null || privateKey == null) { return; }
         privateKey = PrivateKey.Decrypt(privateKey);
         if (privateKey == null) { return; }
         foreach (string inputFilePath in filePaths)
