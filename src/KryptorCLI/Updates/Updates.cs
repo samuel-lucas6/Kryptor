@@ -46,8 +46,11 @@ public static class Updates
     private static string GetLatestVersion()
     {
         string downloadFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), VersionFileName);
+        string signatureFilePath = downloadFilePath + Constants.SignatureExtension;
+        DownloadFile(VersionFileLink + Constants.SignatureExtension, signatureFilePath);
         DownloadFile(VersionFileLink, downloadFilePath);
         string latestVersion = File.ReadAllText(downloadFilePath).Trim('\n').Trim();
+        VerifyDownloadSignature(signatureFilePath, downloadFilePath, latestVersion);
         File.Delete(downloadFilePath);
         return latestVersion;
     }
@@ -64,45 +67,41 @@ public static class Updates
         {
             throw new PlatformNotSupportedException("There are no official releases for your operating system.");
         }
-        Console.WriteLine("Downloading update...");
+        Console.WriteLine($"Downloading {latestVersion} update...");
         byte[] downloadedExecutable = GetLatestExecutable(latestVersion);
-        Console.WriteLine("Applying update...");
+        Console.WriteLine($"Applying {latestVersion} update...");
         ReplaceExecutable(downloadedExecutable);
     }
 
     private static byte[] GetLatestExecutable(string latestVersion)
     {
         string downloadFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), LatestReleaseFileName);
-        string downloadLink = $"https://github.com/samuel-lucas6/Kryptor/releases/download/v{latestVersion}/";
-        if (OperatingSystem.IsWindows())
-        {
-            downloadLink += WindowsDownloadFileName;
-        }
-        else if (OperatingSystem.IsLinux())
-        {
-            downloadLink += LinuxDownloadFileName;
-        }
-        else if (OperatingSystem.IsMacOS())
-        {
-            downloadLink += MacOSDownloadFileName;
-        }
+        string downloadLink = GetReleaseDownloadLink(latestVersion);
+        string signatureFilePath = downloadFilePath + Constants.SignatureExtension;
+        DownloadFile(downloadLink + Constants.SignatureExtension, signatureFilePath);
         DownloadFile(downloadLink, downloadFilePath);
-        VerifyDownloadSignature(downloadLink, downloadFilePath, latestVersion);
+        VerifyDownloadSignature(signatureFilePath, downloadFilePath, latestVersion);
         string extractedDirectoryPath = Path.Combine(Path.GetDirectoryName(downloadFilePath), ExecutableFileName);
         if (!Directory.Exists(extractedDirectoryPath)) { Directory.CreateDirectory(extractedDirectoryPath); }
         ZipFile.ExtractToDirectory(downloadFilePath, extractedDirectoryPath, overwriteFiles: true);
         File.Delete(downloadFilePath);
-        string executableFilePath = Path.Combine(extractedDirectoryPath, ExecutableFileName);
-        if (OperatingSystem.IsWindows()) { executableFilePath += ExeExtension; }
+        string executableFilePath = Path.Combine(extractedDirectoryPath, OperatingSystem.IsWindows() ? ExecutableFileName + ExeExtension : ExecutableFileName);
         byte[] downloadedExecutable = File.ReadAllBytes(executableFilePath);
         Directory.Delete(extractedDirectoryPath, recursive: true);
         return downloadedExecutable;
     }
 
-    private static void VerifyDownloadSignature(string downloadLink, string downloadFilePath, string latestVersion)
+    private static string GetReleaseDownloadLink(string latestVersion)
     {
-        string signatureFilePath = downloadFilePath + Constants.SignatureExtension;
-        DownloadFile(downloadLink + Constants.SignatureExtension, signatureFilePath);
+        string downloadLink = $"https://github.com/samuel-lucas6/Kryptor/releases/download/v{latestVersion}/";
+        if (OperatingSystem.IsWindows()) { return downloadLink + WindowsDownloadFileName; }
+        if (OperatingSystem.IsLinux()) { return downloadLink + LinuxDownloadFileName; }
+        if (OperatingSystem.IsMacOS()) { return downloadLink + MacOSDownloadFileName; }
+        return null;
+    }
+
+    private static void VerifyDownloadSignature(string signatureFilePath, string downloadFilePath, string latestVersion)
+    {
         byte[] publicKey = AsymmetricKeyValidation.SigningPublicKeyString("RWRudj7GpRdUxpojSmgHBOoNGUoD37H0WOUMAcT0yZcobg==".ToCharArray());
         bool validSignature = DigitalSignatures.VerifySignature(signatureFilePath, downloadFilePath, publicKey, out string comment);
         File.Delete(signatureFilePath);
