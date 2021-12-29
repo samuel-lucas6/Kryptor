@@ -39,17 +39,11 @@ public static class FilePathValidation
 
     public static string GetFileEncryptionError(string inputFilePath)
     {
-        if (Directory.Exists(inputFilePath))
-        {
-            return FileHandling.IsDirectoryEmpty(inputFilePath) ? DirectoryEmpty : null;
-        }
+        if (Directory.Exists(inputFilePath)) { return FileHandling.IsDirectoryEmpty(inputFilePath) ? DirectoryEmpty : null; }
         if (!File.Exists(inputFilePath)) { return FileOrFolderDoesNotExist; }
         bool? validMagicBytes = FileHandling.IsKryptorFile(inputFilePath);
         if (validMagicBytes == null) { return FileInaccessible; }
-        if (FileHandling.HasKryptorExtension(inputFilePath) || validMagicBytes == true)
-        {
-            return "This file has already been encrypted.";
-        }
+        if (FileHandling.HasKryptorExtension(inputFilePath) || validMagicBytes == true) { return "This file has already been encrypted."; }
         return null;
     }
 
@@ -100,17 +94,11 @@ public static class FilePathValidation
 
     public static string GetFileDecryptionError(string inputFilePath)
     {
-        if (Directory.Exists(inputFilePath))
-        {
-            return FileHandling.IsDirectoryEmpty(inputFilePath) ? DirectoryEmpty : null;
-        }
+        if (Directory.Exists(inputFilePath)) { return FileHandling.IsDirectoryEmpty(inputFilePath) ? DirectoryEmpty : null; }
         if (!File.Exists(inputFilePath)) { return FileOrFolderDoesNotExist; }
         bool? validMagicBytes = FileHandling.IsKryptorFile(inputFilePath);
         if (validMagicBytes == null) { return FileInaccessible; }
-        if (!FileHandling.HasKryptorExtension(inputFilePath) || validMagicBytes == false)
-        {
-            return "This file hasn't been encrypted.";
-        }
+        if (!FileHandling.HasKryptorExtension(inputFilePath) || validMagicBytes == false) { return "This file hasn't been encrypted."; }
         return null;
     }
 

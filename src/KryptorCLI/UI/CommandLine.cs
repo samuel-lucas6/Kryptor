@@ -220,11 +220,9 @@ public static class CommandLine
 
     private static void VerifySignature(char[] encodedPublicKey, string signatureFilePath, string[] filePaths)
     {
+        signatureFilePath = FilePathValidation.GetSignatureFilePath(signatureFilePath, filePaths);
         bool validUserInput = SigningValidation.Verify(encodedPublicKey, signatureFilePath, filePaths);
         if (!validUserInput) { return; }
-        signatureFilePath = FilePathValidation.GetSignatureFilePath(signatureFilePath, filePaths);
-        bool validSignatureFile = SigningValidation.SignatureFile(signatureFilePath);
-        if (!validSignatureFile) { return; }
         byte[] publicKey = AsymmetricKeyValidation.SigningPublicKeyString(encodedPublicKey);
         FileSigning.VerifyFile(signatureFilePath, filePaths[0], publicKey);
     }
@@ -234,12 +232,10 @@ public static class CommandLine
         signatureFilePath = FilePathValidation.GetSignatureFilePath(signatureFilePath, filePaths);
         bool validUserInput = SigningValidation.Verify(publicKeyPath, signatureFilePath, filePaths);
         if (!validUserInput) { return; }
-        bool validSignatureFile = SigningValidation.SignatureFile(signatureFilePath);
-        if (!validSignatureFile) { return; }
         byte[] publicKey = AsymmetricKeyValidation.SigningPublicKeyFile(publicKeyPath);
         FileSigning.VerifyFile(signatureFilePath, filePaths[0], publicKey);
     }
-        
+    
     public static void CheckForUpdates()
     {
         try

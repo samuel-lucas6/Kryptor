@@ -84,6 +84,11 @@ public static class SigningValidation
         {
             yield return InvalidSignatureFile;
         }
+        else
+        {
+            string errorMessage = GetSignatureFileError(signatureFilePath);
+            if (!string.IsNullOrEmpty(errorMessage)) { yield return errorMessage; }
+        }
         if (filePaths == null)
         {
             yield return ErrorMessages.NoFileToVerify;
@@ -115,6 +120,11 @@ public static class SigningValidation
         {
             yield return InvalidSignatureFile;
         }
+        else
+        {
+            string errorMessage = GetSignatureFileError(signatureFilePath);
+            if (!string.IsNullOrEmpty(errorMessage)) { yield return errorMessage; }
+        }
         if (filePaths == null)
         {
             yield return ErrorMessages.NoFileToVerify;
@@ -130,29 +140,11 @@ public static class SigningValidation
         }
     }
 
-    public static bool SignatureFile(string signatureFilePath)
+    private static string GetSignatureFileError(string signatureFilePath)
     {
-        IEnumerable<string> errorMessages = GetSignatureFileError(signatureFilePath);
-        return DisplayMessage.AnyErrors(errorMessages);
-    }
-
-    private static IEnumerable<string> GetSignatureFileError(string signatureFilePath)
-    {
-        if (string.IsNullOrEmpty(signatureFilePath))
-        {
-            yield return "Please specify a signature file.";
-        }
-        else
-        {
-            bool? validMagicBytes = FileHandling.IsSignatureFile(signatureFilePath);
-            if (validMagicBytes == null)
-            {
-                yield return "Unable to access the signature file.";
-            }
-            else if (validMagicBytes == false)
-            {
-                yield return InvalidSignatureFile;
-            }
-        }
+        if (string.IsNullOrEmpty(signatureFilePath)) { return "Please specify a signature file."; }
+        bool? validMagicBytes = FileHandling.IsSignatureFile(signatureFilePath);
+        if (validMagicBytes == null) { return "Unable to access the signature file."; }
+        return validMagicBytes == false ? InvalidSignatureFile : null;
     }
 }
