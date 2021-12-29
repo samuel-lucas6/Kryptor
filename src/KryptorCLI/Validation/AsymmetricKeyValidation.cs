@@ -61,12 +61,9 @@ public static class AsymmetricKeyValidation
         try
         {
             string encodedPublicKey = File.ReadAllText(publicKeyPath);
-            if (encodedPublicKey.Length != Constants.PublicKeyLength)
-            {
-                DisplayMessage.Error(ErrorMessages.InvalidPublicKey);
-                return null;
-            }
-            return Convert.FromBase64String(encodedPublicKey);
+            if (encodedPublicKey.Length == Constants.PublicKeyLength) { return Convert.FromBase64String(encodedPublicKey); }
+            DisplayMessage.Error(ErrorMessages.InvalidPublicKey);
+            return null;
         }
         catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
         {
