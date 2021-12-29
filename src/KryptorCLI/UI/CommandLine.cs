@@ -268,7 +268,7 @@ public static class CommandLine
                     return;
             }
         }
-        catch (Exception ex) when (ex is WebException or PlatformNotSupportedException || ExceptionFilters.Cryptography(ex))
+        catch (Exception ex) when (ex is WebException or PlatformNotSupportedException or FormatException or OverflowException || ExceptionFilters.Cryptography(ex))
         {
             if (ex is PlatformNotSupportedException or CryptographicException)
             {
