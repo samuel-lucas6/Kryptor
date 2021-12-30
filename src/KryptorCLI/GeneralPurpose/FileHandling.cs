@@ -35,13 +35,19 @@ public static class FileHandling
     public static string[] GetAllFiles(string directoryPath) => Directory.GetFiles(directoryPath, searchPattern: "*", SearchOption.AllDirectories);
 
     public static long GetFileLength(string filePath) => new FileInfo(filePath).Length;
-    
-    public static string ReplaceFileName(string originalFilePath, string newFileName) => Path.Combine(Path.GetDirectoryName(originalFilePath), newFileName);
 
     public static bool HasKryptorExtension(string filePath) => filePath.EndsWith(Constants.EncryptedExtension, StringComparison.Ordinal);
     
     public static string GetRandomFileName() => Utilities.BinaryToBase64(SodiumCore.GetRandomBytes(count: 16), Utilities.Base64Variant.UrlSafeNoPadding);
 
+    public static string ReplaceFileName(string originalFilePath, string newFileName)
+    {
+        string directoryPath = Path.GetDirectoryName(originalFilePath);
+        string newPath = Path.GetFullPath(Path.Combine(directoryPath, newFileName));
+        if (!newPath.StartsWith(directoryPath)) { throw new ArgumentException("Invalid new path."); }
+        return newPath;
+    }
+    
     public static string GetEncryptedOutputFilePath(string inputFilePath)
     {
         try
@@ -167,7 +173,6 @@ public static class FileHandling
 
     public static string GetUniqueFilePath(string filePath)
     {
-        if (filePath.IndexOfAny(Path.GetInvalidPathChars()) != -1) { throw new ArgumentException(ErrorMessages.InvalidCharactersInPath); }
         filePath = RemoveFileNameNumber(filePath);
         if (!File.Exists(filePath)) { return filePath; }
         string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
@@ -201,7 +206,6 @@ public static class FileHandling
 
     public static string GetUniqueDirectoryPath(string directoryPath)
     {
-        if (directoryPath.IndexOfAny(Path.GetInvalidPathChars()) != -1) { throw new ArgumentException(ErrorMessages.InvalidCharactersInPath); }
         if (!Directory.Exists(directoryPath)) { return directoryPath; }
         string parentDirectory = Directory.GetParent(directoryPath)?.FullName;
         string directoryName = Path.GetFileName(directoryPath);

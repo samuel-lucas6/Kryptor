@@ -30,7 +30,6 @@ public static class ErrorMessages
     public const string NonExistentPublicKeyFile = "Please specify a public key file that exists.";
     public const string NoFileToVerify = "Please specify a file to verify.";
     public const string NoFileToSign = "Please specify a file to sign.";
-    public const string InvalidCharactersInPath = "Invalid characters in the file path.";
     public const string PasswordBasedEncryption = "Please specify a password and/or keyfile, private key, or private key and public key.";
     public const string UnableToEncryptFile = "Unable to encrypt the file.";
     public const string UnableToDecryptFile = "Unable to decrypt the file.";
