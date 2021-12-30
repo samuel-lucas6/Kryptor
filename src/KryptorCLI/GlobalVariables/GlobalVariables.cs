@@ -23,5 +23,5 @@ public static class Globals
     public static int SuccessfulCount { get; set; }
     public static int TotalCount { get; set; }
     public static bool Overwrite { get; set; }
-    public static bool ObfuscateFileNames { get; set; }
+    public static bool EncryptFileNames { get; set; }
 }

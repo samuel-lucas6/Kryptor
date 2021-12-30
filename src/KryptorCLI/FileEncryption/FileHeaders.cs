@@ -38,7 +38,7 @@ public static class FileHeaders
 
     public static byte[] GetFileNameLength(string inputFilePath, bool zeroByteFile)
     {
-        if (!zeroByteFile && !Globals.ObfuscateFileNames) { return BitConversion.GetBytes(0); }
+        if (!zeroByteFile && !Globals.EncryptFileNames) { return BitConversion.GetBytes(0); }
         var fileNameBytes = Encoding.UTF8.GetBytes(Path.GetFileName(inputFilePath));
         return BitConversion.GetBytes(fileNameBytes.Length);
     }

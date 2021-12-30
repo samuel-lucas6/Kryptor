@@ -52,7 +52,7 @@ public static class FileHandling
     {
         try
         {
-            if (Globals.ObfuscateFileNames)
+            if (Globals.EncryptFileNames)
             {
                 AppendFileName(inputFilePath);
                 inputFilePath = ReplaceFileName(inputFilePath, GetRandomFileName());

@@ -65,7 +65,7 @@ public static class DirectoryEncryption
         newDirectoryPath = directoryPath;
         try
         {
-            if (Globals.ObfuscateFileNames)
+            if (Globals.EncryptFileNames)
             {
                 Console.WriteLine($"Renaming {Path.GetFileName(directoryPath)} and subdirectories...");
                 newDirectoryPath = ObfuscateDirectoryNames.AllDirectories(directoryPath);

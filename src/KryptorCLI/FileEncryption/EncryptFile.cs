@@ -48,7 +48,7 @@ public static class EncryptFile
             {
                 FileHandling.OverwriteFile(inputFilePath, outputFilePath);
             }
-            else if (Globals.ObfuscateFileNames || zeroByteFile)
+            else if (Globals.EncryptFileNames || zeroByteFile)
             {
                 RestoreFileName.RemoveAppendedFileName(inputFilePath);
             }

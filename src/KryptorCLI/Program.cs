@@ -57,8 +57,8 @@ public class Program
     [Option("-y|--public", "specify a public key", CommandOptionType.SingleValue)]
     private string PublicKey { get; }
 
-    [Option("-f|--obfuscate", "obfuscate file names", CommandOptionType.NoValue)]
-    private bool ObfuscateFileNames { get; }
+    [Option("-n|--names", "encrypt file/folder names", CommandOptionType.NoValue)]
+    private bool EncryptFileNames { get; }
 
     [Option("-o|--overwrite", "overwrite input files", CommandOptionType.NoValue)]
     private bool Overwrite { get; }
@@ -99,7 +99,7 @@ public class Program
     {
         ExtractVisualCRuntime();
         Globals.Overwrite = Overwrite;
-        Globals.ObfuscateFileNames = ObfuscateFileNames;
+        Globals.EncryptFileNames = EncryptFileNames;
         Globals.TotalCount = FilePaths?.Length ?? 0;
         Console.WriteLine();
         if (Encrypt)
