@@ -31,7 +31,7 @@ public static class DisplayMessage
 
     public static void FilePathMessage(string filePath, string message) => Console.WriteLine($"{Path.GetFileName(filePath)}: {message}");
 
-    public static void FilePathError(string filePath, string message) => Console.WriteLine($"{Path.GetFileName(filePath)} - {ErrorWord}: {message}");
+    public static void FilePathError(string filePath, string errorMessage) => Console.WriteLine($"{Path.GetFileName(filePath)} - {ErrorWord}: {errorMessage}");
     
     public static void Exception(string exceptionName, string errorMessage) => Console.WriteLine($"{ErrorWord}: {exceptionName} - {errorMessage}");
     

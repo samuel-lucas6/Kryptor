@@ -46,7 +46,7 @@ public static class ObfuscateDirectoryNames
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
-            DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to obfuscate directory name.");
+            DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to obfuscate the directory name.");
             return directoryPath;
         }
     }

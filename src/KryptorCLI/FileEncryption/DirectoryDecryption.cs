@@ -30,7 +30,7 @@ public static class DirectoryDecryption
         {
             string[] filePaths = GetFiles(directoryPath);
             string saltFilePath = Path.Combine(directoryPath, Constants.SaltFileName);
-            if (!File.Exists(saltFilePath)) { throw new FileNotFoundException("No salt file found. Unable to decrypt the directory. Please decrypt these files individually."); }
+            if (!File.Exists(saltFilePath)) { throw new FileNotFoundException("No salt file was found, so it's not possible to decrypt the directory. Please decrypt these files individually."); }
             byte[] salt = File.ReadAllBytes(saltFilePath);
             if (salt.Length != Constants.SaltLength) { throw new ArgumentException("Invalid salt length."); }
             byte[] keyEncryptionKey = KeyDerivation.Argon2id(passwordBytes, salt);
@@ -177,6 +177,6 @@ public static class DirectoryDecryption
             DisplayMessage.FilePathMessage(inputFilePath, ex.Message);
             return;
         }
-        DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to decrypt the file.");
+        DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToDecryptFile);
     }
 }

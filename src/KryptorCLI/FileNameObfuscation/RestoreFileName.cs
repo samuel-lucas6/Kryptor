@@ -64,7 +64,7 @@ public static class RestoreFileName
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
-            DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to remove appended file name.");
+            DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to remove the appended file name.");
         }
     }
 }

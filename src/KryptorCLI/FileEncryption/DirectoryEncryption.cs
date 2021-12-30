@@ -111,7 +111,7 @@ public static class DirectoryEncryption
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
         {
-            DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to encrypt the file.");
+            DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToEncryptFile);
         }
     }
 

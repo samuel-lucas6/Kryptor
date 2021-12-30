@@ -42,7 +42,7 @@ public static class FileSigning
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
-                DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to create signature.");
+                DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to create a signature.");
             }
         }
         CryptographicOperations.ZeroMemory(privateKey);
@@ -72,7 +72,7 @@ public static class FileSigning
                 DisplayMessage.FilePathMessage(signatureFilePath, ex.Message);
                 return;
             }
-            DisplayMessage.Exception(ex.GetType().Name, "Unable to verify signature.");
+            DisplayMessage.Exception(ex.GetType().Name, "Unable to verify the signature.");
         }
     }
 }

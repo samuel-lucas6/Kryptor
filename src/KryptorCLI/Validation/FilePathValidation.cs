@@ -62,7 +62,7 @@ public static class FilePathValidation
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
-            DisplayMessage.FilePathException(keyfilePath, ex.GetType().Name, "Unable to randomly generate keyfile.");
+            DisplayMessage.FilePathException(keyfilePath, ex.GetType().Name, "Unable to randomly generate a keyfile.");
             return null;
         }
     }

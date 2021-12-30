@@ -46,7 +46,7 @@ public static class FileHeaders
     public static void ValidateFormatVersion(byte[] formatVersion, byte[] currentFormatVersion)
     {
         bool validFormatVersion = Utilities.Compare(formatVersion, currentFormatVersion);
-        if (!validFormatVersion) { throw new ArgumentException("Incorrect file format for this version of Kryptor."); }
+        if (!validFormatVersion) { throw new ArgumentException("This file format is not supported in this version of Kryptor."); }
     }
 
     public static byte[] ReadEphemeralPublicKey(FileStream inputFile)

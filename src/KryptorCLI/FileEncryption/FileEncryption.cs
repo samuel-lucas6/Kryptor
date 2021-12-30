@@ -52,7 +52,7 @@ public static class FileEncryption
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
         {
-            DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to encrypt the file.");
+            DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToEncryptFile);
         }
     }
 
@@ -95,7 +95,7 @@ public static class FileEncryption
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
         {
-            DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to encrypt the file.");
+            DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToEncryptFile);
         }
     }
 
@@ -128,7 +128,7 @@ public static class FileEncryption
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
         {
-            DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to encrypt the file.");
+            DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToEncryptFile);
         }
     }
 }

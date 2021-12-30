@@ -47,7 +47,7 @@ public static class Password
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
-            DisplayMessage.Exception(ex.GetType().Name, "Unable to read keyfile. The keyfile has not been used.");
+            DisplayMessage.Exception(ex.GetType().Name, "Unable to read the keyfile, so it has not been used.");
             return passwordBytes;
         }
     }

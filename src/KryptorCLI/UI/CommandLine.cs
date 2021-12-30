@@ -45,7 +45,7 @@ public static class CommandLine
         }
         else
         {
-            DisplayMessage.Error("Please specify a password and/or keyfile, private key, or private key and public key.");
+            DisplayMessage.Error(ErrorMessages.PasswordBasedEncryption);
         }
     }
 
@@ -106,7 +106,7 @@ public static class CommandLine
         }
         else
         {
-            DisplayMessage.Error("Please specify a password and/or keyfile, private key, or private key and public key.");
+            DisplayMessage.Error(ErrorMessages.PasswordBasedEncryption);
         }
     }
 
@@ -168,7 +168,7 @@ public static class CommandLine
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
-            DisplayMessage.FilePathException(exportDirectoryPath, ex.GetType().Name, "Unable to create key pair files.");
+            DisplayMessage.FilePathException(exportDirectoryPath, ex.GetType().Name, "Unable to create the key pair files.");
         }
     }
 

@@ -54,7 +54,7 @@ public static class FileHandling
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex) || ex is EncoderFallbackException)
         {
-            DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to store file name.");
+            DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to store the file name.");
         }
         return GetUniqueFilePath(inputFilePath + Constants.EncryptedExtension);
     }
@@ -119,7 +119,7 @@ public static class FileHandling
     public static void CopyDirectory(string sourceDirectoryPath, string destinationDirectoryPath, bool copySubdirectories)
     {
         var directoryInfo = new DirectoryInfo(sourceDirectoryPath);
-        if (!directoryInfo.Exists) { throw new DirectoryNotFoundException("Source directory does not exist or could not be found."); }
+        if (!directoryInfo.Exists) { throw new DirectoryNotFoundException("The source directory does not exist or could not be found."); }
         DirectoryInfo[] directories = directoryInfo.GetDirectories();
         destinationDirectoryPath = GetUniqueDirectoryPath(destinationDirectoryPath);
         Directory.CreateDirectory(destinationDirectoryPath);
@@ -167,7 +167,7 @@ public static class FileHandling
 
     public static string GetUniqueFilePath(string filePath)
     {
-        if (filePath.IndexOfAny(Path.GetInvalidPathChars()) != -1) { throw new ArgumentException("Invalid characters in file path."); }
+        if (filePath.IndexOfAny(Path.GetInvalidPathChars()) != -1) { throw new ArgumentException(ErrorMessages.InvalidCharactersInPath); }
         filePath = RemoveFileNameNumber(filePath);
         if (!File.Exists(filePath)) { return filePath; }
         string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
@@ -201,7 +201,7 @@ public static class FileHandling
 
     public static string GetUniqueDirectoryPath(string directoryPath)
     {
-        if (directoryPath.IndexOfAny(Path.GetInvalidPathChars()) != -1) { throw new ArgumentException("Invalid characters in file path."); }
+        if (directoryPath.IndexOfAny(Path.GetInvalidPathChars()) != -1) { throw new ArgumentException(ErrorMessages.InvalidCharactersInPath); }
         if (!Directory.Exists(directoryPath)) { return directoryPath; }
         string parentDirectory = Directory.GetParent(directoryPath)?.FullName;
         string directoryName = Path.GetFileName(directoryPath);
@@ -223,7 +223,7 @@ public static class FileHandling
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
-            DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to make the file read-only.");
+            DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to mark the file as read-only.");
         }
     }
 }

@@ -67,7 +67,7 @@ public static class AsymmetricKeyValidation
         }
         catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
         {
-            DisplayMessage.Exception(ex.GetType().Name, "Unable to retrieve public key.");
+            DisplayMessage.Exception(ex.GetType().Name, "Unable to retrieve the public key.");
             return null;
         }
     }
@@ -169,7 +169,7 @@ public static class AsymmetricKeyValidation
                 DisplayMessage.Exception(ex.GetType().Name, ex.Message);
                 return null;
             }
-            DisplayMessage.Exception(ex.GetType().Name, "Unable to retrieve private key.");
+            DisplayMessage.Exception(ex.GetType().Name, "Unable to retrieve the private key.");
             return null;
         }
     }
@@ -178,6 +178,6 @@ public static class AsymmetricKeyValidation
     {
         byte[] keyVersion = Arrays.Copy(privateKey, Constants.Curve25519KeyHeader.Length, Constants.PrivateKeyVersion.Length);
         bool validKeyVersion = Utilities.Compare(keyVersion, Constants.PrivateKeyVersion);
-        if (!validKeyVersion) { throw new ArgumentException("Unsupported private key version."); }
+        if (!validKeyVersion) { throw new ArgumentException("This private key version is not supported in this version of Kryptor."); }
     }
 }

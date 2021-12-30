@@ -63,7 +63,7 @@ public static class Updates
 
     public static void Update(string latestVersion)
     {
-        if (!OperatingSystem.IsWindows() & !OperatingSystem.IsLinux() & !OperatingSystem.IsMacOS())
+        if (!Environment.Is64BitOperatingSystem || !OperatingSystem.IsWindows() & !OperatingSystem.IsLinux() & !OperatingSystem.IsMacOS())
         {
             throw new PlatformNotSupportedException("There are no official releases for your operating system.");
         }
@@ -137,7 +137,7 @@ public static class Updates
             };
             Process.Start(startInfo);
         }
-        Console.WriteLine("Update complete.");
+        Console.WriteLine("Update complete. Please specify -a|--about to check the version.");
         Environment.Exit(0);
     }
 }

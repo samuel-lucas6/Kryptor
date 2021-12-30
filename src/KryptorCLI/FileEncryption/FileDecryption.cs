@@ -143,6 +143,6 @@ public static class FileDecryption
             DisplayMessage.FilePathMessage(inputFilePath, ex.Message);
             return;
         }
-        DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to decrypt the file.");
+        DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToDecryptFile);
     }
 }
