@@ -41,11 +41,11 @@ public static class FileEncryptionValidation
         }
         if (Path.EndsInDirectorySeparator(keyfilePath) && !Directory.Exists(keyfilePath))
         {
-            yield return "Please specify a valid keyfile directory.";
+            yield return "Please specify a valid directory for the keyfile.";
         }
         else if (File.Exists(keyfilePath) && FileHandling.GetFileLength(keyfilePath) < Constants.KeyfileLength)
         {
-            yield return "Please specify a keyfile that is at least 64 bytes in size.";
+            yield return "Please specify a keyfile that's at least 64 bytes in size.";
         }
     }
 
@@ -73,17 +73,17 @@ public static class FileEncryptionValidation
 
     private static IEnumerable<string> GetFileEncryptionErrors(string privateKeyPath, string publicKeyPath)
     {
-        if (string.IsNullOrEmpty(privateKeyPath) && !File.Exists(Constants.DefaultEncryptionPrivateKeyPath))
+        foreach (string errorMessage in GetFileEncryptionErrors(privateKeyPath))
         {
-            yield return ErrorMessages.InvalidPrivateKeyFile;
+            yield return errorMessage;
         }
-        else if (!string.IsNullOrEmpty(privateKeyPath) && (!privateKeyPath.EndsWith(Constants.PrivateKeyExtension) || !File.Exists(privateKeyPath)))
+        if (!string.IsNullOrEmpty(publicKeyPath) && !publicKeyPath.EndsWith(Constants.PublicKeyExtension))
         {
-            yield return ErrorMessages.InvalidPrivateKeyFile;
+            yield return ErrorMessages.InvalidPublicKeyFile;
         }
-        if (string.IsNullOrEmpty(publicKeyPath) || !publicKeyPath.EndsWith(Constants.PublicKeyExtension) || !File.Exists(publicKeyPath))
+        else if (!File.Exists(publicKeyPath))
         {
-            yield return ErrorMessages.InvalidPublicKey;
+            yield return ErrorMessages.NonExistentPublicKeyFile;
         }
     }
 
@@ -95,18 +95,11 @@ public static class FileEncryptionValidation
 
     private static IEnumerable<string> GetFileEncryptionErrors(string privateKeyPath, char[] encodedPublicKey)
     {
-        if (string.IsNullOrEmpty(privateKeyPath) && !File.Exists(Constants.DefaultEncryptionPrivateKeyPath))
+        foreach (string errorMessage in GetFileEncryptionErrors(privateKeyPath))
         {
-            yield return ErrorMessages.InvalidPrivateKeyFile;
+            yield return errorMessage;
         }
-        else if (!string.IsNullOrEmpty(privateKeyPath) && (!privateKeyPath.EndsWith(Constants.PrivateKeyExtension) || !File.Exists(privateKeyPath)))
-        {
-            yield return ErrorMessages.InvalidPrivateKeyFile;
-        }
-        if (encodedPublicKey.Length != Constants.PublicKeyLength)
-        {
-            yield return ErrorMessages.InvalidPublicKey;
-        }
+        if (encodedPublicKey.Length != Constants.PublicKeyLength) { yield return ErrorMessages.InvalidPublicKey; }
     }
 
     public static bool FileEncryptionWithPrivateKey(string privateKeyPath, string[] filePaths)
@@ -119,11 +112,15 @@ public static class FileEncryptionValidation
     {
         if (string.IsNullOrEmpty(privateKeyPath) && !File.Exists(Constants.DefaultEncryptionPrivateKeyPath))
         {
-            yield return ErrorMessages.InvalidPrivateKeyFile;
+            yield return ErrorMessages.NonExistentDefaultPrivateKeyFile;
         }
-        else if (!string.IsNullOrEmpty(privateKeyPath) && (!privateKeyPath.EndsWith(Constants.PrivateKeyExtension) || !File.Exists(privateKeyPath)))
+        else if (!string.IsNullOrEmpty(privateKeyPath) && !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
         {
             yield return ErrorMessages.InvalidPrivateKeyFile;
+        }
+        else if (!string.IsNullOrEmpty(privateKeyPath) && !File.Exists(privateKeyPath))
+        {
+            yield return ErrorMessages.NonExistentPrivateKeyFile;
         }
     }
 
@@ -135,14 +132,8 @@ public static class FileEncryptionValidation
 
     private static IEnumerable<string> GetFileDecryptionErrors(bool usePassword, string keyfilePath)
     {
-        if (!usePassword && string.IsNullOrEmpty(keyfilePath))
-        {
-            yield return PasswordOrKeyfileError;
-        }
-        if (!string.IsNullOrEmpty(keyfilePath) && !File.Exists(keyfilePath))
-        {
-            yield return "Please specify a keyfile that exists.";
-        }
+        if (!usePassword && string.IsNullOrEmpty(keyfilePath)) { yield return PasswordOrKeyfileError; }
+        if (!string.IsNullOrEmpty(keyfilePath) && !File.Exists(keyfilePath)) { yield return "Please specify a keyfile that exists."; }
     }
 
     private static IEnumerable<string> GetDecryptionFilePathErrors(string[] filePaths)

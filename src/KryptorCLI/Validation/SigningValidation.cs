@@ -24,6 +24,7 @@ namespace KryptorCLI;
 public static class SigningValidation
 {
     private const string InvalidSignatureFile = "Please specify a valid signature file.";
+    private const string NonExistentSignatureFile = "Please specify a signature file that exists.";
     private const string SingleFileToVerifyError = "Please specify a single file to verify.";
 
     public static bool Sign(string privateKeyPath, string comment, string signatureFilePath, string[] filePaths)
@@ -36,15 +37,19 @@ public static class SigningValidation
     {
         if (string.IsNullOrEmpty(privateKeyPath) && !File.Exists(Constants.DefaultSigningPrivateKeyPath))
         {
-            yield return ErrorMessages.InvalidPrivateKeyFile;
+            yield return ErrorMessages.NonExistentDefaultPrivateKeyFile;
         }
-        else if (!string.IsNullOrEmpty(privateKeyPath) && (!File.Exists(privateKeyPath) || !privateKeyPath.EndsWith(Constants.PrivateKeyExtension)))
+        else if (!string.IsNullOrEmpty(privateKeyPath) && !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
         {
             yield return ErrorMessages.InvalidPrivateKeyFile;
+        }
+        else if (!string.IsNullOrEmpty(privateKeyPath) && !File.Exists(privateKeyPath))
+        {
+            yield return ErrorMessages.NonExistentPrivateKeyFile;
         }
         if (!string.IsNullOrEmpty(comment) && comment.Length > 500)
         {
-            yield return "Please enter a comment 500 or less characters long.";
+            yield return "Please enter a shorter comment. The maximum length is 500 characters.";
         }
         if (!string.IsNullOrEmpty(signatureFilePath) && !signatureFilePath.EndsWith(Constants.SignatureExtension))
         {
@@ -56,7 +61,7 @@ public static class SigningValidation
         }
         else if (filePaths.Length > 1 && !string.IsNullOrEmpty(signatureFilePath))
         {
-            yield return "You cannot specify a signature file when signing multiple files.";
+            yield return "You cannot currently specify a signature file when signing multiple files.";
         }
         else
         {
@@ -76,31 +81,14 @@ public static class SigningValidation
 
     private static IEnumerable<string> GetVerifyErrors(char[] encodedPublicKey, string signatureFilePath, string[] filePaths)
     {
-        if (encodedPublicKey.Length != Constants.PublicKeyLength)
+        if (encodedPublicKey.Length != Constants.PublicKeyLength) { yield return ErrorMessages.InvalidPublicKey; }
+        foreach (string errorMessage in GetSignatureFileErrors(signatureFilePath))
         {
-            yield return ErrorMessages.InvalidPublicKey;
+            yield return errorMessage;
         }
-        if (!string.IsNullOrEmpty(signatureFilePath) && (!signatureFilePath.EndsWith(Constants.SignatureExtension) || !File.Exists(signatureFilePath)))
+        foreach (string errorMessage in GetVerifyFilePathsErrors(filePaths))
         {
-            yield return InvalidSignatureFile;
-        }
-        else
-        {
-            string errorMessage = GetSignatureFileError(signatureFilePath);
-            if (!string.IsNullOrEmpty(errorMessage)) { yield return errorMessage; }
-        }
-        if (filePaths == null)
-        {
-            yield return ErrorMessages.NoFileToVerify;
-        }
-        else if (filePaths.Length > 1)
-        {
-            yield return SingleFileToVerifyError;
-        }
-        else
-        {
-            string errorMessage = FilePathValidation.GetSignatureVerifyError(filePaths[0]);
-            if (!string.IsNullOrEmpty(errorMessage)) { yield return ErrorMessages.GetFilePathError(filePaths[0], errorMessage); }
+            yield return errorMessage;
         }
     }
 
@@ -112,19 +100,48 @@ public static class SigningValidation
 
     private static IEnumerable<string> GetVerifyErrors(string publicKeyPath, string signatureFilePath, string[] filePaths)
     {
-        if (!File.Exists(publicKeyPath) || !publicKeyPath.EndsWith(Constants.PublicKeyExtension))
+        if (!string.IsNullOrEmpty(publicKeyPath) && !publicKeyPath.EndsWith(Constants.PublicKeyExtension))
         {
-            yield return ErrorMessages.InvalidPublicKey;
+            yield return ErrorMessages.InvalidPublicKeyFile;
         }
-        if (!string.IsNullOrEmpty(signatureFilePath) && (!signatureFilePath.EndsWith(Constants.SignatureExtension) || !File.Exists(signatureFilePath)))
+        else if (!File.Exists(publicKeyPath))
+        {
+            yield return ErrorMessages.NonExistentPublicKeyFile;
+        }
+        foreach (string errorMessage in GetSignatureFileErrors(signatureFilePath))
+        {
+            yield return errorMessage;
+        }
+        foreach (string errorMessage in GetVerifyFilePathsErrors(filePaths))
+        {
+            yield return errorMessage;
+        }
+    }
+
+    private static IEnumerable<string> GetSignatureFileErrors(string signatureFilePath)
+    {
+        if (string.IsNullOrEmpty(signatureFilePath))
+        {
+            yield return "Please specify a signature file.";
+        }
+        else if (!signatureFilePath.EndsWith(Constants.SignatureExtension))
         {
             yield return InvalidSignatureFile;
         }
+        else if (!File.Exists(signatureFilePath))
+        {
+            yield return NonExistentSignatureFile;
+        }
         else
         {
-            string errorMessage = GetSignatureFileError(signatureFilePath);
-            if (!string.IsNullOrEmpty(errorMessage)) { yield return errorMessage; }
+            bool? validMagicBytes = FileHandling.IsSignatureFile(signatureFilePath);
+            if (validMagicBytes == null) { yield return "Unable to access the signature file."; }
+            if (validMagicBytes == false) { yield return InvalidSignatureFile; }
         }
+    }
+
+    private static IEnumerable<string> GetVerifyFilePathsErrors(string[] filePaths)
+    {
         if (filePaths == null)
         {
             yield return ErrorMessages.NoFileToVerify;
@@ -138,13 +155,5 @@ public static class SigningValidation
             string errorMessage = FilePathValidation.GetSignatureVerifyError(filePaths[0]);
             if (!string.IsNullOrEmpty(errorMessage)) { yield return ErrorMessages.GetFilePathError(filePaths[0], errorMessage); }
         }
-    }
-
-    private static string GetSignatureFileError(string signatureFilePath)
-    {
-        if (string.IsNullOrEmpty(signatureFilePath)) { return "Please specify a signature file."; }
-        bool? validMagicBytes = FileHandling.IsSignatureFile(signatureFilePath);
-        if (validMagicBytes == null) { return "Unable to access the signature file."; }
-        return validMagicBytes == false ? InvalidSignatureFile : null;
     }
 }

@@ -158,13 +158,17 @@ public static class FilePathValidation
 
     private static IEnumerable<string> GetRecoverPublicKeyError(string privateKeyPath)
     {
-        if (privateKeyPath == null)
+        if (string.IsNullOrEmpty(privateKeyPath))
         {
             yield return "Please specify a private key using [-x=filepath].";
         }
-        else if (!File.Exists(privateKeyPath) || !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
+        else if (!string.IsNullOrEmpty(privateKeyPath) && !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
         {
             yield return ErrorMessages.InvalidPrivateKeyFile;
+        }
+        else if (!string.IsNullOrEmpty(privateKeyPath) && !File.Exists(privateKeyPath))
+        {
+            yield return ErrorMessages.NonExistentPrivateKeyFile;
         }
     }
 

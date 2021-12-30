@@ -23,7 +23,11 @@ namespace KryptorCLI;
 public static class ErrorMessages
 {
     public const string InvalidPrivateKeyFile = "Please specify a valid private key file.";
+    public const string NonExistentDefaultPrivateKeyFile = "You don't have a default key pair. You can generate one using -g|--generate.";
+    public const string NonExistentPrivateKeyFile = "Please specify a private key file that exists.";
     public const string InvalidPublicKey = "Please specify a valid public key.";
+    public const string InvalidPublicKeyFile = "Please specify a valid public key file.";
+    public const string NonExistentPublicKeyFile = "Please specify a public key file that exists.";
     public const string NoFileToVerify = "Please specify a file to verify.";
     public const string NoFileToSign = "Please specify a file to sign.";
     public const string InvalidCharactersInPath = "Invalid characters in the file path.";
