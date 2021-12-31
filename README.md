@@ -2,7 +2,7 @@
 [![CodeQL](https://github.com/samuel-lucas6/Kryptor/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/samuel-lucas6/Kryptor/actions)
 
 # Kryptor
-Kryptor is free and open source file encryption software for Windows, Linux, and macOS.
+Kryptor is free and open source file encryption and signing software for Windows, Linux, and macOS.
 
 It is a portable, cross-platform command line tool that makes use of modern and secure cryptographic algorithms. It aims to be a better version of [age](https://github.com/FiloSottile/age) and [Minisign](https://github.com/jedisct1/minisign) to provide a simple, user friendly alternative to [GPG](https://gnupg.org/).
 
@@ -15,7 +15,7 @@ It is a portable, cross-platform command line tool that makes use of modern and 
 - Generation of asymmetric key pairs. The private key is encrypted for protection at rest.
 - UNIX style password entry and random passphrase generation.
 - Random keyfile generation. Any type of file can also be used as a keyfile.
-- Obfuscate output file names when encrypting files/folders.
+- Encrypt file/folder names.
 - Overwrite input files when encrypting files/folders.
 
 For more information, please go to [kryptor.co.uk](https://www.kryptor.co.uk/).
@@ -58,7 +58,7 @@ Examples:
   ```
 
 ### Specifying files
-When referencing file paths/file names that contain spaces, you must surround them with "speech marks" on Windows and 'apostrophes' on Linux and macOS:
+When referencing file paths/file names that contain spaces, you must surround them with "speech marks":
 ```
 $ kryptor -e -p "GitHub Logo.png"
 $ kryptor -e -p "C:\Users\samuel-lucas6\Downloads\GitHub Logo.png"
@@ -72,9 +72,13 @@ However, files that are not in the same directory as the `kryptor` executable mu
 $ kryptor -e -p C:\Users\samuel-lucas6\Documents\message.txt
 ```
 ### Specifying your private key
-You can use the `-x|--private` option without specifying a file path to use your default private key. This is the recommended approach, but it means your private keys must be kept in the default folder (`%USERPROFILE%/.kryptor` on Windows and `/home/.kryptor` on Linux and macOS).
+You can use the `-x|--private` option without specifying a file path to use your default private key. This is the recommended approach, but it means your private keys must be kept in the default folder, which varies depending on your operating system:
 
-To specify a non-default private key, you can use `-x|--private` followed by `=[file]` like so:
+- Windows: `%USERPROFILE%/.kryptor`
+- Linux: `/home/.kryptor`
+- macOS: `/Users/USERNAME/.kryptor`
+
+To specify a non-default private key, you can use `-x|--private` followed by `:[file]` like so:
 ```
-$ kryptor -e -x=C:\Users\samuel-lucas6\Documents\encryption.private message.txt
+$ kryptor -e -x:"C:\Users\samuel-lucas6\Documents\encryption.private message.txt"
 ```
