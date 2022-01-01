@@ -27,12 +27,14 @@ namespace KryptorCLI;
 [Command(ExtendedHelpText = @"  -h|--help       show help information
 
 Examples:
+  --encrypt [file]
   --encrypt -p [file]
-  --encrypt -x [file]
   --encrypt [-y recipient's public key] [file]
   --decrypt [-y sender's public key] [file]
   --sign [-c comment] [file]
-  --verify [-y public key] [-t signature] [file]
+  --verify [-y public key] [file]
+
+File names/paths that contain a space must be surrounded by ""speech marks"".
 
 Stuck? Read the tutorial at <https://www.kryptor.co.uk/tutorial>.
 
@@ -48,10 +50,10 @@ public class Program
     [Option("-p|--password", "use a password", CommandOptionType.NoValue)]
     private bool Password { get; }
 
-    [Option("-k|--keyfile", "specify a keyfile", CommandOptionType.SingleValue)]
+    [Option("-k|--keyfile", "specify or randomly generate a keyfile", CommandOptionType.SingleValue)]
     private string Keyfile { get; }
 
-    [Option("-x|--private", "specify your private key (blank for default)", CommandOptionType.SingleOrNoValue)]
+    [Option("-x|--private", "specify your private key (not used or empty for default key)", CommandOptionType.SingleOrNoValue)]
     private (bool hasValue, string value) PrivateKey { get; }
 
     [Option("-y|--public", "specify a public key", CommandOptionType.SingleValue)]
@@ -60,7 +62,7 @@ public class Program
     [Option("-n|--names", "encrypt file/folder names", CommandOptionType.NoValue)]
     private bool EncryptFileNames { get; }
 
-    [Option("-o|--overwrite", "overwrite input files", CommandOptionType.NoValue)]
+    [Option("-o|--overwrite", "overwrite files", CommandOptionType.NoValue)]
     private bool Overwrite { get; }
 
     [Option("-g|--generate", "generate a new key pair", CommandOptionType.NoValue)]
@@ -81,7 +83,7 @@ public class Program
     [Option("-v|--verify", "verify a signature", CommandOptionType.NoValue)]
     private bool Verify { get; }
 
-    [Option("-t|--signature", "specify a signature file", CommandOptionType.SingleValue)]
+    [Option("-t|--signature", "specify a signature file (not used for default name)", CommandOptionType.SingleValue)]
     private string Signature { get; }
 
     [Option("-u|--update", "check for updates", CommandOptionType.NoValue)]
@@ -90,7 +92,7 @@ public class Program
     [Option("-a|--about", "view the program version and license", CommandOptionType.NoValue)]
     private bool About { get; }
 
-    [Argument(0, Name = "file", Description = "specify a file path")]
+    [Argument(0, Name = "file", Description = "specify a file/folder path")]
     private string[] FilePaths { get; }
 
     public static int Main(string[] args) => CommandLineApplication.Execute<Program>(args);
