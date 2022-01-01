@@ -246,7 +246,11 @@ public static class CommandLine
                 Console.WriteLine("Kryptor is up-to-date.");
                 return;
             }
-            Console.WriteLine("An update is available for Kryptor. Would you like to update now? (type y or n)");
+            Console.WriteLine("An update is available for Kryptor.");
+            Console.WriteLine();
+            Console.WriteLine($"IMPORTANT: Please check the latest changelog at <https://www.kryptor.co.uk/changelog#v{latestVersion}> to see if there are any breaking changes BEFORE updating.");
+            Console.WriteLine();
+            Console.WriteLine("Would you like Kryptor to automatically install this update now? (type y or n)");
             string userInput = Console.ReadLine()?.ToLower();
             if (!string.IsNullOrEmpty(userInput)) { Console.WriteLine(); }
             switch (userInput)
