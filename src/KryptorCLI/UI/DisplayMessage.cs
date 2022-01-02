@@ -53,13 +53,13 @@ public static class DisplayMessage
     public static void DirectoryEncryptionComplete(string directoryPath)
     {
         Console.WriteLine();
-        WriteLine($"Encryption of '{Path.GetFileName(directoryPath)}' directory finished.", ConsoleColor.Blue);
+        WriteLine($"Encryption of '{Path.GetFileName(directoryPath)}' directory complete.", ConsoleColor.Blue);
     }
 
     public static void DirectoryDecryptionComplete(string directoryPath)
     {
         Console.WriteLine();
-        WriteLine($"Decryption of '{Path.GetFileName(directoryPath)}' directory finished.", ConsoleColor.Blue);
+        WriteLine($"Decryption of '{Path.GetFileName(directoryPath)}' directory complete.", ConsoleColor.Blue);
     }
 
     public static void SuccessfullyEncrypted(bool space = true)
