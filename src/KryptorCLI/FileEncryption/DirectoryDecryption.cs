@@ -32,6 +32,7 @@ public static class DirectoryDecryption
             string saltFilePath = Path.Combine(directoryPath, Constants.SaltFileName);
             if (!File.Exists(saltFilePath)) { throw new FileNotFoundException("No salt file was found, so it's not possible to decrypt the directory. Please decrypt these files individually."); }
             byte[] salt = File.ReadAllBytes(saltFilePath);
+            Globals.TotalCount--;
             if (salt.Length != Constants.SaltLength) { throw new ArgumentException("Invalid salt length."); }
             byte[] keyEncryptionKey = KeyDerivation.Argon2id(passwordBytes, salt);
             DecryptEachFileWithPassword(filePaths, keyEncryptionKey);

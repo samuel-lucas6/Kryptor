@@ -81,11 +81,7 @@ public static class FilePathValidation
 
     public static bool FileDecryption(string inputFilePath)
     {
-        if (inputFilePath.Contains(Constants.SaltFileName))
-        {
-            --Globals.TotalCount;
-            return false;
-        }
+        if (inputFilePath.Contains(Constants.SaltFileName)) { return false; }
         string errorMessage = GetFileDecryptionError(inputFilePath);
         if (string.IsNullOrEmpty(errorMessage)) { return true; }
         DisplayMessage.FilePathError(inputFilePath, errorMessage);

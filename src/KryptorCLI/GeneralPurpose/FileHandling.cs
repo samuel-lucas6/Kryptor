@@ -28,7 +28,7 @@ public static class FileHandling
 {
     public static bool IsDirectory(string filePath) => File.GetAttributes(filePath).HasFlag(FileAttributes.Directory);
 
-    public static bool IsDirectoryEmpty(string directoryPath) => !Directory.EnumerateFiles(directoryPath).Any();
+    public static bool IsDirectoryEmpty(string directoryPath) => !Directory.EnumerateFiles(directoryPath, searchPattern: "*", SearchOption.AllDirectories).Any();
 
     public static string[] GetAllDirectories(string directoryPath) => Directory.GetDirectories(directoryPath, searchPattern: "*", SearchOption.AllDirectories);
 
@@ -46,7 +46,7 @@ public static class FileHandling
     {
         string directoryPath = Path.GetDirectoryName(originalFilePath);
         string newPath = Path.GetFullPath(Path.Combine(directoryPath, newFileName));
-        if (!newPath.StartsWith(directoryPath)) { throw new ArgumentException("Invalid new path."); }
+        if (!newPath.StartsWith(Path.GetFullPath(directoryPath))) { throw new ArgumentException("Invalid new path."); }
         return newPath;
     }
     
