@@ -69,7 +69,7 @@ $ kryptor -e -p message.txt
 ```
 However, files that are not in the same directory as the `kryptor` executable must be specified using a file path:
 ```
-$ kryptor -e -p C:\Users\samuel-lucas6\Documents\message.txt
+$ kryptor -e -p "C:\Users\samuel-lucas6\Documents\message.txt"
 ```
 ### Specifying your private key
 You can use the `-x|--private` option without specifying a file path to use your default private key. However, in most cases, this option does not need to be specified. For example, you can perform encryption, decryption, and signing with your default private key as follows:
@@ -82,9 +82,9 @@ $ kryptor -s message.txt
 ```
 This is the recommended approach, but it means your private keys must be kept in the default folder, which varies depending on your operating system:
 
-- Windows: %USERPROFILE%/.kryptor
-- Linux: /home/.kryptor
-- macOS: /Users/USERNAME/.kryptor
+- Windows: `%USERPROFILE%/.kryptor`
+- Linux: `/home/.kryptor`
+- macOS: `/Users/USERNAME/.kryptor`
 
 To specify a private key for `-r|--recover` or a private key not stored in the default folder, you must use the `-x|--private` option followed by `:[file]` like so:
 ```
