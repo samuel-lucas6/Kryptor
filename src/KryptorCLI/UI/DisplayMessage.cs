@@ -27,51 +27,53 @@ public static class DisplayMessage
 {
     private const string ErrorWord = "Error";
     
-    public static void Error(string errorMessage) => Console.WriteLine($"{ErrorWord}: {errorMessage}");
+    public static void Error(string errorMessage) => WriteLine($"{ErrorWord}: {errorMessage}", ConsoleColor.DarkRed);
 
-    public static void FilePathMessage(string filePath, string message) => Console.WriteLine($"{Path.GetFileName(filePath)}: {message}");
+    public static void FilePathMessage(string filePath, string message) => WriteLine($"'{Path.GetFileName(filePath)}': {message}", ConsoleColor.DarkRed);
 
-    public static void FilePathError(string filePath, string errorMessage) => Console.WriteLine($"{Path.GetFileName(filePath)} - {ErrorWord}: {errorMessage}");
+    public static void FilePathError(string filePath, string errorMessage) => WriteLine($"'{Path.GetFileName(filePath)}' - {ErrorWord}: {errorMessage}", ConsoleColor.DarkRed);
     
-    public static void Exception(string exceptionName, string errorMessage) => Console.WriteLine($"{ErrorWord}: {exceptionName} - {errorMessage}");
+    public static void Exception(string exceptionName, string errorMessage) => WriteLine($"{ErrorWord}: {exceptionName} - {errorMessage}", ConsoleColor.DarkRed);
     
     public static void FilePathException(string filePath, string exceptionName, string errorMessage)
     {
-        Console.WriteLine($"{Path.GetFileName(filePath)} - {ErrorWord}: {exceptionName} - {errorMessage}");
+        WriteLine($"'{Path.GetFileName(filePath)}' - {ErrorWord}: {exceptionName} - {errorMessage}", ConsoleColor.DarkRed);
     }
 
     public static void EncryptingFile(string inputFilePath, string outputFilePath)
     {
-        Console.WriteLine($"Encrypting {Path.GetFileName(inputFilePath)} => {Path.GetFileName(outputFilePath)}...");
+        Console.WriteLine($"Encrypting '{Path.GetFileName(inputFilePath)}' => '{Path.GetFileName(outputFilePath)}'...");
     }
 
     public static void DecryptingFile(string inputFilePath, string outputFilePath)
     {
-        Console.WriteLine($"Decrypting {Path.GetFileName(inputFilePath)} => {Path.GetFileName(outputFilePath)}...");
+        Console.WriteLine($"Decrypting '{Path.GetFileName(inputFilePath)}' => '{Path.GetFileName(outputFilePath)}'...");
     }
 
     public static void DirectoryEncryptionComplete(string directoryPath)
     {
-        Console.WriteLine($"Encryption of {Path.GetFileName(directoryPath)} directory completed.");
+        Console.WriteLine();
+        WriteLine($"Encryption of '{Path.GetFileName(directoryPath)}' directory finished.", ConsoleColor.Blue);
     }
 
     public static void DirectoryDecryptionComplete(string directoryPath)
     {
-        Console.WriteLine($"Decryption of {Path.GetFileName(directoryPath)} directory completed.");
+        Console.WriteLine();
+        WriteLine($"Decryption of '{Path.GetFileName(directoryPath)}' directory finished.", ConsoleColor.Blue);
     }
 
-    public static void SuccessfullyEncrypted()
+    public static void SuccessfullyEncrypted(bool space = true)
     {
         if (Globals.TotalCount <= 0) { return; }
-        Console.WriteLine();
-        Console.WriteLine($"Successfully encrypted: {Globals.SuccessfulCount}/{Globals.TotalCount}");
+        if (space) { Console.WriteLine(); }
+        WriteLine($"Successfully encrypted: {Globals.SuccessfulCount}/{Globals.TotalCount}", Globals.SuccessfulCount == Globals.TotalCount ? ConsoleColor.Green : ConsoleColor.DarkRed);
     }
 
-    public static void SuccessfullyDecrypted()
+    public static void SuccessfullyDecrypted(bool space = true)
     {
         if (Globals.TotalCount <= 0) { return; }
-        Console.WriteLine();
-        Console.WriteLine($"Successfully decrypted: {Globals.SuccessfulCount}/{Globals.TotalCount}");
+        if (space) { Console.WriteLine(); }
+        WriteLine($"Successfully decrypted: {Globals.SuccessfulCount}/{Globals.TotalCount}", Globals.SuccessfulCount == Globals.TotalCount ? ConsoleColor.Green : ConsoleColor.DarkRed);
     }
     
     public static void KeyPair(string publicKey, string publicKeyFilePath, string privateKeyFilePath)
@@ -80,7 +82,8 @@ public static class DisplayMessage
         Console.WriteLine($"Public key: {publicKey}");
         Console.WriteLine($"Public key file: {publicKeyFilePath}");
         Console.WriteLine();
-        Console.WriteLine($"Private key file: {privateKeyFilePath} - Keep this secret!");
+        Console.Write($"Private key file: {privateKeyFilePath} - ");
+        WriteLine("Keep this secret!", ConsoleColor.DarkRed);
     }
     
     public static void PublicKey(string publicKey, string publicKeyFilePath)
@@ -94,7 +97,7 @@ public static class DisplayMessage
     {
         if (Globals.TotalCount <= 0) { return; }
         Console.WriteLine();
-        Console.WriteLine($"Successfully signed: {Globals.SuccessfulCount}/{Globals.TotalCount}");
+        WriteLine($"Successfully signed: {Globals.SuccessfulCount}/{Globals.TotalCount}", Globals.SuccessfulCount == Globals.TotalCount ? ConsoleColor.Green : ConsoleColor.DarkRed);
     }
 
     public static bool AnyErrors(IEnumerable<string> errorMessages)
@@ -104,5 +107,12 @@ public static class DisplayMessage
             Error(errorMessage);
         }
         return !errorMessages.Any();
+    }
+    
+    public static void WriteLine(string message, ConsoleColor colour)
+    {
+        Console.ForegroundColor = colour;
+        Console.WriteLine(message);
+        Console.ResetColor();
     }
 }

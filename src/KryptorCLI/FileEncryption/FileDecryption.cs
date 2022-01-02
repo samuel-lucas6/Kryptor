@@ -30,9 +30,10 @@ public static class FileDecryption
         foreach (string inputFilePath in filePaths)
         {
             UsingPassword(inputFilePath, passwordBytes);
+            Console.WriteLine();
         }
         CryptographicOperations.ZeroMemory(passwordBytes);
-        DisplayMessage.SuccessfullyDecrypted();
+        DisplayMessage.SuccessfullyDecrypted(space: false);
     }
 
     private static void UsingPassword(string inputFilePath, byte[] passwordBytes)
@@ -72,6 +73,7 @@ public static class FileDecryption
         byte[] sharedSecret = KeyExchange.GetSharedSecret(recipientPrivateKey, senderPublicKey);
         foreach (string inputFilePath in filePaths)
         {
+            Console.WriteLine();
             UsingPublicKey(inputFilePath, sharedSecret, recipientPrivateKey);
         }
         CryptographicOperations.ZeroMemory(recipientPrivateKey);
@@ -108,6 +110,7 @@ public static class FileDecryption
         if (privateKey == null) { return; }
         foreach (string inputFilePath in filePaths)
         {
+            Console.WriteLine();
             UsingPrivateKey(inputFilePath, privateKey);
         }
         CryptographicOperations.ZeroMemory(privateKey);

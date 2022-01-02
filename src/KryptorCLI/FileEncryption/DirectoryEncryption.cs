@@ -54,8 +54,9 @@ public static class DirectoryEncryption
     {
         if (Globals.Overwrite) { return null; }
         string destinationDirectoryPath = FileHandling.GetUniqueDirectoryPath($"{directoryPath} - Copy");
-        Console.WriteLine($"Copying {Path.GetFileName(directoryPath)} directory => {Path.GetFileName(destinationDirectoryPath)} because you didn't specify -o|--overwrite...");
+        Console.WriteLine($"Copying '{Path.GetFileName(directoryPath)}' directory => '{Path.GetFileName(destinationDirectoryPath)}' because you didn't specify -o|--overwrite...");
         FileHandling.CopyDirectory(directoryPath, destinationDirectoryPath, copySubdirectories: true);
+        Console.WriteLine();
         Globals.Overwrite = true;
         return destinationDirectoryPath;
     }
@@ -67,7 +68,7 @@ public static class DirectoryEncryption
         {
             if (Globals.EncryptFileNames)
             {
-                Console.WriteLine($"Renaming {Path.GetFileName(directoryPath)} and subdirectories...");
+                DisplayMessage.WriteLine($"Renaming '{Path.GetFileName(directoryPath)}' and subdirectories...", ConsoleColor.Blue);
                 newDirectoryPath = ObfuscateDirectoryNames.AllDirectories(directoryPath);
             }
         }
@@ -75,7 +76,8 @@ public static class DirectoryEncryption
         {
             DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to obfuscate the directory names.");
         }
-        Console.WriteLine($"Beginning encryption of {Path.GetFileName(newDirectoryPath)} directory...");
+        DisplayMessage.WriteLine($"Beginning encryption of '{Path.GetFileName(newDirectoryPath)}' directory...", ConsoleColor.Blue);
+        Console.WriteLine();
         string[] filePaths = FileHandling.GetAllFiles(newDirectoryPath);
         // -1 for the specified directory
         Globals.TotalCount += filePaths.Length - 1;
@@ -106,6 +108,7 @@ public static class DirectoryEncryption
         try
         {
             string outputFilePath = FileHandling.GetEncryptedOutputFilePath(inputFilePath);
+            Console.WriteLine();
             DisplayMessage.EncryptingFile(inputFilePath, outputFilePath);
             EncryptFile.Encrypt(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
         }
@@ -118,7 +121,7 @@ public static class DirectoryEncryption
     private static void RenameBackupDirectory(string backupDirectoryPath, string originalDirectoryPath)
     {
         if (string.IsNullOrEmpty(backupDirectoryPath) || Directory.Exists(originalDirectoryPath)) { return; }
-        Console.WriteLine($"Renaming {Path.GetFileName(backupDirectoryPath)} backup directory => {Path.GetFileName(originalDirectoryPath)}...");
+        Console.WriteLine($"Renaming '{Path.GetFileName(backupDirectoryPath)}' backup directory => '{Path.GetFileName(originalDirectoryPath)}'...");
         Directory.Move(backupDirectoryPath, originalDirectoryPath);
     }
 

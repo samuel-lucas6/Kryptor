@@ -137,7 +137,7 @@ public static class Updates
             };
             Process.Start(startInfo);
         }
-        Console.WriteLine("Update complete. Please specify -a|--about to check the version.");
+        DisplayMessage.WriteLine("Update complete. Please specify -a|--about to check the version.", ConsoleColor.Green);
         Environment.Exit(0);
     }
 }

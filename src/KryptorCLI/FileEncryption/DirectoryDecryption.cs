@@ -49,7 +49,8 @@ public static class DirectoryDecryption
     
     private static string[] GetFiles(string directoryPath)
     {
-        Console.WriteLine($"Beginning decryption of {Path.GetFileName(directoryPath)} directory...");
+        DisplayMessage.WriteLine($"Beginning decryption of '{Path.GetFileName(directoryPath)}' directory...", ConsoleColor.Blue);
+        Console.WriteLine();
         string[] filePaths = FileHandling.GetAllFiles(directoryPath);
         // -1 for the specified directory
         Globals.TotalCount += filePaths.Length - 1;
@@ -79,6 +80,7 @@ public static class DirectoryDecryption
     private static void DecryptInputFile(FileStream inputFile, byte[] ephemeralPublicKey, byte[] keyEncryptionKey)
     {
         string outputFilePath = FileHandling.GetDecryptedOutputFilePath(inputFile.Name);
+        Console.WriteLine();
         DisplayMessage.DecryptingFile(inputFile.Name, outputFilePath);
         DecryptFile.Decrypt(inputFile, outputFilePath, ephemeralPublicKey, keyEncryptionKey);
     }

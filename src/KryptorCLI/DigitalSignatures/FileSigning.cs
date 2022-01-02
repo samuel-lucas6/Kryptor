@@ -36,7 +36,8 @@ public static class FileSigning
         {
             try
             {
-                Console.WriteLine($"Signing {Path.GetFileName(filePath)}...");
+                Console.WriteLine();
+                Console.WriteLine($"Signing '{Path.GetFileName(filePath)}'...");
                 DigitalSignatures.SignFile(filePath, signatureFilePath, comment, preHash, privateKey);
                 Globals.SuccessfulCount += 1;
             }
@@ -54,15 +55,15 @@ public static class FileSigning
         if (signatureFilePath == null || filePath == null || publicKey == null) { return; }
         try
         {
-            Console.WriteLine($"Verifying {Path.GetFileName(signatureFilePath)}...");
+            Console.WriteLine($"Verifying '{Path.GetFileName(signatureFilePath)}'...");
             bool validSignature = DigitalSignatures.VerifySignature(signatureFilePath, filePath, publicKey, out string comment);
             Console.WriteLine();
             if (!validSignature)
             {
-                Console.WriteLine("Bad signature.");
+                DisplayMessage.WriteLine("Bad signature.", ConsoleColor.DarkRed);
                 return;
             }
-            Console.WriteLine("Good signature.");
+            DisplayMessage.WriteLine("Good signature.", ConsoleColor.Green);
             if (!string.IsNullOrWhiteSpace(comment)) { Console.WriteLine($"Authenticated comment: {comment}"); }
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))

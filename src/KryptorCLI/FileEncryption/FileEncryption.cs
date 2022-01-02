@@ -30,9 +30,10 @@ public static class FileEncryption
         foreach (string inputFilePath in filePaths)
         {
             UsingPassword(inputFilePath, passwordBytes);
+            Console.WriteLine();
         }
         CryptographicOperations.ZeroMemory(passwordBytes);
-        DisplayMessage.SuccessfullyEncrypted();
+        DisplayMessage.SuccessfullyEncrypted(space: false);
     }
 
     private static void UsingPassword(string inputFilePath, byte[] passwordBytes)
@@ -73,6 +74,7 @@ public static class FileEncryption
         CryptographicOperations.ZeroMemory(senderPrivateKey);
         foreach (string inputFilePath in filePaths)
         {
+            Console.WriteLine();
             UsingPublicKey(inputFilePath, sharedSecret, recipientPublicKey);
         }
         CryptographicOperations.ZeroMemory(sharedSecret);
@@ -106,6 +108,7 @@ public static class FileEncryption
         if (privateKey == null) { return; }
         foreach (string inputFilePath in filePaths)
         {
+            Console.WriteLine();
             UsingPrivateKey(inputFilePath, privateKey);
         }
         CryptographicOperations.ZeroMemory(privateKey);

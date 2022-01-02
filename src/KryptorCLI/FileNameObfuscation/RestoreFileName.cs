@@ -34,7 +34,7 @@ public static class RestoreFileName
             if (string.Equals(originalFileName, FileHandling.RemoveFileNameNumber(obfuscatedFileName))) { return; }
             string restoredFilePath = FileHandling.ReplaceFileName(outputFilePath, originalFileName);
             restoredFilePath = FileHandling.GetUniqueFilePath(restoredFilePath);
-            Console.WriteLine($"Renaming {Path.GetFileName(outputFilePath)} => {Path.GetFileName(restoredFilePath)}...");
+            Console.WriteLine($"Renaming '{Path.GetFileName(outputFilePath)}' => '{Path.GetFileName(restoredFilePath)}'...");
             File.Move(outputFilePath, restoredFilePath);
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
