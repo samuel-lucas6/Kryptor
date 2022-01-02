@@ -38,13 +38,13 @@ public static class FileHandling
 
     public static bool HasKryptorExtension(string filePath) => filePath.EndsWith(Constants.EncryptedExtension, StringComparison.Ordinal);
     
-    public static string GetRandomFileName() => Utilities.BinaryToBase64(SodiumCore.GetRandomBytes(count: 16), Utilities.Base64Variant.UrlSafeNoPadding);
+    public static string GetRandomFileName() => Utilities.BinaryToBase64(SodiumCore.GetRandomBytes(count: 16), Utilities.Base64Variant.UrlSafeNoPadding).TrimStart('-');
 
     public static string RemoveIllegalFileNameChars(string fileName) => string.Concat(fileName.Split(Path.GetInvalidFileNameChars()));
     
     public static string ReplaceFileName(string originalFilePath, string newFileName)
     {
-        string directoryPath = Path.GetDirectoryName(originalFilePath);
+        string directoryPath = Path.GetDirectoryName(Path.GetFullPath(originalFilePath));
         string newPath = Path.GetFullPath(Path.Combine(directoryPath, newFileName));
         if (!newPath.StartsWith(Path.GetFullPath(directoryPath))) { throw new ArgumentException("Invalid new path."); }
         return newPath;
