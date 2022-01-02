@@ -72,13 +72,21 @@ However, files that are not in the same directory as the `kryptor` executable mu
 $ kryptor -e -p C:\Users\samuel-lucas6\Documents\message.txt
 ```
 ### Specifying your private key
-You can use the `-x|--private` option without specifying a file path to use your default private key. This is the recommended approach, but it means your private keys must be kept in the default folder, which varies depending on your operating system:
-
-- Windows: `%USERPROFILE%/.kryptor`
-- Linux: `/home/.kryptor`
-- macOS: `/Users/USERNAME/.kryptor`
-
-To specify a non-default private key, you can use `-x|--private` followed by `:[file]` like so:
+You can use the `-x|--private` option without specifying a file path to use your default private key. However, in most cases, this option does not need to be specified. For example, you can perform encryption, decryption, and signing with your default private key as follows:
 ```
-$ kryptor -e -x:"C:\Users\samuel-lucas6\Documents\encryption.private message.txt"
+$ kryptor -e message.txt
+
+$ kryptor -d message.txt.kryptor
+
+$ kryptor -s message.txt
+```
+This is the recommended approach, but it means your private keys must be kept in the default folder, which varies depending on your operating system:
+
+- Windows: %USERPROFILE%/.kryptor
+- Linux: /home/.kryptor
+- macOS: /Users/USERNAME/.kryptor
+
+To specify a private key for `-r|--recover` or a private key not stored in the default folder, you must use the `-x|--private` option followed by `:[file]` like so:
+```
+$ kryptor -r -x:"C:\Users\samuel-lucas6\Documents\encryption.private"
 ```
