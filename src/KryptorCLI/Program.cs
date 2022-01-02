@@ -53,7 +53,7 @@ public class Program
     [Option("-k|--keyfile", "specify or randomly generate a keyfile", CommandOptionType.SingleValue)]
     private string Keyfile { get; }
 
-    [Option("-x|--private", "specify your private key (not used or empty for default key)", CommandOptionType.SingleOrNoValue)]
+    [Option("-x|--private", "specify your private key (unused or empty for default key)", CommandOptionType.SingleOrNoValue)]
     private (bool hasValue, string value) PrivateKey { get; }
 
     [Option("-y|--public", "specify a public key", CommandOptionType.SingleValue)]
@@ -83,7 +83,7 @@ public class Program
     [Option("-v|--verify", "verify a signature", CommandOptionType.NoValue)]
     private bool Verify { get; }
 
-    [Option("-t|--signature", "specify a signature file (not used for default name)", CommandOptionType.SingleValue)]
+    [Option("-t|--signature", "specify a signature file (unused for default name)", CommandOptionType.SingleValue)]
     private string Signature { get; }
 
     [Option("-u|--update", "check for updates", CommandOptionType.NoValue)]

@@ -26,35 +26,35 @@ If you are just getting started, then I recommend reading the [tutorial](https:/
 Usage: kryptor [options] [file]
 
 Arguments:
-  file                   specify a file path
+  file                   specify a file/folder path
 
 Options:
   -e|--encrypt           encrypt files/folders
   -d|--decrypt           decrypt files/folders
-  -p|--password          use a password
-  -k|--keyfile           specify a keyfile
-  -x|--private           specify your private key (blank for default)
+  -p|--password          specify a password (empty for interactive entry)
+  -k|--keyfile           specify or randomly generate a keyfile
+  -x|--private           specify your private key (unused or empty for default key)
   -y|--public            specify a public key
-  -f|--obfuscate         obfuscate file names
-  -o|--overwrite         overwrite input files
+  -n|--names             encrypt file/folder names
+  -o|--overwrite         overwrite files
   -g|--generate          generate a new key pair
   -r|--recover           recover your public key from your private key
   -s|--sign              create a signature
   -c|--comment           add a comment to a signature
   -l|--prehash           sign large files by prehashing
   -v|--verify            verify a signature
-  -t|--signature         specify a signature file
+  -t|--signature         specify a signature file (unused for default name)
   -u|--update            check for updates
   -a|--about             view the program version and license
   -h|--help              show help information
 
 Examples:
-  --encrypt -p [file]   
-  --encrypt -x [file]   
-  --encrypt [-y recipient's public key] [file]   
-  --decrypt [-y sender's public key] [file]   
-  --sign [-c comment] [file]   
-  --verify [-y public key] [-t signature] [file]
+  --encrypt [file]
+  --encrypt -p [file]
+  --encrypt [-y recipient's public key] [file]
+  --decrypt [-y sender's public key] [file]
+  --sign [-c comment] [file]
+  --verify [-y public key] [file]
   ```
 
 ### Specifying files
