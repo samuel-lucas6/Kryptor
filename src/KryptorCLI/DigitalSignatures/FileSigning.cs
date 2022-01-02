@@ -26,10 +26,10 @@ public static class FileSigning
 {
     private const string DefaultComment = "This file has not been tampered with.";
 
-    public static void SignEachFile(string[] filePaths, string signatureFilePath, string comment, bool preHash, byte[] privateKey)
+    public static void SignEachFile(byte[] privateKey, char[] password, string comment, bool preHash, string signatureFilePath, string[] filePaths)
     {
         if (privateKey == null || filePaths == null) { return; }
-        privateKey = PrivateKey.Decrypt(privateKey);
+        privateKey = PrivateKey.Decrypt(privateKey, password);
         if (privateKey == null) { return; }
         if (string.IsNullOrEmpty(comment)) { comment = DefaultComment; }
         foreach (string filePath in filePaths)
@@ -63,7 +63,7 @@ public static class FileSigning
                 return;
             }
             Console.WriteLine("Good signature.");
-            Console.WriteLine($"Authenticated comment: {comment}");
+            if (!string.IsNullOrWhiteSpace(comment)) { Console.WriteLine($"Authenticated comment: {comment}"); }
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
         {

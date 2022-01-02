@@ -47,8 +47,8 @@ public class Program
     [Option("-d|--decrypt", "decrypt files/folders", CommandOptionType.NoValue)]
     private bool Decrypt { get; }
 
-    [Option("-p|--password", "use a password", CommandOptionType.NoValue)]
-    private bool Password { get; }
+    [Option("-p|--password", "specify a password (empty for interactive entry)", CommandOptionType.SingleOrNoValue)]
+    private (bool hasValue, string value) Password { get; }
 
     [Option("-k|--keyfile", "specify or randomly generate a keyfile", CommandOptionType.SingleValue)]
     private string Keyfile { get; }
@@ -106,23 +106,23 @@ public class Program
         Console.WriteLine();
         if (Encrypt)
         {
-            CommandLine.Encrypt(Password, Keyfile, GetEncryptionPrivateKey(PrivateKey.value), PublicKey, FilePaths);
+            CommandLine.Encrypt((Password.hasValue, GetPassword(Password.value)), Keyfile, (PrivateKey.hasValue, GetEncryptionPrivateKey(PrivateKey.value)), PublicKey, FilePaths);
         }
         else if (Decrypt)
         {
-            CommandLine.Decrypt(Password, Keyfile, GetEncryptionPrivateKey(PrivateKey.value), PublicKey, FilePaths);
+            CommandLine.Decrypt((Password.hasValue, GetPassword(Password.value)), Keyfile, (PrivateKey.hasValue, GetEncryptionPrivateKey(PrivateKey.value)), PublicKey, FilePaths);
         }
         else if (GenerateKeys)
         {
-            CommandLine.GenerateNewKeyPair(FilePaths == null ? Constants.DefaultKeyDirectory : FilePaths[0]);
+            CommandLine.GenerateNewKeyPair(GetPassword(Password.value), FilePaths == null ? Constants.DefaultKeyDirectory : FilePaths[0]);
         }
         else if (RecoverPublicKey)
         {
-            CommandLine.RecoverPublicKey(PrivateKey.value);
+            CommandLine.RecoverPublicKey(PrivateKey.value, GetPassword(Password.value));
         }
         else if (Sign)
         {
-            CommandLine.Sign(GetSigningPrivateKey(PrivateKey.value), Comment, Prehash, Signature, FilePaths);
+            CommandLine.Sign(GetSigningPrivateKey(PrivateKey.value), GetPassword(Password.value), Comment, Prehash, Signature, FilePaths);
         }
         else if (Verify)
         {
@@ -160,6 +160,8 @@ public class Program
             DisplayMessage.Exception(ex.GetType().Name, "Unable to extract the vcruntime140.dll file, which is required for the libsodium library to function on Windows.");
         }
     }
+
+    private static char[] GetPassword(string password) => string.IsNullOrEmpty(password) ? Array.Empty<char>() : password.ToCharArray();
 
     private static string GetEncryptionPrivateKey(string privateKey) => string.IsNullOrEmpty(privateKey) ? Constants.DefaultEncryptionPrivateKeyPath : privateKey;
 

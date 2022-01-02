@@ -25,20 +25,20 @@ namespace KryptorCLI;
 
 public static class AsymmetricKeys
 {
-    public static (string publicKey, string privateKey) GenerateEncryptionKeyPair()
+    public static (string publicKey, string privateKey) GenerateEncryptionKeyPair(char[] password)
     {
-        char[] password = PasswordPrompt.EnterNewPassword();
-        byte[] passwordBytes = Password.Prehash(password);
+        password = Password.ReadInput(password, newPassword: true);
+        var passwordBytes = Password.Prehash(password);
         using var keyPair = PublicKeyBox.GenerateKeyPair();
         byte[] publicKey = Arrays.Concat(Constants.Curve25519KeyHeader, keyPair.PublicKey);
         byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, Constants.Curve25519KeyHeader, keyPair.PrivateKey);
         return (Convert.ToBase64String(publicKey), Convert.ToBase64String(encryptedPrivateKey));
     }
 
-    public static (string publicKey, string privateKey) GenerateSigningKeyPair()
+    public static (string publicKey, string privateKey) GenerateSigningKeyPair(char[] password)
     {
-        char[] password = PasswordPrompt.EnterNewPassword();
-        byte[] passwordBytes = Password.Prehash(password);
+        password = Password.ReadInput(password, newPassword: true);
+        var passwordBytes = Password.Prehash(password);
         using var keyPair = PublicKeyAuth.GenerateKeyPair();
         byte[] publicKey = Arrays.Concat(Constants.Ed25519KeyHeader, keyPair.PublicKey);
         byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, Constants.Ed25519KeyHeader, keyPair.PrivateKey);

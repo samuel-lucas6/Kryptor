@@ -35,10 +35,7 @@ public static class FileEncryptionValidation
 
     private static IEnumerable<string> GetFileEncryptionErrors(bool usePassword, string keyfilePath)
     {
-        if (!usePassword && string.IsNullOrEmpty(keyfilePath))
-        {
-            yield return PasswordOrKeyfileError;
-        }
+        if (!usePassword && string.IsNullOrEmpty(keyfilePath)) { yield return PasswordOrKeyfileError; }
         if (Path.EndsInDirectorySeparator(keyfilePath) && !Directory.Exists(keyfilePath))
         {
             yield return "Please specify a valid directory for the keyfile.";
@@ -110,7 +107,7 @@ public static class FileEncryptionValidation
 
     private static IEnumerable<string> GetFileEncryptionErrors(string privateKeyPath)
     {
-        if (string.IsNullOrEmpty(privateKeyPath) && !File.Exists(Constants.DefaultEncryptionPrivateKeyPath))
+        if (string.Equals(privateKeyPath, Constants.DefaultEncryptionPrivateKeyPath) && !File.Exists(Constants.DefaultEncryptionPrivateKeyPath))
         {
             yield return ErrorMessages.NonExistentDefaultPrivateKeyFile;
         }

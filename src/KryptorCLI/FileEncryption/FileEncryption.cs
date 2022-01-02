@@ -64,10 +64,10 @@ public static class FileEncryption
         CryptographicOperations.ZeroMemory(keyEncryptionKey);
     }
 
-    public static void EncryptEachFileWithPublicKey(string[] filePaths, byte[] senderPrivateKey, byte[] recipientPublicKey)
+    public static void EncryptEachFileWithPublicKey(byte[] senderPrivateKey, char[] password, byte[] recipientPublicKey, string[] filePaths)
     {
         if (filePaths == null || senderPrivateKey == null || recipientPublicKey == null) { return; }
-        senderPrivateKey = PrivateKey.Decrypt(senderPrivateKey);
+        senderPrivateKey = PrivateKey.Decrypt(senderPrivateKey, password);
         if (senderPrivateKey == null) { return; }
         byte[] sharedSecret = KeyExchange.GetSharedSecret(senderPrivateKey, recipientPublicKey);
         CryptographicOperations.ZeroMemory(senderPrivateKey);
@@ -99,10 +99,10 @@ public static class FileEncryption
         }
     }
 
-    public static void EncryptEachFileWithPrivateKey(string[] filePaths, byte[] privateKey)
+    public static void EncryptEachFileWithPrivateKey(byte[] privateKey, char[] password, string[] filePaths)
     {
         if (filePaths == null || privateKey == null) { return; }
-        privateKey = PrivateKey.Decrypt(privateKey);
+        privateKey = PrivateKey.Decrypt(privateKey, password);
         if (privateKey == null) { return; }
         foreach (string inputFilePath in filePaths)
         {

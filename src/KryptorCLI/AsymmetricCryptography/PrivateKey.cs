@@ -16,6 +16,7 @@
     along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
+using System;
 using System.Security.Cryptography;
 using Sodium;
 using ChaCha20BLAKE2;
@@ -37,17 +38,18 @@ public static class PrivateKey
         return Arrays.Concat(additionalData, salt, nonce, encryptedPrivateKey);
     }
 
-    public static byte[] Decrypt(byte[] privateKey)
+    public static byte[] Decrypt(byte[] privateKey, char[] password)
     {
         if (privateKey == null) { return null; }
         try
         {
-            char[] password = PasswordPrompt.EnterYourPassword();
-            byte[] passwordBytes = Password.Prehash(password);
+            password = Password.ReadInput(password, newPassword: false);
+            var passwordBytes = Password.Prehash(password);
             return Decrypt(passwordBytes, privateKey);
         }
         catch (CryptographicException)
         {
+            Console.WriteLine();
             DisplayMessage.Error("Incorrect password, or the private key has been tampered with.");
             return null;
         }

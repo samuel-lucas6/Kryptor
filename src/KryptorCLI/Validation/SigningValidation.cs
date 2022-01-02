@@ -35,7 +35,7 @@ public static class SigningValidation
 
     private static IEnumerable<string> GetSignErrors(string privateKeyPath, string comment, string signatureFilePath, string[] filePaths)
     {
-        if (string.IsNullOrEmpty(privateKeyPath) && !File.Exists(Constants.DefaultSigningPrivateKeyPath))
+        if (string.Equals(privateKeyPath, Constants.DefaultSigningPrivateKeyPath) && !File.Exists(Constants.DefaultSigningPrivateKeyPath))
         {
             yield return ErrorMessages.NonExistentDefaultPrivateKeyFile;
         }
@@ -61,7 +61,7 @@ public static class SigningValidation
         }
         else if (filePaths.Length > 1 && !string.IsNullOrEmpty(signatureFilePath))
         {
-            yield return "You cannot currently specify a signature file when signing multiple files.";
+            yield return "You cannot specify a signature file when signing multiple files.";
         }
         else
         {

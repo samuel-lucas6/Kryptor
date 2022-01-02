@@ -27,15 +27,8 @@ public static class PasswordPrompt
     {
         Console.WriteLine("Enter a password (leave empty for a random passphrase):");
         char[] password = GetPassword();
-        if (password.Length != 0)
-        {
-            RetypeNewPassword(password);
-            return password;
-        }
-        password = PassphraseGenerator.GetRandomPassphrase(wordCount: 8);
-        Console.Write($"Randomly generated passphrase: ");
-        Console.WriteLine(password);
-        Console.WriteLine();
+        if (password.Length == 0) { return UseRandomPassphrase(); }
+        RetypeNewPassword(password);
         return password;
     }
 
@@ -49,6 +42,15 @@ public static class PasswordPrompt
             Environment.Exit(exitCode: 13);
         }
         Arrays.ZeroMemory(retypedPassword);
+    }
+    
+    public static char[] UseRandomPassphrase()
+    {
+        char[] password = PassphraseGenerator.GetRandomPassphrase(wordCount: 8);
+        Console.Write("Randomly generated passphrase: ");
+        Console.WriteLine(password);
+        Console.WriteLine();
+        return password;
     }
 
     public static char[] EnterYourPassword()

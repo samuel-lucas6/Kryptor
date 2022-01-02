@@ -24,6 +24,14 @@ namespace KryptorCLI;
 
 public static class Password
 {
+    public static char[] ReadInput(char[] password, bool newPassword)
+    {
+        if (password.Length == 0 && newPassword) { return PasswordPrompt.EnterNewPassword(); }
+        if (password.Length == 0 && !newPassword) { return PasswordPrompt.EnterYourPassword(); }
+        if (newPassword && password.Length == 1 && Arrays.Compare(password, new[] { ' ' })) { return PasswordPrompt.UseRandomPassphrase(); }
+        return password;
+    }
+    
     public static byte[] Prehash(char[] password, string keyfilePath)
     {
         var passwordBytes = Prehash(password);

@@ -28,7 +28,7 @@ public static class FilePathValidation
     private const string FileOrFolderDoesNotExist = "This file/folder doesn't exist.";
     private const string FileInaccessible = "Unable to access the file.";
     private const string DirectoryEmpty = "This directory is empty.";
-
+    
     public static bool FileEncryption(string inputFilePath)
     {
         string errorMessage = GetFileEncryptionError(inputFilePath);
@@ -110,10 +110,7 @@ public static class FilePathValidation
 
     private static IEnumerable<string> GetGenerateKeyPairError(string directoryPath, int keyPairType)
     {
-        if (keyPairType is < 1 or > 2)
-        {
-            yield return "Please enter a valid number.";
-        }
+        if (keyPairType is < 1 or > 2) { yield return "Please enter a valid number.";}
         bool defaultKeyDirectory = string.Equals(directoryPath, Constants.DefaultKeyDirectory);
         if (!defaultKeyDirectory && !Directory.Exists(directoryPath))
         {
@@ -160,7 +157,7 @@ public static class FilePathValidation
     {
         if (string.IsNullOrEmpty(privateKeyPath))
         {
-            yield return "Please specify a private key using [-x=filepath].";
+            yield return "Please specify a private key using [-x:file].";
         }
         else if (!string.IsNullOrEmpty(privateKeyPath) && !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
         {
