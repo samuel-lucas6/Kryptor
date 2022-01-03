@@ -26,7 +26,7 @@ public static class FileSigning
 {
     private const string DefaultComment = "This file has not been tampered with.";
 
-    public static void SignEachFile(byte[] privateKey, char[] password, string comment, bool preHash, string signatureFilePath, string[] filePaths)
+    public static void SignEachFile(byte[] privateKey, char[] password, string comment, bool prehash, string signatureFilePath, string[] filePaths)
     {
         if (privateKey == null || filePaths == null) { return; }
         privateKey = PrivateKey.Decrypt(privateKey, password);
@@ -38,7 +38,7 @@ public static class FileSigning
             {
                 Console.WriteLine();
                 Console.WriteLine($"Signing \"{Path.GetFileName(filePath)}\"...");
-                DigitalSignatures.SignFile(filePath, signatureFilePath, comment, preHash, privateKey);
+                DigitalSignatures.SignFile(filePath, signatureFilePath, comment, prehash, privateKey);
                 Globals.SuccessfulCount += 1;
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))

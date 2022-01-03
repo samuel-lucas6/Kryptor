@@ -200,12 +200,12 @@ public static class CommandLine
         DisplayMessage.PublicKey(publicKeyString, publicKeyFilePath);
     }
 
-    public static void Sign(string privateKeyPath, char[] password, string comment, bool preHash, string signatureFilePath, string[] filePaths)
+    public static void Sign(string privateKeyPath, char[] password, string comment, bool prehash, string signatureFilePath, string[] filePaths)
     {
         bool validUserInput = SigningValidation.Sign(privateKeyPath, comment, signatureFilePath, filePaths);
         if (!validUserInput) { return; }
         byte[] privateKey = AsymmetricKeyValidation.SigningPrivateKeyFile(privateKeyPath);
-        FileSigning.SignEachFile(privateKey, password, comment, preHash, signatureFilePath, filePaths);
+        FileSigning.SignEachFile(privateKey, password, comment, prehash, signatureFilePath, filePaths);
     }
 
     public static void Verify(string publicKey, string signatureFilePath, string[] filePaths)
