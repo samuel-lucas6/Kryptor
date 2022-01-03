@@ -34,5 +34,5 @@ public static class ErrorMessages
     public const string UnableToEncryptFile = "Unable to encrypt the file.";
     public const string UnableToDecryptFile = "Unable to decrypt the file.";
     
-    public static string GetFilePathError(string filePath, string errorMessage) => $"{Path.GetFileName(filePath)} - {errorMessage}";
+    public static string GetFilePathError(string filePath, string errorMessage) => $"\"{Path.GetFileName(filePath)}\" - {errorMessage}";
 }

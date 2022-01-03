@@ -157,7 +157,7 @@ public class Program
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
-            DisplayMessage.Exception(ex.GetType().Name, "Unable to extract the 'vcruntime140.dll' file, which is required for the libsodium library to function on Windows.");
+            DisplayMessage.Exception(ex.GetType().Name, "Unable to extract the \"vcruntime140.dll\" file, which is required for the libsodium library to function on Windows.");
         }
     }
 

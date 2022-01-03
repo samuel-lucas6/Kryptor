@@ -49,7 +49,7 @@ public static class DirectoryDecryption
     
     private static string[] GetFiles(string directoryPath)
     {
-        DisplayMessage.WriteLine($"Beginning decryption of '{Path.GetFileName(directoryPath)}' directory...", ConsoleColor.Blue);
+        DisplayMessage.WriteLine($"Beginning decryption of \"{Path.GetFileName(directoryPath)}\" directory...", ConsoleColor.Blue);
         Console.WriteLine();
         string[] filePaths = FileHandling.GetAllFiles(directoryPath);
         // -1 for the specified directory

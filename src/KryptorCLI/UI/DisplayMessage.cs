@@ -29,37 +29,37 @@ public static class DisplayMessage
     
     public static void Error(string errorMessage) => WriteLine($"{ErrorWord}: {errorMessage}", ConsoleColor.DarkRed);
 
-    public static void FilePathMessage(string filePath, string message) => WriteLine($"'{Path.GetFileName(filePath)}': {message}", ConsoleColor.DarkRed);
+    public static void FilePathMessage(string filePath, string message) => WriteLine($"\"{Path.GetFileName(filePath)}\": {message}", ConsoleColor.DarkRed);
 
-    public static void FilePathError(string filePath, string errorMessage) => WriteLine($"'{Path.GetFileName(filePath)}' - {ErrorWord}: {errorMessage}", ConsoleColor.DarkRed);
+    public static void FilePathError(string filePath, string errorMessage) => WriteLine($"\"{Path.GetFileName(filePath)}\" - {ErrorWord}: {errorMessage}", ConsoleColor.DarkRed);
     
     public static void Exception(string exceptionName, string errorMessage) => WriteLine($"{ErrorWord}: {exceptionName} - {errorMessage}", ConsoleColor.DarkRed);
     
     public static void FilePathException(string filePath, string exceptionName, string errorMessage)
     {
-        WriteLine($"'{Path.GetFileName(filePath)}' - {ErrorWord}: {exceptionName} - {errorMessage}", ConsoleColor.DarkRed);
+        WriteLine($"\"{Path.GetFileName(filePath)}\" - {ErrorWord}: {exceptionName} - {errorMessage}", ConsoleColor.DarkRed);
     }
 
     public static void EncryptingFile(string inputFilePath, string outputFilePath)
     {
-        Console.WriteLine($"Encrypting '{Path.GetFileName(inputFilePath)}' => '{Path.GetFileName(outputFilePath)}'...");
+        Console.WriteLine($"Encrypting \"{Path.GetFileName(inputFilePath)}\" => \"{Path.GetFileName(outputFilePath)}\"...");
     }
 
     public static void DecryptingFile(string inputFilePath, string outputFilePath)
     {
-        Console.WriteLine($"Decrypting '{Path.GetFileName(inputFilePath)}' => '{Path.GetFileName(outputFilePath)}'...");
+        Console.WriteLine($"Decrypting \"{Path.GetFileName(inputFilePath)}\" => \"{Path.GetFileName(outputFilePath)}\"...");
     }
 
     public static void DirectoryEncryptionComplete(string directoryPath)
     {
         Console.WriteLine();
-        WriteLine($"Encryption of '{Path.GetFileName(directoryPath)}' directory complete.", ConsoleColor.Blue);
+        WriteLine($"Encryption of \"{Path.GetFileName(directoryPath)}\" directory complete.", ConsoleColor.Blue);
     }
 
     public static void DirectoryDecryptionComplete(string directoryPath)
     {
         Console.WriteLine();
-        WriteLine($"Decryption of '{Path.GetFileName(directoryPath)}' directory complete.", ConsoleColor.Blue);
+        WriteLine($"Decryption of \"{Path.GetFileName(directoryPath)}\" directory complete.", ConsoleColor.Blue);
     }
 
     public static void SuccessfullyEncrypted(bool space = true)
@@ -80,9 +80,9 @@ public static class DisplayMessage
     {
         Console.WriteLine();
         Console.WriteLine($"Public key: {publicKey}");
-        Console.WriteLine($"Public key file: {publicKeyFilePath}");
+        Console.WriteLine($"Public key file: \"{publicKeyFilePath}\"");
         Console.WriteLine();
-        Console.Write($"Private key file: {privateKeyFilePath} - ");
+        Console.Write($"Private key file: \"{privateKeyFilePath}\" - ");
         WriteLine("Keep this secret!", ConsoleColor.DarkRed);
     }
     
@@ -90,7 +90,7 @@ public static class DisplayMessage
     {
         Console.WriteLine();
         Console.WriteLine($"Public key: {publicKey}");
-        if (!string.IsNullOrEmpty(publicKeyFilePath)) { Console.WriteLine($"Public key file: {publicKeyFilePath}"); }
+        if (!string.IsNullOrEmpty(publicKeyFilePath)) { Console.WriteLine($"Public key file: \"{publicKeyFilePath}\""); }
     }
 
     public static void SuccessfullySigned()
