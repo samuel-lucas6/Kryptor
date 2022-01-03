@@ -22,10 +22,7 @@ namespace KryptorCLI;
 
 public static class KeyExchange
 {
-    public static byte[] GetSharedSecret(byte[] privateKey, byte[] publicKey)
-    {
-        return ScalarMult.Mult(privateKey, publicKey);
-    }
+    public static byte[] GetSharedSecret(byte[] privateKey, byte[] publicKey) => ScalarMult.Mult(privateKey, publicKey);
 
     public static byte[] GetPublicKeySharedSecret(byte[] publicKey, out byte[] ephemeralPublicKey)
     {

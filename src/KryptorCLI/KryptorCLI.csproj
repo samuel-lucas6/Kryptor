@@ -14,7 +14,7 @@
     <Company />
     <Product>Kryptor</Product>
     <Copyright>Copyright © 2020-2022 Samuel Lucas</Copyright>
-    <Description>A simple, modern, and secure encryption tool.</Description>
+    <Description>A simple, modern, and secure encryption and signing tool.</Description>
     <PackageLicenseFile></PackageLicenseFile>
     <PackageLicenseExpression>GPLv3</PackageLicenseExpression>
     <PackageProjectUrl>https://www.kryptor.co.uk</PackageProjectUrl>
