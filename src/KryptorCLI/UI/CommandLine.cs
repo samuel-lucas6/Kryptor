@@ -276,6 +276,8 @@ public static class CommandLine
                 return;
             }
             DisplayMessage.Exception(ex.GetType().Name, "Unable to check for updates or the download failed.");
+            Console.WriteLine();
+            Console.WriteLine("You can manually download the latest release at <https://www.kryptor.co.uk/#download-kryptor>.");
         }
     }
 

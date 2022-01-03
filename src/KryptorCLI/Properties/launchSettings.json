@@ -2,6 +2,7 @@
   "profiles": {
     "KryptorCLI": {
       "commandName": "Project",
+      "commandLineArgs": "",
       "remoteDebugEnabled": false
     }
   }

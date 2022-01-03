@@ -43,7 +43,8 @@ public static class ObfuscateDirectoryNames
             string obfuscatedPath = FileHandling.ReplaceFileName(directoryPath, FileHandling.GetRandomFileName());
             Console.WriteLine($"Renaming \"{directoryName}\" directory => \"{Path.GetFileName(obfuscatedPath)}\"...");
             Directory.Move(directoryPath, obfuscatedPath);
-            StoreDirectoryName(directoryName, obfuscatedPath);
+            string storageFilePath = Path.Combine(obfuscatedPath, $"{Path.GetFileName(obfuscatedPath)}.txt");
+            File.WriteAllText(storageFilePath, directoryName);
             return obfuscatedPath;
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
@@ -51,11 +52,5 @@ public static class ObfuscateDirectoryNames
             DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to obfuscate the directory name.");
             return directoryPath;
         }
-    }
-
-    private static void StoreDirectoryName(string directoryName, string obfuscatedPath)
-    {
-        string storageFilePath = Path.Combine(obfuscatedPath, $"{Path.GetFileName(obfuscatedPath)}.txt");
-        File.WriteAllText(storageFilePath, directoryName);
     }
 }

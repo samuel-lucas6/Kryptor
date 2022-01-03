@@ -56,8 +56,8 @@ public static class EncryptFile
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
         {
-            FileHandling.DeleteFile(outputFilePath);
             CryptographicOperations.ZeroMemory(dataEncryptionKey);
+            FileHandling.DeleteFile(outputFilePath);
             throw;
         }
     }

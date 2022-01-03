@@ -18,6 +18,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 
 namespace KryptorCLI;
@@ -36,8 +37,8 @@ public static class DirectoryDecryption
             if (salt.Length != Constants.SaltLength) { throw new ArgumentException("Invalid salt length."); }
             byte[] keyEncryptionKey = KeyDerivation.Argon2id(passwordBytes, salt);
             DecryptEachFileWithPassword(filePaths, keyEncryptionKey);
-            string[] kryptorFiles = Directory.GetFiles(directoryPath, searchPattern: $"*{Constants.EncryptedExtension}", SearchOption.AllDirectories);
-            if (kryptorFiles.Length == 0) { FileHandling.DeleteFile(saltFilePath); }
+            bool anyKryptorFiles = Directory.EnumerateFiles(directoryPath, searchPattern: $"*{Constants.EncryptedExtension}", SearchOption.AllDirectories).Any();
+            if (!anyKryptorFiles) { FileHandling.DeleteFile(saltFilePath); }
             RestoreDirectoryNames.AllDirectories(directoryPath);
             DisplayMessage.DirectoryDecryptionComplete(directoryPath);
         }

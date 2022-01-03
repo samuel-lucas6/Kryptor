@@ -39,6 +39,13 @@ public static class DisplayMessage
     {
         WriteLine($"\"{Path.GetFileName(filePath)}\" - {ErrorWord}: {exceptionName} - {errorMessage}", ConsoleColor.DarkRed);
     }
+    
+    public static void WriteLine(string message, ConsoleColor colour)
+    {
+        Console.ForegroundColor = colour;
+        Console.WriteLine(message);
+        Console.ResetColor();
+    }
 
     public static void EncryptingFile(string inputFilePath, string outputFilePath)
     {
@@ -107,12 +114,5 @@ public static class DisplayMessage
             Error(errorMessage);
         }
         return !errorMessages.Any();
-    }
-    
-    public static void WriteLine(string message, ConsoleColor colour)
-    {
-        Console.ForegroundColor = colour;
-        Console.WriteLine(message);
-        Console.ResetColor();
     }
 }
