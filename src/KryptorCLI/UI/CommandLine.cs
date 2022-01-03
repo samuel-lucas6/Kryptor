@@ -243,12 +243,12 @@ public static class CommandLine
             bool updateAvailable = Updates.CheckForUpdates(out string latestVersion);
             if (!updateAvailable)
             {
-                Console.WriteLine("Kryptor is up-to-date.");
+                DisplayMessage.WriteLine("Kryptor is up-to-date.", ConsoleColor.Green);
                 return;
             }
-            Console.WriteLine("An update is available for Kryptor.");
+            Console.WriteLine($"An update is available for Kryptor. The latest version is v{latestVersion}.");
             Console.WriteLine();
-            Console.WriteLine($"IMPORTANT: Please check the latest changelog at <https://www.kryptor.co.uk/changelog#v{latestVersion}> to see if there are any breaking changes BEFORE updating.");
+            DisplayMessage.WriteLine($"IMPORTANT: Please check the latest changelog at <https://www.kryptor.co.uk/changelog#v{latestVersion}> to see if there are any breaking changes BEFORE updating.", ConsoleColor.Yellow);
             Console.WriteLine();
             Console.WriteLine("Would you like Kryptor to automatically install this update now? (type y or n)");
             string userInput = Console.ReadLine()?.ToLower();
@@ -264,11 +264,11 @@ public static class CommandLine
                     Console.WriteLine("Alternatively, you can manually download the latest release at <https://www.kryptor.co.uk/#download-kryptor>.");
                     return;
                 default:
-                    Console.WriteLine("Please type either y or n next time.");
+                    DisplayMessage.Error("Please type either y or n next time.");
                     return;
             }
         }
-        catch (Exception ex) when (ex is WebException or PlatformNotSupportedException or FormatException or OverflowException || ExceptionFilters.Cryptography(ex))
+        catch (Exception ex) when (ex is WebException or PlatformNotSupportedException or FormatException or OverflowException or InvalidOperationException || ExceptionFilters.Cryptography(ex))
         {
             if (ex is PlatformNotSupportedException or CryptographicException)
             {

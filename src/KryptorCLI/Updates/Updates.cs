@@ -27,6 +27,7 @@ namespace KryptorCLI;
 
 public static class Updates
 {
+    private static readonly string LocalApplicationDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
     private const string VersionFileName = "version.txt";
     private const string VersionFileLink = "https://raw.githubusercontent.com/samuel-lucas6/Kryptor/master/version.txt";
     private const string LatestReleaseFileName = "kryptor-latest.zip";
@@ -34,7 +35,6 @@ public static class Updates
     private const string LinuxDownloadFileName = "kryptor-linux.zip";
     private const string MacOSDownloadFileName = "kryptor-macos.zip";
     private const string ExecutableFileName = "kryptor";
-    private const string ExeExtension = ".exe";
 
     public static bool CheckForUpdates(out string latestVersion)
     {
@@ -45,7 +45,7 @@ public static class Updates
 
     private static string GetLatestVersion()
     {
-        string downloadFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), VersionFileName);
+        string downloadFilePath = Path.Combine(LocalApplicationDataPath, VersionFileName);
         string signatureFilePath = downloadFilePath + Constants.SignatureExtension;
         DownloadFile(VersionFileLink + Constants.SignatureExtension, signatureFilePath);
         DownloadFile(VersionFileLink, downloadFilePath);
@@ -67,25 +67,25 @@ public static class Updates
         {
             throw new PlatformNotSupportedException("There are no official releases for your operating system.");
         }
-        Console.WriteLine($"Downloading {latestVersion} update...");
+        Console.WriteLine("Downloading update...");
         byte[] downloadedExecutable = GetLatestExecutable(latestVersion);
-        Console.WriteLine($"Applying {latestVersion} update...");
+        Console.WriteLine("Applying update...");
         ReplaceExecutable(downloadedExecutable);
     }
 
     private static byte[] GetLatestExecutable(string latestVersion)
     {
-        string downloadFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), LatestReleaseFileName);
+        string downloadFilePath = Path.Combine(LocalApplicationDataPath, LatestReleaseFileName);
         string downloadLink = GetReleaseDownloadLink(latestVersion);
         string signatureFilePath = downloadFilePath + Constants.SignatureExtension;
         DownloadFile(downloadLink + Constants.SignatureExtension, signatureFilePath);
         DownloadFile(downloadLink, downloadFilePath);
         VerifyDownloadSignature(signatureFilePath, downloadFilePath, latestVersion);
-        string extractedDirectoryPath = Path.Combine(Path.GetDirectoryName(downloadFilePath), ExecutableFileName);
+        string extractedDirectoryPath = Path.Combine(LocalApplicationDataPath, ExecutableFileName);
         if (!Directory.Exists(extractedDirectoryPath)) { Directory.CreateDirectory(extractedDirectoryPath); }
         ZipFile.ExtractToDirectory(downloadFilePath, extractedDirectoryPath, overwriteFiles: true);
         File.Delete(downloadFilePath);
-        string executableFilePath = Path.Combine(extractedDirectoryPath, OperatingSystem.IsWindows() ? ExecutableFileName + ExeExtension : ExecutableFileName);
+        string executableFilePath = Path.Combine(extractedDirectoryPath, OperatingSystem.IsWindows() ? $"{ExecutableFileName}.exe" : ExecutableFileName);
         byte[] downloadedExecutable = File.ReadAllBytes(executableFilePath);
         Directory.Delete(extractedDirectoryPath, recursive: true);
         return downloadedExecutable;
@@ -112,15 +112,15 @@ public static class Updates
 
     private static void ReplaceExecutable(byte[] downloadedExecutable)
     {
-        string executableFilePath = Environment.ProcessPath;
+        string executableFilePath = Environment.ProcessPath ?? throw new ArgumentNullException(nameof(executableFilePath));
         if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
         {
             File.WriteAllBytes(executableFilePath, downloadedExecutable);
         }
         else
         {
-            string newExecutableFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), ExecutableFileName + ExeExtension);
-            string batFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), $"{ExecutableFileName}.bat");
+            string newExecutableFilePath = Path.Combine(LocalApplicationDataPath, $"{ExecutableFileName}.exe");
+            string batFilePath = Path.Combine(LocalApplicationDataPath, $"{ExecutableFileName}.bat");
             File.WriteAllBytes(newExecutableFilePath, downloadedExecutable);
             using (var batFile = new StreamWriter(File.Create(batFilePath)))
             {
