@@ -1,5 +1,5 @@
 ﻿/*
-    Kryptor: A simple, modern, and secure encryption tool.
+    Kryptor: A simple, modern, and secure encryption and signing tool.
     Copyright (C) 2020-2022 Samuel Lucas
 
     This program is free software: you can redistribute it and/or modify
