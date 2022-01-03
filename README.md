@@ -4,7 +4,7 @@
 # Kryptor
 Kryptor is free and open source file encryption and signing software for Windows, Linux, and macOS.
 
-It is a portable, cross-platform command line tool that makes use of modern and secure cryptographic algorithms. It aims to be a better version of [age](https://github.com/FiloSottile/age) and [Minisign](https://github.com/jedisct1/minisign) to provide a simple, user friendly alternative to [GPG](https://gnupg.org/).
+It is a portable, cross-platform command line tool that makes use of modern and secure cryptographic algorithms. It aims to be a better version of [age](https://github.com/FiloSottile/age) and [Minisign](https://jedisct1.github.io/minisign/) to provide a simple, user friendly alternative to [GPG](https://gnupg.org/).
 
 ![kryptor](https://user-images.githubusercontent.com/63159663/110021517-c0af3500-7d22-11eb-9acd-02ba9f24617c.gif)
 
@@ -58,7 +58,7 @@ Examples:
   ```
 
 ### Specifying files
-When referencing file paths/file names that contain spaces, you must surround them with "speech marks":
+When referencing file names/paths that contain spaces, you must surround them with "speech marks":
 ```
 $ kryptor -e -p "GitHub Logo.png"
 $ kryptor -e -p "C:\Users\samuel-lucas6\Downloads\GitHub Logo.png"
@@ -75,9 +75,7 @@ $ kryptor -e -p "C:\Users\samuel-lucas6\Documents\message.txt"
 You can use the `-x|--private` option without specifying a file path to use your default private key. However, in most cases, this option does not need to be specified. For example, you can perform encryption, decryption, and signing with your default private key as follows:
 ```
 $ kryptor -e message.txt
-
 $ kryptor -d message.txt.kryptor
-
 $ kryptor -s message.txt
 ```
 This is the recommended approach, but it means your private keys must be kept in the default folder, which varies depending on your operating system:
