@@ -91,6 +91,8 @@ public static class DisplayMessage
         Console.WriteLine();
         Console.Write($"Private key file: \"{privateKeyFilePath}\" - ");
         WriteLine("Keep this secret!", ConsoleColor.DarkRed);
+        Console.WriteLine();
+        WriteLine("IMPORTANT: Please back up these files to external storage (e.g. memory sticks).", ConsoleColor.Blue);
     }
     
     public static void PublicKey(string publicKey, string publicKeyFilePath)
