@@ -58,6 +58,8 @@ public static class FilePathValidation
             Keyfiles.GenerateKeyfile(keyfilePath);
             Console.WriteLine($"Randomly generated keyfile: {Path.GetFileName(keyfilePath)}");
             Console.WriteLine();
+            DisplayMessage.WriteLine("IMPORTANT: Please back up this keyfile to external storage (e.g. memory sticks).", ConsoleColor.Blue);
+            Console.WriteLine();
             return keyfilePath;
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
