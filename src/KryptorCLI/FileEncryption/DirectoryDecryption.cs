@@ -35,6 +35,7 @@ public static class DirectoryDecryption
             byte[] salt = File.ReadAllBytes(saltFilePath);
             Globals.TotalCount--;
             if (salt.Length != Constants.SaltLength) { throw new ArgumentException("Invalid salt length."); }
+            DisplayMessage.DerivingKeyFromPassword();
             byte[] keyEncryptionKey = KeyDerivation.Argon2id(passwordBytes, salt);
             DecryptEachFileWithPassword(filePaths, keyEncryptionKey);
             bool anyKryptorFiles = Directory.EnumerateFiles(directoryPath, searchPattern: $"*{Constants.EncryptedExtension}", SearchOption.AllDirectories).Any();

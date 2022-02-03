@@ -46,6 +46,7 @@ public static class FileEncryption
                 return;
             }
             byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
+            DisplayMessage.DerivingKeyFromPassword();
             byte[] keyEncryptionKey = KeyDerivation.Argon2id(passwordBytes, salt);
             // Fill unused header with random public key
             using var ephemeralKeyPair = PublicKeyBox.GenerateKeyPair();

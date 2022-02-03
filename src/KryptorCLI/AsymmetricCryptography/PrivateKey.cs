@@ -28,6 +28,7 @@ public static class PrivateKey
     public static byte[] Encrypt(byte[] passwordBytes, byte[] keyAlgorithm, byte[] privateKey)
     {
         byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
+        DisplayMessage.DerivingKeyFromPassword();
         byte[] key = KeyDerivation.Argon2id(passwordBytes, salt);
         CryptographicOperations.ZeroMemory(passwordBytes);
         byte[] nonce = SodiumCore.GetRandomBytes(Constants.XChaChaNonceLength);
@@ -44,6 +45,7 @@ public static class PrivateKey
         try
         {
             password = Password.ReadInput(password, newPassword: false);
+            Console.WriteLine("Decrypting private key...");
             var passwordBytes = Password.Prehash(password);
             return Decrypt(passwordBytes, privateKey);
         }
