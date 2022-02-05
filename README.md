@@ -65,18 +65,18 @@ $ kryptor -e -p "C:\Users\samuel-lucas6\Downloads\GitHub Logo.png"
 ```
 Files in the same directory as the `kryptor` executable can be specified using their file name:
 ```
-$ kryptor -e -p message.txt
+$ kryptor -e -p file.txt
 ```
 However, files that are not in the same directory as the `kryptor` executable must be specified using a file path:
 ```
-$ kryptor -e -p "C:\Users\samuel-lucas6\Documents\message.txt"
+$ kryptor -e -p "C:\Users\samuel-lucas6\Documents\file.txt"
 ```
 ### Specifying your private key
 You can use the `-x|--private` option without specifying a file path to use your default private key. However, in most cases, this option does not need to be specified. For example, you can perform encryption, decryption, and signing with your default private key as follows:
 ```
-$ kryptor -e message.txt
-$ kryptor -d message.txt.kryptor
-$ kryptor -s message.txt
+$ kryptor -e file.txt
+$ kryptor -d file.txt.kryptor
+$ kryptor -s file.txt
 ```
 This is the recommended approach, but it means your private keys must be kept in the default folder, which varies depending on your operating system:
 
