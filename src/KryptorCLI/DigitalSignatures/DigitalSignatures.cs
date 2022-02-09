@@ -49,7 +49,8 @@ public static class DigitalSignatures
     {
         if (!prehash) { return File.ReadAllBytes(filePath); }
         using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
-        return Blake2b.Hash(fileStream);
+        using var blake2b = new GenericHash.GenericHashAlgorithm(key: (byte[])null, Constants.HashLength);
+        return blake2b.ComputeHash(fileStream);
     }
 
     private static void CreateSignatureFile(string filePath, string signatureFilePath, byte[] signatureFileBytes, byte[] globalSignature)

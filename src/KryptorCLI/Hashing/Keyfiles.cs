@@ -35,6 +35,7 @@ public static class Keyfiles
     public static byte[] ReadKeyfile(string keyfilePath)
     {
         using var keyfile = new FileStream(keyfilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
-        return Blake2b.Hash(keyfile);
+        using var blake2b = new GenericHash.GenericHashAlgorithm(key: (byte[])null, Constants.HashLength);
+        return blake2b.ComputeHash(keyfile);
     }
 }

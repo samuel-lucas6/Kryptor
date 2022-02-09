@@ -93,7 +93,7 @@ public static class FileEncryption
             }
             byte[] ephemeralSharedSecret = KeyExchange.GetPublicKeySharedSecret(recipientPublicKey, out byte[] ephemeralPublicKey);
             byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
-            byte[] keyEncryptionKey = KeyDerivation.Blake2(ephemeralSharedSecret, sharedSecret, salt);
+            byte[] keyEncryptionKey = KeyDerivation.Blake2b(ephemeralSharedSecret, sharedSecret, salt);
             EncryptInputFile(inputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -127,7 +127,7 @@ public static class FileEncryption
             }
             byte[] ephemeralSharedSecret = KeyExchange.GetPrivateKeySharedSecret(privateKey, out byte[] ephemeralPublicKey);
             byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
-            byte[] keyEncryptionKey = KeyDerivation.Blake2(ephemeralSharedSecret, salt);
+            byte[] keyEncryptionKey = KeyDerivation.Blake2b(ephemeralSharedSecret, salt);
             EncryptInputFile(inputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
