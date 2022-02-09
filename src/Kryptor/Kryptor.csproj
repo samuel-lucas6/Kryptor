@@ -56,7 +56,7 @@
 
   <ItemGroup>
     <PackageReference Include="libsodium" Version="1.0.18.1" />
-    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.0.0" />
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.0.1" />
     <PackageReference Include="Sodium.Core" Version="1.2.3" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
   </ItemGroup>
