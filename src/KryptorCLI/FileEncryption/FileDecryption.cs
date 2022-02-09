@@ -95,7 +95,7 @@ public static class FileDecryption
             byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
             byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecret(recipientPrivateKey, ephemeralPublicKey);
             byte[] salt = FileHeaders.ReadSalt(inputFile);
-            byte[] keyEncryptionKey = KeyDerivation.Blake2(sharedSecret, ephemeralSharedSecret, salt);
+            byte[] keyEncryptionKey = KeyDerivation.Blake2(ephemeralSharedSecret, sharedSecret, salt);
             DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey);
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))

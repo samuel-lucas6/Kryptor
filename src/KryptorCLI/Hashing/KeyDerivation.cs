@@ -16,7 +16,6 @@
     along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
-using System;
 using System.Security.Cryptography;
 using Sodium;
 
@@ -29,9 +28,9 @@ public static class KeyDerivation
         return PasswordHash.ArgonHashBinary(passwordBytes, salt, Constants.Iterations, Constants.MemorySize, Constants.EncryptionKeyLength, PasswordHash.ArgonAlgorithm.Argon_2ID13);
     }
 
-    public static byte[] Blake2(byte[] sharedSecret, byte[] ephemeralSharedSecret, byte[] salt)
+    public static byte[] Blake2(byte[] ephemeralSharedSecret, byte[] sharedSecret, byte[] salt)
     {
-        byte[] inputKeyingMaterial = Arrays.Concat(sharedSecret, ephemeralSharedSecret);
+        byte[] inputKeyingMaterial = Arrays.Concat(ephemeralSharedSecret, sharedSecret);
         byte[] keyEncryptionKey = Blake2b.KeyDerivation(inputKeyingMaterial, salt, Constants.EncryptionKeyLength);
         CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
         CryptographicOperations.ZeroMemory(inputKeyingMaterial);
