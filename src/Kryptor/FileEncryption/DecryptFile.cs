@@ -41,8 +41,7 @@ public static class DecryptFile
             using (var outputFile = new FileStream(outputFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
             {
                 nonce = Utilities.Increment(nonce);
-                byte[] additionalData = Arrays.Copy(encryptedHeader, encryptedHeader.Length - Constants.TagLength, Constants.TagLength);
-                DecryptChunks(inputFile, outputFile, nonce, dataEncryptionKey, additionalData, lastChunkLength);
+                DecryptChunks(inputFile, outputFile, nonce, dataEncryptionKey, lastChunkLength);
             }
             inputFile.Dispose();
             Globals.SuccessfulCount += 1;
@@ -74,15 +73,14 @@ public static class DecryptFile
         }
     }
 
-    private static void DecryptChunks(FileStream inputFile, FileStream outputFile, byte[] nonce, byte[] dataEncryptionKey, byte[] additionalData, int lastChunkLength)
+    private static void DecryptChunks(Stream inputFile, Stream outputFile, byte[] nonce, byte[] dataEncryptionKey, int lastChunkLength)
     {
         var ciphertextChunk = new byte[Constants.CiphertextChunkLength];
         inputFile.Seek(Constants.FileHeadersLength, SeekOrigin.Begin);
         while (inputFile.Read(ciphertextChunk, offset: 0, ciphertextChunk.Length) > 0)
         {
-            byte[] plaintextChunk = XChaCha20BLAKE2b.Decrypt(ciphertextChunk, nonce, dataEncryptionKey, additionalData);
+            byte[] plaintextChunk = XChaCha20BLAKE2b.Decrypt(ciphertextChunk, nonce, dataEncryptionKey);
             nonce = Utilities.Increment(nonce);
-            additionalData = Arrays.Copy(ciphertextChunk, ciphertextChunk.Length - Constants.TagLength, Constants.TagLength);
             outputFile.Write(plaintextChunk, offset: 0, plaintextChunk.Length);
         }
         outputFile.SetLength(outputFile.Length - Constants.FileChunkSize + lastChunkLength);
