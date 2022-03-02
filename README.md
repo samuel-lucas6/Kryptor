@@ -71,6 +71,11 @@ However, files that are not in the same directory as the `kryptor` executable mu
 ```
 $ kryptor -e -p "C:\Users\samuel-lucas6\Documents\file.txt"
 ```
+Multiple files and/or directories can be specified at once:
+```
+$ kryptor -e file1.txt file2.jpg file3.mp4 Photos Videos
+```
+
 ### Specifying your private key
 You can use the `-x|--private` option without specifying a file path to use your default private key. However, in most cases, this option does not need to be specified. For example, you can perform encryption, decryption, and signing with your default private key as follows:
 ```
