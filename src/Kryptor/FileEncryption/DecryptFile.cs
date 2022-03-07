@@ -34,14 +34,14 @@ public static class DecryptFile
             byte[] encryptedHeader = FileHeaders.ReadEncryptedHeader(inputFile);
             byte[] nonce = FileHeaders.ReadNonce(inputFile);
             byte[] fileHeader = DecryptFileHeader(inputFile, ephemeralPublicKey, encryptedHeader, nonce, keyEncryptionKey);
-            int lastChunkLength = BitConversion.ToInt32(Arrays.Copy(fileHeader, sourceIndex: 0, Constants.IntBitConverterLength));
+            int paddingLength = BitConversion.ToInt32(Arrays.Copy(fileHeader, sourceIndex: 0, Constants.IntBitConverterLength));
             int fileNameLength = BitConversion.ToInt32(Arrays.Copy(fileHeader, Constants.IntBitConverterLength, Constants.IntBitConverterLength));
             dataEncryptionKey = Arrays.Copy(fileHeader, fileHeader.Length - dataEncryptionKey.Length, Constants.EncryptionKeyLength);
             CryptographicOperations.ZeroMemory(fileHeader);
             using (var outputFile = new FileStream(outputFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
             {
                 nonce = Utilities.Increment(nonce);
-                DecryptChunks(inputFile, outputFile, nonce, dataEncryptionKey, lastChunkLength);
+                DecryptChunks(inputFile, outputFile, nonce, dataEncryptionKey, paddingLength);
             }
             inputFile.Dispose();
             Globals.SuccessfulCount += 1;
@@ -73,7 +73,7 @@ public static class DecryptFile
         }
     }
 
-    private static void DecryptChunks(Stream inputFile, Stream outputFile, byte[] nonce, byte[] dataEncryptionKey, int lastChunkLength)
+    private static void DecryptChunks(Stream inputFile, Stream outputFile, byte[] nonce, byte[] dataEncryptionKey, int paddingLength)
     {
         var ciphertextChunk = new byte[Constants.CiphertextChunkLength];
         inputFile.Seek(Constants.FileHeadersLength, SeekOrigin.Begin);
@@ -83,7 +83,7 @@ public static class DecryptFile
             nonce = Utilities.Increment(nonce);
             outputFile.Write(plaintextChunk, offset: 0, plaintextChunk.Length);
         }
-        outputFile.SetLength(outputFile.Length - Constants.FileChunkSize + lastChunkLength);
+        outputFile.SetLength(outputFile.Length - paddingLength);
         CryptographicOperations.ZeroMemory(dataEncryptionKey);
     }
 }

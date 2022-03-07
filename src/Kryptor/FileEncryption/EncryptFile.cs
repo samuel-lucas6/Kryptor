@@ -64,9 +64,9 @@ public static class EncryptFile
     private static byte[] EncryptFileHeader(string inputFilePath, bool zeroByteFile, byte[] ephemeralPublicKey, byte[] dataEncryptionKey, byte[] nonce, byte[] keyEncryptionKey)
     {
         long fileLength = FileHandling.GetFileLength(inputFilePath);
-        byte[] lastChunkLength = BitConversion.GetBytes(Convert.ToInt32(fileLength % Constants.FileChunkSize));
+        byte[] paddingLength = BitConversion.GetBytes(Constants.FileChunkSize - Convert.ToInt32(fileLength % Constants.FileChunkSize));
         byte[] fileNameLength = FileHeaders.GetFileNameLength(inputFilePath, zeroByteFile);
-        byte[] fileHeader = Arrays.Concat(lastChunkLength, fileNameLength, dataEncryptionKey);
+        byte[] fileHeader = Arrays.Concat(paddingLength, fileNameLength, dataEncryptionKey);
         long chunkCount = (long)Math.Ceiling((double)fileLength / Constants.FileChunkSize);
         byte[] ciphertextLength = BitConversion.GetBytes(chunkCount * Constants.CiphertextChunkLength);
         byte[] additionalData = Arrays.Concat(ciphertextLength, Constants.KryptorMagicBytes, Constants.EncryptionVersion, ephemeralPublicKey);
