@@ -39,7 +39,7 @@ public static class ObfuscateDirectoryNames
     {
         try
         {
-            string directoryName = FileHandling.RemoveIllegalFileNameChars(Path.GetFileName(directoryPath));
+            string directoryName = Path.GetFileName(directoryPath);
             string obfuscatedPath = FileHandling.ReplaceFileName(directoryPath, FileHandling.GetRandomFileName());
             Console.WriteLine($"Renaming \"{directoryName}\" directory => \"{Path.GetFileName(obfuscatedPath)}\"...");
             Directory.Move(directoryPath, obfuscatedPath);
