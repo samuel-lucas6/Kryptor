@@ -18,6 +18,7 @@
 
 using System;
 using System.IO;
+using System.Text;
 using System.Security.Cryptography;
 using Sodium;
 using ChaCha20BLAKE2;
@@ -31,11 +32,12 @@ public static class DecryptFile
         var dataEncryptionKey = new byte[Constants.EncryptionKeyLength];
         try
         {
-            byte[] encryptedHeader = FileHeaders.ReadEncryptedHeader(inputFile);
+            byte[] encryptedFileHeader = FileHeaders.ReadEncryptedHeader(inputFile);
             byte[] nonce = FileHeaders.ReadNonce(inputFile);
-            byte[] fileHeader = DecryptFileHeader(inputFile, ephemeralPublicKey, encryptedHeader, nonce, keyEncryptionKey);
+            byte[] fileHeader = DecryptFileHeader(inputFile, ephemeralPublicKey, encryptedFileHeader, nonce, keyEncryptionKey);
             int paddingLength = BitConversion.ToInt32(Arrays.Copy(fileHeader, sourceIndex: 0, Constants.IntBitConverterLength));
             int fileNameLength = BitConversion.ToInt32(Arrays.Copy(fileHeader, Constants.IntBitConverterLength, Constants.IntBitConverterLength));
+            byte[] fileName = fileNameLength == 0 ? Array.Empty<byte>() : Arrays.Copy(fileHeader, fileHeader.Length - dataEncryptionKey.Length - Constants.FileNameHeaderLength, fileNameLength);
             dataEncryptionKey = Arrays.Copy(fileHeader, fileHeader.Length - dataEncryptionKey.Length, Constants.EncryptionKeyLength);
             CryptographicOperations.ZeroMemory(fileHeader);
             using (var outputFile = new FileStream(outputFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
@@ -45,7 +47,7 @@ public static class DecryptFile
             }
             inputFile.Dispose();
             Globals.SuccessfulCount += 1;
-            RestoreFileName.RenameFile(outputFilePath, fileNameLength);
+            if (fileNameLength != 0) { FileHandling.RenameFile(outputFilePath, Encoding.UTF8.GetString(fileName)); }
             if (Globals.Overwrite) { FileHandling.DeleteFile(inputFile.Name); }
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))

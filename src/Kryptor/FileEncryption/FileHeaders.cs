@@ -36,13 +36,6 @@ public static class FileHeaders
         outputFile.Write(encryptedHeader, offset, encryptedHeader.Length);
     }
 
-    public static byte[] GetFileNameLength(string inputFilePath, bool zeroByteFile)
-    {
-        if (!zeroByteFile && !Globals.EncryptFileNames) { return BitConversion.GetBytes(0); }
-        var fileNameBytes = Encoding.UTF8.GetBytes(Path.GetFileName(inputFilePath));
-        return BitConversion.GetBytes(fileNameBytes.Length);
-    }
-
     public static void ValidateFormatVersion(byte[] formatVersion, byte[] currentFormatVersion)
     {
         bool validFormatVersion = Utilities.Compare(formatVersion, currentFormatVersion);

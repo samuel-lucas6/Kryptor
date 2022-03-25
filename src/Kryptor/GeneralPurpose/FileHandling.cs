@@ -50,29 +50,10 @@ public static class FileHandling
     
     public static string GetEncryptedOutputFilePath(string inputFilePath)
     {
-        try
-        {
-            if (Globals.EncryptFileNames)
-            {
-                AppendFileName(inputFilePath);
-                inputFilePath = ReplaceFileName(inputFilePath, GetRandomFileName());
-            }
-        }
-        catch (Exception ex) when (ExceptionFilters.FileAccess(ex) || ex is EncoderFallbackException)
-        {
-            DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, "Unable to store the file name.");
-        }
+        if (Globals.EncryptFileNames) { inputFilePath = ReplaceFileName(inputFilePath, GetRandomFileName()); }
         return GetUniqueFilePath(inputFilePath + Constants.EncryptedExtension);
     }
-    
-    public static void AppendFileName(string filePath)
-    {
-        File.SetAttributes(filePath, FileAttributes.Normal);
-        using var fileStream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
-        var fileNameBytes = Encoding.UTF8.GetBytes(Path.GetFileName(filePath));
-        fileStream.Write(fileNameBytes, offset: 0, fileNameBytes.Length);
-    }
-    
+        
     public static string GetDecryptedOutputFilePath(string inputFilePath) => GetUniqueFilePath(Path.ChangeExtension(inputFilePath, extension: null));
 
     public static byte[] ReadFileHeader(FileStream fileStream, long offset, int length)
@@ -202,6 +183,22 @@ public static class FileHandling
             return filePath.Remove(startIndex: lengthMinusExtension - 4) + fileExtension;
         }
         return filePath;
+    }
+    
+    public static void RenameFile(string filePath, string newFileName)
+    {
+        try
+        {
+            if (string.Equals(newFileName, RemoveFileNameNumber(Path.GetFileName(filePath)))) { return; }
+            string newFilePath = ReplaceFileName(filePath, newFileName);
+            newFilePath = GetUniqueFilePath(newFilePath);
+            Console.WriteLine($"Renaming \"{Path.GetFileName(filePath)}\" => \"{Path.GetFileName(newFilePath)}\"...");
+            File.Move(filePath, newFilePath);
+        }
+        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
+        {
+            DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to restore the original file name.");
+        }
     }
 
     public static string GetUniqueDirectoryPath(string directoryPath)

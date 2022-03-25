@@ -18,6 +18,7 @@
 
 using System;
 using System.IO;
+using System.Text;
 using System.Security.Cryptography;
 using Sodium;
 using ChaCha20BLAKE2;
@@ -31,26 +32,17 @@ public static class EncryptFile
         var dataEncryptionKey = SodiumCore.GetRandomBytes(Constants.EncryptionKeyLength);
         try
         {
-            bool zeroByteFile = FileHandling.GetFileLength(inputFilePath) == 0;
-            if (zeroByteFile) { FileHandling.AppendFileName(inputFilePath); }
             using (var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
             using (var outputFile = new FileStream(outputFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
             {
                 var nonce = SodiumCore.GetRandomBytes(Constants.XChaChaNonceLength);
-                byte[] encryptedHeader = EncryptFileHeader(inputFilePath, zeroByteFile, ephemeralPublicKey, dataEncryptionKey, nonce, keyEncryptionKey);
+                byte[] encryptedHeader = EncryptFileHeader(inputFilePath, ephemeralPublicKey, dataEncryptionKey, nonce, keyEncryptionKey);
                 FileHeaders.WriteHeaders(outputFile, ephemeralPublicKey, salt, nonce, encryptedHeader);
                 nonce = Utilities.Increment(nonce);
                 EncryptChunks(inputFile, outputFile, nonce, dataEncryptionKey);
             }
             Globals.SuccessfulCount += 1;
-            if (Globals.Overwrite)
-            {
-                FileHandling.OverwriteFile(inputFilePath, outputFilePath);
-            }
-            else if (Globals.EncryptFileNames || zeroByteFile)
-            {
-                RestoreFileName.RemoveAppendedFileName(inputFilePath);
-            }
+            if (Globals.Overwrite) { FileHandling.OverwriteFile(inputFilePath, outputFilePath); }
             FileHandling.SetFileAttributesReadOnly(outputFilePath);
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -61,13 +53,16 @@ public static class EncryptFile
         }
     }
 
-    private static byte[] EncryptFileHeader(string inputFilePath, bool zeroByteFile, byte[] ephemeralPublicKey, byte[] dataEncryptionKey, byte[] nonce, byte[] keyEncryptionKey)
+    private static byte[] EncryptFileHeader(string inputFilePath, byte[] ephemeralPublicKey, byte[] dataEncryptionKey, byte[] nonce, byte[] keyEncryptionKey)
     {
         long fileLength = FileHandling.GetFileLength(inputFilePath);
         byte[] paddingLength = BitConversion.GetBytes(Constants.FileChunkSize - Convert.ToInt32(fileLength % Constants.FileChunkSize));
-        byte[] fileNameLength = FileHeaders.GetFileNameLength(inputFilePath, zeroByteFile);
-        byte[] fileHeader = Arrays.Concat(paddingLength, fileNameLength, dataEncryptionKey);
-        long chunkCount = (long)Math.Ceiling((double)fileLength / Constants.FileChunkSize);
+        byte[] fileName = Encoding.UTF8.GetBytes(Path.GetFileName(inputFilePath));
+        var paddedFileName = new byte[Constants.FileNameHeaderLength];
+        if (Globals.EncryptFileNames) { Array.Copy(fileName, paddedFileName, fileName.Length); }
+        byte[] fileNameLength = !Globals.EncryptFileNames ? BitConversion.GetBytes(0) : BitConversion.GetBytes(fileName.Length);
+        byte[] fileHeader = Arrays.Concat(paddingLength, fileNameLength, paddedFileName, dataEncryptionKey);
+        long chunkCount = (long)Math.Ceiling((double)(fileLength != 0 ? fileLength : 1) / Constants.FileChunkSize);
         byte[] ciphertextLength = BitConversion.GetBytes(chunkCount * Constants.CiphertextChunkLength);
         byte[] additionalData = Arrays.Concat(ciphertextLength, Constants.KryptorMagicBytes, Constants.EncryptionVersion, ephemeralPublicKey);
         return XChaCha20BLAKE2b.Encrypt(fileHeader, nonce, keyEncryptionKey, additionalData);
@@ -76,12 +71,13 @@ public static class EncryptFile
     private static void EncryptChunks(Stream inputFile, Stream outputFile, byte[] nonce, byte[] dataEncryptionKey)
     {
         var plaintextChunk = new byte[Constants.FileChunkSize];
-        while (inputFile.Read(plaintextChunk, offset: 0, plaintextChunk.Length) > 0)
+        do
         {
             byte[] ciphertextChunk = XChaCha20BLAKE2b.Encrypt(plaintextChunk, nonce, dataEncryptionKey);
             nonce = Utilities.Increment(nonce);
             outputFile.Write(ciphertextChunk, offset: 0, ciphertextChunk.Length);
         }
+        while (inputFile.Read(plaintextChunk, offset: 0, plaintextChunk.Length) > 0);
         CryptographicOperations.ZeroMemory(dataEncryptionKey);
     }
 }
