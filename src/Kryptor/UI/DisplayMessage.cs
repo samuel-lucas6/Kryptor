@@ -42,6 +42,16 @@ public static class DisplayMessage
     
     public static void DerivingKeyFromPassword() => Console.WriteLine("Deriving encryption key from password...");
     
+    public static void CreatingZipFile(string directoryPath, string zipFilePath)
+    {
+        Console.WriteLine($"Compressing \"{Path.GetFileName(directoryPath)}\" => \"{Path.GetFileName(zipFilePath)}\"...");
+    }
+    
+    public static void ExtractingZipFile(string zipFilePath, string directoryPath)
+    {
+        Console.WriteLine($"Extracting \"{Path.GetFileName(zipFilePath)}\" => \"{Path.GetFileName(directoryPath)}\"...");
+    }
+    
     public static void EncryptingFile(string inputFilePath, string outputFilePath)
     {
         Console.WriteLine($"Encrypting \"{Path.GetFileName(inputFilePath)}\" => \"{Path.GetFileName(outputFilePath)}\"...");

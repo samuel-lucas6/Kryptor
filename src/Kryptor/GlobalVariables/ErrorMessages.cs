@@ -31,8 +31,8 @@ public static class ErrorMessages
     public const string NoFileToVerify = "Please specify a file to verify.";
     public const string NoFileToSign = "Please specify a file to sign.";
     public const string PasswordBasedEncryption = "Please specify a password and/or keyfile, private key, or private key and public key.";
-    public const string UnableToEncryptFile = "Unable to encrypt the file.";
-    public const string UnableToDecryptFile = "Unable to decrypt the file.";
+    public const string UnableToEncryptFile = "Unable to encrypt the file/directory.";
+    public const string UnableToDecryptFile = "Unable to decrypt the file/directory.";
     
     public static string GetFilePathError(string filePath, string errorMessage) => $"\"{Path.GetFileName(filePath)}\" - {errorMessage}";
 }

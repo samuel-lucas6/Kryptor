@@ -32,11 +32,12 @@ public static class DecryptFile
         var dataEncryptionKey = new byte[Constants.EncryptionKeyLength];
         try
         {
-            byte[] encryptedFileHeader = FileHeaders.ReadEncryptedHeader(inputFile);
             byte[] nonce = FileHeaders.ReadNonce(inputFile);
+            byte[] encryptedFileHeader = FileHeaders.ReadEncryptedHeader(inputFile);
             byte[] fileHeader = DecryptFileHeader(inputFile, ephemeralPublicKey, encryptedFileHeader, nonce, keyEncryptionKey);
             int paddingLength = BitConversion.ToInt32(Arrays.Copy(fileHeader, sourceIndex: 0, Constants.IntBitConverterLength));
-            int fileNameLength = BitConversion.ToInt32(Arrays.Copy(fileHeader, Constants.IntBitConverterLength, Constants.IntBitConverterLength));
+            bool isDirectory = BitConverter.ToBoolean(Arrays.Copy(fileHeader, sourceIndex: Constants.IntBitConverterLength, length: Constants.BoolBitConverterLength));
+            int fileNameLength = BitConversion.ToInt32(Arrays.Copy(fileHeader, Constants.IntBitConverterLength + Constants.BoolBitConverterLength, Constants.IntBitConverterLength));
             byte[] fileName = fileNameLength == 0 ? Array.Empty<byte>() : Arrays.Copy(fileHeader, fileHeader.Length - dataEncryptionKey.Length - Constants.FileNameHeaderLength, fileNameLength);
             dataEncryptionKey = Arrays.Copy(fileHeader, fileHeader.Length - dataEncryptionKey.Length, Constants.EncryptionKeyLength);
             CryptographicOperations.ZeroMemory(fileHeader);
@@ -47,7 +48,8 @@ public static class DecryptFile
             }
             inputFile.Dispose();
             Globals.SuccessfulCount += 1;
-            if (fileNameLength != 0) { FileHandling.RenameFile(outputFilePath, Encoding.UTF8.GetString(fileName)); }
+            if (fileNameLength != 0) { outputFilePath = FileHandling.RenameFile(outputFilePath, Encoding.UTF8.GetString(fileName)); }
+            if (isDirectory) { FileHandling.ExtractZipFile(outputFilePath); }
             if (Globals.Overwrite) { FileHandling.DeleteFile(inputFile.Name); }
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))

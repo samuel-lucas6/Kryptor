@@ -25,8 +25,6 @@ namespace Kryptor;
 
 public static class DigitalSignatures
 {
-    private const int PrehashedHeaderLength = 1;
-
     public static void SignFile(string filePath, string signatureFilePath, string comment, bool prehash, byte[] privateKey)
     {
         if (!prehash) { prehash = IsPrehashingRequired(filePath); }
@@ -69,7 +67,7 @@ public static class DigitalSignatures
         byte[] magicBytes = FileHandling.ReadFileHeader(signatureFile, Constants.SignatureMagicBytes.Length);
         byte[] formatVersion = FileHandling.ReadFileHeader(signatureFile, Constants.SignatureVersion.Length);
         FileHeaders.ValidateFormatVersion(formatVersion, Constants.SignatureVersion);
-        byte[] prehashed = FileHandling.ReadFileHeader(signatureFile, PrehashedHeaderLength);
+        byte[] prehashed = FileHandling.ReadFileHeader(signatureFile, Constants.BoolBitConverterLength);
         byte[] fileSignature = FileHandling.ReadFileHeader(signatureFile, Constants.SignatureLength);
         byte[] commentBytes = GetCommentBytes(signatureFile);
         byte[] signatureFileBytes = Arrays.Concat(magicBytes, formatVersion, prehashed, fileSignature, commentBytes);
@@ -88,7 +86,7 @@ public static class DigitalSignatures
 
     private static byte[] GetCommentBytes(FileStream signatureFile)
     {
-        int offset = Constants.SignatureMagicBytes.Length + Constants.SignatureVersion.Length + PrehashedHeaderLength + Constants.SignatureLength;
+        int offset = Constants.SignatureMagicBytes.Length + Constants.SignatureVersion.Length + Constants.BoolBitConverterLength + Constants.SignatureLength;
         return FileHandling.ReadFileHeader(signatureFile, (int)(signatureFile.Length - offset - Constants.SignatureLength));
     }
 }

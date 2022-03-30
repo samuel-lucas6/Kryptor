@@ -18,8 +18,8 @@
 
 using System;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
-using System.Text;
 using Sodium;
 
 namespace Kryptor;
@@ -103,27 +103,6 @@ public static class FileHandling
         return ReadFileHeader(fileStream, offset, length);
     }
 
-    public static void CopyDirectory(string sourceDirectoryPath, string destinationDirectoryPath, bool copySubdirectories)
-    {
-        var directoryInfo = new DirectoryInfo(sourceDirectoryPath);
-        if (!directoryInfo.Exists) { throw new DirectoryNotFoundException("The source directory does not exist or could not be found."); }
-        DirectoryInfo[] directories = directoryInfo.GetDirectories();
-        destinationDirectoryPath = GetUniqueDirectoryPath(destinationDirectoryPath);
-        Directory.CreateDirectory(destinationDirectoryPath);
-        FileInfo[] files = directoryInfo.GetFiles();
-        foreach (FileInfo file in files)
-        {
-            string newFilePath = Path.Combine(destinationDirectoryPath, file.Name);
-            file.CopyTo(newFilePath, overwrite: false);
-        }
-        if (!copySubdirectories) { return; }
-        foreach (DirectoryInfo subdirectory in directories)
-        {
-            string newSubdirectoryPath = Path.Combine(destinationDirectoryPath, subdirectory.Name);
-            CopyDirectory(subdirectory.FullName, newSubdirectoryPath, copySubdirectories);
-        }
-    }
-
     public static void OverwriteFile(string fileToDelete, string fileToCopy)
     {
         try
@@ -137,7 +116,7 @@ public static class FileHandling
             DisplayMessage.FilePathException(fileToDelete, ex.GetType().Name, "Unable to overwrite the file.");
         }
     }
-
+    
     public static void DeleteFile(string filePath)
     {
         try
@@ -149,6 +128,23 @@ public static class FileHandling
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
             DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to delete the file.");
+        }
+    }
+
+    public static void DeleteDirectory(string directoryPath)
+    {
+        try
+        {
+            if (!Directory.Exists(directoryPath)) { return; }
+            foreach (string filePath in GetAllFiles(directoryPath))
+            {
+                File.SetAttributes(filePath, FileAttributes.Normal);
+            }
+            Directory.Delete(directoryPath, recursive: true);
+        }
+        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
+        {
+            DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to delete the directory.");
         }
     }
 
@@ -185,19 +181,21 @@ public static class FileHandling
         return filePath;
     }
     
-    public static void RenameFile(string filePath, string newFileName)
+    public static string RenameFile(string filePath, string newFileName)
     {
         try
         {
-            if (string.Equals(newFileName, RemoveFileNameNumber(Path.GetFileName(filePath)))) { return; }
+            if (string.Equals(newFileName, RemoveFileNameNumber(Path.GetFileName(filePath)))) { return filePath; }
             string newFilePath = ReplaceFileName(filePath, newFileName);
             newFilePath = GetUniqueFilePath(newFilePath);
             Console.WriteLine($"Renaming \"{Path.GetFileName(filePath)}\" => \"{Path.GetFileName(newFilePath)}\"...");
             File.Move(filePath, newFilePath);
+            return newFilePath;
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
             DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to restore the original file name.");
+            return filePath;
         }
     }
 
@@ -225,6 +223,28 @@ public static class FileHandling
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
             DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to mark the file as read-only.");
+        }
+    }
+    
+    public static void CreateZipFile(string directoryPath, string zipFilePath)
+    {
+        DisplayMessage.CreatingZipFile(directoryPath, zipFilePath);
+        ZipFile.CreateFromDirectory(directoryPath, zipFilePath, CompressionLevel.NoCompression, includeBaseDirectory: false);
+        if (Globals.Overwrite) { DeleteDirectory(directoryPath); }
+    }
+
+    public static void ExtractZipFile(string zipFilePath)
+    {
+        try
+        {
+            string directoryPath = GetUniqueDirectoryPath(zipFilePath[..^Path.GetExtension(zipFilePath).Length]);
+            DisplayMessage.ExtractingZipFile(zipFilePath, directoryPath);
+            ZipFile.ExtractToDirectory(zipFilePath, directoryPath);
+            DeleteFile(zipFilePath);
+        }
+        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
+        {
+            DisplayMessage.FilePathException(zipFilePath, ex.GetType().Name, "Unable to extract the file.");
         }
     }
 }
