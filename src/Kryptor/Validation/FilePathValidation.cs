@@ -177,7 +177,7 @@ public static class FilePathValidation
 
     public static string GetFileSigningError(string inputFilePath)
     {
-        if (Directory.Exists(inputFilePath)) { return ErrorMessages.NoFileToSign; }
+        if (Directory.Exists(inputFilePath)) { return FileHandling.IsDirectoryEmpty(inputFilePath) ? DirectoryEmpty : null; }
         return !File.Exists(inputFilePath) ? FileDoesNotExist : null;
     }
 

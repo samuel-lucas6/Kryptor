@@ -59,7 +59,7 @@ public static class SigningValidation
         {
             yield return ErrorMessages.NoFileToSign;
         }
-        else if (filePaths.Length > 1 && !string.IsNullOrEmpty(signatureFilePath))
+        else if ((filePaths.Length > 1 || Directory.Exists(filePaths[0])) && !string.IsNullOrEmpty(signatureFilePath))
         {
             yield return "You cannot specify a signature file when signing multiple files.";
         }

@@ -35,6 +35,7 @@ public static class DigitalSignatures
         byte[] signatureFileBytes = Arrays.Concat(Constants.SignatureMagicBytes, Constants.SignatureVersion, prehashed, fileSignature, commentBytes);
         byte[] globalSignature = PublicKeyAuth.SignDetached(signatureFileBytes, privateKey);
         CreateSignatureFile(filePath, signatureFilePath, signatureFileBytes, globalSignature);
+        Globals.SuccessfulCount += 1;
     }
 
     private static bool IsPrehashingRequired(string filePath)

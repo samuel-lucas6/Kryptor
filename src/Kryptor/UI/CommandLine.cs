@@ -205,7 +205,8 @@ public static class CommandLine
         bool validUserInput = SigningValidation.Sign(privateKeyPath, comment, signatureFilePath, filePaths);
         if (!validUserInput) { return; }
         byte[] privateKey = AsymmetricKeyValidation.SigningPrivateKeyFile(privateKeyPath);
-        FileSigning.SignEachFile(privateKey, password, comment, prehash, signatureFilePath, filePaths);
+        privateKey = PrivateKey.Decrypt(privateKey, password);
+        FileSigning.SignEachFile(privateKey, comment, prehash, signatureFilePath, filePaths);
     }
 
     public static void Verify(string publicKey, string signatureFilePath, string[] filePaths)

@@ -62,18 +62,6 @@ public static class DisplayMessage
         Console.WriteLine($"Decrypting \"{Path.GetFileName(inputFilePath)}\" => \"{Path.GetFileName(outputFilePath)}\"...");
     }
 
-    public static void DirectoryEncryptionComplete(string directoryPath)
-    {
-        Console.WriteLine();
-        WriteLine($"Encryption of \"{Path.GetFileName(directoryPath)}\" directory complete.", ConsoleColor.Blue);
-    }
-
-    public static void DirectoryDecryptionComplete(string directoryPath)
-    {
-        Console.WriteLine();
-        WriteLine($"Decryption of \"{Path.GetFileName(directoryPath)}\" directory complete.", ConsoleColor.Blue);
-    }
-
     public static void SuccessfullyEncrypted(bool space = true)
     {
         if (Globals.TotalCount <= 0) { return; }
@@ -106,7 +94,12 @@ public static class DisplayMessage
         Console.WriteLine($"Public key: {publicKey}");
         if (!string.IsNullOrEmpty(publicKeyFilePath)) { Console.WriteLine($"Public key file: \"{publicKeyFilePath}\""); }
     }
-
+    
+    public static void SigningFile(string filePath)
+    {
+        Console.WriteLine($"Signing \"{Path.GetFileName(filePath)}\"...");
+    }
+        
     public static void SuccessfullySigned()
     {
         if (Globals.TotalCount <= 0) { return; }
