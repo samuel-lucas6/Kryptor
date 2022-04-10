@@ -104,41 +104,48 @@ public class Program
         Globals.EncryptFileNames = EncryptFileNames;
         Globals.TotalCount = FilePaths?.Length ?? 0;
         Console.WriteLine();
-        if (Encrypt)
+        try
         {
-            CommandLine.Encrypt((Password.hasValue, GetPassword(Password.value)), Keyfile, (PrivateKey.hasValue, GetEncryptionPrivateKey(PrivateKey.value)), PublicKey, FilePaths);
+            if (Encrypt)
+            {
+                CommandLine.Encrypt((Password.hasValue, GetPassword(Password.value)), Keyfile, (PrivateKey.hasValue, GetEncryptionPrivateKey(PrivateKey.value)), PublicKey, FilePaths);
+            }
+            else if (Decrypt)
+            {
+                CommandLine.Decrypt((Password.hasValue, GetPassword(Password.value)), Keyfile, (PrivateKey.hasValue, GetEncryptionPrivateKey(PrivateKey.value)), PublicKey, FilePaths);
+            }
+            else if (GenerateKeys)
+            {
+                CommandLine.GenerateNewKeyPair(GetPassword(Password.value), FilePaths == null ? Constants.DefaultKeyDirectory : FilePaths[0]);
+            }
+            else if (RecoverPublicKey)
+            {
+                CommandLine.RecoverPublicKey(PrivateKey.value, GetPassword(Password.value));
+            }
+            else if (Sign)
+            {
+                CommandLine.Sign(GetSigningPrivateKey(PrivateKey.value), GetPassword(Password.value), Comment, Prehash, Signature, FilePaths);
+            }
+            else if (Verify)
+            {
+                CommandLine.Verify(PublicKey, Signature, FilePaths);
+            }
+            else if (CheckForUpdates)
+            {
+                CommandLine.CheckForUpdates();
+            }
+            else if (About)
+            {
+                CommandLine.DisplayAbout();
+            }
+            else
+            {
+                DisplayMessage.Error("Unknown command. Please specify -h|--help for a list of options and examples.");
+            }
         }
-        else if (Decrypt)
+        catch (DllNotFoundException ex)
         {
-            CommandLine.Decrypt((Password.hasValue, GetPassword(Password.value)), Keyfile, (PrivateKey.hasValue, GetEncryptionPrivateKey(PrivateKey.value)), PublicKey, FilePaths);
-        }
-        else if (GenerateKeys)
-        {
-            CommandLine.GenerateNewKeyPair(GetPassword(Password.value), FilePaths == null ? Constants.DefaultKeyDirectory : FilePaths[0]);
-        }
-        else if (RecoverPublicKey)
-        {
-            CommandLine.RecoverPublicKey(PrivateKey.value, GetPassword(Password.value));
-        }
-        else if (Sign)
-        {
-            CommandLine.Sign(GetSigningPrivateKey(PrivateKey.value), GetPassword(Password.value), Comment, Prehash, Signature, FilePaths);
-        }
-        else if (Verify)
-        {
-            CommandLine.Verify(PublicKey, Signature, FilePaths);
-        }
-        else if (CheckForUpdates)
-        {
-            CommandLine.CheckForUpdates();
-        }
-        else if (About)
-        {
-            CommandLine.DisplayAbout();
-        }
-        else
-        {
-            DisplayMessage.Error("Unknown command. Please specify -h|--help for a list of options and examples.");
+            DisplayMessage.Exception(ex.GetType().Name, "The libsodium cryptographic library requires the Microsoft Visual C++ Redistributable for Visual Studio 2015-2022 to function on Windows. Please install this runtime or move the Kryptor executable to a directory that doesn't require administrative privileges.");
         }
     }
     
@@ -157,7 +164,6 @@ public class Program
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
-            DisplayMessage.Exception(ex.GetType().Name, "Unable to extract the \"vcruntime140.dll\" file, which is required for the libsodium library to function on Windows.");
         }
     }
 
