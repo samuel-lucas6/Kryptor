@@ -49,7 +49,7 @@ public static class FileSigning
                         }
                         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
                         {
-                            DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to sign the file.");
+                            DisplayMessage.FilePathException(file, ex.GetType().Name, "Unable to sign the file.");
                         }
                     }
                     continue;
