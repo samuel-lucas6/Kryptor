@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Kryptor": {
+      "commandName": "Project",
+      "commandLineArgs": "",
+      "remoteDebugEnabled": false
+    }
+  }
+}
