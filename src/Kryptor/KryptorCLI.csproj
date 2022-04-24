@@ -5,11 +5,11 @@
     <TargetFramework>net6.0</TargetFramework>
 	<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
 	<PublishReadyToRunShowWarnings>true</PublishReadyToRunShowWarnings>
-	<StartupObject>Kryptor.Program</StartupObject>
+	<StartupObject>KryptorCLI.Program</StartupObject>
     <ApplicationIcon>Kryptor Icon.ico</ApplicationIcon>
     <Platforms>x64</Platforms>
     <PackageId>Kryptor</PackageId>
-    <Version>4.0.0</Version>
+    <Version>3.1.0</Version>
     <Authors>Samuel Lucas</Authors>
     <Company />
     <Product>Kryptor</Product>
@@ -25,11 +25,16 @@
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <AnalysisLevel>latest</AnalysisLevel>
-    <AssemblyVersion>4.0.0.0</AssemblyVersion>
-    <FileVersion>4.0.0.0</FileVersion>
+    <AssemblyVersion>3.1.0.0</AssemblyVersion>
+    <FileVersion>3.1.0.0</FileVersion>
     <ErrorReport>none</ErrorReport>
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>x64</PlatformTarget>
+    <Optimize>false</Optimize>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -39,7 +44,6 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <DefineConstants>TRACE</DefineConstants>
-    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
@@ -51,8 +55,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="libsodium" Version="1.0.18.2" />
-    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.0.1" />
+    <PackageReference Include="libsodium" Version="1.0.18.1" />
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.0.0" />
     <PackageReference Include="Sodium.Core" Version="1.2.3" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
   </ItemGroup>

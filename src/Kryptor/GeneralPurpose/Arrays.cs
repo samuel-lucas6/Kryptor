@@ -23,7 +23,7 @@ using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using Sodium;
 
-namespace Kryptor;
+namespace KryptorCLI;
 
 public static class Arrays
 {
@@ -51,8 +51,8 @@ public static class Arrays
         var aBytes = Encoding.UTF8.GetBytes(a);
         var bBytes = Encoding.UTF8.GetBytes(b);
         var key = SodiumCore.GetRandomBytes(Constants.HashLength);
-        aBytes = GenericHash.Hash(aBytes, key, Constants.HashLength);
-        bBytes = GenericHash.Hash(bBytes, key, Constants.HashLength);
+        aBytes = Blake2b.KeyedHash(aBytes, key);
+        bBytes = Blake2b.KeyedHash(bBytes, key);
         CryptographicOperations.ZeroMemory(key);
         return Utilities.Compare(aBytes, bBytes);
     }

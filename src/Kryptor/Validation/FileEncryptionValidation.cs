@@ -20,7 +20,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace Kryptor;
+namespace KryptorCLI;
 
 public static class FileEncryptionValidation
 {

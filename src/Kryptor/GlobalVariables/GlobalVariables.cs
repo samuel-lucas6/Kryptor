@@ -16,7 +16,7 @@
     along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
-namespace Kryptor;
+namespace KryptorCLI;
 
 public static class Globals
 {

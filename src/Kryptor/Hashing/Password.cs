@@ -19,9 +19,8 @@
 using System;
 using System.Text;
 using System.Security.Cryptography;
-using Sodium;
 
-namespace Kryptor;
+namespace KryptorCLI;
 
 public static class Password
 {
@@ -44,7 +43,7 @@ public static class Password
         if (password.Length == 0) { return null; }
         var passwordBytes = Encoding.UTF8.GetBytes(password);
         Arrays.ZeroMemory(password);
-        return GenericHash.Hash(passwordBytes, key: null, Constants.HashLength);
+        return Blake2b.Hash(passwordBytes);
     }
 
     private static byte[] UseKeyfile(byte[] passwordBytes, string keyfilePath)
@@ -63,7 +62,7 @@ public static class Password
 
     private static byte[] PepperPassword(byte[] passwordBytes, byte[] keyfileBytes)
     {
-        passwordBytes = GenericHash.Hash(passwordBytes, keyfileBytes, Constants.HashLength);
+        passwordBytes = Blake2b.KeyedHash(passwordBytes, keyfileBytes);
         CryptographicOperations.ZeroMemory(keyfileBytes);
         return passwordBytes;
     }

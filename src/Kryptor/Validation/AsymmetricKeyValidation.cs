@@ -20,7 +20,7 @@ using System;
 using System.IO;
 using Sodium;
 
-namespace Kryptor;
+namespace KryptorCLI;
 
 public static class AsymmetricKeyValidation
 {

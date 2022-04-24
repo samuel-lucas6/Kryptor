@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Sodium;
 
-namespace Kryptor;
+namespace KryptorCLI;
 
 public static class PassphraseGenerator
 {

@@ -23,7 +23,7 @@ using System.IO.Compression;
 using System.Net;
 using System.Security.Cryptography;
 
-namespace Kryptor;
+namespace KryptorCLI;
 
 public static class Updates
 {

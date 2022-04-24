@@ -19,7 +19,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Kryptor;
+namespace KryptorCLI;
 
 public static class PasswordPrompt
 {

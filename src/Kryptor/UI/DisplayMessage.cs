@@ -21,7 +21,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace Kryptor;
+namespace KryptorCLI;
 
 public static class DisplayMessage
 {
@@ -40,18 +40,13 @@ public static class DisplayMessage
         WriteLine($"\"{Path.GetFileName(filePath)}\" - {ErrorWord}: {exceptionName} - {errorMessage}", ConsoleColor.DarkRed);
     }
     
-    public static void DerivingKeyFromPassword() => Console.WriteLine("Deriving encryption key from password...");
-    
-    public static void CreatingZipFile(string directoryPath, string zipFilePath)
+    public static void WriteLine(string message, ConsoleColor colour)
     {
-        Console.WriteLine($"Compressing \"{Path.GetFileName(directoryPath)}\" => \"{Path.GetFileName(zipFilePath)}\"...");
+        Console.ForegroundColor = colour;
+        Console.WriteLine(message);
+        Console.ResetColor();
     }
-    
-    public static void ExtractingZipFile(string zipFilePath, string directoryPath)
-    {
-        Console.WriteLine($"Extracting \"{Path.GetFileName(zipFilePath)}\" => \"{Path.GetFileName(directoryPath)}\"...");
-    }
-    
+
     public static void EncryptingFile(string inputFilePath, string outputFilePath)
     {
         Console.WriteLine($"Encrypting \"{Path.GetFileName(inputFilePath)}\" => \"{Path.GetFileName(outputFilePath)}\"...");
@@ -60,6 +55,18 @@ public static class DisplayMessage
     public static void DecryptingFile(string inputFilePath, string outputFilePath)
     {
         Console.WriteLine($"Decrypting \"{Path.GetFileName(inputFilePath)}\" => \"{Path.GetFileName(outputFilePath)}\"...");
+    }
+
+    public static void DirectoryEncryptionComplete(string directoryPath)
+    {
+        Console.WriteLine();
+        WriteLine($"Encryption of \"{Path.GetFileName(directoryPath)}\" directory complete.", ConsoleColor.Blue);
+    }
+
+    public static void DirectoryDecryptionComplete(string directoryPath)
+    {
+        Console.WriteLine();
+        WriteLine($"Decryption of \"{Path.GetFileName(directoryPath)}\" directory complete.", ConsoleColor.Blue);
     }
 
     public static void SuccessfullyEncrypted(bool space = true)
@@ -84,8 +91,6 @@ public static class DisplayMessage
         Console.WriteLine();
         Console.Write($"Private key file: \"{privateKeyFilePath}\" - ");
         WriteLine("Keep this secret!", ConsoleColor.DarkRed);
-        Console.WriteLine();
-        WriteLine("IMPORTANT: Please back up these files to external storage (e.g. memory sticks).", ConsoleColor.Blue);
     }
     
     public static void PublicKey(string publicKey, string publicKeyFilePath)
@@ -94,12 +99,7 @@ public static class DisplayMessage
         Console.WriteLine($"Public key: {publicKey}");
         if (!string.IsNullOrEmpty(publicKeyFilePath)) { Console.WriteLine($"Public key file: \"{publicKeyFilePath}\""); }
     }
-    
-    public static void SigningFile(string filePath)
-    {
-        Console.WriteLine($"Signing \"{Path.GetFileName(filePath)}\"...");
-    }
-        
+
     public static void SuccessfullySigned()
     {
         if (Globals.TotalCount <= 0) { return; }
@@ -107,13 +107,6 @@ public static class DisplayMessage
         WriteLine($"Successfully signed: {Globals.SuccessfulCount}/{Globals.TotalCount}", Globals.SuccessfulCount == Globals.TotalCount ? ConsoleColor.Green : ConsoleColor.DarkRed);
     }
 
-    public static void WriteLine(string message, ConsoleColor colour)
-    {
-        Console.ForegroundColor = colour;
-        Console.WriteLine(message);
-        Console.ResetColor();
-    }
-    
     public static bool AnyErrors(IEnumerable<string> errorMessages)
     {
         foreach (string errorMessage in errorMessages)

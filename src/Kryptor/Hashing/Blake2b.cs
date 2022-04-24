@@ -16,25 +16,29 @@
     along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
+using System;
 using System.IO;
-using System.Security.Cryptography;
+using System.Text;
 using Sodium;
 
 namespace KryptorCLI;
 
-public static class Keyfiles
+public static class Blake2b
 {
-    public static void GenerateKeyfile(string keyfilePath)
+    private static readonly byte[] Personalisation = Encoding.UTF8.GetBytes("Kryptor.Personal");
+
+    public static byte[] Hash(byte[] message) => GenericHash.Hash(message, key: null, Constants.HashLength);
+
+    public static byte[] KeyedHash(byte[] message, byte[] key) => GenericHash.Hash(message, key, Constants.HashLength);
+    
+    public static byte[] Hash(FileStream fileStream)
     {
-        var keyfileBytes = SodiumCore.GetRandomBytes(Constants.KeyfileLength);
-        File.WriteAllBytes(keyfilePath, keyfileBytes);
-        File.SetAttributes(keyfilePath, FileAttributes.ReadOnly);
-        CryptographicOperations.ZeroMemory(keyfileBytes);
+        using var blake2 = new GenericHash.GenericHashAlgorithm(key: (byte[])null, Constants.HashLength);
+        return blake2.ComputeHash(fileStream);
     }
 
-    public static byte[] ReadKeyfile(string keyfilePath)
+    public static byte[] KeyDerivation(byte[] inputKeyingMaterial, byte[] salt, int outputLength)
     {
-        using var keyfile = new FileStream(keyfilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
-        return Blake2b.Hash(keyfile);
+        return GenericHash.HashSaltPersonal(message: Array.Empty<byte>(), inputKeyingMaterial, salt, Personalisation, outputLength);
     }
 }

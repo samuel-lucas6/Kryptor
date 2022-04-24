@@ -20,7 +20,7 @@ using System;
 using System.Net;
 using System.Security.Cryptography;
 
-namespace Kryptor;
+namespace KryptorCLI;
 
 public static class CommandLine
 {
@@ -205,8 +205,7 @@ public static class CommandLine
         bool validUserInput = SigningValidation.Sign(privateKeyPath, comment, signatureFilePath, filePaths);
         if (!validUserInput) { return; }
         byte[] privateKey = AsymmetricKeyValidation.SigningPrivateKeyFile(privateKeyPath);
-        privateKey = PrivateKey.Decrypt(privateKey, password);
-        FileSigning.SignEachFile(privateKey, comment, prehash, signatureFilePath, filePaths);
+        FileSigning.SignEachFile(privateKey, password, comment, prehash, signatureFilePath, filePaths);
     }
 
     public static void Verify(string publicKey, string signatureFilePath, string[] filePaths)
@@ -249,7 +248,7 @@ public static class CommandLine
             }
             Console.WriteLine($"An update is available for Kryptor. The latest version is v{latestVersion}.");
             Console.WriteLine();
-            DisplayMessage.WriteLine($"IMPORTANT: Please check the latest changelog at <https://www.kryptor.co.uk/changelog#v{latestVersion}> to see if there are any breaking changes BEFORE updating.", ConsoleColor.Blue);
+            DisplayMessage.WriteLine($"IMPORTANT: Please check the latest changelog at <https://www.kryptor.co.uk/changelog#v{latestVersion}> to see if there are any breaking changes BEFORE updating.", ConsoleColor.Yellow);
             Console.WriteLine();
             Console.WriteLine("Would you like Kryptor to automatically install this update now? (type y or n)");
             string userInput = Console.ReadLine()?.ToLower();

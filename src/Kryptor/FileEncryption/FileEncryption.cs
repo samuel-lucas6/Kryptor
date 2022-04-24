@@ -20,7 +20,7 @@ using System;
 using System.Security.Cryptography;
 using Sodium;
 
-namespace Kryptor;
+namespace KryptorCLI;
 
 public static class FileEncryption
 {
@@ -29,28 +29,42 @@ public static class FileEncryption
         if (filePaths == null || passwordBytes == null) { return; }
         foreach (string inputFilePath in filePaths)
         {
-            try
-            {
-                bool directory = FileHandling.IsDirectory(inputFilePath);
-                string zipFilePath = inputFilePath + Constants.ZipFileExtension;
-                if (directory) { FileHandling.CreateZipFile(inputFilePath, zipFilePath); }
-                byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
-                DisplayMessage.DerivingKeyFromPassword();
-                byte[] keyEncryptionKey = KeyDerivation.Argon2id(passwordBytes, salt);
-                // Fill unused header with random public key
-                using var ephemeralKeyPair = PublicKeyBox.GenerateKeyPair();
-                EncryptInputFile(directory ? zipFilePath : inputFilePath, directory, ephemeralKeyPair.PublicKey, salt, keyEncryptionKey);
-            }
-            catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
-            {
-                DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToEncryptFile);
-            }
+            UsingPassword(inputFilePath, passwordBytes);
             Console.WriteLine();
         }
         CryptographicOperations.ZeroMemory(passwordBytes);
         DisplayMessage.SuccessfullyEncrypted(space: false);
     }
-    
+
+    private static void UsingPassword(string inputFilePath, byte[] passwordBytes)
+    {
+        try
+        {
+            if (FileHandling.IsDirectory(inputFilePath))
+            {
+                DirectoryEncryption.UsingPassword(inputFilePath, passwordBytes);
+                return;
+            }
+            byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
+            byte[] keyEncryptionKey = KeyDerivation.Argon2id(passwordBytes, salt);
+            // Fill unused header with random public key
+            using var ephemeralKeyPair = PublicKeyBox.GenerateKeyPair();
+            EncryptInputFile(inputFilePath, ephemeralKeyPair.PublicKey, salt, keyEncryptionKey);
+        }
+        catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
+        {
+            DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToEncryptFile);
+        }
+    }
+
+    private static void EncryptInputFile(string inputFilePath, byte[] ephemeralPublicKey, byte[] salt, byte[] keyEncryptionKey)
+    {
+        string outputFilePath = FileHandling.GetEncryptedOutputFilePath(inputFilePath);
+        DisplayMessage.EncryptingFile(inputFilePath, outputFilePath);
+        EncryptFile.Encrypt(inputFilePath, outputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
+        CryptographicOperations.ZeroMemory(keyEncryptionKey);
+    }
+
     public static void EncryptEachFileWithPublicKey(byte[] senderPrivateKey, char[] password, byte[] recipientPublicKey, string[] filePaths)
     {
         if (filePaths == null || senderPrivateKey == null || recipientPublicKey == null) { return; }
@@ -61,23 +75,30 @@ public static class FileEncryption
         foreach (string inputFilePath in filePaths)
         {
             Console.WriteLine();
-            try
-            {
-                bool directory = FileHandling.IsDirectory(inputFilePath);
-                string zipFilePath = inputFilePath + Constants.ZipFileExtension;
-                if (directory) { FileHandling.CreateZipFile(inputFilePath, zipFilePath); }
-                byte[] ephemeralSharedSecret = KeyExchange.GetPublicKeySharedSecret(recipientPublicKey, out byte[] ephemeralPublicKey);
-                byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
-                byte[] keyEncryptionKey = KeyDerivation.Blake2b(ephemeralSharedSecret, sharedSecret, salt);
-                EncryptInputFile(directory ? zipFilePath : inputFilePath, directory, ephemeralPublicKey, salt, keyEncryptionKey);
-            }
-            catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
-            {
-                DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToEncryptFile);
-            }
+            UsingPublicKey(inputFilePath, sharedSecret, recipientPublicKey);
         }
         CryptographicOperations.ZeroMemory(sharedSecret);
         DisplayMessage.SuccessfullyEncrypted();
+    }
+
+    private static void UsingPublicKey(string inputFilePath, byte[] sharedSecret, byte[] recipientPublicKey)
+    {
+        try
+        {
+            if (FileHandling.IsDirectory(inputFilePath))
+            {
+                DirectoryEncryption.UsingPublicKey(inputFilePath, sharedSecret, recipientPublicKey);
+                return;
+            }
+            byte[] ephemeralSharedSecret = KeyExchange.GetPublicKeySharedSecret(recipientPublicKey, out byte[] ephemeralPublicKey);
+            byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
+            byte[] keyEncryptionKey = KeyDerivation.Blake2(sharedSecret, ephemeralSharedSecret, salt);
+            EncryptInputFile(inputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
+        }
+        catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
+        {
+            DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToEncryptFile);
+        }
     }
 
     public static void EncryptEachFileWithPrivateKey(byte[] privateKey, char[] password, string[] filePaths)
@@ -88,30 +109,29 @@ public static class FileEncryption
         foreach (string inputFilePath in filePaths)
         {
             Console.WriteLine();
-            try
-            {
-                bool directory = FileHandling.IsDirectory(inputFilePath);
-                string zipFilePath = inputFilePath + Constants.ZipFileExtension;
-                if (directory) { FileHandling.CreateZipFile(inputFilePath, zipFilePath); }
-                byte[] ephemeralSharedSecret = KeyExchange.GetPrivateKeySharedSecret(privateKey, out byte[] ephemeralPublicKey);
-                byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
-                byte[] keyEncryptionKey = KeyDerivation.Blake2b(ephemeralSharedSecret, salt);
-                EncryptInputFile(directory ? zipFilePath : inputFilePath, directory, ephemeralPublicKey, salt, keyEncryptionKey);
-            }
-            catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
-            {
-                DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToEncryptFile);
-            }
+            UsingPrivateKey(inputFilePath, privateKey);
         }
         CryptographicOperations.ZeroMemory(privateKey);
         DisplayMessage.SuccessfullyEncrypted();
     }
-    
-    private static void EncryptInputFile(string inputFilePath, bool directory, byte[] ephemeralPublicKey, byte[] salt, byte[] keyEncryptionKey)
+
+    private static void UsingPrivateKey(string inputFilePath, byte[] privateKey)
     {
-        string outputFilePath = FileHandling.GetEncryptedOutputFilePath(inputFilePath);
-        DisplayMessage.EncryptingFile(inputFilePath, outputFilePath);
-        EncryptFile.Encrypt(inputFilePath, outputFilePath, directory, ephemeralPublicKey, salt, keyEncryptionKey);
-        CryptographicOperations.ZeroMemory(keyEncryptionKey);
+        try
+        {
+            if (FileHandling.IsDirectory(inputFilePath))
+            {
+                DirectoryEncryption.UsingPrivateKey(inputFilePath, privateKey);
+                return;
+            }
+            byte[] ephemeralSharedSecret = KeyExchange.GetPrivateKeySharedSecret(privateKey, out byte[] ephemeralPublicKey);
+            byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
+            byte[] keyEncryptionKey = KeyDerivation.Blake2(ephemeralSharedSecret, salt);
+            EncryptInputFile(inputFilePath, ephemeralPublicKey, salt, keyEncryptionKey);
+        }
+        catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
+        {
+            DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToEncryptFile);
+        }
     }
 }

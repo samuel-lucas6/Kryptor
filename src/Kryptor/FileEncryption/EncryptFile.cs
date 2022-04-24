@@ -18,33 +18,40 @@
 
 using System;
 using System.IO;
-using System.Text;
 using System.Security.Cryptography;
 using Sodium;
 using ChaCha20BLAKE2;
 
-namespace Kryptor;
+namespace KryptorCLI;
 
 public static class EncryptFile
 {
-    public static void Encrypt(string inputFilePath, string outputFilePath, bool directory, byte[] ephemeralPublicKey, byte[] salt, byte[] keyEncryptionKey)
+    public static void Encrypt(string inputFilePath, string outputFilePath, byte[] ephemeralPublicKey, byte[] salt, byte[] keyEncryptionKey)
     {
         var dataEncryptionKey = SodiumCore.GetRandomBytes(Constants.EncryptionKeyLength);
         try
         {
+            bool zeroByteFile = FileHandling.GetFileLength(inputFilePath) == 0;
+            if (zeroByteFile) { FileHandling.AppendFileName(inputFilePath); }
             using (var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
             using (var outputFile = new FileStream(outputFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
             {
                 var nonce = SodiumCore.GetRandomBytes(Constants.XChaChaNonceLength);
-                byte[] encryptedHeader = EncryptFileHeader(inputFilePath, directory, ephemeralPublicKey, dataEncryptionKey, nonce, keyEncryptionKey);
+                byte[] encryptedHeader = EncryptFileHeader(inputFilePath, zeroByteFile, ephemeralPublicKey, dataEncryptionKey, nonce, keyEncryptionKey);
                 FileHeaders.WriteHeaders(outputFile, ephemeralPublicKey, salt, nonce, encryptedHeader);
                 nonce = Utilities.Increment(nonce);
-                EncryptChunks(inputFile, outputFile, nonce, dataEncryptionKey);
-                CryptographicOperations.ZeroMemory(dataEncryptionKey);
+                byte[] additionalData = Arrays.Copy(encryptedHeader, encryptedHeader.Length - Constants.TagLength, Constants.TagLength);
+                EncryptChunks(inputFile, outputFile, nonce, dataEncryptionKey, additionalData);
             }
             Globals.SuccessfulCount += 1;
-            if (Globals.Overwrite) { FileHandling.OverwriteFile(inputFilePath, outputFilePath); }
-            else if (directory) { FileHandling.DeleteFile(inputFilePath); }
+            if (Globals.Overwrite)
+            {
+                FileHandling.OverwriteFile(inputFilePath, outputFilePath);
+            }
+            else if (Globals.EncryptFileNames || zeroByteFile)
+            {
+                RestoreFileName.RemoveAppendedFileName(inputFilePath);
+            }
             FileHandling.SetFileAttributesReadOnly(outputFilePath);
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -55,36 +62,29 @@ public static class EncryptFile
         }
     }
 
-    private static byte[] EncryptFileHeader(string inputFilePath, bool directory, byte[] ephemeralPublicKey, byte[] dataEncryptionKey, byte[] nonce, byte[] keyEncryptionKey)
+    private static byte[] EncryptFileHeader(string inputFilePath, bool zeroByteFile, byte[] ephemeralPublicKey, byte[] dataEncryptionKey, byte[] nonce, byte[] keyEncryptionKey)
     {
         long fileLength = FileHandling.GetFileLength(inputFilePath);
-        byte[] paddingLength = BitConversion.GetBytes(Constants.FileChunkSize - Convert.ToInt32(fileLength % Constants.FileChunkSize));
-        byte[] isDirectory = BitConverter.GetBytes(directory);
-        byte[] fileName = Encoding.UTF8.GetBytes(Path.GetFileName(inputFilePath));
-        var paddedFileName = new byte[Constants.FileNameHeaderLength];
-        if (Globals.EncryptFileNames) { Array.Copy(fileName, paddedFileName, fileName.Length); }
-        byte[] fileNameLength = !Globals.EncryptFileNames ? BitConversion.GetBytes(0) : BitConversion.GetBytes(fileName.Length);
-        byte[] fileHeader = Arrays.Concat(paddingLength, isDirectory, fileNameLength, paddedFileName, dataEncryptionKey);
-        long chunkCount = (long)Math.Ceiling((double)(fileLength != 0 ? fileLength : 1) / Constants.FileChunkSize);
+        int lastChunkRemainder = Convert.ToInt32(fileLength % Constants.FileChunkSize);
+        byte[] lastChunkLength = BitConversion.GetBytes(lastChunkRemainder == 0 ? Constants.FileChunkSize : lastChunkRemainder);
+        byte[] fileNameLength = FileHeaders.GetFileNameLength(inputFilePath, zeroByteFile);
+        byte[] fileHeader = Arrays.Concat(lastChunkLength, fileNameLength, dataEncryptionKey);
+        long chunkCount = (long)Math.Ceiling((double)fileLength / Constants.FileChunkSize);
         byte[] ciphertextLength = BitConversion.GetBytes(chunkCount * Constants.CiphertextChunkLength);
         byte[] additionalData = Arrays.Concat(ciphertextLength, Constants.KryptorMagicBytes, Constants.EncryptionVersion, ephemeralPublicKey);
         return XChaCha20BLAKE2b.Encrypt(fileHeader, nonce, keyEncryptionKey, additionalData);
     }
 
-    private static void EncryptChunks(Stream inputFile, Stream outputFile, byte[] nonce, byte[] dataEncryptionKey)
+    private static void EncryptChunks(FileStream inputFile, FileStream outputFile, byte[] nonce, byte[] dataEncryptionKey, byte[] additionalData)
     {
         var plaintextChunk = new byte[Constants.FileChunkSize];
-        if (inputFile.Length == 0)
-        {
-            byte[] ciphertextChunk = XChaCha20BLAKE2b.Encrypt(plaintextChunk, nonce, dataEncryptionKey);
-            outputFile.Write(ciphertextChunk, offset: 0, ciphertextChunk.Length);
-            return;
-        }
         while (inputFile.Read(plaintextChunk, offset: 0, plaintextChunk.Length) > 0)
         {
-            byte[] ciphertextChunk = XChaCha20BLAKE2b.Encrypt(plaintextChunk, nonce, dataEncryptionKey);
+            byte[] ciphertextChunk = XChaCha20BLAKE2b.Encrypt(plaintextChunk, nonce, dataEncryptionKey, additionalData);
             nonce = Utilities.Increment(nonce);
+            additionalData = Arrays.Copy(ciphertextChunk, ciphertextChunk.Length - Constants.TagLength, Constants.TagLength);
             outputFile.Write(ciphertextChunk, offset: 0, ciphertextChunk.Length);
         }
+        CryptographicOperations.ZeroMemory(dataEncryptionKey);
     }
 }

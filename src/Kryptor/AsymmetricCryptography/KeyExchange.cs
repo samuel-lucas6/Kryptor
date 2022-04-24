@@ -18,29 +18,23 @@
 
 using Sodium;
 
-namespace Kryptor;
+namespace KryptorCLI;
 
 public static class KeyExchange
 {
-    public static byte[] GetSharedSecret(byte[] privateKey, byte[] publicKey)
-    {
-        byte[] sharedSecret = ScalarMult.Mult(privateKey, publicKey);
-        return GenericHash.Hash(Arrays.Concat(sharedSecret, ScalarMult.Base(privateKey), publicKey), key: null, Constants.EncryptionKeyLength);
-    }
+    public static byte[] GetSharedSecret(byte[] privateKey, byte[] publicKey) => ScalarMult.Mult(privateKey, publicKey);
 
     public static byte[] GetPublicKeySharedSecret(byte[] publicKey, out byte[] ephemeralPublicKey)
     {
         using var ephemeralKeyPair = PublicKeyBox.GenerateKeyPair();
         ephemeralPublicKey = ephemeralKeyPair.PublicKey;
-        byte[] ephemeralSharedSecret = ScalarMult.Mult(ephemeralKeyPair.PrivateKey, publicKey);
-        return GenericHash.Hash(Arrays.Concat(ephemeralSharedSecret, ephemeralPublicKey, publicKey), key: null, Constants.EncryptionKeyLength);
+        return ScalarMult.Mult(ephemeralKeyPair.PrivateKey, publicKey);
     }
 
     public static byte[] GetPrivateKeySharedSecret(byte[] privateKey, out byte[] ephemeralPublicKey)
     {
         using var ephemeralKeyPair = PublicKeyBox.GenerateKeyPair();
         ephemeralPublicKey = ephemeralKeyPair.PublicKey;
-        byte[] ephemeralSharedSecret = ScalarMult.Mult(privateKey, ephemeralKeyPair.PublicKey);
-        return GenericHash.Hash(Arrays.Concat(ephemeralSharedSecret, ScalarMult.Base(privateKey), ephemeralPublicKey), key: null, Constants.EncryptionKeyLength);
+        return ScalarMult.Mult(privateKey, ephemeralKeyPair.PublicKey);
     }
 }

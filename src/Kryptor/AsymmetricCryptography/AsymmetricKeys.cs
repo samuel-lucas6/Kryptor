@@ -21,7 +21,7 @@ using System.IO;
 using System.Security.Cryptography;
 using Sodium;
 
-namespace Kryptor;
+namespace KryptorCLI;
 
 public static class AsymmetricKeys
 {

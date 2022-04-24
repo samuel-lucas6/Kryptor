@@ -20,7 +20,7 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace Kryptor;
+namespace KryptorCLI;
 
 public static class Constants
 {
@@ -31,18 +31,15 @@ public static class Constants
 
     // File encryption
     public static readonly byte[] KryptorMagicBytes = Encoding.UTF8.GetBytes("KRYPTOR");
-    public static readonly byte[] EncryptionVersion = BitConversion.GetBytes((short)4);
+    public static readonly byte[] EncryptionVersion = BitConversion.GetBytes((short)3);
     public const string EncryptedExtension = ".kryptor";
     public const string KeyfileExtension = ".key";
-    public const string ZipFileExtension = ".zip";
     public const string SaltFileName = "kryptor.salt";
     public const int KeyfileLength = 64;
     public const int FileStreamBufferSize = 131072;
     public const int FileChunkSize = 16384;
-    public const int BoolBitConverterLength = 1;
     public const int IntBitConverterLength = 4;
-    public const int FileNameHeaderLength = 255;
-    public const int EncryptedHeaderLength = 328;
+    public const int EncryptedHeaderLength = 72;
     public static readonly int FileHeadersLength = KryptorMagicBytes.Length + EncryptionVersion.Length + EphemeralPublicKeyLength + SaltLength + XChaChaNonceLength + EncryptedHeaderLength;
     public const int CiphertextChunkLength = FileChunkSize + TagLength;
 

@@ -17,33 +17,31 @@
 */
 
 using System;
-using System.Text;
 using System.Security.Cryptography;
 using Sodium;
 
-namespace Kryptor;
+namespace KryptorCLI;
 
 public static class KeyDerivation
 {
-    private static readonly byte[] Personalisation = Encoding.UTF8.GetBytes("Kryptor.Personal");
-
     public static byte[] Argon2id(byte[] passwordBytes, byte[] salt)
     {
+        Console.WriteLine("Deriving encryption key from password...");
         return PasswordHash.ArgonHashBinary(passwordBytes, salt, Constants.Iterations, Constants.MemorySize, Constants.EncryptionKeyLength, PasswordHash.ArgonAlgorithm.Argon_2ID13);
     }
 
-    public static byte[] Blake2b(byte[] ephemeralSharedSecret, byte[] sharedSecret, byte[] salt)
+    public static byte[] Blake2(byte[] sharedSecret, byte[] ephemeralSharedSecret, byte[] salt)
     {
-        byte[] inputKeyingMaterial = Arrays.Concat(ephemeralSharedSecret, sharedSecret);
-        byte[] keyEncryptionKey = GenericHash.HashSaltPersonal(message: Array.Empty<byte>(), inputKeyingMaterial, salt, Personalisation, Constants.EncryptionKeyLength);
+        byte[] inputKeyingMaterial = Arrays.Concat(sharedSecret, ephemeralSharedSecret);
+        byte[] keyEncryptionKey = Blake2b.KeyDerivation(inputKeyingMaterial, salt, Constants.EncryptionKeyLength);
         CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
         CryptographicOperations.ZeroMemory(inputKeyingMaterial);
         return keyEncryptionKey;
     }
 
-    public static byte[] Blake2b(byte[] ephemeralSharedSecret, byte[] salt)
+    public static byte[] Blake2(byte[] ephemeralSharedSecret, byte[] salt)
     {
-        byte[] keyEncryptionKey = GenericHash.HashSaltPersonal(message: Array.Empty<byte>(), ephemeralSharedSecret, salt, Personalisation, Constants.EncryptionKeyLength);
+        byte[] keyEncryptionKey = Blake2b.KeyDerivation(ephemeralSharedSecret, salt, Constants.EncryptionKeyLength);
         CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
         return keyEncryptionKey;
     }

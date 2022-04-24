@@ -18,7 +18,7 @@
 
 using System;
 
-namespace Kryptor;
+namespace KryptorCLI;
 
 public static class BitConversion
 {

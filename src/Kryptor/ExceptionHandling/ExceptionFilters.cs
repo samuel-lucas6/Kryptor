@@ -21,7 +21,7 @@ using System.IO;
 using System.Security;
 using System.Security.Cryptography;
 
-namespace Kryptor;
+namespace KryptorCLI;
 
 public static class ExceptionFilters
 {

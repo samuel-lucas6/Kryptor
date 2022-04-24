@@ -20,46 +20,30 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 
-namespace Kryptor;
+namespace KryptorCLI;
 
 public static class FileSigning
 {
     private const string DefaultComment = "This file has not been tampered with.";
 
-    public static void SignEachFile(byte[] privateKey, string comment, bool prehash, string signatureFilePath, string[] filePaths)
+    public static void SignEachFile(byte[] privateKey, char[] password, string comment, bool prehash, string signatureFilePath, string[] filePaths)
     {
         if (privateKey == null || filePaths == null) { return; }
+        privateKey = PrivateKey.Decrypt(privateKey, password);
+        if (privateKey == null) { return; }
         if (string.IsNullOrEmpty(comment)) { comment = DefaultComment; }
         foreach (string filePath in filePaths)
         {
             try
             {
                 Console.WriteLine();
-                if (FileHandling.IsDirectory(filePath))
-                {
-                    Console.WriteLine($"Signing each file in \"{Path.GetFileName(filePath)}\" directory...");
-                    string[] files = FileHandling.GetAllFiles(filePath);
-                    Globals.TotalCount += files.Length - 1;
-                    foreach (string file in files)
-                    {
-                        try
-                        {
-                            DisplayMessage.SigningFile(file);
-                            DigitalSignatures.SignFile(file, signatureFilePath: string.Empty, comment, prehash, privateKey);
-                        }
-                        catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
-                        {
-                            DisplayMessage.FilePathException(file, ex.GetType().Name, "Unable to sign the file.");
-                        }
-                    }
-                    continue;
-                }
-                DisplayMessage.SigningFile(filePath);
+                Console.WriteLine($"Signing \"{Path.GetFileName(filePath)}\"...");
                 DigitalSignatures.SignFile(filePath, signatureFilePath, comment, prehash, privateKey);
+                Globals.SuccessfulCount += 1;
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
-                DisplayMessage.FilePathException(filePath, ex.GetType().Name, !Directory.Exists(filePath) ? "Unable to sign the file." : "Unable to sign the files in the directory.");
+                DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to create a signature.");
             }
         }
         CryptographicOperations.ZeroMemory(privateKey);
