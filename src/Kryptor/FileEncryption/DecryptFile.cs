@@ -87,7 +87,7 @@ public static class DecryptFile
             nonce = Utilities.Increment(nonce);
             outputFile.Write(plaintextChunk, offset: 0, plaintextChunk.Length);
         }
-        outputFile.SetLength(outputFile.Length - paddingLength);
+        if (paddingLength != 0) { outputFile.SetLength(outputFile.Length - paddingLength); }
         CryptographicOperations.ZeroMemory(dataEncryptionKey);
     }
 }

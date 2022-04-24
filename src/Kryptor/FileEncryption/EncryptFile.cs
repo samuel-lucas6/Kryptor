@@ -58,7 +58,13 @@ public static class EncryptFile
     private static byte[] EncryptFileHeader(string inputFilePath, bool directory, byte[] ephemeralPublicKey, byte[] dataEncryptionKey, byte[] nonce, byte[] keyEncryptionKey)
     {
         long fileLength = FileHandling.GetFileLength(inputFilePath);
-        byte[] paddingLength = BitConversion.GetBytes(Constants.FileChunkSize - Convert.ToInt32(fileLength % Constants.FileChunkSize));
+        byte[] paddingLength;
+        if (fileLength == 0) { paddingLength = BitConversion.GetBytes(Constants.FileChunkSize); }
+        else
+        {
+            int lastChunkRemainder = Convert.ToInt32(fileLength % Constants.FileChunkSize);
+            paddingLength = BitConversion.GetBytes(lastChunkRemainder == 0 ? lastChunkRemainder : Constants.FileChunkSize - lastChunkRemainder);
+        }
         byte[] isDirectory = BitConverter.GetBytes(directory);
         byte[] fileName = Encoding.UTF8.GetBytes(Path.GetFileName(inputFilePath));
         var paddedFileName = new byte[Constants.FileNameHeaderLength];
