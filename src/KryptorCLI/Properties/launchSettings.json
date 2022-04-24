@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Kryptor": {
+    "KryptorCLI": {
       "commandName": "Project",
       "commandLineArgs": "",
       "remoteDebugEnabled": false

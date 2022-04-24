@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Kryptor.Properties {
+namespace KryptorCLI.Properties {
     using System;
     
     
