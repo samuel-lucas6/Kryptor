@@ -48,6 +48,7 @@ public static class FileDecryption
             using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
             byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
             byte[] salt = FileHeaders.ReadSalt(inputFile);
+            DisplayMessage.DerivingKeyFromPassword();
             byte[] keyEncryptionKey = KeyDerivation.Argon2id(passwordBytes, salt);
             DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey);
         }

@@ -24,6 +24,13 @@ namespace KryptorCLI;
 
 public static class FilePathValidation
 {
+    private static readonly char[] IllegalFileNameChars = {
+        '\"', '<', '>', '|', '\0',
+        (char) 1, (char) 2, (char) 3, (char) 4, (char) 5, (char) 6, (char) 7, (char) 8, (char) 9, (char) 10,
+        (char) 11, (char) 12, (char) 13, (char) 14, (char) 15, (char) 16, (char) 17, (char) 18, (char) 19, (char) 20,
+        (char) 21, (char) 22, (char) 23, (char) 24, (char) 25, (char) 26, (char) 27, (char) 28, (char) 29, (char) 30,
+        (char) 31, ':', '*', '?', '\\', '/'
+    };
     private const string FileDoesNotExist = "This file doesn't exist.";
     private const string FileOrFolderDoesNotExist = "This file/folder doesn't exist.";
     private const string FileInaccessible = "Unable to access the file.";
@@ -39,6 +46,7 @@ public static class FilePathValidation
 
     public static string GetFileEncryptionError(string inputFilePath)
     {
+        if (Path.GetFileName(Path.TrimEndingDirectorySeparator(inputFilePath)).IndexOfAny(IllegalFileNameChars) != -1) { return "This file/directory name contains illegal characters for Windows, Linux, and/or macOS.";}
         if (Directory.Exists(inputFilePath)) { return FileHandling.IsDirectoryEmpty(inputFilePath) ? DirectoryEmpty : null; }
         if (!File.Exists(inputFilePath)) { return FileOrFolderDoesNotExist; }
         bool? validMagicBytes = FileHandling.IsKryptorFile(inputFilePath);
@@ -57,6 +65,8 @@ public static class FilePathValidation
             if (File.Exists(keyfilePath)) { return keyfilePath; }
             Keyfiles.GenerateKeyfile(keyfilePath);
             Console.WriteLine($"Randomly generated keyfile: {Path.GetFileName(keyfilePath)}");
+            Console.WriteLine();
+            DisplayMessage.WriteLine("IMPORTANT: Please back up this keyfile to external storage (e.g. memory sticks).", ConsoleColor.Blue);
             Console.WriteLine();
             return keyfilePath;
         }

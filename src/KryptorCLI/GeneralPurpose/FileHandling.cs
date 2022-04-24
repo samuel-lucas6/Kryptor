@@ -39,8 +39,6 @@ public static class FileHandling
     public static bool HasKryptorExtension(string filePath) => filePath.EndsWith(Constants.EncryptedExtension, StringComparison.Ordinal);
     
     public static string GetRandomFileName() => Utilities.BinaryToBase64(SodiumCore.GetRandomBytes(count: 16), Utilities.Base64Variant.UrlSafeNoPadding).TrimStart('-');
-
-    public static string RemoveIllegalFileNameChars(string fileName) => string.Concat(fileName.Split(Path.GetInvalidFileNameChars()));
     
     public static string ReplaceFileName(string originalFilePath, string newFileName)
     {
@@ -71,7 +69,7 @@ public static class FileHandling
     {
         File.SetAttributes(filePath, FileAttributes.Normal);
         using var fileStream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
-        var fileNameBytes = Encoding.UTF8.GetBytes(RemoveIllegalFileNameChars(Path.GetFileName(filePath)));
+        var fileNameBytes = Encoding.UTF8.GetBytes(Path.GetFileName(filePath));
         fileStream.Write(fileNameBytes, offset: 0, fileNameBytes.Length);
     }
     

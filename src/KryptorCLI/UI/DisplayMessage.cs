@@ -39,13 +39,8 @@ public static class DisplayMessage
     {
         WriteLine($"\"{Path.GetFileName(filePath)}\" - {ErrorWord}: {exceptionName} - {errorMessage}", ConsoleColor.DarkRed);
     }
-    
-    public static void WriteLine(string message, ConsoleColor colour)
-    {
-        Console.ForegroundColor = colour;
-        Console.WriteLine(message);
-        Console.ResetColor();
-    }
+
+    public static void DerivingKeyFromPassword() => Console.WriteLine("Deriving encryption key from password...");
 
     public static void EncryptingFile(string inputFilePath, string outputFilePath)
     {
@@ -91,6 +86,8 @@ public static class DisplayMessage
         Console.WriteLine();
         Console.Write($"Private key file: \"{privateKeyFilePath}\" - ");
         WriteLine("Keep this secret!", ConsoleColor.DarkRed);
+        Console.WriteLine();
+        WriteLine("IMPORTANT: Please back up these files to external storage (e.g. memory sticks).", ConsoleColor.Blue);
     }
     
     public static void PublicKey(string publicKey, string publicKeyFilePath)
@@ -105,6 +102,13 @@ public static class DisplayMessage
         if (Globals.TotalCount <= 0) { return; }
         Console.WriteLine();
         WriteLine($"Successfully signed: {Globals.SuccessfulCount}/{Globals.TotalCount}", Globals.SuccessfulCount == Globals.TotalCount ? ConsoleColor.Green : ConsoleColor.DarkRed);
+    }
+    
+    public static void WriteLine(string message, ConsoleColor colour)
+    {
+        Console.ForegroundColor = colour;
+        Console.WriteLine(message);
+        Console.ResetColor();
     }
 
     public static bool AnyErrors(IEnumerable<string> errorMessages)

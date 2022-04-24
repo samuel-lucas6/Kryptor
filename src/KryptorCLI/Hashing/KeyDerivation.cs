@@ -26,7 +26,6 @@ public static class KeyDerivation
 {
     public static byte[] Argon2id(byte[] passwordBytes, byte[] salt)
     {
-        Console.WriteLine("Deriving encryption key from password...");
         return PasswordHash.ArgonHashBinary(passwordBytes, salt, Constants.Iterations, Constants.MemorySize, Constants.EncryptionKeyLength, PasswordHash.ArgonAlgorithm.Argon_2ID13);
     }
 

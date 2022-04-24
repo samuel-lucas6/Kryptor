@@ -47,7 +47,7 @@ public static class DecryptFile
             inputFile.Dispose();
             Globals.SuccessfulCount += 1;
             RestoreFileName.RenameFile(outputFilePath, fileNameLength);
-            FileHandling.DeleteFile(inputFile.Name);
+            if (Globals.Overwrite) { FileHandling.DeleteFile(inputFile.Name); }
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
         {

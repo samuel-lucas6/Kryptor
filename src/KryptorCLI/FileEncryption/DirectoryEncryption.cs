@@ -35,6 +35,7 @@ public static class DirectoryEncryption
             string[] filePaths = GetFiles(directoryPath, out string newDirectoryPath);
             byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
             CreateSaltFile(newDirectoryPath, salt);
+            DisplayMessage.DerivingKeyFromPassword();
             byte[] keyEncryptionKey = KeyDerivation.Argon2id(passwordBytes, salt);
             EncryptEachFileWithPassword(filePaths, salt, keyEncryptionKey);
             RenameBackupDirectory(backupDirectoryPath, directoryPath);
