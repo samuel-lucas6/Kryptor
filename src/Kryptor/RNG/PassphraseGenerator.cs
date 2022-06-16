@@ -32,19 +32,19 @@ public static class PassphraseGenerator
         return FormatPassphrase(words, wordCount);
     }
 
-    private static List<string> GetRandomWords(string[] wordlist, int wordCount)
+    private static List<string> GetRandomWords(IReadOnlyList<string> wordlist, int wordCount)
     {
         var words = new List<string>();
         var textInfo = new CultureInfo("en-US", useUserOverride: false).TextInfo;
         for (int i = 0; i < wordCount; i++)
         {
-            int randomIndex = SodiumCore.GetRandomNumber(wordlist.Length);
+            int randomIndex = SodiumCore.GetRandomNumber(wordlist.Count);
             words.Add(textInfo.ToTitleCase(wordlist[randomIndex]));
         }
         return words;
     }
 
-    private static char[] FormatPassphrase(List<string> words, int wordCount)
+    private static char[] FormatPassphrase(IReadOnlyList<string> words, int wordCount)
     {
         var passphrase = new List<char>();
         for (int i = 0; i < wordCount; i++)
