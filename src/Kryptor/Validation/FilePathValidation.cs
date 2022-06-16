@@ -36,14 +36,6 @@ public static class FilePathValidation
     private const string FileInaccessible = "Unable to access the file.";
     private const string DirectoryEmpty = "This directory is empty.";
     
-    public static bool FileEncryption(string inputFilePath)
-    {
-        string errorMessage = GetFileEncryptionError(inputFilePath);
-        if (string.IsNullOrEmpty(errorMessage)) { return true; }
-        DisplayMessage.FilePathError(inputFilePath, errorMessage);
-        return false;
-    }
-
     public static string GetFileEncryptionError(string inputFilePath)
     {
         if (Path.GetFileName(Path.TrimEndingDirectorySeparator(inputFilePath)).IndexOfAny(IllegalFileNameChars) != -1) { return "This file/directory name contains illegal characters for Windows, Linux, and/or macOS.";}
@@ -75,27 +67,6 @@ public static class FilePathValidation
             DisplayMessage.FilePathException(keyfilePath, ex.GetType().Name, "Unable to randomly generate a keyfile.");
             return null;
         }
-    }
-
-    public static void DirectoryEncryption(string directoryPath)
-    {
-        string saltFilePath = Path.Combine(directoryPath, Constants.SaltFileName);
-        if (File.Exists(saltFilePath)) { throw new ArgumentException("This directory has already been encrypted."); }
-    }
-
-    public static void DirectoryDecryption(string directoryPath)
-    {
-        string saltFilePath = Path.Combine(directoryPath, Constants.SaltFileName);
-        if (File.Exists(saltFilePath)) { throw new ArgumentException("This directory was encrypted using a password."); }
-    }
-
-    public static bool FileDecryption(string inputFilePath)
-    {
-        if (inputFilePath.Contains(Constants.SaltFileName)) { return false; }
-        string errorMessage = GetFileDecryptionError(inputFilePath);
-        if (string.IsNullOrEmpty(errorMessage)) { return true; }
-        DisplayMessage.FilePathError(inputFilePath, errorMessage);
-        return false;
     }
 
     public static string GetFileDecryptionError(string inputFilePath)
@@ -187,10 +158,14 @@ public static class FilePathValidation
         return !File.Exists(inputFilePath) ? "This file doesn't exist." : null;
     }
 
-    public static string GetSignatureFilePath(string signatureFilePath, string[] filePaths)
+    public static string[] GetSignatureFilePaths(string[] signatureFilePaths, string[] filePaths)
     {
-        if (!string.IsNullOrEmpty(signatureFilePath) || filePaths == null) { return signatureFilePath; }
-        string possibleSignatureFilePath = filePaths[0] + Constants.SignatureExtension;
-        return File.Exists(possibleSignatureFilePath) ? possibleSignatureFilePath : signatureFilePath;
+        if (signatureFilePaths == null || filePaths == null || signatureFilePaths.Length != filePaths.Length) { return signatureFilePaths; }
+        for (int i = 0; i < signatureFilePaths.Length; i++)
+        {
+            string possibleSignatureFilePath = filePaths[i] + Constants.SignatureExtension;
+            if (File.Exists(possibleSignatureFilePath)) { signatureFilePaths[i] = possibleSignatureFilePath; }
+        }
+        return signatureFilePaths;
     }
 }
