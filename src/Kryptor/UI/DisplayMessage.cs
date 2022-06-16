@@ -116,10 +116,11 @@ public static class DisplayMessage
     
     public static bool AnyErrors(IEnumerable<string> errorMessages)
     {
-        foreach (string errorMessage in errorMessages)
+        var errors = errorMessages.ToList();
+        foreach (string errorMessage in errors)
         {
             Error(errorMessage);
         }
-        return !errorMessages.Any();
+        return !errors.Any();
     }
 }
