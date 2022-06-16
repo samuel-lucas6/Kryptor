@@ -44,7 +44,7 @@ public static class PrivateKey
         if (privateKey == null) { return null; }
         try
         {
-            password = Password.ReadInput(password, newPassword: false);
+            if (password.Length == 0) { password = PasswordPrompt.EnterYourPassword(isPrivateKey: true); }
             Console.WriteLine("Decrypting private key...");
             var passwordBytes = Password.Prehash(password);
             return Decrypt(passwordBytes, privateKey);

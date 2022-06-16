@@ -27,7 +27,7 @@ public static class AsymmetricKeys
 {
     public static (string publicKey, string privateKey) GenerateEncryptionKeyPair(char[] password)
     {
-        password = Password.ReadInput(password, newPassword: true);
+        password = Password.GetNewPassword(password);
         var passwordBytes = Password.Prehash(password);
         using var keyPair = PublicKeyBox.GenerateKeyPair();
         byte[] publicKey = Arrays.Concat(Constants.Curve25519KeyHeader, keyPair.PublicKey);
@@ -37,7 +37,7 @@ public static class AsymmetricKeys
 
     public static (string publicKey, string privateKey) GenerateSigningKeyPair(char[] password)
     {
-        password = Password.ReadInput(password, newPassword: true);
+        password = Password.GetNewPassword(password);
         var passwordBytes = Password.Prehash(password);
         using var keyPair = PublicKeyAuth.GenerateKeyPair();
         byte[] publicKey = Arrays.Concat(Constants.Ed25519KeyHeader, keyPair.PublicKey);

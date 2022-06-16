@@ -53,9 +53,9 @@ public static class PasswordPrompt
         return password;
     }
 
-    public static char[] EnterYourPassword()
+    public static char[] EnterYourPassword(bool isPrivateKey = false)
     {
-        Console.WriteLine("Enter your password:");
+        Console.WriteLine(isPrivateKey == false ? "Enter your password:" : "Enter your private key password:");
         char[] password = GetPassword();
         if (password.Length != 0) { return password; }
         DisplayMessage.Error("You didn't enter a password.");

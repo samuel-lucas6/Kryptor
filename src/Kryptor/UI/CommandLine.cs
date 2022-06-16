@@ -24,24 +24,24 @@ namespace Kryptor;
 
 public static class CommandLine
 {
-    public static void Encrypt((bool hasValue, char[] value) password, string keyfile, (bool hasValue, string value) privateKey, string publicKey, string[] filePaths)
+    public static void Encrypt(bool usePassword, char[] password, string keyfile, bool usePrivateKey, string privateKeyPath, string publicKey, string[] filePaths)
     {
-        if (!privateKey.hasValue && string.IsNullOrEmpty(publicKey) && (password.hasValue || !string.IsNullOrEmpty(keyfile)))
+        if (!usePrivateKey && string.IsNullOrEmpty(publicKey) && (usePassword || !string.IsNullOrEmpty(keyfile)))
         {
-            FileEncryptionWithPassword(password, keyfile, filePaths);
+            FileEncryptionWithPassword(usePassword, password, keyfile, filePaths);
         }
-        else if (!string.IsNullOrEmpty(publicKey) && !string.IsNullOrEmpty(privateKey.value) && string.IsNullOrEmpty(keyfile))
+        else if (!string.IsNullOrEmpty(publicKey) && !string.IsNullOrEmpty(privateKeyPath) && string.IsNullOrEmpty(keyfile))
         {
             if (publicKey.EndsWith(Constants.PublicKeyExtension))
             {
-                FileEncryptionWithPublicKeyFile(privateKey.value, password.value, publicKey, filePaths);
+                FileEncryptionWithPublicKeyFile(privateKeyPath, password, publicKey, filePaths);
                 return;
             }
-            FileEncryptionWithPublicKey(privateKey.value, password.value, publicKey.ToCharArray(), filePaths);
+            FileEncryptionWithPublicKey(privateKeyPath, password, publicKey.ToCharArray(), filePaths);
         }
-        else if (!string.IsNullOrEmpty(privateKey.value) && string.IsNullOrEmpty(keyfile))
+        else if (!string.IsNullOrEmpty(privateKeyPath) && string.IsNullOrEmpty(keyfile))
         {
-            FileEncryptionWithPrivateKey(privateKey.value, password.value, filePaths);
+            FileEncryptionWithPrivateKey(privateKeyPath, password, filePaths);
         }
         else
         {
@@ -49,13 +49,12 @@ public static class CommandLine
         }
     }
 
-    private static void FileEncryptionWithPassword((bool hasValue, char[] value) password, string keyfilePath, string[] filePaths)
+    private static void FileEncryptionWithPassword(bool usePassword, char[] password, string keyfilePath, string[] filePaths)
     {
-        bool validUserInput = FileEncryptionValidation.FileEncryptionWithPassword(password.hasValue, keyfilePath, filePaths);
+        bool validUserInput = FileEncryptionValidation.FileEncryptionWithPassword(usePassword, keyfilePath, filePaths);
         if (!validUserInput) { return; }
-        var passwordChars = Array.Empty<char>();
-        if (password.hasValue) { passwordChars = Password.ReadInput(password.value, newPassword: true); }
-        var passwordBytes = Password.Prehash(passwordChars, FilePathValidation.KeyfilePath(keyfilePath));
+        if (usePassword) { password = Password.GetNewPassword(password); }
+        var passwordBytes = Password.Prehash(password, FilePathValidation.KeyfilePath(keyfilePath));
         FileEncryption.EncryptEachFileWithPassword(filePaths, passwordBytes);
     }
 
@@ -85,24 +84,24 @@ public static class CommandLine
         FileEncryption.EncryptEachFileWithPrivateKey(privateKey, password, filePaths);
     }
 
-    public static void Decrypt((bool hasValue, char[] value) password, string keyfile, (bool hasValue, string value) privateKey, string publicKey, string[] filePaths)
+    public static void Decrypt(bool usePassword, char[] password, string keyfile, bool usePrivateKey, string privateKeyPath, string publicKey, string[] filePaths)
     {
-        if (!privateKey.hasValue && string.IsNullOrEmpty(publicKey) && (password.hasValue || !string.IsNullOrEmpty(keyfile)))
+        if (!usePrivateKey && string.IsNullOrEmpty(publicKey) && (usePassword || !string.IsNullOrEmpty(keyfile)))
         {
-            FileDecryptionWithPassword(password, keyfile, filePaths);
+            FileDecryptionWithPassword(usePassword, password, keyfile, filePaths);
         }
-        else if (!string.IsNullOrEmpty(publicKey) && !string.IsNullOrEmpty(privateKey.value) && string.IsNullOrEmpty(keyfile))
+        else if (!string.IsNullOrEmpty(publicKey) && !string.IsNullOrEmpty(privateKeyPath) && string.IsNullOrEmpty(keyfile))
         {
             if (publicKey.EndsWith(Constants.PublicKeyExtension))
             {
-                FileDecryptionWithPublicKeyFile(privateKey.value, password.value, publicKey, filePaths);
+                FileDecryptionWithPublicKeyFile(privateKeyPath, password, publicKey, filePaths);
                 return;
             }
-            FileDecryptionWithPublicKey(privateKey.value, password.value, publicKey.ToCharArray(), filePaths);
+            FileDecryptionWithPublicKey(privateKeyPath, password, publicKey.ToCharArray(), filePaths);
         }
-        else if (!string.IsNullOrEmpty(privateKey.value) && string.IsNullOrEmpty(keyfile))
+        else if (!string.IsNullOrEmpty(privateKeyPath) && string.IsNullOrEmpty(keyfile))
         {
-            FileDecryptionWithPrivateKey(privateKey.value, password.value, filePaths);
+            FileDecryptionWithPrivateKey(privateKeyPath, password, filePaths);
         }
         else
         {
@@ -110,13 +109,12 @@ public static class CommandLine
         }
     }
 
-    private static void FileDecryptionWithPassword((bool hasValue, char[] value) password, string keyfilePath, string[] filePaths)
+    private static void FileDecryptionWithPassword(bool usePassword, char[] password, string keyfilePath, string[] filePaths)
     {
-        bool validUserInput = FileEncryptionValidation.FileDecryptionWithPassword(password.hasValue, keyfilePath, filePaths);
+        bool validUserInput = FileEncryptionValidation.FileDecryptionWithPassword(usePassword, keyfilePath, filePaths);
         if (!validUserInput) { return; }
-        var passwordChars = Array.Empty<char>();
-        if (password.hasValue) { passwordChars = Password.ReadInput(password.value, newPassword: false); }
-        var passwordBytes = Password.Prehash(passwordChars, keyfilePath);
+        if (usePassword && password.Length == 0) { password = PasswordPrompt.EnterYourPassword(); }
+        var passwordBytes = Password.Prehash(password, keyfilePath);
         FileDecryption.DecryptEachFileWithPassword(filePaths, passwordBytes);
     }
 
@@ -183,11 +181,11 @@ public static class CommandLine
         return keyPairType;
     }
 
-    public static void RecoverPublicKey(string privateKeyFilePath, char[] password)
+    public static void RecoverPublicKey(string privateKeyPath, char[] password)
     {
-        bool validUserInput = FilePathValidation.RecoverPublicKey(privateKeyFilePath);
+        bool validUserInput = FilePathValidation.RecoverPublicKey(privateKeyPath);
         if (!validUserInput) { return; }
-        byte[] privateKey = AsymmetricKeyValidation.GetPrivateKeyFromFile(privateKeyFilePath);
+        byte[] privateKey = AsymmetricKeyValidation.GetPrivateKeyFromFile(privateKeyPath);
         privateKey = PrivateKey.Decrypt(privateKey, password);
         if (privateKey == null) { return; }
         byte[] publicKey = privateKey.Length switch
@@ -196,7 +194,7 @@ public static class CommandLine
             _ => AsymmetricKeys.GetEd25519PublicKey(privateKey)
         };
         string publicKeyString = Convert.ToBase64String(publicKey);
-        string publicKeyFilePath = AsymmetricKeys.ExportPublicKey(privateKeyFilePath, publicKeyString);
+        string publicKeyFilePath = AsymmetricKeys.ExportPublicKey(privateKeyPath, publicKeyString);
         DisplayMessage.PublicKey(publicKeyString, publicKeyFilePath);
     }
 

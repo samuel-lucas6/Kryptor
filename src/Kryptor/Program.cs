@@ -48,13 +48,13 @@ public class Program
     private bool Decrypt { get; }
 
     [Option("-p|--password", "specify a password (empty for interactive entry)", CommandOptionType.SingleOrNoValue)]
-    private (bool hasValue, string value) Password { get; }
+    private (bool optionSpecified, string value) Password { get; }
 
     [Option("-k|--keyfile", "specify or randomly generate a keyfile", CommandOptionType.SingleValue)]
     private string Keyfile { get; }
 
     [Option("-x|--private", "specify your private key (unused or empty for default key)", CommandOptionType.SingleOrNoValue)]
-    private (bool hasValue, string value) PrivateKey { get; }
+    private (bool optionSpecified, string value) PrivateKey { get; }
 
     [Option("-y|--public", "specify a public key", CommandOptionType.SingleValue)]
     private string PublicKey { get; }
@@ -108,11 +108,11 @@ public class Program
         {
             if (Encrypt)
             {
-                CommandLine.Encrypt((Password.hasValue, GetPassword(Password.value)), Keyfile, (PrivateKey.hasValue, GetEncryptionPrivateKey(PrivateKey.value)), PublicKey, FilePaths);
+                CommandLine.Encrypt(Password.optionSpecified, GetPassword(Password.value), Keyfile, PrivateKey.optionSpecified, GetEncryptionPrivateKey(PrivateKey.value), PublicKey, FilePaths);
             }
             else if (Decrypt)
             {
-                CommandLine.Decrypt((Password.hasValue, GetPassword(Password.value)), Keyfile, (PrivateKey.hasValue, GetEncryptionPrivateKey(PrivateKey.value)), PublicKey, FilePaths);
+                CommandLine.Decrypt(Password.optionSpecified, GetPassword(Password.value), Keyfile, PrivateKey.optionSpecified, GetEncryptionPrivateKey(PrivateKey.value), PublicKey, FilePaths);
             }
             else if (GenerateKeys)
             {
