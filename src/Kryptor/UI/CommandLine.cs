@@ -198,43 +198,41 @@ public static class CommandLine
         DisplayMessage.PublicKey(publicKeyString, publicKeyFilePath);
     }
 
-    public static void Sign(string privateKeyPath, char[] password, string comment, bool prehash, string signatureFilePath, string[] filePaths)
+    public static void Sign(string privateKeyPath, char[] password, string comment, bool prehash, string[] signatureFilePaths, string[] filePaths)
     {
-        bool validUserInput = SigningValidation.Sign(privateKeyPath, comment, signatureFilePath, filePaths);
+        bool validUserInput = SigningValidation.Sign(privateKeyPath, comment, signatureFilePaths, filePaths);
         if (!validUserInput) { return; }
         byte[] privateKey = AsymmetricKeyValidation.SigningPrivateKeyFile(privateKeyPath);
         privateKey = PrivateKey.Decrypt(privateKey, password);
-        FileSigning.SignEachFile(privateKey, comment, prehash, signatureFilePath, filePaths);
+        FileSigning.SignEachFile(privateKey, comment, prehash, signatureFilePaths, filePaths);
     }
 
-    public static void Verify(string publicKey, string signatureFilePath, string[] filePaths)
+    public static void Verify(string publicKey, string[] signatureFilePaths, string[] filePaths)
     {
         if (string.IsNullOrEmpty(publicKey) || publicKey.EndsWith(Constants.PublicKeyExtension))
         {
-            VerifySignature(publicKey, signatureFilePath, filePaths);
+            VerifySignatures(publicKey, signatureFilePaths, filePaths);
             return;
         }
-        VerifySignature(publicKey.ToCharArray(), signatureFilePath, filePaths);
+        VerifySignatures(publicKey.ToCharArray(), signatureFilePaths, filePaths);
     }
 
-    private static void VerifySignature(char[] encodedPublicKey, string signatureFilePath, string[] filePaths)
+    private static void VerifySignatures(string publicKeyPath, string[] signatureFilePaths, string[] filePaths)
     {
-        signatureFilePath = FilePathValidation.GetSignatureFilePath(signatureFilePath, filePaths);
-        bool validUserInput = SigningValidation.Verify(encodedPublicKey, signatureFilePath, filePaths);
-        if (!validUserInput) { return; }
-        byte[] publicKey = AsymmetricKeyValidation.SigningPublicKeyString(encodedPublicKey);
-        FileSigning.VerifyFile(signatureFilePath, filePaths[0], publicKey);
-    }
-
-    private static void VerifySignature(string publicKeyPath, string signatureFilePath, string[] filePaths)
-    {
-        signatureFilePath = FilePathValidation.GetSignatureFilePath(signatureFilePath, filePaths);
-        bool validUserInput = SigningValidation.Verify(publicKeyPath, signatureFilePath, filePaths);
+        bool validUserInput = SigningValidation.Verify(publicKeyPath, signatureFilePaths, filePaths);
         if (!validUserInput) { return; }
         byte[] publicKey = AsymmetricKeyValidation.SigningPublicKeyFile(publicKeyPath);
-        FileSigning.VerifyFile(signatureFilePath, filePaths[0], publicKey);
+        FileSigning.VerifyEachFile(signatureFilePaths, filePaths, publicKey);
     }
     
+    private static void VerifySignatures(char[] encodedPublicKey, string[] signatureFilePaths, string[] filePaths)
+    {
+        bool validUserInput = SigningValidation.Verify(encodedPublicKey, signatureFilePaths, filePaths);
+        if (!validUserInput) { return; }
+        byte[] publicKey = AsymmetricKeyValidation.SigningPublicKeyString(encodedPublicKey);
+        FileSigning.VerifyEachFile(signatureFilePaths, filePaths, publicKey);
+    }
+
     public static void CheckForUpdates()
     {
         try

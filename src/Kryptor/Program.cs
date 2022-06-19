@@ -83,8 +83,8 @@ public class Program
     [Option("-v|--verify", "verify a signature", CommandOptionType.NoValue)]
     private bool Verify { get; }
 
-    [Option("-t|--signature", "specify a signature file (unused for default name)", CommandOptionType.SingleValue)]
-    private string Signature { get; }
+    [Option("-t|--signature", "specify a signature file (unused for default name)", CommandOptionType.MultipleValue)]
+    private string[] Signatures { get; }
 
     [Option("-u|--update", "check for updates", CommandOptionType.NoValue)]
     private bool CheckForUpdates { get; }
@@ -124,11 +124,11 @@ public class Program
             }
             else if (Sign)
             {
-                CommandLine.Sign(GetSigningPrivateKey(PrivateKey.value), GetPassword(Password.value), Comment, Prehash, Signature, FilePaths);
+                CommandLine.Sign(GetSigningPrivateKey(PrivateKey.value), GetPassword(Password.value), Comment, Prehash, Signatures, FilePaths);
             }
             else if (Verify)
             {
-                CommandLine.Verify(PublicKey, Signature, FilePaths);
+                CommandLine.Verify(PublicKey, Signatures, FilePaths);
             }
             else if (CheckForUpdates)
             {

@@ -31,11 +31,12 @@ public static class FilePathValidation
         (char) 21, (char) 22, (char) 23, (char) 24, (char) 25, (char) 26, (char) 27, (char) 28, (char) 29, (char) 30,
         (char) 31, ':', '*', '?', '\\', '/'
     };
-    private const string FileDoesNotExist = "This file doesn't exist.";
     private const string FileOrFolderDoesNotExist = "This file/folder doesn't exist.";
     private const string FileInaccessible = "Unable to access the file.";
     private const string DirectoryEmpty = "This directory is empty.";
-    
+    private const string InvalidSignatureFile = "Please specify a valid signature file.";
+    private const string SignatureFileInaccessible = "Unable to access the signature file.";
+
     public static string GetFileEncryptionError(string inputFilePath)
     {
         if (Path.GetFileName(Path.TrimEndingDirectorySeparator(inputFilePath)).IndexOfAny(IllegalFileNameChars) != -1) { return "This file/directory name contains illegal characters for Windows, Linux, and/or macOS.";}
@@ -146,26 +147,37 @@ public static class FilePathValidation
         }
     }
 
-    public static string GetFileSigningError(string inputFilePath)
+    public static IEnumerable<string> GetFileSigningError(string filePath, string[] signatureFilePaths)
     {
-        if (Directory.Exists(inputFilePath)) { return FileHandling.IsDirectoryEmpty(inputFilePath) ? DirectoryEmpty : null; }
-        return !File.Exists(inputFilePath) ? FileDoesNotExist : null;
-    }
-
-    public static string GetSignatureVerifyError(string inputFilePath)
-    {
-        if (Directory.Exists(inputFilePath)) { return ErrorMessages.NoFileToVerify; }
-        return !File.Exists(inputFilePath) ? "This file doesn't exist." : null;
-    }
-
-    public static string[] GetSignatureFilePaths(string[] signatureFilePaths, string[] filePaths)
-    {
-        if (signatureFilePaths == null || filePaths == null || signatureFilePaths.Length != filePaths.Length) { return signatureFilePaths; }
-        for (int i = 0; i < signatureFilePaths.Length; i++)
+        if (Directory.Exists(filePath))
         {
-            string possibleSignatureFilePath = filePaths[i] + Constants.SignatureExtension;
-            if (File.Exists(possibleSignatureFilePath)) { signatureFilePaths[i] = possibleSignatureFilePath; }
+            if (FileHandling.IsDirectoryEmpty(filePath)) { yield return DirectoryEmpty; }
+            if (signatureFilePaths != null) { yield return "You cannot specify signature files when signing a directory."; }
         }
-        return signatureFilePaths;
+        else if (!File.Exists(filePath))
+        {
+            yield return FileOrFolderDoesNotExist;
+        }
+    }
+
+    public static string GetSignatureVerifyError(string filePath, string signatureFilePath)
+    {
+        if (filePath.EndsWith(Constants.SignatureExtension)) { return "Please specify the file to verify, not the signature file."; }
+        if (Directory.Exists(filePath)) { return "Please only specify files, not directories."; }
+        if (!File.Exists(filePath)) { return "This file doesn't exist."; }
+        if (string.IsNullOrEmpty(signatureFilePath)) { return null; }
+        if (!File.Exists(signatureFilePath)) { return "Unable to find the signature file. Please specify it manually using -t|--signature."; }
+        bool? validMagicBytes = FileHandling.IsSignatureFile(signatureFilePath);
+        if (validMagicBytes == null) { return SignatureFileInaccessible; }
+        return validMagicBytes == false ? "The signature file that was found is not valid." : null;
+    }
+
+    public static string GetSignatureFileError(string signatureFilePath)
+    {
+        if (!signatureFilePath.EndsWith(Constants.SignatureExtension)) { return InvalidSignatureFile; }
+        if (!File.Exists(signatureFilePath)) { return "Please specify a signature file that exists."; }
+        bool? validMagicBytes = FileHandling.IsSignatureFile(signatureFilePath);
+        if (validMagicBytes == null) { return SignatureFileInaccessible; }
+        return validMagicBytes == false ? InvalidSignatureFile : null;
     }
 }
