@@ -18,6 +18,7 @@
 
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Security.Cryptography;
 using Sodium;
@@ -29,22 +30,24 @@ public static class DecryptFile
 {
     public static void Decrypt(FileStream inputFile, string outputFilePath, byte[] ephemeralPublicKey, byte[] keyEncryptionKey)
     {
-        var dataEncryptionKey = new byte[Constants.EncryptionKeyLength];
+        var dataEncryptionKey = GC.AllocateArray<byte>(Constants.EncryptionKeyLength, pinned: true);
         try
         {
             byte[] nonce = FileHeaders.ReadNonce(inputFile);
             byte[] encryptedFileHeader = FileHeaders.ReadEncryptedHeader(inputFile);
             byte[] fileHeader = DecryptFileHeader(inputFile, ephemeralPublicKey, encryptedFileHeader, nonce, keyEncryptionKey);
+            var fileHeaderHandle = GCHandle.Alloc(fileHeader, GCHandleType.Pinned);
             int paddingLength = BitConversion.ToInt32(Arrays.Copy(fileHeader, sourceIndex: 0, Constants.IntBitConverterLength));
             bool isDirectory = BitConverter.ToBoolean(Arrays.Copy(fileHeader, sourceIndex: Constants.IntBitConverterLength, length: Constants.BoolBitConverterLength));
             int fileNameLength = BitConversion.ToInt32(Arrays.Copy(fileHeader, Constants.IntBitConverterLength + Constants.BoolBitConverterLength, Constants.IntBitConverterLength));
             byte[] fileName = fileNameLength == 0 ? Array.Empty<byte>() : Arrays.Copy(fileHeader, fileHeader.Length - dataEncryptionKey.Length - Constants.FileNameHeaderLength, fileNameLength);
-            dataEncryptionKey = Arrays.Copy(fileHeader, fileHeader.Length - dataEncryptionKey.Length, Constants.EncryptionKeyLength);
-            CryptographicOperations.ZeroMemory(fileHeader);
+            Array.Copy(fileHeader, fileHeader.Length - dataEncryptionKey.Length, dataEncryptionKey, destinationIndex: 0, dataEncryptionKey.Length);
+            CryptographicOperations.ZeroMemory(fileHeader); fileHeaderHandle.Free();
             using (var outputFile = new FileStream(outputFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
             {
                 nonce = Utilities.Increment(nonce);
                 DecryptChunks(inputFile, outputFile, nonce, dataEncryptionKey, paddingLength);
+                CryptographicOperations.ZeroMemory(dataEncryptionKey);
             }
             inputFile.Dispose();
             Globals.SuccessfulCount += 1;
@@ -88,6 +91,5 @@ public static class DecryptFile
             outputFile.Write(plaintextChunk, offset: 0, plaintextChunk.Length);
         }
         if (paddingLength != 0) { outputFile.SetLength(outputFile.Length - paddingLength); }
-        CryptographicOperations.ZeroMemory(dataEncryptionKey);
     }
 }

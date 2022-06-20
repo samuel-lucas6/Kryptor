@@ -29,7 +29,8 @@ public static class EncryptFile
 {
     public static void Encrypt(string inputFilePath, string outputFilePath, bool directory, byte[] ephemeralPublicKey, byte[] salt, byte[] keyEncryptionKey)
     {
-        var dataEncryptionKey = SodiumCore.GetRandomBytes(Constants.EncryptionKeyLength);
+        var dataEncryptionKey = GC.AllocateArray<byte>(Constants.EncryptionKeyLength, pinned: true);
+        RandomNumberGenerator.Fill(dataEncryptionKey);
         try
         {
             using (var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
@@ -74,12 +75,13 @@ public static class EncryptFile
         long chunkCount = (long)Math.Ceiling((double)(fileLength != 0 ? fileLength : 1) / Constants.FileChunkSize);
         byte[] ciphertextLength = BitConversion.GetBytes(chunkCount * Constants.CiphertextChunkLength);
         byte[] additionalData = Arrays.Concat(ciphertextLength, Constants.KryptorMagicBytes, Constants.EncryptionVersion, ephemeralPublicKey);
-        return XChaCha20BLAKE2b.Encrypt(fileHeader, nonce, keyEncryptionKey, additionalData);
+        fileHeader = XChaCha20BLAKE2b.Encrypt(fileHeader, nonce, keyEncryptionKey, additionalData);
+        return fileHeader;
     }
 
     private static void EncryptChunks(Stream inputFile, Stream outputFile, byte[] nonce, byte[] dataEncryptionKey)
     {
-        var plaintextChunk = new byte[Constants.FileChunkSize];
+        var plaintextChunk = GC.AllocateArray<byte>(Constants.FileChunkSize, pinned: true);
         if (inputFile.Length == 0)
         {
             byte[] ciphertextChunk = XChaCha20BLAKE2b.Encrypt(plaintextChunk, nonce, dataEncryptionKey);
@@ -92,5 +94,6 @@ public static class EncryptFile
             nonce = Utilities.Increment(nonce);
             outputFile.Write(ciphertextChunk, offset: 0, ciphertextChunk.Length);
         }
+        CryptographicOperations.ZeroMemory(plaintextChunk);
     }
 }
