@@ -46,6 +46,8 @@ public static class Arrays
         return destinationArray;
     }
 
+    public static byte[] SliceFromEnd(byte[] sourceArray, int startIndex) => Slice(sourceArray, startIndex, sourceArray.Length - startIndex);
+
     public static bool Compare(char[] a, char[] b)
     {
         var aBytes = Encoding.UTF8.GetBytes(a);

@@ -62,7 +62,7 @@ public static class PrivateKey
         byte[] additionalData = Arrays.Slice(privateKey, sourceIndex: 0, Constants.Curve25519KeyHeader.Length + Constants.PrivateKeyVersion.Length);
         byte[] salt = Arrays.Slice(privateKey, additionalData.Length, Constants.SaltLength);
         byte[] nonce = Arrays.Slice(privateKey, additionalData.Length + salt.Length, Constants.XChaChaNonceLength);
-        byte[] encryptedPrivateKey = Arrays.Slice(privateKey, additionalData.Length + salt.Length + nonce.Length, privateKey.Length - (additionalData.Length + salt.Length + nonce.Length));
+        byte[] encryptedPrivateKey = Arrays.SliceFromEnd(privateKey, additionalData.Length + salt.Length + nonce.Length);
         byte[] key = KeyDerivation.Argon2id(passwordBytes, salt);
         CryptographicOperations.ZeroMemory(passwordBytes);
         byte[] decryptedPrivateKey = XChaCha20BLAKE2b.Decrypt(encryptedPrivateKey, nonce, key, additionalData);

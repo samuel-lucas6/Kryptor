@@ -31,7 +31,7 @@ public static class AsymmetricKeyValidation
             byte[] publicKey = GetPublicKeyFromFile(publicKeyPath);
             if (publicKey == null) { return null; }
             ValidateEncryptionKeyAlgorithm(publicKey);
-            return Arrays.Slice(publicKey, Constants.Curve25519KeyHeader.Length, publicKey.Length - Constants.Curve25519KeyHeader.Length);
+            return Arrays.SliceFromEnd(publicKey, Constants.Curve25519KeyHeader.Length);
         }
         catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
         {
@@ -47,7 +47,7 @@ public static class AsymmetricKeyValidation
             byte[] publicKey = GetPublicKeyFromFile(publicKeyPath);
             if (publicKey == null) { return null; }
             ValidateSigningKeyAlgorithm(publicKey);
-            return Arrays.Slice(publicKey, Constants.Ed25519KeyHeader.Length, publicKey.Length - Constants.Ed25519KeyHeader.Length);
+            return Arrays.SliceFromEnd(publicKey, Constants.Ed25519KeyHeader.Length);
         }
         catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
         {
@@ -78,7 +78,7 @@ public static class AsymmetricKeyValidation
         {
             byte[] publicKey = Convert.FromBase64CharArray(encodedPublicKey, offset: 0, encodedPublicKey.Length);
             ValidateEncryptionKeyAlgorithm(publicKey);
-            return Arrays.Slice(publicKey, Constants.Curve25519KeyHeader.Length, publicKey.Length - Constants.Curve25519KeyHeader.Length);
+            return Arrays.SliceFromEnd(publicKey, Constants.Curve25519KeyHeader.Length);
         }
         catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
         {
@@ -93,7 +93,7 @@ public static class AsymmetricKeyValidation
         {
             byte[] publicKey = Convert.FromBase64CharArray(encodedPublicKey, offset: 0, encodedPublicKey.Length);
             ValidateSigningKeyAlgorithm(publicKey);
-            return Arrays.Slice(publicKey, Constants.Ed25519KeyHeader.Length, publicKey.Length - Constants.Ed25519KeyHeader.Length);
+            return Arrays.SliceFromEnd(publicKey, Constants.Ed25519KeyHeader.Length);
         }
         catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
         {
