@@ -51,6 +51,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="ChaCha20BLAKE2b" Version="2.0.1" />
     <PackageReference Include="libsodium" Version="1.0.18.2" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.0.1" />
     <PackageReference Include="Sodium.Core" Version="1.2.3" />
