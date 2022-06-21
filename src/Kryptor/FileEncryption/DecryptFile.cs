@@ -37,10 +37,10 @@ public static class DecryptFile
             byte[] encryptedFileHeader = FileHeaders.ReadEncryptedHeader(inputFile);
             byte[] fileHeader = DecryptFileHeader(inputFile, ephemeralPublicKey, encryptedFileHeader, nonce, keyEncryptionKey);
             var fileHeaderHandle = GCHandle.Alloc(fileHeader, GCHandleType.Pinned);
-            int paddingLength = BitConversion.ToInt32(Arrays.Copy(fileHeader, sourceIndex: 0, Constants.IntBitConverterLength));
-            bool isDirectory = BitConverter.ToBoolean(Arrays.Copy(fileHeader, sourceIndex: Constants.IntBitConverterLength, length: Constants.BoolBitConverterLength));
-            int fileNameLength = BitConversion.ToInt32(Arrays.Copy(fileHeader, Constants.IntBitConverterLength + Constants.BoolBitConverterLength, Constants.IntBitConverterLength));
-            byte[] fileName = fileNameLength == 0 ? Array.Empty<byte>() : Arrays.Copy(fileHeader, fileHeader.Length - dataEncryptionKey.Length - Constants.FileNameHeaderLength, fileNameLength);
+            int paddingLength = BitConversion.ToInt32(Arrays.Slice(fileHeader, sourceIndex: 0, Constants.IntBitConverterLength));
+            bool isDirectory = BitConverter.ToBoolean(Arrays.Slice(fileHeader, sourceIndex: Constants.IntBitConverterLength, length: Constants.BoolBitConverterLength));
+            int fileNameLength = BitConversion.ToInt32(Arrays.Slice(fileHeader, Constants.IntBitConverterLength + Constants.BoolBitConverterLength, Constants.IntBitConverterLength));
+            byte[] fileName = fileNameLength == 0 ? Array.Empty<byte>() : Arrays.Slice(fileHeader, fileHeader.Length - dataEncryptionKey.Length - Constants.FileNameHeaderLength, fileNameLength);
             Array.Copy(fileHeader, fileHeader.Length - dataEncryptionKey.Length, dataEncryptionKey, destinationIndex: 0, dataEncryptionKey.Length);
             CryptographicOperations.ZeroMemory(fileHeader); fileHeaderHandle.Free();
             using (var outputFile = new FileStream(outputFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))

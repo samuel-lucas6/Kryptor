@@ -59,12 +59,10 @@ public static class PrivateKey
 
     private static byte[] Decrypt(byte[] passwordBytes, byte[] privateKey)
     {
-        byte[] keyAlgorithm = Arrays.Copy(privateKey, sourceIndex: 0, Constants.Curve25519KeyHeader.Length);
-        byte[] keyVersion = Arrays.Copy(privateKey, keyAlgorithm.Length, Constants.PrivateKeyVersion.Length);
-        byte[] salt = Arrays.Copy(privateKey, keyAlgorithm.Length + keyVersion.Length, Constants.SaltLength);
-        byte[] nonce = Arrays.Copy(privateKey, keyAlgorithm.Length + keyVersion.Length + salt.Length, Constants.XChaChaNonceLength);
-        byte[] encryptedPrivateKey = Arrays.Copy(privateKey, keyAlgorithm.Length + keyVersion.Length + salt.Length + nonce.Length, privateKey.Length - (keyAlgorithm.Length + keyVersion.Length + salt.Length + nonce.Length));
-        byte[] additionalData = Arrays.Concat(keyAlgorithm, keyVersion);
+        byte[] additionalData = Arrays.Slice(privateKey, sourceIndex: 0, Constants.Curve25519KeyHeader.Length + Constants.PrivateKeyVersion.Length);
+        byte[] salt = Arrays.Slice(privateKey, additionalData.Length, Constants.SaltLength);
+        byte[] nonce = Arrays.Slice(privateKey, additionalData.Length + salt.Length, Constants.XChaChaNonceLength);
+        byte[] encryptedPrivateKey = Arrays.Slice(privateKey, additionalData.Length + salt.Length + nonce.Length, privateKey.Length - (additionalData.Length + salt.Length + nonce.Length));
         byte[] key = KeyDerivation.Argon2id(passwordBytes, salt);
         CryptographicOperations.ZeroMemory(passwordBytes);
         byte[] decryptedPrivateKey = XChaCha20BLAKE2b.Decrypt(encryptedPrivateKey, nonce, key, additionalData);

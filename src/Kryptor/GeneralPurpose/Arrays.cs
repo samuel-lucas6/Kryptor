@@ -39,7 +39,7 @@ public static class Arrays
         return result;
     }
     
-    public static byte[] Copy(byte[] sourceArray, int sourceIndex, int length)
+    public static byte[] Slice(byte[] sourceArray, int sourceIndex, int length)
     {
         var destinationArray = new byte[length];
         Array.Copy(sourceArray, sourceIndex, destinationArray, destinationIndex: 0, destinationArray.Length);

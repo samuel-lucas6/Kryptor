@@ -31,7 +31,7 @@ public static class AsymmetricKeyValidation
             byte[] publicKey = GetPublicKeyFromFile(publicKeyPath);
             if (publicKey == null) { return null; }
             ValidateEncryptionKeyAlgorithm(publicKey);
-            return Arrays.Copy(publicKey, Constants.Curve25519KeyHeader.Length, publicKey.Length - Constants.Curve25519KeyHeader.Length);
+            return Arrays.Slice(publicKey, Constants.Curve25519KeyHeader.Length, publicKey.Length - Constants.Curve25519KeyHeader.Length);
         }
         catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
         {
@@ -47,7 +47,7 @@ public static class AsymmetricKeyValidation
             byte[] publicKey = GetPublicKeyFromFile(publicKeyPath);
             if (publicKey == null) { return null; }
             ValidateSigningKeyAlgorithm(publicKey);
-            return Arrays.Copy(publicKey, Constants.Ed25519KeyHeader.Length, publicKey.Length - Constants.Ed25519KeyHeader.Length);
+            return Arrays.Slice(publicKey, Constants.Ed25519KeyHeader.Length, publicKey.Length - Constants.Ed25519KeyHeader.Length);
         }
         catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
         {
@@ -78,7 +78,7 @@ public static class AsymmetricKeyValidation
         {
             byte[] publicKey = Convert.FromBase64CharArray(encodedPublicKey, offset: 0, encodedPublicKey.Length);
             ValidateEncryptionKeyAlgorithm(publicKey);
-            return Arrays.Copy(publicKey, Constants.Curve25519KeyHeader.Length, publicKey.Length - Constants.Curve25519KeyHeader.Length);
+            return Arrays.Slice(publicKey, Constants.Curve25519KeyHeader.Length, publicKey.Length - Constants.Curve25519KeyHeader.Length);
         }
         catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
         {
@@ -93,7 +93,7 @@ public static class AsymmetricKeyValidation
         {
             byte[] publicKey = Convert.FromBase64CharArray(encodedPublicKey, offset: 0, encodedPublicKey.Length);
             ValidateSigningKeyAlgorithm(publicKey);
-            return Arrays.Copy(publicKey, Constants.Ed25519KeyHeader.Length, publicKey.Length - Constants.Ed25519KeyHeader.Length);
+            return Arrays.Slice(publicKey, Constants.Ed25519KeyHeader.Length, publicKey.Length - Constants.Ed25519KeyHeader.Length);
         }
         catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
         {
@@ -104,14 +104,14 @@ public static class AsymmetricKeyValidation
 
     private static void ValidateEncryptionKeyAlgorithm(byte[] asymmetricKey)
     {
-        byte[] keyAlgorithm = Arrays.Copy(asymmetricKey, sourceIndex: 0, Constants.Curve25519KeyHeader.Length);
+        byte[] keyAlgorithm = Arrays.Slice(asymmetricKey, sourceIndex: 0, Constants.Curve25519KeyHeader.Length);
         bool validKey = Utilities.Compare(keyAlgorithm, Constants.Curve25519KeyHeader);
         if (!validKey) { throw new ArgumentException("Please specify an asymmetric encryption key."); }
     }
 
     private static void ValidateSigningKeyAlgorithm(byte[] asymmetricKey)
     {
-        byte[] keyAlgorithm = Arrays.Copy(asymmetricKey, sourceIndex: 0, Constants.Ed25519KeyHeader.Length);
+        byte[] keyAlgorithm = Arrays.Slice(asymmetricKey, sourceIndex: 0, Constants.Ed25519KeyHeader.Length);
         bool validKey = Utilities.Compare(keyAlgorithm, Constants.Ed25519KeyHeader);
         if (!validKey) { throw new ArgumentException("Please specify an asymmetric signing key."); }
     }
@@ -176,7 +176,7 @@ public static class AsymmetricKeyValidation
 
     private static void ValidateKeyVersion(byte[] privateKey)
     {
-        byte[] keyVersion = Arrays.Copy(privateKey, Constants.Curve25519KeyHeader.Length, Constants.PrivateKeyVersion.Length);
+        byte[] keyVersion = Arrays.Slice(privateKey, Constants.Curve25519KeyHeader.Length, Constants.PrivateKeyVersion.Length);
         bool validKeyVersion = Utilities.Compare(keyVersion, Constants.PrivateKeyVersion);
         if (!validKeyVersion) { throw new ArgumentException("This private key version is not supported in this version of Kryptor."); }
     }
