@@ -16,6 +16,7 @@
     along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
+using System;
 using System.IO;
 using System.Security.Cryptography;
 using Sodium;
@@ -34,8 +35,16 @@ public static class Keyfiles
 
     public static byte[] ReadKeyfile(string keyfilePath)
     {
-        using var keyfile = new FileStream(keyfilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
-        using var blake2b = new GenericHash.GenericHashAlgorithm(key: (byte[])null, Constants.HashLength);
-        return blake2b.ComputeHash(keyfile);
+        try
+        {
+            using var keyfile = new FileStream(keyfilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
+            using var blake2b = new GenericHash.GenericHashAlgorithm(key: (byte[])null, Constants.HashLength);
+            return blake2b.ComputeHash(keyfile);
+        }
+        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
+        {
+            DisplayMessage.Exception(ex.GetType().Name, "Unable to read the keyfile, so it has not been used.");
+            return null;
+        }
     }
 }

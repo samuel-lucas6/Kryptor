@@ -16,7 +16,6 @@
     along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
-using System;
 using System.Text;
 using System.Security.Cryptography;
 using Sodium;
@@ -31,38 +30,15 @@ public static class Password
         if (password.Length == 1 && Arrays.Compare(password, new[] { ' ' })) { return PasswordPrompt.UseRandomPassphrase(); }
         return password;
     }
-
-    public static byte[] Prehash(char[] password, string keyfilePath)
+    
+    public static byte[] Prehash(char[] password, string keyfilePath = null)
     {
-        var passwordBytes = Prehash(password);
-        return string.IsNullOrEmpty(keyfilePath) ? passwordBytes : UseKeyfile(passwordBytes, keyfilePath);
-    }
-
-    public static byte[] Prehash(char[] password)
-    {
-        if (password.Length == 0) { return null; }
-        var passwordBytes = Encoding.UTF8.GetBytes(password);
+        if (password.Length == 0 && string.IsNullOrEmpty(keyfilePath)) { return null; }
+        var passwordBytes = password.Length != 0 ? Encoding.UTF8.GetBytes(password) : null;
         Arrays.ZeroMemory(password);
-        return GenericHash.Hash(passwordBytes, key: null, Constants.HashLength);
-    }
-
-    private static byte[] UseKeyfile(byte[] passwordBytes, string keyfilePath)
-    {
-        try
-        {
-            var keyfileBytes = Keyfiles.ReadKeyfile(keyfilePath);
-            return passwordBytes == null ? keyfileBytes : PepperPassword(passwordBytes, keyfileBytes);
-        }
-        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
-        {
-            DisplayMessage.Exception(ex.GetType().Name, "Unable to read the keyfile, so it has not been used.");
-            return passwordBytes;
-        }
-    }
-
-    private static byte[] PepperPassword(byte[] passwordBytes, byte[] keyfileBytes)
-    {
-        passwordBytes = GenericHash.Hash(passwordBytes, keyfileBytes, Constants.HashLength);
+        var keyfileBytes = !string.IsNullOrEmpty(keyfilePath) ? Keyfiles.ReadKeyfile(keyfilePath) : null;
+        if (passwordBytes == null) { return keyfileBytes; }
+        passwordBytes = GenericHash.Hash(passwordBytes, key: keyfileBytes, Constants.HashLength);
         CryptographicOperations.ZeroMemory(keyfileBytes);
         return passwordBytes;
     }
