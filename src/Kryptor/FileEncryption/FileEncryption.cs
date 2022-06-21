@@ -24,7 +24,7 @@ namespace Kryptor;
 
 public static class FileEncryption
 {
-    public static void EncryptEachFileWithPassword(string[] filePaths, byte[] passwordBytes)
+    public static unsafe void EncryptEachFileWithPassword(string[] filePaths, byte[] passwordBytes)
     {
         if (filePaths == null || passwordBytes == null) { return; }
         foreach (string inputFilePath in filePaths)
@@ -37,9 +37,12 @@ public static class FileEncryption
                 byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
                 DisplayMessage.DerivingKeyFromPassword();
                 byte[] keyEncryptionKey = KeyDerivation.Argon2id(passwordBytes, salt);
-                // Fill unused header with random public key
-                using var ephemeralKeyPair = PublicKeyBox.GenerateKeyPair();
-                EncryptInputFile(directory ? zipFilePath : inputFilePath, directory, ephemeralKeyPair.PublicKey, salt, keyEncryptionKey);
+                fixed (byte* ignored = keyEncryptionKey)
+                {
+                    // Fill unused header with random public key
+                    using var ephemeralKeyPair = PublicKeyBox.GenerateKeyPair();
+                    EncryptInputFile(directory ? zipFilePath : inputFilePath, directory, ephemeralKeyPair.PublicKey, salt, keyEncryptionKey);
+                }
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
@@ -51,7 +54,7 @@ public static class FileEncryption
         DisplayMessage.SuccessfullyEncrypted(space: false);
     }
     
-    public static void EncryptEachFileWithPublicKey(byte[] senderPrivateKey, char[] password, byte[] recipientPublicKey, string[] filePaths)
+    public static unsafe void EncryptEachFileWithPublicKey(byte[] senderPrivateKey, char[] password, byte[] recipientPublicKey, string[] filePaths)
     {
         if (filePaths == null || senderPrivateKey == null || recipientPublicKey == null) { return; }
         senderPrivateKey = PrivateKey.Decrypt(senderPrivateKey, password);
@@ -69,7 +72,7 @@ public static class FileEncryption
                 byte[] ephemeralSharedSecret = KeyExchange.GetPublicKeySharedSecret(recipientPublicKey, out byte[] ephemeralPublicKey);
                 byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
                 byte[] keyEncryptionKey = KeyDerivation.Blake2b(ephemeralSharedSecret, sharedSecret, salt);
-                EncryptInputFile(directory ? zipFilePath : inputFilePath, directory, ephemeralPublicKey, salt, keyEncryptionKey);
+                fixed (byte* ignored = keyEncryptionKey) { EncryptInputFile(directory ? zipFilePath : inputFilePath, directory, ephemeralPublicKey, salt, keyEncryptionKey); }
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
@@ -80,7 +83,7 @@ public static class FileEncryption
         DisplayMessage.SuccessfullyEncrypted();
     }
 
-    public static void EncryptEachFileWithPrivateKey(byte[] privateKey, char[] password, string[] filePaths)
+    public static unsafe void EncryptEachFileWithPrivateKey(byte[] privateKey, char[] password, string[] filePaths)
     {
         if (filePaths == null || privateKey == null) { return; }
         privateKey = PrivateKey.Decrypt(privateKey, password);
@@ -96,7 +99,7 @@ public static class FileEncryption
                 byte[] ephemeralSharedSecret = KeyExchange.GetPrivateKeySharedSecret(privateKey, out byte[] ephemeralPublicKey);
                 byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
                 byte[] keyEncryptionKey = KeyDerivation.Blake2b(ephemeralSharedSecret, salt);
-                EncryptInputFile(directory ? zipFilePath : inputFilePath, directory, ephemeralPublicKey, salt, keyEncryptionKey);
+                fixed (byte* ignored = keyEncryptionKey) { EncryptInputFile(directory ? zipFilePath : inputFilePath, directory, ephemeralPublicKey, salt, keyEncryptionKey); }
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {

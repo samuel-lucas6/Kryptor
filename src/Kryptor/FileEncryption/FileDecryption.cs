@@ -24,7 +24,7 @@ namespace Kryptor;
 
 public static class FileDecryption
 {
-    public static void DecryptEachFileWithPassword(string[] filePaths, byte[] passwordBytes)
+    public static unsafe void DecryptEachFileWithPassword(string[] filePaths, byte[] passwordBytes)
     {
         if (filePaths == null || passwordBytes == null) { return; }
         foreach (string inputFilePath in filePaths)
@@ -36,7 +36,7 @@ public static class FileDecryption
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
                 DisplayMessage.DerivingKeyFromPassword();
                 byte[] keyEncryptionKey = KeyDerivation.Argon2id(passwordBytes, salt);
-                DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey);
+                fixed (byte* ignored = keyEncryptionKey) { DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey); }
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
@@ -53,7 +53,7 @@ public static class FileDecryption
         DisplayMessage.SuccessfullyDecrypted(space: false);
     }
 
-    public static void DecryptEachFileWithPublicKey(byte[] recipientPrivateKey, char[] password, byte[] senderPublicKey, string[] filePaths)
+    public static unsafe void DecryptEachFileWithPublicKey(byte[] recipientPrivateKey, char[] password, byte[] senderPublicKey, string[] filePaths)
     {
         if (filePaths == null || recipientPrivateKey == null || senderPublicKey == null) { return; }
         recipientPrivateKey = PrivateKey.Decrypt(recipientPrivateKey, password);
@@ -69,7 +69,7 @@ public static class FileDecryption
                 byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecret(recipientPrivateKey, ephemeralPublicKey);
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
                 byte[] keyEncryptionKey = KeyDerivation.Blake2b(ephemeralSharedSecret, sharedSecret, salt);
-                DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey);
+                fixed (byte* ignored = keyEncryptionKey) { DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey); }
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
@@ -86,7 +86,7 @@ public static class FileDecryption
         DisplayMessage.SuccessfullyDecrypted();
     }
     
-    public static void DecryptEachFileWithPrivateKey(byte[] privateKey, char[] password, string[] filePaths)
+    public static unsafe void DecryptEachFileWithPrivateKey(byte[] privateKey, char[] password, string[] filePaths)
     {
         if (filePaths == null || privateKey == null) { return; }
         privateKey = PrivateKey.Decrypt(privateKey, password);
@@ -101,7 +101,7 @@ public static class FileDecryption
                 byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecret(privateKey, ephemeralPublicKey);
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
                 byte[] keyEncryptionKey = KeyDerivation.Blake2b(ephemeralSharedSecret, salt);
-                DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey);
+                fixed (byte* ignored = keyEncryptionKey) { DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey); }
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
