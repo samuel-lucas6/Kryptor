@@ -20,6 +20,7 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Text;
 using Sodium;
 
 namespace Kryptor;
@@ -35,9 +36,18 @@ public static class FileHandling
     public static long GetFileLength(string filePath) => new FileInfo(filePath).Length;
 
     public static bool HasKryptorExtension(string filePath) => filePath.EndsWith(Constants.EncryptedExtension, StringComparison.Ordinal);
-    
-    public static string GetRandomFileName() => Utilities.BinaryToBase64(SodiumCore.GetRandomBytes(count: 16), Utilities.Base64Variant.UrlSafeNoPadding).TrimStart('-');
-    
+
+    public static string GetRandomFileName(int length = 16)
+    {
+        const string characterSet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        var stringBuilder = new StringBuilder();
+        for (int i = 0; i < length; i++)
+        {
+            stringBuilder.Append(characterSet[SodiumCore.GetRandomNumber(upperBound: characterSet.Length)]);
+        }
+        return stringBuilder.ToString();
+    }
+
     public static string ReplaceFileName(string originalFilePath, string newFileName)
     {
         string directoryPath = Path.GetDirectoryName(Path.GetFullPath(originalFilePath));
