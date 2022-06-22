@@ -63,6 +63,6 @@ public static class Arrays
     public static void ZeroMemory(char[] array)
     {
         if (array.Length == 0) { return; }
-        Array.Clear(array, index: 0, array.Length);
+        Array.Clear(array);
     }
 }

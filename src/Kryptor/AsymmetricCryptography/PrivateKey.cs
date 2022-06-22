@@ -29,7 +29,7 @@ public static class PrivateKey
     {
         byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
         DisplayMessage.DerivingKeyFromPassword();
-        byte[] key = KeyDerivation.Argon2id(passwordBytes, salt);
+        byte[] key = PasswordHash.ArgonHashBinary(passwordBytes, salt, Constants.Iterations, Constants.MemorySize, Constants.EncryptionKeyLength, PasswordHash.ArgonAlgorithm.Argon_2ID13);
         CryptographicOperations.ZeroMemory(passwordBytes);
         byte[] nonce = SodiumCore.GetRandomBytes(Constants.XChaChaNonceLength);
         byte[] additionalData = Arrays.Concat(keyAlgorithm, Constants.PrivateKeyVersion);
@@ -47,7 +47,15 @@ public static class PrivateKey
             if (password.Length == 0) { password = PasswordPrompt.EnterYourPassword(isPrivateKey: true); }
             Console.WriteLine("Decrypting private key...");
             var passwordBytes = Password.Prehash(password);
-            return Decrypt(passwordBytes, privateKey);
+            byte[] additionalData = Arrays.Slice(privateKey, sourceIndex: 0, Constants.Curve25519KeyHeader.Length + Constants.PrivateKeyVersion.Length);
+            byte[] salt = Arrays.Slice(privateKey, additionalData.Length, Constants.SaltLength);
+            byte[] nonce = Arrays.Slice(privateKey, additionalData.Length + salt.Length, Constants.XChaChaNonceLength);
+            byte[] encryptedPrivateKey = Arrays.SliceFromEnd(privateKey, additionalData.Length + salt.Length + nonce.Length);
+            byte[] key = PasswordHash.ArgonHashBinary(passwordBytes, salt, Constants.Iterations, Constants.MemorySize, Constants.EncryptionKeyLength, PasswordHash.ArgonAlgorithm.Argon_2ID13);
+            CryptographicOperations.ZeroMemory(passwordBytes);
+            byte[] decryptedPrivateKey = XChaCha20BLAKE2b.Decrypt(encryptedPrivateKey, nonce, key, additionalData);
+            CryptographicOperations.ZeroMemory(key);
+            return decryptedPrivateKey;
         }
         catch (CryptographicException)
         {
@@ -55,18 +63,5 @@ public static class PrivateKey
             DisplayMessage.Error("Incorrect password, or the private key has been tampered with.");
             return null;
         }
-    }
-
-    private static byte[] Decrypt(byte[] passwordBytes, byte[] privateKey)
-    {
-        byte[] additionalData = Arrays.Slice(privateKey, sourceIndex: 0, Constants.Curve25519KeyHeader.Length + Constants.PrivateKeyVersion.Length);
-        byte[] salt = Arrays.Slice(privateKey, additionalData.Length, Constants.SaltLength);
-        byte[] nonce = Arrays.Slice(privateKey, additionalData.Length + salt.Length, Constants.XChaChaNonceLength);
-        byte[] encryptedPrivateKey = Arrays.SliceFromEnd(privateKey, additionalData.Length + salt.Length + nonce.Length);
-        byte[] key = KeyDerivation.Argon2id(passwordBytes, salt);
-        CryptographicOperations.ZeroMemory(passwordBytes);
-        byte[] decryptedPrivateKey = XChaCha20BLAKE2b.Decrypt(encryptedPrivateKey, nonce, key, additionalData);
-        CryptographicOperations.ZeroMemory(key);
-        return decryptedPrivateKey;
     }
 }

@@ -19,6 +19,7 @@
 using System;
 using System.IO;
 using System.Security.Cryptography;
+using Sodium;
 
 namespace Kryptor;
 
@@ -35,7 +36,7 @@ public static class FileDecryption
                 byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
                 DisplayMessage.DerivingKeyFromPassword();
-                byte[] keyEncryptionKey = KeyDerivation.Argon2id(passwordBytes, salt);
+                byte[] keyEncryptionKey = PasswordHash.ArgonHashBinary(passwordBytes, salt, Constants.Iterations, Constants.MemorySize, Constants.EncryptionKeyLength, PasswordHash.ArgonAlgorithm.Argon_2ID13);
                 fixed (byte* ignored = keyEncryptionKey) { DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey); }
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))

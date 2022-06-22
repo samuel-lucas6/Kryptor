@@ -26,12 +26,7 @@ namespace Kryptor;
 public static class KeyDerivation
 {
     private static readonly byte[] Personalisation = Encoding.UTF8.GetBytes("Kryptor.Personal");
-
-    public static byte[] Argon2id(byte[] passwordBytes, byte[] salt)
-    {
-        return PasswordHash.ArgonHashBinary(passwordBytes, salt, Constants.Iterations, Constants.MemorySize, Constants.EncryptionKeyLength, PasswordHash.ArgonAlgorithm.Argon_2ID13);
-    }
-
+    
     public static byte[] Blake2b(byte[] ephemeralSharedSecret, byte[] sharedSecret, byte[] salt)
     {
         byte[] inputKeyingMaterial = Arrays.Concat(ephemeralSharedSecret, sharedSecret);

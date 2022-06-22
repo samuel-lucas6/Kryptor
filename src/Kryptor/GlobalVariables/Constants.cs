@@ -19,6 +19,7 @@
 using System;
 using System.IO;
 using System.Text;
+using ChaCha20BLAKE2;
 
 namespace Kryptor;
 
@@ -35,7 +36,6 @@ public static class Constants
     public const string EncryptedExtension = ".kryptor";
     public const string KeyfileExtension = ".key";
     public const string ZipFileExtension = ".zip";
-    public const string SaltFileName = "kryptor.salt";
     public const int KeyfileLength = 64;
     public const int FileStreamBufferSize = 131072;
     public const int FileChunkSize = 16384;
@@ -44,14 +44,13 @@ public static class Constants
     public const int FileNameHeaderLength = 255;
     public const int EncryptedHeaderLength = 328;
     public static readonly int FileHeadersLength = KryptorMagicBytes.Length + EncryptionVersion.Length + EphemeralPublicKeyLength + SaltLength + XChaChaNonceLength + EncryptedHeaderLength;
-    public const int CiphertextChunkLength = FileChunkSize + TagLength;
+    public const int CiphertextChunkLength = FileChunkSize + (int)TagLength.Medium;
 
     // Cryptography
     public const int EncryptionKeyLength = 32;
     public const int EphemeralPublicKeyLength = 32;
     public const int SaltLength = 16;
     public const int XChaChaNonceLength = 24;
-    public const int TagLength = 32;
     public const int HashLength = 64;
 
     // Asymmetric keys

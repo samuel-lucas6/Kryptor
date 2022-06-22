@@ -36,7 +36,7 @@ public static class FileEncryption
                 if (directory) { FileHandling.CreateZipFile(inputFilePath, zipFilePath); }
                 byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
                 DisplayMessage.DerivingKeyFromPassword();
-                byte[] keyEncryptionKey = KeyDerivation.Argon2id(passwordBytes, salt);
+                byte[] keyEncryptionKey = PasswordHash.ArgonHashBinary(passwordBytes, salt, Constants.Iterations, Constants.MemorySize, Constants.EncryptionKeyLength, PasswordHash.ArgonAlgorithm.Argon_2ID13);
                 fixed (byte* ignored = keyEncryptionKey)
                 {
                     // Fill unused header with random public key

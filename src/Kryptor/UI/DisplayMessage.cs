@@ -30,8 +30,6 @@ public static class DisplayMessage
     public static void Error(string errorMessage) => WriteLine($"{ErrorWord}: {errorMessage}", ConsoleColor.DarkRed);
 
     public static void FilePathMessage(string filePath, string message) => WriteLine($"\"{Path.GetFileName(filePath)}\": {message}", ConsoleColor.DarkRed);
-
-    public static void FilePathError(string filePath, string errorMessage) => WriteLine($"\"{Path.GetFileName(filePath)}\" - {ErrorWord}: {errorMessage}", ConsoleColor.DarkRed);
     
     public static void Exception(string exceptionName, string errorMessage) => WriteLine($"{ErrorWord}: {exceptionName} - {errorMessage}", ConsoleColor.DarkRed);
     
