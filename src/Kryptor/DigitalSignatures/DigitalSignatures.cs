@@ -27,7 +27,7 @@ public static class DigitalSignatures
 {
     public static void SignFile(string filePath, string signatureFilePath, string comment, bool prehash, byte[] privateKey)
     {
-        if (!prehash) { prehash = IsPrehashingRequired(filePath); }
+        if (!prehash) { prehash = FileHandling.GetFileLength(filePath) >= Constants.Mebibyte * 1024; }
         byte[] prehashed = BitConverter.GetBytes(prehash);
         byte[] fileBytes = GetFileBytes(filePath, prehash);
         byte[] fileSignature = PublicKeyAuth.SignDetached(fileBytes, privateKey);
@@ -36,12 +36,6 @@ public static class DigitalSignatures
         byte[] globalSignature = PublicKeyAuth.SignDetached(signatureFileBytes, privateKey);
         CreateSignatureFile(filePath, signatureFilePath, signatureFileBytes, globalSignature);
         Globals.SuccessfulCount += 1;
-    }
-
-    private static bool IsPrehashingRequired(string filePath)
-    {
-        const int oneGibibyte = Constants.Mebibyte * 1024;
-        return FileHandling.GetFileLength(filePath) >= oneGibibyte;
     }
 
     private static byte[] GetFileBytes(string filePath, bool prehash)
@@ -74,11 +68,7 @@ public static class DigitalSignatures
         byte[] signatureFileBytes = Arrays.Concat(magicBytes, formatVersion, prehashed, fileSignature, commentBytes);
         byte[] globalSignature = FileHandling.ReadFileHeader(signatureFile, Constants.SignatureLength);
         bool validGlobalSignature = PublicKeyAuth.VerifyDetached(globalSignature, signatureFileBytes, publicKey);
-        if (!validGlobalSignature)
-        {
-            comment = string.Empty;
-            return false;
-        }
+        if (!validGlobalSignature) { comment = string.Empty; return false; }
         bool prehash = BitConverter.ToBoolean(prehashed);
         byte[] fileBytes = GetFileBytes(filePath, prehash);
         comment = Encoding.UTF8.GetString(commentBytes);
