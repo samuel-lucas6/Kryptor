@@ -53,6 +53,34 @@ public static class FileDecryption
         CryptographicOperations.ZeroMemory(passwordBytes);
         DisplayMessage.SuccessfullyDecrypted(space: false);
     }
+    
+    public static unsafe void DecryptEachFileWithKeyfile(string[] filePaths, byte[] keyfileBytes)
+    {
+        if (filePaths == null || keyfileBytes == null) { return; }
+        foreach (string inputFilePath in filePaths)
+        {
+            try
+            {
+                using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
+                byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
+                byte[] salt = FileHeaders.ReadSalt(inputFile);
+                byte[] keyEncryptionKey = GenericHash.HashSaltPersonal(message: Array.Empty<byte>(), keyfileBytes, salt, Constants.Personalisation, Constants.EncryptionKeyLength);
+                fixed (byte* ignored = keyEncryptionKey) { DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey); }
+            }
+            catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
+            {
+                if (ex is ArgumentException)
+                {
+                    DisplayMessage.FilePathMessage(inputFilePath, ex.Message);
+                    return;
+                }
+                DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToDecryptFile);
+            }
+            Console.WriteLine();
+        }
+        CryptographicOperations.ZeroMemory(keyfileBytes);
+        DisplayMessage.SuccessfullyDecrypted(space: false);
+    }
 
     public static unsafe void DecryptEachFileWithPublicKey(byte[] recipientPrivateKey, char[] password, byte[] senderPublicKey, string[] filePaths)
     {

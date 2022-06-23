@@ -33,11 +33,11 @@ public static class Password
     
     public static byte[] Prehash(char[] password, string keyfilePath = null)
     {
-        if (password.Length == 0 && string.IsNullOrEmpty(keyfilePath)) { return null; }
-        var passwordBytes = password.Length != 0 ? Encoding.UTF8.GetBytes(password) : null;
+        if (password.Length == 0) { return null; }
+        var passwordBytes = Encoding.UTF8.GetBytes(password);
         Arrays.ZeroMemory(password);
         var keyfileBytes = !string.IsNullOrEmpty(keyfilePath) ? Keyfiles.ReadKeyfile(keyfilePath) : null;
-        if (passwordBytes == null) { return keyfileBytes; }
+        if (!string.IsNullOrEmpty(keyfilePath) && keyfileBytes == null) { return null; }
         passwordBytes = GenericHash.Hash(passwordBytes, key: keyfileBytes, Constants.HashLength);
         CryptographicOperations.ZeroMemory(keyfileBytes);
         return passwordBytes;

@@ -29,6 +29,7 @@ public static class Constants
     public const int Mebibyte = 1048576;
     public const int MemorySize = 256 * Mebibyte;
     public const int Iterations = 12;
+    public static readonly byte[] Personalisation = Encoding.UTF8.GetBytes("Kryptor.Personal");
 
     // File encryption
     public static readonly byte[] KryptorMagicBytes = Encoding.UTF8.GetBytes("KRYPTOR");

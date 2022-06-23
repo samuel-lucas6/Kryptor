@@ -26,9 +26,13 @@ public static class CommandLine
 {
     public static void Encrypt(bool usePassword, char[] password, string keyfile, bool usePrivateKey, string privateKeyPath, string publicKey, string[] filePaths)
     {
-        if (!usePrivateKey && string.IsNullOrEmpty(publicKey) && (usePassword || !string.IsNullOrEmpty(keyfile)))
+        if (!usePrivateKey && string.IsNullOrEmpty(publicKey) && usePassword)
         {
-            FileEncryptionWithPassword(usePassword, password, keyfile, filePaths);
+            FileEncryptionWithPassword(password, keyfile, filePaths);
+        }
+        else if (!usePrivateKey && string.IsNullOrEmpty(publicKey) && !string.IsNullOrEmpty(keyfile))
+        {
+            FileEncryptionWithKeyfile(keyfile, filePaths);
         }
         else if (!string.IsNullOrEmpty(publicKey) && !string.IsNullOrEmpty(privateKeyPath) && string.IsNullOrEmpty(keyfile))
         {
@@ -49,13 +53,21 @@ public static class CommandLine
         }
     }
 
-    private static void FileEncryptionWithPassword(bool usePassword, char[] password, string keyfilePath, string[] filePaths)
+    private static void FileEncryptionWithPassword(char[] password, string keyfilePath, string[] filePaths)
     {
-        bool validUserInput = FileEncryptionValidation.FileEncryptionWithPassword(usePassword, keyfilePath, filePaths);
+        bool validUserInput = FileEncryptionValidation.FileEncryptionWithPassword(usePassword: true, keyfilePath, filePaths);
         if (!validUserInput) { return; }
-        if (usePassword) { password = Password.GetNewPassword(password); }
+        password = Password.GetNewPassword(password);
         var passwordBytes = Password.Prehash(password, FilePathValidation.KeyfilePath(keyfilePath));
         FileEncryption.EncryptEachFileWithPassword(filePaths, passwordBytes);
+    }
+    
+    private static void FileEncryptionWithKeyfile(string keyfilePath, string[] filePaths)
+    {
+        bool validUserInput = FileEncryptionValidation.FileEncryptionWithPassword(usePassword: false, keyfilePath, filePaths);
+        if (!validUserInput) { return; }
+        var keyfileBytes = Keyfiles.ReadKeyfile(FilePathValidation.KeyfilePath(keyfilePath));
+        FileEncryption.EncryptEachFileWithKeyfile(filePaths, keyfileBytes);
     }
 
     private static void FileEncryptionWithPublicKeyFile(string senderPrivateKeyPath, char[] password, string recipientPublicKeyPath, string[] filePaths)
@@ -86,9 +98,13 @@ public static class CommandLine
 
     public static void Decrypt(bool usePassword, char[] password, string keyfile, bool usePrivateKey, string privateKeyPath, string publicKey, string[] filePaths)
     {
-        if (!usePrivateKey && string.IsNullOrEmpty(publicKey) && (usePassword || !string.IsNullOrEmpty(keyfile)))
+        if (!usePrivateKey && string.IsNullOrEmpty(publicKey) && usePassword)
         {
-            FileDecryptionWithPassword(usePassword, password, keyfile, filePaths);
+            FileDecryptionWithPassword(password, keyfile, filePaths);
+        }
+        else if (!usePrivateKey && string.IsNullOrEmpty(publicKey) && !string.IsNullOrEmpty(keyfile))
+        {
+            FileDecryptionWithKeyfile(keyfile, filePaths);
         }
         else if (!string.IsNullOrEmpty(publicKey) && !string.IsNullOrEmpty(privateKeyPath) && string.IsNullOrEmpty(keyfile))
         {
@@ -109,13 +125,21 @@ public static class CommandLine
         }
     }
 
-    private static void FileDecryptionWithPassword(bool usePassword, char[] password, string keyfilePath, string[] filePaths)
+    private static void FileDecryptionWithPassword(char[] password, string keyfilePath, string[] filePaths)
     {
-        bool validUserInput = FileEncryptionValidation.FileDecryptionWithPassword(usePassword, keyfilePath, filePaths);
+        bool validUserInput = FileEncryptionValidation.FileDecryptionWithPassword(usePassword: true, keyfilePath, filePaths);
         if (!validUserInput) { return; }
-        if (usePassword && password.Length == 0) { password = PasswordPrompt.EnterYourPassword(); }
+        if (password.Length == 0) { password = PasswordPrompt.EnterYourPassword(); }
         var passwordBytes = Password.Prehash(password, keyfilePath);
         FileDecryption.DecryptEachFileWithPassword(filePaths, passwordBytes);
+    }
+    
+    private static void FileDecryptionWithKeyfile(string keyfilePath, string[] filePaths)
+    {
+        bool validUserInput = FileEncryptionValidation.FileDecryptionWithPassword(usePassword: false, keyfilePath, filePaths);
+        if (!validUserInput) { return; }
+        var keyfileBytes = Keyfiles.ReadKeyfile(keyfilePath);
+        FileDecryption.DecryptEachFileWithKeyfile(filePaths, keyfileBytes);
     }
 
     private static void FileDecryptionWithPublicKeyFile(string recipientPrivateKeyPath, char[] password, string senderPublicKeyPath, string[] filePaths)
@@ -272,7 +296,7 @@ public static class CommandLine
                 DisplayMessage.Exception(ex.GetType().Name, ex.Message);
                 return;
             }
-            DisplayMessage.Exception(ex.GetType().Name, "Unable to check for updates or the download failed.");
+            DisplayMessage.Exception(ex.GetType().Name, "Unable to check for updates, or the download failed.");
             Console.WriteLine();
             Console.WriteLine("You can manually download the latest release at <https://www.kryptor.co.uk/#download-kryptor>.");
         }

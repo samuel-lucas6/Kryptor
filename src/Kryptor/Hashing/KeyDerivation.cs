@@ -17,7 +17,6 @@
 */
 
 using System;
-using System.Text;
 using System.Security.Cryptography;
 using Sodium;
 
@@ -25,12 +24,10 @@ namespace Kryptor;
 
 public static class KeyDerivation
 {
-    private static readonly byte[] Personalisation = Encoding.UTF8.GetBytes("Kryptor.Personal");
-    
     public static byte[] Blake2b(byte[] ephemeralSharedSecret, byte[] sharedSecret, byte[] salt)
     {
         byte[] inputKeyingMaterial = Arrays.Concat(ephemeralSharedSecret, sharedSecret);
-        byte[] keyEncryptionKey = GenericHash.HashSaltPersonal(message: Array.Empty<byte>(), inputKeyingMaterial, salt, Personalisation, Constants.EncryptionKeyLength);
+        byte[] keyEncryptionKey = GenericHash.HashSaltPersonal(message: Array.Empty<byte>(), inputKeyingMaterial, salt, Constants.Personalisation, Constants.EncryptionKeyLength);
         CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
         CryptographicOperations.ZeroMemory(inputKeyingMaterial);
         return keyEncryptionKey;
@@ -38,7 +35,7 @@ public static class KeyDerivation
 
     public static byte[] Blake2b(byte[] ephemeralSharedSecret, byte[] salt)
     {
-        byte[] keyEncryptionKey = GenericHash.HashSaltPersonal(message: Array.Empty<byte>(), ephemeralSharedSecret, salt, Personalisation, Constants.EncryptionKeyLength);
+        byte[] keyEncryptionKey = GenericHash.HashSaltPersonal(message: Array.Empty<byte>(), ephemeralSharedSecret, salt, Constants.Personalisation, Constants.EncryptionKeyLength);
         CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
         return keyEncryptionKey;
     }

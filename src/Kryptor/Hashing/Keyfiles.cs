@@ -43,7 +43,7 @@ public static class Keyfiles
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
-            DisplayMessage.Exception(ex.GetType().Name, "Unable to read the keyfile, so it has not been used.");
+            DisplayMessage.FilePathException(keyfilePath, ex.GetType().Name, "Unable to read the keyfile.");
             return null;
         }
     }
