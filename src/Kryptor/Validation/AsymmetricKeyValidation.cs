@@ -55,13 +55,13 @@ public static class AsymmetricKeyValidation
             return null;
         }
     }
-
+    
     private static byte[] GetPublicKeyFromFile(string publicKeyPath)
     {
         try
         {
             string encodedPublicKey = File.ReadAllText(publicKeyPath);
-            if (encodedPublicKey.Length == Constants.PublicKeyLength) { return Convert.FromBase64String(encodedPublicKey); }
+            if (encodedPublicKey.Length == Constants.PublicKeyLength) { return Utilities.Base64ToBinary(encodedPublicKey, ignoredChars: null); }
             DisplayMessage.Error(ErrorMessages.InvalidPublicKey);
             return null;
         }
@@ -72,11 +72,11 @@ public static class AsymmetricKeyValidation
         }
     }
 
-    public static byte[] EncryptionPublicKeyString(char[] encodedPublicKey)
+    public static byte[] EncryptionPublicKeyString(string encodedPublicKey)
     {
         try
         {
-            byte[] publicKey = Convert.FromBase64CharArray(encodedPublicKey, offset: 0, encodedPublicKey.Length);
+            byte[] publicKey = Utilities.Base64ToBinary(encodedPublicKey, ignoredChars: null);
             ValidateEncryptionKeyAlgorithm(publicKey);
             return Arrays.SliceFromEnd(publicKey, Constants.Curve25519KeyHeader.Length);
         }
@@ -87,11 +87,11 @@ public static class AsymmetricKeyValidation
         }
     }
 
-    public static byte[] SigningPublicKeyString(char[] encodedPublicKey)
+    public static byte[] SigningPublicKeyString(string encodedPublicKey)
     {
         try
         {
-            byte[] publicKey = Convert.FromBase64CharArray(encodedPublicKey, offset: 0, encodedPublicKey.Length);
+            byte[] publicKey = Utilities.Base64ToBinary(encodedPublicKey, ignoredChars: null);
             ValidateSigningKeyAlgorithm(publicKey);
             return Arrays.SliceFromEnd(publicKey, Constants.Ed25519KeyHeader.Length);
         }
@@ -158,7 +158,7 @@ public static class AsymmetricKeyValidation
                 DisplayMessage.Error(ErrorMessages.InvalidPrivateKeyFile);
                 return null;
             }
-            byte[] privateKey = Convert.FromBase64String(encodedPrivateKey);
+            byte[] privateKey = Utilities.Base64ToBinary(encodedPrivateKey, ignoredChars: null);
             ValidateKeyVersion(privateKey);
             return privateKey;
         }

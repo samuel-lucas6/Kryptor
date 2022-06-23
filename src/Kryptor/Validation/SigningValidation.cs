@@ -76,13 +76,13 @@ public static class SigningValidation
         }
     }
 
-    public static bool Verify(char[] encodedPublicKey, string[] signatureFilePaths, string[] filePaths)
+    public static bool VerifyWithPublicKeyString(string encodedPublicKey, string[] signatureFilePaths, string[] filePaths)
     {
-        IEnumerable<string> errorMessages = GetVerifyErrors(encodedPublicKey, signatureFilePaths, filePaths);
+        IEnumerable<string> errorMessages = GetVerifyWithPublicKeyStringErrors(encodedPublicKey, signatureFilePaths, filePaths);
         return DisplayMessage.AnyErrors(errorMessages);
     }
 
-    private static IEnumerable<string> GetVerifyErrors(char[] encodedPublicKey, string[] signatureFilePaths, string[] filePaths)
+    private static IEnumerable<string> GetVerifyWithPublicKeyStringErrors(string encodedPublicKey, string[] signatureFilePaths, string[] filePaths)
     {
         if (encodedPublicKey.Length != Constants.PublicKeyLength) { yield return ErrorMessages.InvalidPublicKey; }
         foreach (string errorMessage in GetVerifyFilePathsErrors(filePaths, signatureFilePaths))
@@ -91,13 +91,13 @@ public static class SigningValidation
         }
     }
 
-    public static bool Verify(string publicKeyPath, string[] signatureFilePaths, string[] filePaths)
+    public static bool VerifyWithPublicKeyFile(string publicKeyPath, string[] signatureFilePaths, string[] filePaths)
     {
-        IEnumerable<string> errorMessages = GetVerifyErrors(publicKeyPath, signatureFilePaths, filePaths);
+        IEnumerable<string> errorMessages = GetVerifyWithPublicKeyFileErrors(publicKeyPath, signatureFilePaths, filePaths);
         return DisplayMessage.AnyErrors(errorMessages);
     }
 
-    private static IEnumerable<string> GetVerifyErrors(string publicKeyPath, string[] signatureFilePaths, string[] filePaths)
+    private static IEnumerable<string> GetVerifyWithPublicKeyFileErrors(string publicKeyPath, string[] signatureFilePaths, string[] filePaths)
     {
         if (!string.IsNullOrEmpty(publicKeyPath) && !publicKeyPath.EndsWith(Constants.PublicKeyExtension))
         {

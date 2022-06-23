@@ -62,7 +62,7 @@ public static class FileEncryptionValidation
         }
     }
 
-    public static bool FileEncryptionWithPublicKey(string privateKeyPath, string publicKeyPath, string[] filePaths)
+    public static bool FileEncryptionWithPublicKeyFile(string privateKeyPath, string publicKeyPath, string[] filePaths)
     {
         IEnumerable<string> errorMessages = GetFileEncryptionErrors(privateKeyPath, publicKeyPath).Concat(GetEncryptionFilePathErrors(filePaths));
         return DisplayMessage.AnyErrors(errorMessages);
@@ -84,9 +84,9 @@ public static class FileEncryptionValidation
         }
     }
 
-    public static bool FileEncryptionWithPublicKey(string privateKeyPath, char[] encodedPublicKey, string[] filePaths)
+    public static bool FileEncryptionWithPublicKeyString(string privateKeyPath, string encodedPublicKey, string[] filePaths)
     {
-        IEnumerable<string> errorMessages = GetFileEncryptionErrors(privateKeyPath, encodedPublicKey).Concat(GetEncryptionFilePathErrors(filePaths));
+        IEnumerable<string> errorMessages = GetFileEncryptionErrors(privateKeyPath, encodedPublicKey.ToCharArray()).Concat(GetEncryptionFilePathErrors(filePaths));
         return DisplayMessage.AnyErrors(errorMessages);
     }
 
@@ -149,15 +149,15 @@ public static class FileEncryptionValidation
         }
     }
 
-    public static bool FileDecryptionWithPublicKey(string privateKeyPath, string publicKeyPath, string[] filePaths)
+    public static bool FileDecryptionWithPublicKeyFile(string privateKeyPath, string publicKeyPath, string[] filePaths)
     {
         IEnumerable<string> errorMessages = GetFileEncryptionErrors(privateKeyPath, publicKeyPath).Concat(GetDecryptionFilePathErrors(filePaths));
         return DisplayMessage.AnyErrors(errorMessages);
     }
 
-    public static bool FileDecryptionWithPublicKey(string privateKeyPath, char[] encodedPublicKey, string[] filePaths)
+    public static bool FileDecryptionWithPublicKeyString(string privateKeyPath, string encodedPublicKey, string[] filePaths)
     {
-        IEnumerable<string> errorMessages = GetFileEncryptionErrors(privateKeyPath, encodedPublicKey).Concat(GetDecryptionFilePathErrors(filePaths));
+        IEnumerable<string> errorMessages = GetFileEncryptionErrors(privateKeyPath, encodedPublicKey.ToCharArray()).Concat(GetDecryptionFilePathErrors(filePaths));
         return DisplayMessage.AnyErrors(errorMessages);
     }
 

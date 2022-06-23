@@ -32,7 +32,7 @@ public static class AsymmetricKeys
         using var keyPair = PublicKeyBox.GenerateKeyPair();
         byte[] publicKey = Arrays.Concat(Constants.Curve25519KeyHeader, keyPair.PublicKey);
         byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, Constants.Curve25519KeyHeader, keyPair.PrivateKey);
-        return (Convert.ToBase64String(publicKey), Convert.ToBase64String(encryptedPrivateKey));
+        return (Utilities.BinaryToBase64(publicKey), Utilities.BinaryToBase64(encryptedPrivateKey));
     }
 
     public static (string publicKey, string privateKey) GenerateSigningKeyPair(char[] password)
@@ -42,7 +42,7 @@ public static class AsymmetricKeys
         using var keyPair = PublicKeyAuth.GenerateKeyPair();
         byte[] publicKey = Arrays.Concat(Constants.Ed25519KeyHeader, keyPair.PublicKey);
         byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, Constants.Ed25519KeyHeader, keyPair.PrivateKey);
-        return (Convert.ToBase64String(publicKey), Convert.ToBase64String(encryptedPrivateKey));
+        return (Utilities.BinaryToBase64(publicKey), Utilities.BinaryToBase64(encryptedPrivateKey));
     }
 
     public static (string publicKeyPath, string privateKeyPath) ExportKeyPair(string directoryPath, string fileName, string publicKey, string privateKey)
@@ -57,7 +57,7 @@ public static class AsymmetricKeys
 
     public static string ExportPublicKey(string privateKeyFilePath, string publicKey)
     {
-        string publicKeyFilePath = Path.ChangeExtension(privateKeyFilePath, extension: null) + Constants.PublicKeyExtension;
+        string publicKeyFilePath = Path.ChangeExtension(privateKeyFilePath, Constants.PublicKeyExtension);
         try
         {
             if (File.Exists(publicKeyFilePath)) { return null; }
