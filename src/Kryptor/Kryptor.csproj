@@ -44,6 +44,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\vcruntime140x64.dll" />
+    <None Remove="Resources\vcruntime140x86.dll" />
+    <None Remove="Resources\wordlist.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\vcruntime140x64.dll" />
+    <EmbeddedResource Include="Resources\vcruntime140x86.dll" />
+    <EmbeddedResource Include="Resources\wordlist.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
     <None Include="..\Kryptor Logo.png">
       <Pack>True</Pack>
