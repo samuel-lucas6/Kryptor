@@ -83,8 +83,21 @@ public static class FileHandling
     {
         try
         {
-            var magicBytes = ReadFileHeader(filePath, offset: 0, Constants.KryptorMagicBytes.Length);
-            return Utilities.Compare(magicBytes, Constants.KryptorMagicBytes);
+            var magicBytes = ReadFileHeader(filePath, offset: 0, Constants.EncryptionMagicBytes.Length);
+            return Utilities.Compare(magicBytes, Constants.EncryptionMagicBytes);
+        }
+        catch (Exception ex) when (ExceptionFilters.FileAccess(ex)) 
+        { 
+            return null;
+        }
+    }
+    
+    public static bool? IsValidEncryptedFileVersion(string filePath)
+    {
+        try
+        {
+            var formatVersion = ReadFileHeader(filePath, Constants.EncryptionMagicBytes.Length, Constants.EncryptionVersion.Length);
+            return Utilities.Compare(formatVersion, Constants.EncryptionVersion);
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex)) 
         { 
@@ -101,6 +114,19 @@ public static class FileHandling
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
+            return null;
+        }
+    }
+    
+    public static bool? IsValidSignatureFileVersion(string filePath)
+    {
+        try
+        {
+            var formatVersion = ReadFileHeader(filePath, Constants.SignatureMagicBytes.Length, Constants.SignatureVersion.Length);
+            return Utilities.Compare(formatVersion, Constants.SignatureVersion);
+        }
+        catch (Exception ex) when (ExceptionFilters.FileAccess(ex)) 
+        { 
             return null;
         }
     }

@@ -34,8 +34,9 @@ public static class FilePathValidation
     private const string FileOrFolderDoesNotExist = "This file/folder doesn't exist.";
     private const string FileInaccessible = "Unable to access the file.";
     private const string DirectoryEmpty = "This directory is empty.";
-    private const string InvalidSignatureFile = "Please specify a valid signature file.";
+    private const string InvalidSignatureFile = "Please specify a signature file with a valid format.";
     private const string SignatureFileInaccessible = "Unable to access the signature file.";
+    private const string InvalidFormatVersion = "This file format version is not supported.";
 
     public static string GetFileEncryptionError(string inputFilePath)
     {
@@ -77,7 +78,9 @@ public static class FilePathValidation
         bool? validMagicBytes = FileHandling.IsKryptorFile(inputFilePath);
         if (validMagicBytes == null) { return FileInaccessible; }
         if (!FileHandling.HasKryptorExtension(inputFilePath) || validMagicBytes == false) { return "This file hasn't been encrypted."; }
-        return null;
+        bool? validFormatVersion = FileHandling.IsValidEncryptedFileVersion(inputFilePath);
+        if (validFormatVersion == false) { return "This file format is not supported in this version of Kryptor."; }
+        return validFormatVersion == null ? FileInaccessible : null;
     }
 
     public static bool GenerateKeyPair(string directoryPath, int keyPairType)
@@ -169,7 +172,10 @@ public static class FilePathValidation
         if (!File.Exists(signatureFilePath)) { return "Unable to find the signature file. Please specify it manually using -t|--signature."; }
         bool? validMagicBytes = FileHandling.IsSignatureFile(signatureFilePath);
         if (validMagicBytes == null) { return SignatureFileInaccessible; }
-        return validMagicBytes == false ? "The signature file that was found is not valid." : null;
+        if (validMagicBytes == false) { return "The signature file that was found does not have a valid format."; }
+        bool? validFormatVersion = FileHandling.IsValidSignatureFileVersion(signatureFilePath);
+        if (validFormatVersion == false) { return InvalidFormatVersion; }
+        return validFormatVersion == null ? SignatureFileInaccessible : null;
     }
 
     public static string GetSignatureFileError(string signatureFilePath)
@@ -178,6 +184,9 @@ public static class FilePathValidation
         if (!File.Exists(signatureFilePath)) { return "Please specify a signature file that exists."; }
         bool? validMagicBytes = FileHandling.IsSignatureFile(signatureFilePath);
         if (validMagicBytes == null) { return SignatureFileInaccessible; }
-        return validMagicBytes == false ? InvalidSignatureFile : null;
+        if (validMagicBytes == false) { return InvalidSignatureFile; }
+        bool? validFormatVersion = FileHandling.IsValidSignatureFileVersion(signatureFilePath);
+        if (validFormatVersion == false) { return InvalidFormatVersion; }
+        return validFormatVersion == null ? SignatureFileInaccessible : null;
     }
 }

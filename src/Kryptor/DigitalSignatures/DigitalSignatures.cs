@@ -61,7 +61,6 @@ public static class DigitalSignatures
         using var signatureFile = new FileStream(signatureFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
         byte[] magicBytes = FileHandling.ReadFileHeader(signatureFile, Constants.SignatureMagicBytes.Length);
         byte[] formatVersion = FileHandling.ReadFileHeader(signatureFile, Constants.SignatureVersion.Length);
-        FileHeaders.ValidateFormatVersion(formatVersion, Constants.SignatureVersion);
         byte[] prehashed = FileHandling.ReadFileHeader(signatureFile, Constants.BoolBitConverterLength);
         byte[] fileSignature = FileHandling.ReadFileHeader(signatureFile, Constants.SignatureLength);
         byte[] commentBytes = GetCommentBytes(signatureFile);

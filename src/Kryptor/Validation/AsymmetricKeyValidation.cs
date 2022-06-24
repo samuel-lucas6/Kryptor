@@ -33,7 +33,7 @@ public static class AsymmetricKeyValidation
             ValidateEncryptionKeyAlgorithm(publicKey);
             return Arrays.SliceFromEnd(publicKey, Constants.Curve25519KeyHeader.Length);
         }
-        catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
+        catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
         {
             DisplayMessage.Exception(ex.GetType().Name, "Please specify a valid encryption public key.");
             return null;
@@ -49,7 +49,7 @@ public static class AsymmetricKeyValidation
             ValidateSigningKeyAlgorithm(publicKey);
             return Arrays.SliceFromEnd(publicKey, Constants.Ed25519KeyHeader.Length);
         }
-        catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
+        catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
         {
             DisplayMessage.Exception(ex.GetType().Name, "Please specify a valid signing public key.");
             return null;
@@ -65,9 +65,9 @@ public static class AsymmetricKeyValidation
             DisplayMessage.Error(ErrorMessages.InvalidPublicKey);
             return null;
         }
-        catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
+        catch (Exception ex)
         {
-            DisplayMessage.Exception(ex.GetType().Name, "Unable to retrieve the public key.");
+            DisplayMessage.Exception(ex.GetType().Name, "Unable to retrieve the public key, or the public key is invalid.");
             return null;
         }
     }
@@ -80,7 +80,7 @@ public static class AsymmetricKeyValidation
             ValidateEncryptionKeyAlgorithm(publicKey);
             return Arrays.SliceFromEnd(publicKey, Constants.Curve25519KeyHeader.Length);
         }
-        catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
+        catch (Exception ex)
         {
             DisplayMessage.Exception(ex.GetType().Name, "Please enter a valid encryption public key.");
             return null;
@@ -95,7 +95,7 @@ public static class AsymmetricKeyValidation
             ValidateSigningKeyAlgorithm(publicKey);
             return Arrays.SliceFromEnd(publicKey, Constants.Ed25519KeyHeader.Length);
         }
-        catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
+        catch (Exception ex)
         {
             DisplayMessage.Exception(ex.GetType().Name, "Please enter a valid signing public key.");
             return null;
@@ -106,14 +106,14 @@ public static class AsymmetricKeyValidation
     {
         byte[] keyAlgorithm = Arrays.Slice(asymmetricKey, sourceIndex: 0, Constants.Curve25519KeyHeader.Length);
         bool validKey = Utilities.Compare(keyAlgorithm, Constants.Curve25519KeyHeader);
-        if (!validKey) { throw new ArgumentException("Please specify an asymmetric encryption key."); }
+        if (!validKey) { throw new NotSupportedException("This key algorithm is not supported for encryption."); }
     }
 
     private static void ValidateSigningKeyAlgorithm(byte[] asymmetricKey)
     {
         byte[] keyAlgorithm = Arrays.Slice(asymmetricKey, sourceIndex: 0, Constants.Ed25519KeyHeader.Length);
         bool validKey = Utilities.Compare(keyAlgorithm, Constants.Ed25519KeyHeader);
-        if (!validKey) { throw new ArgumentException("Please specify an asymmetric signing key."); }
+        if (!validKey) { throw new NotSupportedException("This key algorithm is not supported for signing."); }
     }
 
     public static byte[] EncryptionPrivateKeyFile(string privateKeyPath)
@@ -125,7 +125,7 @@ public static class AsymmetricKeyValidation
             ValidateEncryptionKeyAlgorithm(privateKey);
             return privateKey;
         }
-        catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
+        catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
         {
             DisplayMessage.Exception(ex.GetType().Name, "Please specify a valid encryption private key.");
             return null;
@@ -141,7 +141,7 @@ public static class AsymmetricKeyValidation
             ValidateSigningKeyAlgorithm(privateKey);
             return privateKey;
         }
-        catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
+        catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
         {
             DisplayMessage.Exception(ex.GetType().Name, "Please specify a valid signing private key.");
             return null;
@@ -162,14 +162,14 @@ public static class AsymmetricKeyValidation
             ValidateKeyVersion(privateKey);
             return privateKey;
         }
-        catch (Exception ex) when (ExceptionFilters.AsymmetricKeyHandling(ex))
+        catch (Exception ex)
         {
-            if (ex is ArgumentException)
+            if (ex is NotSupportedException)
             {
                 DisplayMessage.Exception(ex.GetType().Name, ex.Message);
                 return null;
             }
-            DisplayMessage.Exception(ex.GetType().Name, "Unable to retrieve the private key.");
+            DisplayMessage.Exception(ex.GetType().Name, "Unable to retrieve the private key, or the private key is invalid.");
             return null;
         }
     }
@@ -178,6 +178,6 @@ public static class AsymmetricKeyValidation
     {
         byte[] keyVersion = Arrays.Slice(privateKey, Constants.Curve25519KeyHeader.Length, Constants.PrivateKeyVersion.Length);
         bool validKeyVersion = Utilities.Compare(keyVersion, Constants.PrivateKeyVersion);
-        if (!validKeyVersion) { throw new ArgumentException("This private key version is not supported in this version of Kryptor."); }
+        if (!validKeyVersion) { throw new NotSupportedException("This private key version is not supported."); }
     }
 }

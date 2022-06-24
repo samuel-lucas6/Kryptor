@@ -27,7 +27,7 @@ public static class FileHeaders
     public static void WriteHeaders(FileStream outputFile, byte[] ephemeralPublicKey, byte[] salt, byte[] nonce, byte[] encryptedHeader)
     {
         const int offset = 0;
-        outputFile.Write(Constants.KryptorMagicBytes, offset, Constants.KryptorMagicBytes.Length);
+        outputFile.Write(Constants.EncryptionMagicBytes, offset, Constants.EncryptionMagicBytes.Length);
         outputFile.Write(Constants.EncryptionVersion, offset, Constants.EncryptionVersion.Length);
         outputFile.Write(ephemeralPublicKey, offset, ephemeralPublicKey.Length);
         outputFile.Write(salt, offset, salt.Length);
@@ -35,33 +35,27 @@ public static class FileHeaders
         outputFile.Write(encryptedHeader, offset, encryptedHeader.Length);
     }
 
-    public static void ValidateFormatVersion(byte[] formatVersion, byte[] currentFormatVersion)
-    {
-        bool validFormatVersion = Utilities.Compare(formatVersion, currentFormatVersion);
-        if (!validFormatVersion) { throw new ArgumentException("This file format is not supported in this version of Kryptor."); }
-    }
-
     public static byte[] ReadEphemeralPublicKey(FileStream inputFile)
     {
-        int offset = Constants.KryptorMagicBytes.Length + Constants.EncryptionVersion.Length;
+        int offset = Constants.EncryptionMagicBytes.Length + Constants.EncryptionVersion.Length;
         return FileHandling.ReadFileHeader(inputFile, offset, Constants.EphemeralPublicKeyLength);
     }
 
     public static byte[] ReadSalt(FileStream inputFile)
     {
-        int offset = Constants.KryptorMagicBytes.Length + Constants.EncryptionVersion.Length + Constants.EphemeralPublicKeyLength;
+        int offset = Constants.EncryptionMagicBytes.Length + Constants.EncryptionVersion.Length + Constants.EphemeralPublicKeyLength;
         return FileHandling.ReadFileHeader(inputFile, offset, Constants.SaltLength);
     }
 
     public static byte[] ReadNonce(FileStream inputFile)
     {
-        int offset = Constants.KryptorMagicBytes.Length + Constants.EncryptionVersion.Length + Constants.EphemeralPublicKeyLength + Constants.SaltLength;
+        int offset = Constants.EncryptionMagicBytes.Length + Constants.EncryptionVersion.Length + Constants.EphemeralPublicKeyLength + Constants.SaltLength;
         return FileHandling.ReadFileHeader(inputFile, offset, Constants.XChaChaNonceLength);
     }
 
     public static byte[] ReadEncryptedHeader(FileStream inputFile)
     {
-        int offset = Constants.KryptorMagicBytes.Length + Constants.EncryptionVersion.Length + Constants.EphemeralPublicKeyLength + Constants.SaltLength + Constants.XChaChaNonceLength;
+        int offset = Constants.EncryptionMagicBytes.Length + Constants.EncryptionVersion.Length + Constants.EphemeralPublicKeyLength + Constants.SaltLength + Constants.XChaChaNonceLength;
         return FileHandling.ReadFileHeader(inputFile, offset, Constants.EncryptedHeaderLength);
     }
 }

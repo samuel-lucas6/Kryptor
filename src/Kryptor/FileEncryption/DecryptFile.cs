@@ -68,9 +68,8 @@ public static class DecryptFile
         try
         {
             byte[] ciphertextLength = BitConversion.GetBytes(inputFile.Length - Constants.FileHeadersLength);
-            byte[] magicBytes = FileHandling.ReadFileHeader(inputFile, offset: 0, Constants.KryptorMagicBytes.Length);
-            byte[] formatVersion = FileHandling.ReadFileHeader(inputFile, Constants.KryptorMagicBytes.Length, Constants.EncryptionVersion.Length);
-            FileHeaders.ValidateFormatVersion(formatVersion, Constants.EncryptionVersion);
+            byte[] magicBytes = FileHandling.ReadFileHeader(inputFile, offset: 0, Constants.EncryptionMagicBytes.Length);
+            byte[] formatVersion = FileHandling.ReadFileHeader(inputFile, Constants.EncryptionMagicBytes.Length, Constants.EncryptionVersion.Length);
             byte[] additionalData = Arrays.Concat(ciphertextLength, magicBytes, formatVersion, ephemeralPublicKey);
             return XChaCha20BLAKE2b.Decrypt(encryptedFileHeader, nonce, keyEncryptionKey, additionalData);
         }

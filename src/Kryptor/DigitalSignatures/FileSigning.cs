@@ -87,11 +87,6 @@ public static class FileSigning
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
-                if (ex is ArgumentException)
-                {
-                    DisplayMessage.FilePathMessage(signatureFilePaths[i], ex.Message);
-                    return;
-                }
                 DisplayMessage.FilePathException(signatureFilePaths[i], ex.GetType().Name, "Unable to verify the signature.");
             }
         }
