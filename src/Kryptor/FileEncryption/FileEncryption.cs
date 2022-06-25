@@ -17,6 +17,7 @@
 */
 
 using System;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using Sodium;
 
@@ -73,30 +74,38 @@ public static class FileEncryption
         DisplayMessage.SuccessfullyEncrypted(space: false);
     }
     
-    public static unsafe void EncryptEachFileWithPublicKey(byte[] senderPrivateKey, char[] password, byte[] recipientPublicKey, string[] filePaths)
+    public static unsafe void EncryptEachFileWithPublicKey(byte[] senderPrivateKey, char[] password, List<byte[]> recipientPublicKeys, string[] filePaths)
     {
-        if (filePaths == null || senderPrivateKey == null || recipientPublicKey == null) { return; }
+        if (filePaths == null || senderPrivateKey == null || recipientPublicKeys == null) { return; }
         senderPrivateKey = PrivateKey.Decrypt(senderPrivateKey, password);
         if (senderPrivateKey == null) { return; }
-        byte[] sharedSecret = KeyExchange.GetSharedSecret(senderPrivateKey, recipientPublicKey);
-        CryptographicOperations.ZeroMemory(senderPrivateKey);
-        foreach (string inputFilePath in filePaths)
+        Globals.TotalCount *= recipientPublicKeys.Count;
+        bool overwrite = Globals.Overwrite;
+        Globals.Overwrite = false;
+        int i = 0;
+        foreach (byte[] recipientPublicKey in recipientPublicKeys)
         {
-            Console.WriteLine();
-            try
+            if (i++ == recipientPublicKeys.Count - 1) { Globals.Overwrite = overwrite; }
+            byte[] sharedSecret = KeyExchange.GetSharedSecretEncryption(senderPrivateKey, recipientPublicKey);
+            foreach (string inputFilePath in filePaths)
             {
-                bool directory = IsDirectory(inputFilePath, out string zipFilePath);
-                byte[] ephemeralSharedSecret = KeyExchange.GetPublicKeySharedSecret(recipientPublicKey, out byte[] ephemeralPublicKey);
-                byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
-                byte[] keyEncryptionKey = KeyDerivation.Blake2b(ephemeralSharedSecret, sharedSecret, salt);
-                fixed (byte* ignored = keyEncryptionKey) { EncryptInputFile(directory ? zipFilePath : inputFilePath, directory, ephemeralPublicKey, salt, keyEncryptionKey); }
+                Console.WriteLine();
+                try
+                {
+                    bool directory = IsDirectory(inputFilePath, out string zipFilePath);
+                    byte[] ephemeralSharedSecret = KeyExchange.GetPublicKeySharedSecret(recipientPublicKey, out byte[] ephemeralPublicKey);
+                    byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
+                    byte[] keyEncryptionKey = KeyDerivation.Blake2b(ephemeralSharedSecret, sharedSecret, salt);
+                    fixed (byte* ignored = keyEncryptionKey) { EncryptInputFile(directory ? zipFilePath : inputFilePath, directory, ephemeralPublicKey, salt, keyEncryptionKey); }
+                }
+                catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
+                {
+                    DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToEncryptFile);
+                }
             }
-            catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
-            {
-                DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToEncryptFile);
-            }
+            CryptographicOperations.ZeroMemory(sharedSecret);
         }
-        CryptographicOperations.ZeroMemory(sharedSecret);
+        CryptographicOperations.ZeroMemory(senderPrivateKey);
         DisplayMessage.SuccessfullyEncrypted();
     }
 

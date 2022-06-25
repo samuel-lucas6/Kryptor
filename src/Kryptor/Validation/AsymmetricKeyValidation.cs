@@ -17,6 +17,7 @@
 */
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Sodium;
 
@@ -24,18 +25,23 @@ namespace Kryptor;
 
 public static class AsymmetricKeyValidation
 {
-    public static byte[] EncryptionPublicKeyFile(string publicKeyPath)
+    public static List<byte[]> EncryptionPublicKeyFile(string[] publicKeyPaths)
     {
         try
         {
-            byte[] publicKey = GetPublicKeyFromFile(publicKeyPath);
-            if (publicKey == null) { return null; }
-            ValidateEncryptionKeyAlgorithm(publicKey);
-            return Arrays.SliceFromEnd(publicKey, Constants.Curve25519KeyHeader.Length);
+            var publicKeys = new List<byte[]>();
+            foreach (string publicKeyPath in publicKeyPaths)
+            {
+                byte[] publicKey = GetPublicKeyFromFile(publicKeyPath);
+                if (publicKey == null) { return null; }
+                ValidateEncryptionKeyAlgorithm(publicKey);
+                publicKeys.Add(Arrays.SliceFromEnd(publicKey, Constants.Curve25519KeyHeader.Length));
+            }
+            return publicKeys;
         }
         catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
         {
-            DisplayMessage.Exception(ex.GetType().Name, "Please specify a valid encryption public key.");
+            DisplayMessage.Exception(ex.GetType().Name, publicKeyPaths == null || publicKeyPaths.Length == 1 ? "Please specify a valid encryption public key." : "Please specify valid encryption public keys.");
             return null;
         }
     }
@@ -67,22 +73,27 @@ public static class AsymmetricKeyValidation
         }
         catch (Exception ex)
         {
-            DisplayMessage.Exception(ex.GetType().Name, "Unable to retrieve the public key, or the public key is invalid.");
+            DisplayMessage.FilePathException(publicKeyPath, ex.GetType().Name, "Unable to retrieve the public key, or the public key is invalid.");
             return null;
         }
     }
 
-    public static byte[] EncryptionPublicKeyString(string encodedPublicKey)
+    public static List<byte[]> EncryptionPublicKeyString(string[] encodedPublicKeys)
     {
         try
         {
-            byte[] publicKey = Utilities.Base64ToBinary(encodedPublicKey, ignoredChars: null);
-            ValidateEncryptionKeyAlgorithm(publicKey);
-            return Arrays.SliceFromEnd(publicKey, Constants.Curve25519KeyHeader.Length);
+            var publicKeys = new List<byte[]>();
+            foreach (string encodedPublicKey in encodedPublicKeys)
+            {
+                byte[] publicKey = Utilities.Base64ToBinary(encodedPublicKey, ignoredChars: null);
+                ValidateEncryptionKeyAlgorithm(publicKey);
+                publicKeys.Add(Arrays.SliceFromEnd(publicKey, Constants.Curve25519KeyHeader.Length));
+            }
+            return publicKeys;
         }
         catch (Exception ex)
         {
-            DisplayMessage.Exception(ex.GetType().Name, "Please enter a valid encryption public key.");
+            DisplayMessage.Exception(ex.GetType().Name, encodedPublicKeys == null || encodedPublicKeys.Length == 1 ? "Please enter a valid encryption public key." : "Please enter valid encryption public keys.");
             return null;
         }
     }

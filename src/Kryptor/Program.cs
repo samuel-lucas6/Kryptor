@@ -56,8 +56,8 @@ public class Program
     [Option("-x|--private", "specify your private key (unused or empty for default key)", CommandOptionType.SingleOrNoValue)]
     private (bool optionSpecified, string value) PrivateKey { get; }
 
-    [Option("-y|--public", "specify a public key", CommandOptionType.SingleValue)]
-    private string PublicKey { get; }
+    [Option("-y|--public", "specify a public key", CommandOptionType.MultipleValue)]
+    private string[] PublicKeys { get; }
 
     [Option("-n|--names", "encrypt file/folder names", CommandOptionType.NoValue)]
     private bool EncryptFileNames { get; }
@@ -108,11 +108,11 @@ public class Program
         {
             if (Encrypt)
             {
-                CommandLine.Encrypt(Password.optionSpecified, GetPassword(Password.value), Keyfile, PrivateKey.optionSpecified, GetEncryptionPrivateKey(PrivateKey.value), PublicKey, FilePaths);
+                CommandLine.Encrypt(Password.optionSpecified, GetPassword(Password.value), Keyfile, PrivateKey.optionSpecified, GetEncryptionPrivateKey(PrivateKey.value), PublicKeys, FilePaths);
             }
             else if (Decrypt)
             {
-                CommandLine.Decrypt(Password.optionSpecified, GetPassword(Password.value), Keyfile, PrivateKey.optionSpecified, GetEncryptionPrivateKey(PrivateKey.value), PublicKey, FilePaths);
+                CommandLine.Decrypt(Password.optionSpecified, GetPassword(Password.value), Keyfile, PrivateKey.optionSpecified, GetEncryptionPrivateKey(PrivateKey.value), PublicKeys, FilePaths);
             }
             else if (GenerateKeys)
             {
@@ -128,7 +128,7 @@ public class Program
             }
             else if (Verify)
             {
-                CommandLine.Verify(PublicKey, Signatures, FilePaths);
+                CommandLine.Verify(PublicKeys, Signatures, FilePaths);
             }
             else if (CheckForUpdates)
             {

@@ -25,12 +25,14 @@ public static class ErrorMessages
     public const string InvalidPrivateKeyFile = "Please specify a valid private key file.";
     public const string NonExistentDefaultPrivateKeyFile = "You don't have a default key pair. You can generate one using -g|--generate.";
     public const string NonExistentPrivateKeyFile = "Please specify a private key file that exists.";
+    public const string PublicKey = "Please specify a public key.";
+    public const string SinglePublicKey = "Please specify a single public key.";
     public const string InvalidPublicKey = "Please specify a valid public key.";
     public const string InvalidPublicKeyFile = "Please specify a valid public key file.";
     public const string NonExistentPublicKeyFile = "Please specify a public key file that exists.";
     public const string PasswordBasedEncryption = "Please specify a password and/or keyfile, private key, or private key and public key.";
     public const string UnableToEncryptFile = "Unable to encrypt the file/directory.";
     public const string UnableToDecryptFile = "Unable to decrypt the file/directory.";
-    
+
     public static string GetFilePathError(string filePath, string errorMessage) => $"\"{Path.GetFileName(filePath)}\" - {errorMessage}";
 }

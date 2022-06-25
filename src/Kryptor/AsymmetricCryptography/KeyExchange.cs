@@ -22,10 +22,16 @@ namespace Kryptor;
 
 public static class KeyExchange
 {
-    public static byte[] GetSharedSecret(byte[] privateKey, byte[] publicKey)
+    public static byte[] GetSharedSecretEncryption(byte[] privateKey, byte[] publicKey)
     {
         byte[] sharedSecret = ScalarMult.Mult(privateKey, publicKey);
         return GenericHash.Hash(Arrays.Concat(sharedSecret, ScalarMult.Base(privateKey), publicKey), key: null, Constants.EncryptionKeyLength);
+    }
+    
+    public static byte[] GetSharedSecretDecryption(byte[] privateKey, byte[] publicKey)
+    {
+        byte[] sharedSecret = ScalarMult.Mult(privateKey, publicKey);
+        return GenericHash.Hash(Arrays.Concat(sharedSecret, publicKey, ScalarMult.Base(privateKey)), key: null, Constants.EncryptionKeyLength);
     }
 
     public static byte[] GetPublicKeySharedSecret(byte[] publicKey, out byte[] ephemeralPublicKey)

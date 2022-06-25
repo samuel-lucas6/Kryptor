@@ -76,34 +76,53 @@ public static class SigningValidation
         }
     }
 
-    public static bool VerifyWithPublicKeyString(string encodedPublicKey, string[] signatureFilePaths, string[] filePaths)
+    public static bool VerifyWithPublicKeyString(string[] encodedPublicKeys, string[] signatureFilePaths, string[] filePaths)
     {
-        IEnumerable<string> errorMessages = GetVerifyWithPublicKeyStringErrors(encodedPublicKey, signatureFilePaths, filePaths);
+        IEnumerable<string> errorMessages = GetVerifyWithPublicKeyStringErrors(encodedPublicKeys, signatureFilePaths, filePaths);
         return DisplayMessage.AnyErrors(errorMessages);
     }
 
-    private static IEnumerable<string> GetVerifyWithPublicKeyStringErrors(string encodedPublicKey, string[] signatureFilePaths, string[] filePaths)
+    private static IEnumerable<string> GetVerifyWithPublicKeyStringErrors(string[] encodedPublicKeys, string[] signatureFilePaths, string[] filePaths)
     {
-        if (encodedPublicKey.Length != Constants.PublicKeyLength) { yield return ErrorMessages.InvalidPublicKey; }
+        if (encodedPublicKeys == null)
+        {
+            yield return ErrorMessages.PublicKey;
+        }
+        else if (encodedPublicKeys.Length > 1)
+        {
+            yield return ErrorMessages.SinglePublicKey;
+        }
+        else if (encodedPublicKeys[0].Length != Constants.PublicKeyLength)
+        {
+            yield return ErrorMessages.InvalidPublicKey;
+        }
         foreach (string errorMessage in GetVerifyFilePathsErrors(filePaths, signatureFilePaths))
         {
             yield return errorMessage;
         }
     }
 
-    public static bool VerifyWithPublicKeyFile(string publicKeyPath, string[] signatureFilePaths, string[] filePaths)
+    public static bool VerifyWithPublicKeyFile(string[] publicKeyPaths, string[] signatureFilePaths, string[] filePaths)
     {
-        IEnumerable<string> errorMessages = GetVerifyWithPublicKeyFileErrors(publicKeyPath, signatureFilePaths, filePaths);
+        IEnumerable<string> errorMessages = GetVerifyWithPublicKeyFileErrors(publicKeyPaths, signatureFilePaths, filePaths);
         return DisplayMessage.AnyErrors(errorMessages);
     }
 
-    private static IEnumerable<string> GetVerifyWithPublicKeyFileErrors(string publicKeyPath, string[] signatureFilePaths, string[] filePaths)
+    private static IEnumerable<string> GetVerifyWithPublicKeyFileErrors(string[] publicKeyPaths, string[] signatureFilePaths, string[] filePaths)
     {
-        if (!string.IsNullOrEmpty(publicKeyPath) && !publicKeyPath.EndsWith(Constants.PublicKeyExtension))
+        if (publicKeyPaths == null)
+        {
+            yield return ErrorMessages.PublicKey;
+        }
+        else if (publicKeyPaths.Length > 1)
+        {
+            yield return ErrorMessages.SinglePublicKey;
+        }
+        else if (!publicKeyPaths[0].EndsWith(Constants.PublicKeyExtension))
         {
             yield return ErrorMessages.InvalidPublicKeyFile;
         }
-        else if (!File.Exists(publicKeyPath))
+        else if (!File.Exists(publicKeyPaths[0]))
         {
             yield return ErrorMessages.NonExistentPublicKeyFile;
         }

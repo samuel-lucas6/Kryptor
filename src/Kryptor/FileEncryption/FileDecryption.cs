@@ -87,7 +87,7 @@ public static class FileDecryption
         if (filePaths == null || recipientPrivateKey == null || senderPublicKey == null) { return; }
         recipientPrivateKey = PrivateKey.Decrypt(recipientPrivateKey, password);
         if (recipientPrivateKey == null) { return; }
-        byte[] sharedSecret = KeyExchange.GetSharedSecret(recipientPrivateKey, senderPublicKey);
+        byte[] sharedSecret = KeyExchange.GetSharedSecretDecryption(recipientPrivateKey, senderPublicKey);
         foreach (string inputFilePath in filePaths)
         {
             Console.WriteLine();
@@ -95,7 +95,7 @@ public static class FileDecryption
             {
                 using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
                 byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
-                byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecret(recipientPrivateKey, ephemeralPublicKey);
+                byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecretDecryption(recipientPrivateKey, ephemeralPublicKey);
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
                 byte[] keyEncryptionKey = KeyDerivation.Blake2b(ephemeralSharedSecret, sharedSecret, salt);
                 fixed (byte* ignored = keyEncryptionKey) { DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey); }
@@ -127,7 +127,7 @@ public static class FileDecryption
             {
                 using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
                 byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
-                byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecret(privateKey, ephemeralPublicKey);
+                byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecretEncryption(privateKey, ephemeralPublicKey);
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
                 byte[] keyEncryptionKey = KeyDerivation.Blake2b(ephemeralSharedSecret, salt);
                 fixed (byte* ignored = keyEncryptionKey) { DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey); }
