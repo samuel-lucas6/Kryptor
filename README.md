@@ -1,5 +1,6 @@
 [![License: GPLv3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
 [![CodeQL](https://github.com/samuel-lucas6/Kryptor/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/samuel-lucas6/Kryptor/actions)
+[![Specification](https://img.shields.io/badge/%23-specification-blueviolet)](https://www.kryptor.co.uk/technical-details)
 
 # Kryptor
 Kryptor is free and open source file encryption and signing software for Windows, Linux, and macOS.
