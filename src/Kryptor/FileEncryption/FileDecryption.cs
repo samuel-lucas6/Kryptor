@@ -41,12 +41,8 @@ public static class FileDecryption
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
-                if (ex is ArgumentException)
-                {
-                    DisplayMessage.FilePathMessage(inputFilePath, ex.Message);
-                    return;
-                }
-                DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToDecryptFile);
+                if (ex is ArgumentException) { DisplayMessage.FilePathMessage(inputFilePath, ex.Message); }
+                else { DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToDecryptFile); }
             }
             Console.WriteLine();
         }
@@ -69,12 +65,8 @@ public static class FileDecryption
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
-                if (ex is ArgumentException)
-                {
-                    DisplayMessage.FilePathMessage(inputFilePath, ex.Message);
-                    return;
-                }
-                DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToDecryptFile);
+                if (ex is ArgumentException) { DisplayMessage.FilePathMessage(inputFilePath, ex.Message); }
+                else { DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToDecryptFile); }
             }
             Console.WriteLine();
         }
@@ -82,12 +74,12 @@ public static class FileDecryption
         DisplayMessage.SuccessfullyDecrypted(space: false);
     }
 
-    public static unsafe void DecryptEachFileWithPublicKey(byte[] recipientPrivateKey, char[] password, byte[] senderPublicKey, string[] filePaths)
+    public static unsafe void DecryptEachFileWithPublicKey(byte[] recipientPrivateKey, char[] password, byte[] senderPublicKey, byte[] presharedKey, string[] filePaths)
     {
         if (filePaths == null || recipientPrivateKey == null || senderPublicKey == null) { return; }
         recipientPrivateKey = PrivateKey.Decrypt(recipientPrivateKey, password);
         if (recipientPrivateKey == null) { return; }
-        byte[] sharedSecret = KeyExchange.GetSharedSecretDecryption(recipientPrivateKey, senderPublicKey);
+        byte[] sharedSecret = KeyExchange.GetSharedSecretDecryption(recipientPrivateKey, senderPublicKey, presharedKey);
         foreach (string inputFilePath in filePaths)
         {
             Console.WriteLine();
@@ -95,27 +87,24 @@ public static class FileDecryption
             {
                 using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
                 byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
-                byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecretDecryption(recipientPrivateKey, ephemeralPublicKey);
+                byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecretDecryption(recipientPrivateKey, ephemeralPublicKey, presharedKey);
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
                 byte[] keyEncryptionKey = KeyDerivation.Blake2b(ephemeralSharedSecret, sharedSecret, salt);
                 fixed (byte* ignored = keyEncryptionKey) { DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey); }
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
-                if (ex is ArgumentException)
-                {
-                    DisplayMessage.FilePathMessage(inputFilePath, ex.Message);
-                    return;
-                }
-                DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToDecryptFile);
+                if (ex is ArgumentException) { DisplayMessage.FilePathMessage(inputFilePath, ex.Message); }
+                else { DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToDecryptFile); }
             }
         }
         CryptographicOperations.ZeroMemory(recipientPrivateKey);
         CryptographicOperations.ZeroMemory(sharedSecret);
+        CryptographicOperations.ZeroMemory(presharedKey);
         DisplayMessage.SuccessfullyDecrypted();
     }
     
-    public static unsafe void DecryptEachFileWithPrivateKey(byte[] privateKey, char[] password, string[] filePaths)
+    public static unsafe void DecryptEachFileWithPrivateKey(byte[] privateKey, char[] password, byte[] presharedKey, string[] filePaths)
     {
         if (filePaths == null || privateKey == null) { return; }
         privateKey = PrivateKey.Decrypt(privateKey, password);
@@ -127,22 +116,19 @@ public static class FileDecryption
             {
                 using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
                 byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
-                byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecretEncryption(privateKey, ephemeralPublicKey);
+                byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecretEncryption(privateKey, ephemeralPublicKey, presharedKey);
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
                 byte[] keyEncryptionKey = KeyDerivation.Blake2b(ephemeralSharedSecret, salt);
                 fixed (byte* ignored = keyEncryptionKey) { DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey); }
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
-                if (ex is ArgumentException)
-                {
-                    DisplayMessage.FilePathMessage(inputFilePath, ex.Message);
-                    return;
-                }
-                DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToDecryptFile);
+                if (ex is ArgumentException) { DisplayMessage.FilePathMessage(inputFilePath, ex.Message); }
+                else { DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToDecryptFile); }
             }
         }
         CryptographicOperations.ZeroMemory(privateKey);
+        CryptographicOperations.ZeroMemory(presharedKey);
         DisplayMessage.SuccessfullyDecrypted();
     }
     

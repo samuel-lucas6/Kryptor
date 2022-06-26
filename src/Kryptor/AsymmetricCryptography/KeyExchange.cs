@@ -22,31 +22,31 @@ namespace Kryptor;
 
 public static class KeyExchange
 {
-    public static byte[] GetSharedSecretEncryption(byte[] privateKey, byte[] publicKey)
+    public static byte[] GetSharedSecretEncryption(byte[] privateKey, byte[] publicKey, byte[] presharedKey)
     {
         byte[] sharedSecret = ScalarMult.Mult(privateKey, publicKey);
-        return GenericHash.Hash(Arrays.Concat(sharedSecret, ScalarMult.Base(privateKey), publicKey), key: null, Constants.EncryptionKeyLength);
+        return GenericHash.Hash(Arrays.Concat(sharedSecret, ScalarMult.Base(privateKey), publicKey), presharedKey, Constants.EncryptionKeyLength);
     }
     
-    public static byte[] GetSharedSecretDecryption(byte[] privateKey, byte[] publicKey)
+    public static byte[] GetSharedSecretDecryption(byte[] privateKey, byte[] publicKey, byte[] presharedKey)
     {
         byte[] sharedSecret = ScalarMult.Mult(privateKey, publicKey);
-        return GenericHash.Hash(Arrays.Concat(sharedSecret, publicKey, ScalarMult.Base(privateKey)), key: null, Constants.EncryptionKeyLength);
+        return GenericHash.Hash(Arrays.Concat(sharedSecret, publicKey, ScalarMult.Base(privateKey)), presharedKey, Constants.EncryptionKeyLength);
     }
 
-    public static byte[] GetPublicKeySharedSecret(byte[] publicKey, out byte[] ephemeralPublicKey)
+    public static byte[] GetPublicKeyEphemeralSharedSecret(byte[] publicKey, out byte[] ephemeralPublicKey, byte[] presharedKey)
     {
         using var ephemeralKeyPair = PublicKeyBox.GenerateKeyPair();
         ephemeralPublicKey = ephemeralKeyPair.PublicKey;
         byte[] ephemeralSharedSecret = ScalarMult.Mult(ephemeralKeyPair.PrivateKey, publicKey);
-        return GenericHash.Hash(Arrays.Concat(ephemeralSharedSecret, ephemeralPublicKey, publicKey), key: null, Constants.EncryptionKeyLength);
+        return GenericHash.Hash(Arrays.Concat(ephemeralSharedSecret, ephemeralPublicKey, publicKey), presharedKey, Constants.EncryptionKeyLength);
     }
 
-    public static byte[] GetPrivateKeySharedSecret(byte[] privateKey, out byte[] ephemeralPublicKey)
+    public static byte[] GetPrivateKeyEphemeralSharedSecret(byte[] privateKey, out byte[] ephemeralPublicKey, byte[] presharedKey)
     {
         using var ephemeralKeyPair = PublicKeyBox.GenerateKeyPair();
         ephemeralPublicKey = ephemeralKeyPair.PublicKey;
         byte[] ephemeralSharedSecret = ScalarMult.Mult(privateKey, ephemeralKeyPair.PublicKey);
-        return GenericHash.Hash(Arrays.Concat(ephemeralSharedSecret, ScalarMult.Base(privateKey), ephemeralPublicKey), key: null, Constants.EncryptionKeyLength);
+        return GenericHash.Hash(Arrays.Concat(ephemeralSharedSecret, ScalarMult.Base(privateKey), ephemeralPublicKey), presharedKey, Constants.EncryptionKeyLength);
     }
 }
