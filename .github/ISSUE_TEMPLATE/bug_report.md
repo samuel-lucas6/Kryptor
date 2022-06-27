@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Report a bug
-title: '🐛 Bug Report: '
+title: '🐛Bug: '
 labels: bug
 assignees: samuel-lucas6
 ---
