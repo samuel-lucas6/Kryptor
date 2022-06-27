@@ -37,11 +37,11 @@ public static class SigningValidation
         }
         else if (!string.IsNullOrEmpty(privateKeyPath) && !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
         {
-            yield return ErrorMessages.InvalidPrivateKeyFile;
+            yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.InvalidPrivateKeyFile);
         }
         else if (!string.IsNullOrEmpty(privateKeyPath) && !File.Exists(privateKeyPath))
         {
-            yield return ErrorMessages.NonExistentPrivateKeyFile;
+            yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.NonExistentPrivateKeyFile);
         }
         if (!string.IsNullOrEmpty(comment) && comment.Length > 500)
         {
@@ -86,15 +86,15 @@ public static class SigningValidation
     {
         if (encodedPublicKeys == null)
         {
-            yield return ErrorMessages.PublicKey;
+            yield return ErrorMessages.NoPublicKey;
         }
         else if (encodedPublicKeys.Length > 1)
         {
-            yield return ErrorMessages.SinglePublicKey;
+            yield return ErrorMessages.MultiplePublicKeys;
         }
         else if (encodedPublicKeys[0].Length != Constants.PublicKeyLength)
         {
-            yield return ErrorMessages.InvalidPublicKey;
+            yield return ErrorMessages.GetFilePathError(encodedPublicKeys[0], ErrorMessages.InvalidPublicKey);
         }
         foreach (string errorMessage in GetVerifyFilePathsErrors(filePaths, signatureFilePaths))
         {
@@ -112,19 +112,19 @@ public static class SigningValidation
     {
         if (publicKeyPaths == null)
         {
-            yield return ErrorMessages.PublicKey;
+            yield return ErrorMessages.NoPublicKey;
         }
         else if (publicKeyPaths.Length > 1)
         {
-            yield return ErrorMessages.SinglePublicKey;
+            yield return ErrorMessages.MultiplePublicKeys;
         }
         else if (!publicKeyPaths[0].EndsWith(Constants.PublicKeyExtension))
         {
-            yield return ErrorMessages.InvalidPublicKeyFile;
+            yield return ErrorMessages.GetFilePathError(publicKeyPaths[0], ErrorMessages.InvalidPublicKeyFile);
         }
         else if (!File.Exists(publicKeyPaths[0]))
         {
-            yield return ErrorMessages.NonExistentPublicKeyFile;
+            yield return ErrorMessages.GetFilePathError(publicKeyPaths[0], ErrorMessages.NonExistentPublicKeyFile);
         }
         foreach (string errorMessage in GetVerifyFilePathsErrors(filePaths, signatureFilePaths))
         {

@@ -41,10 +41,10 @@ Stuck? Read the tutorial at <https://www.kryptor.co.uk/tutorial>.
 Please report bugs at <https://github.com/samuel-lucas6/Kryptor/issues>.")]
 public class Program
 {
-    [Option("-e|--encrypt", "encrypt files/folders", CommandOptionType.NoValue)]
+    [Option("-e|--encrypt", "encrypt files/directories", CommandOptionType.NoValue)]
     private bool Encrypt { get; }
 
-    [Option("-d|--decrypt", "decrypt files/folders", CommandOptionType.NoValue)]
+    [Option("-d|--decrypt", "decrypt files/directories", CommandOptionType.NoValue)]
     private bool Decrypt { get; }
 
     [Option("-p|--password", "specify a password (empty for interactive entry)", CommandOptionType.SingleOrNoValue)]
@@ -59,7 +59,7 @@ public class Program
     [Option("-y|--public", "specify a public key", CommandOptionType.MultipleValue)]
     private string[] PublicKeys { get; }
 
-    [Option("-n|--names", "encrypt file/folder names", CommandOptionType.NoValue)]
+    [Option("-n|--names", "encrypt file/directory names", CommandOptionType.NoValue)]
     private bool EncryptFileNames { get; }
 
     [Option("-o|--overwrite", "overwrite files", CommandOptionType.NoValue)]
@@ -92,7 +92,7 @@ public class Program
     [Option("-a|--about", "view the program version and license", CommandOptionType.NoValue)]
     private bool About { get; }
 
-    [Argument(0, Name = "file", Description = "specify a file/folder path")]
+    [Argument(0, Name = "file", Description = "specify a file/directory path")]
     private string[] FilePaths { get; }
 
     public static int Main(string[] args) => CommandLineApplication.Execute<Program>(args);

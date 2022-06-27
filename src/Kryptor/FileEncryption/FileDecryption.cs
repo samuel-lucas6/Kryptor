@@ -41,7 +41,7 @@ public static class FileDecryption
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
-                if (ex is ArgumentException) { DisplayMessage.FilePathMessage(inputFilePath, ex.Message); }
+                if (ex is ArgumentException) { DisplayMessage.FilePathError(inputFilePath, ex.Message); }
                 else { DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToDecryptFile); }
             }
             Console.WriteLine();
@@ -65,7 +65,7 @@ public static class FileDecryption
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
-                if (ex is ArgumentException) { DisplayMessage.FilePathMessage(inputFilePath, ex.Message); }
+                if (ex is ArgumentException) { DisplayMessage.FilePathError(inputFilePath, ex.Message); }
                 else { DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToDecryptFile); }
             }
             Console.WriteLine();
@@ -94,7 +94,7 @@ public static class FileDecryption
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
-                if (ex is ArgumentException) { DisplayMessage.FilePathMessage(inputFilePath, ex.Message); }
+                if (ex is ArgumentException) { DisplayMessage.FilePathError(inputFilePath, ex.Message); }
                 else { DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToDecryptFile); }
             }
         }
@@ -123,7 +123,7 @@ public static class FileDecryption
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
-                if (ex is ArgumentException) { DisplayMessage.FilePathMessage(inputFilePath, ex.Message); }
+                if (ex is ArgumentException) { DisplayMessage.FilePathError(inputFilePath, ex.Message); }
                 else { DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToDecryptFile); }
             }
         }

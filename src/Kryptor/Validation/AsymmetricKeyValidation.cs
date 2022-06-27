@@ -57,7 +57,7 @@ public static class AsymmetricKeyValidation
         }
         catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
         {
-            DisplayMessage.Exception(ex.GetType().Name, "Please specify a valid signing public key.");
+            DisplayMessage.FilePathException(publicKeyPath, ex.GetType().Name, "Please specify a valid signing public key.");
             return null;
         }
     }
@@ -68,7 +68,7 @@ public static class AsymmetricKeyValidation
         {
             string encodedPublicKey = File.ReadAllText(publicKeyPath);
             if (encodedPublicKey.Length == Constants.PublicKeyLength) { return Utilities.Base64ToBinary(encodedPublicKey, ignoredChars: null); }
-            DisplayMessage.Error(ErrorMessages.InvalidPublicKey);
+            DisplayMessage.FilePathError(publicKeyPath, ErrorMessages.InvalidPublicKey);
             return null;
         }
         catch (Exception ex)
@@ -108,7 +108,7 @@ public static class AsymmetricKeyValidation
         }
         catch (Exception ex)
         {
-            DisplayMessage.Exception(ex.GetType().Name, "Please enter a valid signing public key.");
+            DisplayMessage.FilePathException(encodedPublicKey, ex.GetType().Name, "Please enter a valid signing public key.");
             return null;
         }
     }
@@ -117,14 +117,14 @@ public static class AsymmetricKeyValidation
     {
         byte[] keyAlgorithm = Arrays.Slice(asymmetricKey, sourceIndex: 0, Constants.Curve25519KeyHeader.Length);
         bool validKey = Utilities.Compare(keyAlgorithm, Constants.Curve25519KeyHeader);
-        if (!validKey) { throw new NotSupportedException("This key algorithm is not supported for encryption."); }
+        if (!validKey) { throw new NotSupportedException("This key algorithm isn't supported for encryption."); }
     }
 
     private static void ValidateSigningKeyAlgorithm(byte[] asymmetricKey)
     {
         byte[] keyAlgorithm = Arrays.Slice(asymmetricKey, sourceIndex: 0, Constants.Ed25519KeyHeader.Length);
         bool validKey = Utilities.Compare(keyAlgorithm, Constants.Ed25519KeyHeader);
-        if (!validKey) { throw new NotSupportedException("This key algorithm is not supported for signing."); }
+        if (!validKey) { throw new NotSupportedException("This key algorithm isn't supported for signing."); }
     }
 
     public static byte[] EncryptionPrivateKeyFile(string privateKeyPath)
@@ -138,7 +138,7 @@ public static class AsymmetricKeyValidation
         }
         catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
         {
-            DisplayMessage.Exception(ex.GetType().Name, "Please specify a valid encryption private key.");
+            DisplayMessage.FilePathException(privateKeyPath, ex.GetType().Name, "Please specify a valid encryption private key.");
             return null;
         }
     }
@@ -154,7 +154,7 @@ public static class AsymmetricKeyValidation
         }
         catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
         {
-            DisplayMessage.Exception(ex.GetType().Name, "Please specify a valid signing private key.");
+            DisplayMessage.FilePathException(privateKeyPath, ex.GetType().Name, "Please specify a valid signing private key.");
             return null;
         }
     }
@@ -166,7 +166,7 @@ public static class AsymmetricKeyValidation
             string encodedPrivateKey = File.ReadAllText(privateKeyPath);
             if (encodedPrivateKey.Length != Constants.EncryptionPrivateKeyLength && encodedPrivateKey.Length != Constants.SigningPrivateKeyLength)
             {
-                DisplayMessage.Error(ErrorMessages.InvalidPrivateKeyFile);
+                DisplayMessage.FilePathError(privateKeyPath, "Please specify a valid private key file.");
                 return null;
             }
             byte[] privateKey = Utilities.Base64ToBinary(encodedPrivateKey, ignoredChars: null);
@@ -175,12 +175,7 @@ public static class AsymmetricKeyValidation
         }
         catch (Exception ex)
         {
-            if (ex is NotSupportedException)
-            {
-                DisplayMessage.Exception(ex.GetType().Name, ex.Message);
-                return null;
-            }
-            DisplayMessage.Exception(ex.GetType().Name, "Unable to retrieve the private key, or the private key is invalid.");
+            DisplayMessage.FilePathException(privateKeyPath, ex.GetType().Name, ex is NotSupportedException ? ex.Message : "Unable to retrieve the private key, or the private key is invalid.");
             return null;
         }
     }
@@ -189,6 +184,6 @@ public static class AsymmetricKeyValidation
     {
         byte[] keyVersion = Arrays.Slice(privateKey, Constants.Curve25519KeyHeader.Length, Constants.PrivateKeyVersion.Length);
         bool validKeyVersion = Utilities.Compare(keyVersion, Constants.PrivateKeyVersion);
-        if (!validKeyVersion) { throw new NotSupportedException("This private key version is not supported."); }
+        if (!validKeyVersion) { throw new NotSupportedException("This private key version isn't supported."); }
     }
 }

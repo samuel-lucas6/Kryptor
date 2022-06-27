@@ -31,18 +31,18 @@ public static class FilePathValidation
         (char) 21, (char) 22, (char) 23, (char) 24, (char) 25, (char) 26, (char) 27, (char) 28, (char) 29, (char) 30,
         (char) 31, ':', '*', '?', '\\', '/'
     };
-    private const string FileOrFolderDoesNotExist = "This file/folder doesn't exist.";
+    private const string FileOrDirectoryDoesNotExist = "This file/directory doesn't exist.";
     private const string FileInaccessible = "Unable to access the file.";
     private const string DirectoryEmpty = "This directory is empty.";
     private const string InvalidSignatureFile = "Please specify a signature file with a valid format.";
     private const string SignatureFileInaccessible = "Unable to access the signature file.";
-    private const string InvalidFormatVersion = "This file format version is not supported.";
+    private const string InvalidFormatVersion = "This file format version isn't supported.";
 
     public static string GetFileEncryptionError(string inputFilePath)
     {
         if (Path.GetFileName(Path.TrimEndingDirectorySeparator(inputFilePath)).IndexOfAny(IllegalFileNameChars) != -1) { return "This file/directory name contains illegal characters for Windows, Linux, and/or macOS.";}
         if (Directory.Exists(inputFilePath)) { return FileHandling.IsDirectoryEmpty(inputFilePath) ? DirectoryEmpty : null; }
-        if (!File.Exists(inputFilePath)) { return FileOrFolderDoesNotExist; }
+        if (!File.Exists(inputFilePath)) { return FileOrDirectoryDoesNotExist; }
         bool? validMagicBytes = FileHandling.IsKryptorFile(inputFilePath);
         if (validMagicBytes == null) { return FileInaccessible; }
         if (FileHandling.HasKryptorExtension(inputFilePath) || validMagicBytes == true) { return "This file has already been encrypted."; }
@@ -74,12 +74,12 @@ public static class FilePathValidation
     public static string GetFileDecryptionError(string inputFilePath)
     {
         if (Directory.Exists(inputFilePath)) { return FileHandling.IsDirectoryEmpty(inputFilePath) ? DirectoryEmpty : null; }
-        if (!File.Exists(inputFilePath)) { return FileOrFolderDoesNotExist; }
+        if (!File.Exists(inputFilePath)) { return FileOrDirectoryDoesNotExist; }
         bool? validMagicBytes = FileHandling.IsKryptorFile(inputFilePath);
         if (validMagicBytes == null) { return FileInaccessible; }
         if (!FileHandling.HasKryptorExtension(inputFilePath) || validMagicBytes == false) { return "This file hasn't been encrypted."; }
         bool? validFormatVersion = FileHandling.IsValidEncryptedFileVersion(inputFilePath);
-        if (validFormatVersion == false) { return "This file format is not supported in this version of Kryptor."; }
+        if (validFormatVersion == false) { return "This file format isn't supported in this version of Kryptor."; }
         return validFormatVersion == null ? FileInaccessible : null;
     }
 
@@ -95,17 +95,17 @@ public static class FilePathValidation
         bool defaultKeyDirectory = string.Equals(directoryPath, Constants.DefaultKeyDirectory);
         if (!defaultKeyDirectory && !Directory.Exists(directoryPath))
         {
-            yield return "This directory doesn't exist.";
+            yield return ErrorMessages.GetFilePathError(directoryPath, "This directory doesn't exist.");
         }
         else if (defaultKeyDirectory && !Globals.Overwrite)
         {
             if (keyPairType == 1 && (File.Exists(Constants.DefaultEncryptionPublicKeyPath) || File.Exists(Constants.DefaultEncryptionPrivateKeyPath)))
             {
-                yield return "An encryption key pair already exists. Please specify -o|--overwrite if you want to overwrite your key pair.";
+                yield return "An encryption key pair already exists in the default directory. Please specify -o|--overwrite if you want to overwrite your key pair.";
             }
             else if (keyPairType == 2 && (File.Exists(Constants.DefaultSigningPublicKeyPath) || File.Exists(Constants.DefaultSigningPrivateKeyPath)))
             {   
-                yield return "A signing key pair already exists. Please specify -o|--overwrite if you want to overwrite your key pair.";
+                yield return "A signing key pair already exists in the default directory. Please specify -o|--overwrite if you want to overwrite your key pair.";
             }
         }
         else if (!defaultKeyDirectory && !Globals.Overwrite && keyPairType == 1)
@@ -114,7 +114,7 @@ public static class FilePathValidation
             string privateKeyPath = Path.Combine(directoryPath, Constants.DefaultEncryptionKeyFileName + Constants.PrivateKeyExtension);
             if (File.Exists(publicKeyPath) || File.Exists(privateKeyPath))
             {
-                yield return "An encryption key pair already exists in the specified directory. Please specify -o|--overwrite if you want to overwrite your key pair.";
+                yield return ErrorMessages.GetFilePathError(directoryPath, "An encryption key pair already exists in this directory. Please specify -o|--overwrite if you want to overwrite your key pair.");
             }
         }
         else if (!defaultKeyDirectory && !Globals.Overwrite && keyPairType == 2)
@@ -123,7 +123,7 @@ public static class FilePathValidation
             string privateKeyPath = Path.Combine(directoryPath, Constants.DefaultSigningKeyFileName + Constants.PrivateKeyExtension);
             if (File.Exists(publicKeyPath) || File.Exists(privateKeyPath))
             {
-                yield return "A signing key pair already exists in the specified directory. Please specify -o|--overwrite if you want to overwrite your key pair.";
+                yield return ErrorMessages.GetFilePathError(directoryPath, "A signing key pair already exists in this directory. Please specify -o|--overwrite if you want to overwrite your key pair.");
             }
         }
     }
@@ -138,15 +138,15 @@ public static class FilePathValidation
     {
         if (string.IsNullOrEmpty(privateKeyPath))
         {
-            yield return "Please specify a private key using [-x:file].";
+            yield return "Please specify a private key file using -x:file.";
         }
         else if (!string.IsNullOrEmpty(privateKeyPath) && !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
         {
-            yield return ErrorMessages.InvalidPrivateKeyFile;
+            yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.InvalidPrivateKeyFile);
         }
         else if (!string.IsNullOrEmpty(privateKeyPath) && !File.Exists(privateKeyPath))
         {
-            yield return ErrorMessages.NonExistentPrivateKeyFile;
+            yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.NonExistentPrivateKeyFile);
         }
     }
 
@@ -159,7 +159,7 @@ public static class FilePathValidation
         }
         else if (!File.Exists(filePath))
         {
-            yield return FileOrFolderDoesNotExist;
+            yield return FileOrDirectoryDoesNotExist;
         }
     }
 
@@ -172,7 +172,7 @@ public static class FilePathValidation
         if (!File.Exists(signatureFilePath)) { return "Unable to find the signature file. Please specify it manually using -t|--signature."; }
         bool? validMagicBytes = FileHandling.IsSignatureFile(signatureFilePath);
         if (validMagicBytes == null) { return SignatureFileInaccessible; }
-        if (validMagicBytes == false) { return "The signature file that was found does not have a valid format."; }
+        if (validMagicBytes == false) { return "The signature file that was found doesn't have a valid format."; }
         bool? validFormatVersion = FileHandling.IsValidSignatureFileVersion(signatureFilePath);
         if (validFormatVersion == false) { return InvalidFormatVersion; }
         return validFormatVersion == null ? SignatureFileInaccessible : null;

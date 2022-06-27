@@ -24,7 +24,7 @@ namespace Kryptor;
 
 public static class FileEncryptionValidation
 {
-    private const string FileOrFolderError = "Please specify a file/folder.";
+    private const string FileOrDirectoryError = "Please specify a file/directory.";
     private const string PasswordOrKeyfileError = "Please specify whether to use a password and/or keyfile.";
 
     public static bool FileEncryptionWithPassword(bool usePassword, string keyfilePath, string[] filePaths)
@@ -38,11 +38,11 @@ public static class FileEncryptionValidation
         if (!usePassword && string.IsNullOrEmpty(keyfilePath)) { yield return PasswordOrKeyfileError; }
         if (Path.EndsInDirectorySeparator(keyfilePath) && !Directory.Exists(keyfilePath))
         {
-            yield return "Please specify a valid directory for the keyfile.";
+            yield return ErrorMessages.GetFilePathError(keyfilePath, "Please specify a valid directory for the keyfile.");
         }
         else if (File.Exists(keyfilePath) && FileHandling.GetFileLength(keyfilePath) < Constants.KeyfileLength)
         {
-            yield return "Please specify a keyfile that's at least 64 bytes in size.";
+            yield return ErrorMessages.GetFilePathError(keyfilePath, "Please specify a keyfile that's at least 64 bytes in size.");
         }
     }
 
@@ -50,7 +50,7 @@ public static class FileEncryptionValidation
     {
         if (filePaths == null)
         {
-            yield return FileOrFolderError;
+            yield return FileOrDirectoryError;
         }
         else
         {
@@ -76,7 +76,7 @@ public static class FileEncryptionValidation
         }
         if (publicKeyPaths == null)
         {
-            yield return ErrorMessages.PublicKey;
+            yield return ErrorMessages.NoPublicKey;
         }
         else
         {
@@ -108,7 +108,7 @@ public static class FileEncryptionValidation
         }
         if (encodedPublicKeys == null)
         {
-            yield return ErrorMessages.PublicKey;
+            yield return ErrorMessages.NoPublicKey;
         }
         else
         {
@@ -140,11 +140,11 @@ public static class FileEncryptionValidation
         }
         else if (!string.IsNullOrEmpty(privateKeyPath) && !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
         {
-            yield return ErrorMessages.InvalidPrivateKeyFile;
+            yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.InvalidPrivateKeyFile);
         }
         else if (!string.IsNullOrEmpty(privateKeyPath) && !File.Exists(privateKeyPath))
         {
-            yield return ErrorMessages.NonExistentPrivateKeyFile;
+            yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.NonExistentPrivateKeyFile);
         }
     }
 
@@ -157,14 +157,14 @@ public static class FileEncryptionValidation
     private static IEnumerable<string> GetFileDecryptionErrors(bool usePassword, string keyfilePath)
     {
         if (!usePassword && string.IsNullOrEmpty(keyfilePath)) { yield return PasswordOrKeyfileError; }
-        if (!string.IsNullOrEmpty(keyfilePath) && !File.Exists(keyfilePath)) { yield return "Please specify a keyfile that exists."; }
+        if (!string.IsNullOrEmpty(keyfilePath) && !File.Exists(keyfilePath)) { yield return ErrorMessages.GetFilePathError(keyfilePath, "Please specify a keyfile that exists."); }
     }
 
     private static IEnumerable<string> GetDecryptionFilePathErrors(string[] filePaths)
     {
         if (filePaths == null)
         {
-            yield return FileOrFolderError;
+            yield return FileOrDirectoryError;
         }
         else
         {
@@ -190,19 +190,19 @@ public static class FileEncryptionValidation
         }
         if (publicKeyPaths == null)
         {
-            yield return ErrorMessages.PublicKey;
+            yield return ErrorMessages.NoPublicKey;
         }
         else if (publicKeyPaths.Length > 1)
         {
-            yield return ErrorMessages.SinglePublicKey;
+            yield return ErrorMessages.MultiplePublicKeys;
         }
         else if (!publicKeyPaths[0].EndsWith(Constants.PublicKeyExtension))
         {
-            yield return ErrorMessages.InvalidPublicKeyFile;
+            yield return ErrorMessages.GetFilePathError(publicKeyPaths[0], ErrorMessages.InvalidPublicKeyFile);
         }
         else if (!File.Exists(publicKeyPaths[0]))
         {
-            yield return ErrorMessages.NonExistentPublicKeyFile;
+            yield return ErrorMessages.GetFilePathError(publicKeyPaths[0], ErrorMessages.NonExistentPublicKeyFile);
         }
     }
 
@@ -220,15 +220,15 @@ public static class FileEncryptionValidation
         }
         if (encodedPublicKeys == null)
         {
-            yield return ErrorMessages.PublicKey;
+            yield return ErrorMessages.NoPublicKey;
         }
         else if (encodedPublicKeys.Length > 1)
         {
-            yield return ErrorMessages.SinglePublicKey;
+            yield return ErrorMessages.MultiplePublicKeys;
         }
         else if (encodedPublicKeys[0].Length != Constants.PublicKeyLength)
         {
-            yield return ErrorMessages.InvalidPublicKey;
+            yield return ErrorMessages.GetFilePathError(encodedPublicKeys[0], ErrorMessages.InvalidPublicKey);
         }
     }
 

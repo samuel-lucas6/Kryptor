@@ -29,20 +29,20 @@ public static class DisplayMessage
     
     public static void Error(string errorMessage) => WriteLine($"{ErrorWord}: {errorMessage}", ConsoleColor.DarkRed);
 
-    public static void FilePathMessage(string filePath, string message) => WriteLine($"\"{Path.GetFileName(filePath)}\": {message}", ConsoleColor.DarkRed);
+    public static void FilePathError(string filePath, string message) => WriteLine($"{ErrorWord}: \"{Path.GetFileName(filePath)}\" - {message}", ConsoleColor.DarkRed);
     
     public static void Exception(string exceptionName, string errorMessage) => WriteLine($"{ErrorWord}: {exceptionName} - {errorMessage}", ConsoleColor.DarkRed);
     
     public static void FilePathException(string filePath, string exceptionName, string errorMessage)
     {
-        WriteLine($"\"{Path.GetFileName(filePath)}\" - {ErrorWord}: {exceptionName} - {errorMessage}", ConsoleColor.DarkRed);
+        WriteLine($"{ErrorWord}: \"{Path.GetFileName(filePath)}\" - {exceptionName} - {errorMessage}", ConsoleColor.DarkRed);
     }
     
     public static void DerivingKeyFromPassword() => Console.WriteLine("Deriving encryption key from password...");
     
     public static void CreatingZipFile(string directoryPath, string zipFilePath)
     {
-        Console.WriteLine($"Compressing \"{Path.GetFileName(directoryPath)}\" => \"{Path.GetFileName(zipFilePath)}\"...");
+        Console.WriteLine($"Zipping \"{Path.GetFileName(directoryPath)}\" => \"{Path.GetFileName(zipFilePath)}\"...");
     }
     
     public static void ExtractingZipFile(string zipFilePath, string directoryPath)
