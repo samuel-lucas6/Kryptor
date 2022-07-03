@@ -184,12 +184,12 @@ public static class CommandLine
         FileDecryption.DecryptEachFileWithPrivateKey(privateKey, password, presharedKey, filePaths);
     }
 
-    public static void GenerateNewKeyPair(char[] password, string exportDirectoryPath)
+    public static void GenerateNewKeyPair(char[] password, string exportDirectoryPath, bool encryption, bool signing)
     {
         try
         {
-            int keyPairType = GetKeyPairType();
-            bool validUserInput = FilePathValidation.GenerateKeyPair(exportDirectoryPath, keyPairType);
+            int keyPairType = GetKeyPairType(encryption, signing);
+            bool validUserInput = FilePathValidation.GenerateKeyPair(exportDirectoryPath, keyPairType, encryption, signing);
             if (!validUserInput) { return; }
             string publicKey, privateKey, publicKeyFilePath, privateKeyFilePath;
             if (keyPairType == 1)
@@ -210,8 +210,10 @@ public static class CommandLine
         }
     }
 
-    private static int GetKeyPairType()
+    private static int GetKeyPairType(bool encryption, bool signing)
     {
+        if (encryption) { return 1; }
+        if (signing) { return 2; }
         Console.WriteLine("Please select a key pair type (type 1 or 2):");
         Console.WriteLine("1) Encryption");
         Console.WriteLine("2) Signing");

@@ -60,19 +60,23 @@ public static class FilePathValidation
         return validFormatVersion == null ? FileInaccessible : null;
     }
 
-    public static bool GenerateKeyPair(string directoryPath, int keyPairType)
+    public static bool GenerateKeyPair(string directoryPath, int keyPairType, bool encryption, bool signing)
     {
-        IEnumerable<string> errorMessages = GetGenerateKeyPairError(directoryPath, keyPairType);
+        IEnumerable<string> errorMessages = GetGenerateKeyPairError(directoryPath, keyPairType, encryption, signing);
         return DisplayMessage.AnyErrors(errorMessages);
     }
 
-    private static IEnumerable<string> GetGenerateKeyPairError(string directoryPath, int keyPairType)
+    private static IEnumerable<string> GetGenerateKeyPairError(string directoryPath, int keyPairType, bool encryption, bool signing)
     {
         if (keyPairType is < 1 or > 2) { yield return "Please enter a valid number.";}
         bool defaultKeyDirectory = string.Equals(directoryPath, Constants.DefaultKeyDirectory);
         if (!defaultKeyDirectory && !Directory.Exists(directoryPath))
         {
             yield return ErrorMessages.GetFilePathError(directoryPath, "This directory doesn't exist.");
+        }
+        if (encryption & signing)
+        {
+            yield return "Please specify only one type of key pair to generate.";
         }
         else if (defaultKeyDirectory && !Globals.Overwrite)
         {

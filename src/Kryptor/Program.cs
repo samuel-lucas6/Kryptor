@@ -106,17 +106,17 @@ public class Program
         Console.WriteLine();
         try
         {
-            if (Encrypt)
+            if (GenerateKeys)
+            {
+                CommandLine.GenerateNewKeyPair(GetPassword(Password.value), FilePaths == null ? Constants.DefaultKeyDirectory : FilePaths[0], Encrypt, Sign);
+            }
+            else if (Encrypt)
             {
                 CommandLine.Encrypt(Password.optionSpecified, GetPassword(Password.value), SymmetricKey, PrivateKey.optionSpecified, GetEncryptionPrivateKey(PrivateKey.value), PublicKeys, FilePaths);
             }
             else if (Decrypt)
             {
                 CommandLine.Decrypt(Password.optionSpecified, GetPassword(Password.value), SymmetricKey, PrivateKey.optionSpecified, GetEncryptionPrivateKey(PrivateKey.value), PublicKeys, FilePaths);
-            }
-            else if (GenerateKeys)
-            {
-                CommandLine.GenerateNewKeyPair(GetPassword(Password.value), FilePaths == null ? Constants.DefaultKeyDirectory : FilePaths[0]);
             }
             else if (RecoverPublicKey)
             {
