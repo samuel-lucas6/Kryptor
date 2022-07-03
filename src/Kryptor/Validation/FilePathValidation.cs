@@ -16,7 +16,6 @@
     along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
-using System;
 using System.IO;
 using System.Collections.Generic;
 
@@ -47,28 +46,6 @@ public static class FilePathValidation
         if (validMagicBytes == null) { return FileInaccessible; }
         if (FileHandling.HasKryptorExtension(inputFilePath) || validMagicBytes == true) { return "This file has already been encrypted."; }
         return null;
-    }
-
-    public static string KeyfilePath(string keyfilePath)
-    {
-        try
-        {
-            if (string.IsNullOrEmpty(keyfilePath) || File.Exists(keyfilePath)) { return keyfilePath; }
-            if (Directory.Exists(keyfilePath)) { keyfilePath = Path.Combine(keyfilePath, FileHandling.GetRandomFileName()); }
-            if (!keyfilePath.EndsWith(Constants.KeyfileExtension)) { keyfilePath += Constants.KeyfileExtension; }
-            if (File.Exists(keyfilePath)) { return keyfilePath; }
-            Keyfiles.GenerateKeyfile(keyfilePath);
-            Console.WriteLine($"Randomly generated keyfile: {Path.GetFileName(keyfilePath)}");
-            Console.WriteLine();
-            DisplayMessage.WriteLine("IMPORTANT: Please back up this keyfile to external storage (e.g. memory sticks).", ConsoleColor.Blue);
-            Console.WriteLine();
-            return keyfilePath;
-        }
-        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
-        {
-            DisplayMessage.FilePathException(keyfilePath, ex.GetType().Name, "Unable to randomly generate a keyfile.");
-            return null;
-        }
     }
 
     public static string GetFileDecryptionError(string inputFilePath)

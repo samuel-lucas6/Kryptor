@@ -30,9 +30,13 @@ public static class ErrorMessages
     public const string InvalidPublicKey = "Please specify a valid public key.";
     public const string InvalidPublicKeyFile = "Please specify a .public key file.";
     public const string NonExistentPublicKeyFile = "Please specify a public key file that exists.";
-    public const string PasswordBasedEncryption = "Please specify a password and/or keyfile, private key, or private key and public key.";
+    public const string PasswordBasedEncryption = "Please specify a password and/or symmetric key, private key, or private key and public key.";
+    public const string InvalidSymmetricKey = "Please specify a valid symmetric key string.";
     public const string UnableToEncryptFile = "Unable to encrypt the file/directory.";
     public const string UnableToDecryptFile = "Unable to decrypt the file/directory.";
 
-    public static string GetFilePathError(string filePath, string errorMessage) => $"\"{Path.GetFileName(filePath)}\" - {errorMessage}";
+    public static string GetFilePathError(string filePath, string errorMessage) => $"\"{Path.GetFileName(FileHandling.TrimTrailingSeparatorChars(filePath))}\" - {errorMessage}";
+    
+    public static string GetKeyStringError(string keyString, string errorMessage) => $"\"{keyString}\" - {errorMessage}";
+
 }

@@ -50,9 +50,9 @@ public static class FileEncryption
         DisplayMessage.SuccessfullyEncrypted(space: false);
     }
     
-    public static unsafe void EncryptEachFileWithKeyfile(string[] filePaths, byte[] keyfileBytes)
+    public static unsafe void EncryptEachFileWithSymmetricKey(string[] filePaths, byte[] symmetricKey)
     {
-        if (filePaths == null || keyfileBytes == null) { return; }
+        if (filePaths == null || symmetricKey == null) { return; }
         foreach (string inputFilePath in filePaths)
         {
             try
@@ -61,7 +61,7 @@ public static class FileEncryption
                 byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
                 // Fill unused header with random public key
                 using var ephemeralKeyPair = PublicKeyBox.GenerateKeyPair();
-                byte[] keyEncryptionKey = GenericHash.HashSaltPersonal(message: Array.Empty<byte>(), keyfileBytes, salt, Constants.Personalisation, Constants.EncryptionKeyLength);
+                byte[] keyEncryptionKey = GenericHash.HashSaltPersonal(message: Array.Empty<byte>(), symmetricKey, salt, Constants.Personalisation, Constants.EncryptionKeyLength);
                 fixed (byte* ignored = keyEncryptionKey) { EncryptInputFile(directory ? zipFilePath : inputFilePath, directory, ephemeralKeyPair.PublicKey, salt, keyEncryptionKey); }
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -70,7 +70,7 @@ public static class FileEncryption
             }
             Console.WriteLine();
         }
-        CryptographicOperations.ZeroMemory(keyfileBytes);
+        CryptographicOperations.ZeroMemory(symmetricKey);
         DisplayMessage.SuccessfullyEncrypted(space: false);
     }
     

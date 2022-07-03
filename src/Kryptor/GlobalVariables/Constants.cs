@@ -25,6 +25,13 @@ namespace Kryptor;
 
 public static class Constants
 {
+    // Cryptography
+    public const int EncryptionKeyLength = 32;
+    public const int EphemeralPublicKeyLength = 32;
+    public const int SaltLength = 16;
+    public const int XChaChaNonceLength = 24;
+    public const int HashLength = 64;
+    
     // Key derivation
     public const int Mebibyte = 1048576;
     public const int MemorySize = 256 * Mebibyte;
@@ -37,6 +44,9 @@ public static class Constants
     public const string EncryptedExtension = ".kryptor";
     public const string KeyfileExtension = ".key";
     public const string ZipFileExtension = ".zip";
+    public const int SymmetricKeyLength = 48;
+    public static readonly byte[] SymmetricKeyHeader = Encoding.UTF8.GetBytes("Rn");
+    public static readonly char[] Base64Padding = {'='};
     public const int KeyfileLength = 64;
     public const int FileStreamBufferSize = 131072;
     public const int FileChunkSize = 16384;
@@ -46,13 +56,6 @@ public static class Constants
     public const int EncryptedHeaderLength = 328;
     public static readonly int FileHeadersLength = EncryptionMagicBytes.Length + EncryptionVersion.Length + EphemeralPublicKeyLength + SaltLength + XChaChaNonceLength + EncryptedHeaderLength;
     public const int CiphertextChunkLength = FileChunkSize + (int)TagLength.Medium;
-
-    // Cryptography
-    public const int EncryptionKeyLength = 32;
-    public const int EphemeralPublicKeyLength = 32;
-    public const int SaltLength = 16;
-    public const int XChaChaNonceLength = 24;
-    public const int HashLength = 64;
 
     // Asymmetric keys
     public static readonly string DefaultKeyDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), EncryptedExtension);

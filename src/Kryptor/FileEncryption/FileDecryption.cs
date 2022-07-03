@@ -50,9 +50,9 @@ public static class FileDecryption
         DisplayMessage.SuccessfullyDecrypted(space: false);
     }
     
-    public static unsafe void DecryptEachFileWithKeyfile(string[] filePaths, byte[] keyfileBytes)
+    public static unsafe void DecryptEachFileWithSymmetricKey(string[] filePaths, byte[] symmetricKey)
     {
-        if (filePaths == null || keyfileBytes == null) { return; }
+        if (filePaths == null || symmetricKey == null) { return; }
         foreach (string inputFilePath in filePaths)
         {
             try
@@ -60,7 +60,7 @@ public static class FileDecryption
                 using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
                 byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
-                byte[] keyEncryptionKey = GenericHash.HashSaltPersonal(message: Array.Empty<byte>(), keyfileBytes, salt, Constants.Personalisation, Constants.EncryptionKeyLength);
+                byte[] keyEncryptionKey = GenericHash.HashSaltPersonal(message: Array.Empty<byte>(), symmetricKey, salt, Constants.Personalisation, Constants.EncryptionKeyLength);
                 fixed (byte* ignored = keyEncryptionKey) { DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey); }
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -70,7 +70,7 @@ public static class FileDecryption
             }
             Console.WriteLine();
         }
-        CryptographicOperations.ZeroMemory(keyfileBytes);
+        CryptographicOperations.ZeroMemory(symmetricKey);
         DisplayMessage.SuccessfullyDecrypted(space: false);
     }
 

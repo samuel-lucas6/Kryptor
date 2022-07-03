@@ -31,15 +31,13 @@ public static class Password
         return password;
     }
     
-    public static byte[] Prehash(char[] password, string keyfilePath = null)
+    public static byte[] Prehash(char[] password, byte[] pepper = null)
     {
         if (password.Length == 0) { return null; }
         var passwordBytes = Encoding.UTF8.GetBytes(password);
         Arrays.ZeroMemory(password);
-        var keyfileBytes = !string.IsNullOrEmpty(keyfilePath) ? Keyfiles.ReadKeyfile(keyfilePath) : null;
-        if (!string.IsNullOrEmpty(keyfilePath) && keyfileBytes == null) { return null; }
-        passwordBytes = GenericHash.Hash(passwordBytes, key: keyfileBytes, Constants.HashLength);
-        CryptographicOperations.ZeroMemory(keyfileBytes);
+        passwordBytes = GenericHash.Hash(passwordBytes, key: pepper, Constants.HashLength);
+        CryptographicOperations.ZeroMemory(pepper);
         return passwordBytes;
     }
 }

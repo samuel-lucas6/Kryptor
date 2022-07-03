@@ -27,6 +27,8 @@ namespace Kryptor;
 
 public static class FileHandling
 {
+    private static readonly char[] SeparatorChars = {Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar, Path.VolumeSeparatorChar};
+
     public static bool IsDirectory(string filePath) => File.GetAttributes(filePath).HasFlag(FileAttributes.Directory);
 
     public static bool IsDirectoryEmpty(string directoryPath) => !Directory.EnumerateFiles(directoryPath, searchPattern: "*", SearchOption.AllDirectories).Any();
@@ -36,6 +38,8 @@ public static class FileHandling
     public static long GetFileLength(string filePath) => new FileInfo(filePath).Length;
 
     public static bool HasKryptorExtension(string filePath) => filePath.EndsWith(Constants.EncryptedExtension, StringComparison.Ordinal);
+
+    public static string TrimTrailingSeparatorChars(string filePath) => filePath.TrimEnd(SeparatorChars);
 
     public static string GetRandomFileName(int length = 16)
     {

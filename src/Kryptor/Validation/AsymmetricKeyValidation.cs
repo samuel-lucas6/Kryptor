@@ -108,7 +108,7 @@ public static class AsymmetricKeyValidation
         }
         catch (Exception ex)
         {
-            DisplayMessage.FilePathException(encodedPublicKey, ex.GetType().Name, "Please enter a valid signing public key.");
+            DisplayMessage.KeyStringException(encodedPublicKey, ex.GetType().Name, "Please enter a valid signing public key.");
             return null;
         }
     }

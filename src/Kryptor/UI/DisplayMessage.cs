@@ -25,17 +25,20 @@ namespace Kryptor;
 
 public static class DisplayMessage
 {
-    private const string ErrorWord = "Error";
-    
-    public static void Error(string errorMessage) => WriteLine($"{ErrorWord}: {errorMessage}", ConsoleColor.DarkRed);
+    public static void Error(string errorMessage) => WriteLine($"Error: {errorMessage}", ConsoleColor.DarkRed);
 
-    public static void FilePathError(string filePath, string message) => WriteLine($"{ErrorWord}: \"{Path.GetFileName(filePath)}\" - {message}", ConsoleColor.DarkRed);
-    
-    public static void Exception(string exceptionName, string errorMessage) => WriteLine($"{ErrorWord}: {exceptionName} - {errorMessage}", ConsoleColor.DarkRed);
+    public static void FilePathError(string filePath, string message) => Error($"\"{Path.GetFileName(FileHandling.TrimTrailingSeparatorChars(filePath))}\" - {message}");
+
+    public static void Exception(string exceptionName, string errorMessage) => WriteLine($"{exceptionName}: {errorMessage}", ConsoleColor.DarkRed);
     
     public static void FilePathException(string filePath, string exceptionName, string errorMessage)
     {
-        WriteLine($"{ErrorWord}: \"{Path.GetFileName(filePath)}\" - {exceptionName} - {errorMessage}", ConsoleColor.DarkRed);
+        WriteLine($"{exceptionName}: \"{Path.GetFileName(FileHandling.TrimTrailingSeparatorChars(filePath))}\" - {errorMessage}", ConsoleColor.DarkRed);
+    }
+    
+    public static void KeyStringException(string keyString, string exceptionName, string errorMessage)
+    {
+        WriteLine($"{exceptionName}: \"{keyString}\" - {errorMessage}", ConsoleColor.DarkRed);
     }
     
     public static void DerivingKeyFromPassword() => Console.WriteLine("Deriving encryption key from password...");
@@ -73,12 +76,24 @@ public static class DisplayMessage
         if (space) { Console.WriteLine(); }
         WriteLine($"Successfully decrypted: {Globals.SuccessfulCount}/{Globals.TotalCount}", Globals.SuccessfulCount == Globals.TotalCount ? ConsoleColor.Green : ConsoleColor.DarkRed);
     }
+
+    public static void SymmetricKey(string symmetricKey)
+    {
+        Console.WriteLine($"Randomly generated key: {symmetricKey}");
+        Console.WriteLine();
+    }
+
+    public static void Keyfile(string keyfilePath)
+    {
+        Console.WriteLine($"Randomly generated keyfile: \"{keyfilePath}\"");
+        Console.WriteLine();
+        WriteLine("IMPORTANT: Please back up this keyfile to external storage (e.g. memory sticks).", ConsoleColor.Blue);
+        Console.WriteLine();
+    }
     
     public static void KeyPair(string publicKey, string publicKeyFilePath, string privateKeyFilePath)
     {
-        Console.WriteLine();
-        Console.WriteLine($"Public key: {publicKey}");
-        Console.WriteLine($"Public key file: \"{publicKeyFilePath}\"");
+        PublicKey(publicKey, publicKeyFilePath);
         Console.WriteLine();
         Console.Write($"Private key file: \"{privateKeyFilePath}\" - ");
         WriteLine("Keep this secret!", ConsoleColor.DarkRed);

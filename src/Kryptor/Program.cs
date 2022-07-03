@@ -50,8 +50,8 @@ public class Program
     [Option("-p|--password", "specify a password (empty for interactive entry)", CommandOptionType.SingleOrNoValue)]
     private (bool optionSpecified, string value) Password { get; }
 
-    [Option("-k|--keyfile", "specify or randomly generate a keyfile", CommandOptionType.SingleValue)]
-    private string Keyfile { get; }
+    [Option("-k|--key", "specify or randomly generate a symmetric key or keyfile", CommandOptionType.SingleValue)]
+    private string SymmetricKey { get; }
 
     [Option("-x|--private", "specify your private key (unused or empty for default key)", CommandOptionType.SingleOrNoValue)]
     private (bool optionSpecified, string value) PrivateKey { get; }
@@ -108,11 +108,11 @@ public class Program
         {
             if (Encrypt)
             {
-                CommandLine.Encrypt(Password.optionSpecified, GetPassword(Password.value), Keyfile, PrivateKey.optionSpecified, GetEncryptionPrivateKey(PrivateKey.value), PublicKeys, FilePaths);
+                CommandLine.Encrypt(Password.optionSpecified, GetPassword(Password.value), SymmetricKey, PrivateKey.optionSpecified, GetEncryptionPrivateKey(PrivateKey.value), PublicKeys, FilePaths);
             }
             else if (Decrypt)
             {
-                CommandLine.Decrypt(Password.optionSpecified, GetPassword(Password.value), Keyfile, PrivateKey.optionSpecified, GetEncryptionPrivateKey(PrivateKey.value), PublicKeys, FilePaths);
+                CommandLine.Decrypt(Password.optionSpecified, GetPassword(Password.value), SymmetricKey, PrivateKey.optionSpecified, GetEncryptionPrivateKey(PrivateKey.value), PublicKeys, FilePaths);
             }
             else if (GenerateKeys)
             {

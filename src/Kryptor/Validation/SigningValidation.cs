@@ -94,7 +94,7 @@ public static class SigningValidation
         }
         else if (encodedPublicKeys[0].Length != Constants.PublicKeyLength)
         {
-            yield return ErrorMessages.GetFilePathError(encodedPublicKeys[0], ErrorMessages.InvalidPublicKey);
+            yield return ErrorMessages.GetKeyStringError(encodedPublicKeys[0], ErrorMessages.InvalidPublicKey);
         }
         foreach (string errorMessage in GetVerifyFilePathsErrors(filePaths, signatureFilePaths))
         {
