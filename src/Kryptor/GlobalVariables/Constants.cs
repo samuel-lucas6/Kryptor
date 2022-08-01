@@ -25,6 +25,9 @@ namespace Kryptor;
 
 public static class Constants
 {
+    // Error handling
+    public const int ErrorCode = -1;
+    
     // Cryptography
     public const int EncryptionKeyLength = 32;
     public const int EphemeralPublicKeyLength = 32;
