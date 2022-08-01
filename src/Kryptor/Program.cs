@@ -97,7 +97,7 @@ public class Program
 
     public static int Main(string[] args) => CommandLineApplication.Execute<Program>(args);
 
-    private void OnExecute()
+    private int OnExecute()
     {
         ExtractVisualCRuntime();
         Globals.Overwrite = Overwrite;
@@ -147,6 +147,7 @@ public class Program
         {
             DisplayMessage.Exception(ex.GetType().Name, "The libsodium cryptographic library requires the Microsoft Visual C++ Redistributable for Visual Studio 2015-2022 to function on Windows. Please install this runtime or move the Kryptor executable to a directory that doesn't require administrative privileges.");
         }
+        return Environment.ExitCode;
     }
     
     private static void ExtractVisualCRuntime()

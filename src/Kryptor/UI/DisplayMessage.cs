@@ -25,19 +25,33 @@ namespace Kryptor;
 
 public static class DisplayMessage
 {
-    public static void Error(string errorMessage) => WriteLine($"Error: {errorMessage}", ConsoleColor.DarkRed);
+    public static void Error(string errorMessage)
+    {
+        Environment.ExitCode = -1;
+        WriteLine($"Error: {errorMessage}", ConsoleColor.DarkRed);
+    }
 
-    public static void FilePathError(string filePath, string message) => Error($"\"{Path.GetFileName(FileHandling.TrimTrailingSeparatorChars(filePath))}\" - {message}");
+    public static void FilePathError(string filePath, string message)
+    {
+        Environment.ExitCode = -1;
+        Error($"\"{Path.GetFileName(FileHandling.TrimTrailingSeparatorChars(filePath))}\" - {message}");
+    }
 
-    public static void Exception(string exceptionName, string errorMessage) => WriteLine($"{exceptionName}: {errorMessage}", ConsoleColor.DarkRed);
-    
+    public static void Exception(string exceptionName, string errorMessage)
+    {
+        Environment.ExitCode = -1;
+        WriteLine($"{exceptionName}: {errorMessage}", ConsoleColor.DarkRed);
+    }
+
     public static void FilePathException(string filePath, string exceptionName, string errorMessage)
     {
+        Environment.ExitCode = -1;
         WriteLine($"{exceptionName}: \"{Path.GetFileName(FileHandling.TrimTrailingSeparatorChars(filePath))}\" - {errorMessage}", ConsoleColor.DarkRed);
     }
     
     public static void KeyStringException(string keyString, string exceptionName, string errorMessage)
     {
+        Environment.ExitCode = -1;
         WriteLine($"{exceptionName}: \"{keyString}\" - {errorMessage}", ConsoleColor.DarkRed);
     }
     
