@@ -19,7 +19,7 @@
 using System;
 using System.IO;
 using System.Security.Cryptography;
-using Sodium;
+using Geralt;
 
 namespace Kryptor;
 
@@ -29,20 +29,24 @@ public static class AsymmetricKeys
     {
         password = Password.GetNewPassword(password);
         var passwordBytes = Password.Prehash(password);
-        using var keyPair = PublicKeyBox.GenerateKeyPair();
-        byte[] publicKey = Arrays.Concat(Constants.Curve25519KeyHeader, keyPair.PublicKey);
-        byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, Constants.Curve25519KeyHeader, keyPair.PrivateKey);
-        return (Utilities.BinaryToBase64(publicKey), Utilities.BinaryToBase64(encryptedPrivateKey));
+        var publicKey = new byte[X25519.PublicKeySize];
+        var privateKey = new byte[X25519.PrivateKeySize];
+        X25519.GenerateKeyPair(publicKey, privateKey);
+        publicKey = Arrays.Concat(Constants.Curve25519KeyHeader, publicKey);
+        byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, Constants.Curve25519KeyHeader, privateKey);
+        return (Encodings.ToBase64(publicKey), Encodings.ToBase64(encryptedPrivateKey));
     }
 
     public static (string publicKey, string privateKey) GenerateSigningKeyPair(char[] password)
     {
         password = Password.GetNewPassword(password);
         var passwordBytes = Password.Prehash(password);
-        using var keyPair = PublicKeyAuth.GenerateKeyPair();
-        byte[] publicKey = Arrays.Concat(Constants.Ed25519KeyHeader, keyPair.PublicKey);
-        byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, Constants.Ed25519KeyHeader, keyPair.PrivateKey);
-        return (Utilities.BinaryToBase64(publicKey), Utilities.BinaryToBase64(encryptedPrivateKey));
+        var publicKey = new byte[Ed25519.PublicKeySize];
+        var privateKey = new byte[Ed25519.PrivateKeySize];
+        Ed25519.GenerateKeyPair(publicKey, privateKey);
+        publicKey = Arrays.Concat(Constants.Ed25519KeyHeader, publicKey);
+        byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, Constants.Ed25519KeyHeader, privateKey);
+        return (Encodings.ToBase64(publicKey), Encodings.ToBase64(encryptedPrivateKey));
     }
 
     public static (string publicKeyPath, string privateKeyPath) ExportKeyPair(string directoryPath, string fileName, string publicKey, string privateKey)
@@ -80,14 +84,16 @@ public static class AsymmetricKeys
 
     public static byte[] GetCurve25519PublicKey(byte[] privateKey)
     {
-        byte[] publicKey = ScalarMult.Base(privateKey);
+        var publicKey = new byte[X25519.PublicKeySize];
+        X25519.ComputePublicKey(publicKey, privateKey);
         CryptographicOperations.ZeroMemory(privateKey);
         return Arrays.Concat(Constants.Curve25519KeyHeader, publicKey);
     }
 
     public static byte[] GetEd25519PublicKey(byte[] privateKey)
     {
-        byte[] publicKey = PublicKeyAuth.ExtractEd25519PublicKeyFromEd25519SecretKey(privateKey);
+        var publicKey = new byte[Ed25519.PublicKeySize];
+        Ed25519.ComputePublicKey(publicKey, privateKey);
         CryptographicOperations.ZeroMemory(privateKey);
         return Arrays.Concat(Constants.Ed25519KeyHeader, publicKey);
     }
