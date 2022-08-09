@@ -18,7 +18,7 @@
 
 using System;
 using System.Security.Cryptography;
-using Sodium;
+using Geralt;
 using ChaCha20BLAKE2;
 
 namespace Kryptor;
@@ -27,11 +27,14 @@ public static class PrivateKey
 {
     public static byte[] Encrypt(byte[] passwordBytes, byte[] keyAlgorithm, byte[] privateKey)
     {
-        byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
+        var salt = new byte[Constants.SaltLength];
+        SecureRandom.Fill(salt);
         DisplayMessage.DerivingKeyFromPassword();
-        byte[] key = PasswordHash.ArgonHashBinary(passwordBytes, salt, Constants.Iterations, Constants.MemorySize, Constants.EncryptionKeyLength, PasswordHash.ArgonAlgorithm.Argon_2ID13);
+        var key = new byte[Constants.EncryptionKeyLength];
+        Argon2id.DeriveKey(key, passwordBytes, salt, Constants.Iterations, Constants.MemorySize);
         CryptographicOperations.ZeroMemory(passwordBytes);
-        byte[] nonce = SodiumCore.GetRandomBytes(Constants.XChaChaNonceLength);
+        var nonce = new byte[Constants.XChaChaNonceLength];
+        SecureRandom.Fill(nonce);
         byte[] additionalData = Arrays.Concat(keyAlgorithm, Constants.PrivateKeyVersion);
         byte[] encryptedPrivateKey = XChaCha20BLAKE2b.Encrypt(privateKey, nonce, key, additionalData);
         CryptographicOperations.ZeroMemory(privateKey);
@@ -51,7 +54,8 @@ public static class PrivateKey
             byte[] salt = Arrays.Slice(privateKey, additionalData.Length, Constants.SaltLength);
             byte[] nonce = Arrays.Slice(privateKey, additionalData.Length + salt.Length, Constants.XChaChaNonceLength);
             byte[] encryptedPrivateKey = Arrays.SliceFromEnd(privateKey, additionalData.Length + salt.Length + nonce.Length);
-            byte[] key = PasswordHash.ArgonHashBinary(passwordBytes, salt, Constants.Iterations, Constants.MemorySize, Constants.EncryptionKeyLength, PasswordHash.ArgonAlgorithm.Argon_2ID13);
+            var key = new byte[Constants.EncryptionKeyLength];
+            Argon2id.DeriveKey(key, passwordBytes, salt, Constants.Iterations, Constants.MemorySize);
             CryptographicOperations.ZeroMemory(passwordBytes);
             byte[] decryptedPrivateKey = XChaCha20BLAKE2b.Decrypt(encryptedPrivateKey, nonce, key, additionalData);
             CryptographicOperations.ZeroMemory(key);
