@@ -20,7 +20,6 @@ using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using Geralt;
-using Sodium;
 
 namespace Kryptor;
 
@@ -34,12 +33,15 @@ public static class FileEncryption
             try
             {
                 bool directory = IsDirectory(inputFilePath, out string zipFilePath);
-                byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
+                var salt = new byte[Constants.SaltLength];
+                SecureRandom.Fill(salt);
                 // Fill unused header with random public key
-                using var ephemeralKeyPair = PublicKeyBox.GenerateKeyPair();
+                byte[] ephemeralPublicKey = new byte[X25519.PublicKeySize], ephemeralPrivateKey = new byte[X25519.PrivateKeySize];
+                X25519.GenerateKeyPair(ephemeralPublicKey, ephemeralPrivateKey);
                 DisplayMessage.DerivingKeyFromPassword();
-                byte[] keyEncryptionKey = PasswordHash.ArgonHashBinary(passwordBytes, salt, Constants.Iterations, Constants.MemorySize, Constants.EncryptionKeyLength, PasswordHash.ArgonAlgorithm.Argon_2ID13);
-                fixed (byte* ignored = keyEncryptionKey) { EncryptInputFile(directory ? zipFilePath : inputFilePath, directory, ephemeralKeyPair.PublicKey, salt, keyEncryptionKey); }
+                var keyEncryptionKey = new byte[Constants.EncryptionKeyLength];
+                Argon2id.DeriveKey(keyEncryptionKey, passwordBytes, salt, Constants.Iterations, Constants.MemorySize);
+                fixed (byte* ignored = keyEncryptionKey) { EncryptInputFile(directory ? zipFilePath : inputFilePath, directory, ephemeralPublicKey, salt, keyEncryptionKey); }
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
@@ -59,11 +61,14 @@ public static class FileEncryption
             try
             {
                 bool directory = IsDirectory(inputFilePath, out string zipFilePath);
-                byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
+                var salt = new byte[Constants.SaltLength];
+                SecureRandom.Fill(salt);
                 // Fill unused header with random public key
-                using var ephemeralKeyPair = PublicKeyBox.GenerateKeyPair();
-                byte[] keyEncryptionKey = GenericHash.HashSaltPersonal(message: Array.Empty<byte>(), symmetricKey, salt, Constants.Personalisation, Constants.EncryptionKeyLength);
-                fixed (byte* ignored = keyEncryptionKey) { EncryptInputFile(directory ? zipFilePath : inputFilePath, directory, ephemeralKeyPair.PublicKey, salt, keyEncryptionKey); }
+                byte[] ephemeralPublicKey = new byte[X25519.PublicKeySize], ephemeralPrivateKey = new byte[X25519.PrivateKeySize];
+                X25519.GenerateKeyPair(ephemeralPublicKey, ephemeralPrivateKey);
+                var keyEncryptionKey = new byte[Constants.EncryptionKeyLength];
+                BLAKE2b.DeriveKey(keyEncryptionKey, symmetricKey, Constants.Personalisation, salt);
+                fixed (byte* ignored = keyEncryptionKey) { EncryptInputFile(directory ? zipFilePath : inputFilePath, directory, ephemeralPublicKey, salt, keyEncryptionKey); }
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
@@ -101,7 +106,8 @@ public static class FileEncryption
                     var ephemeralSharedSecret = new byte[X25519.SharedSecretSize];
                     X25519.DeriveSenderSharedSecret(ephemeralSharedSecret, ephemeralPrivateKey, recipientPublicKey, presharedKey);
                     CryptographicOperations.ZeroMemory(ephemeralPrivateKey);
-                    byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
+                    var salt = new byte[Constants.SaltLength];
+                    SecureRandom.Fill(salt);
                     byte[] inputKeyingMaterial = Arrays.Concat(ephemeralSharedSecret, sharedSecret);
                     var keyEncryptionKey = new byte[Constants.EncryptionKeyLength];
                     BLAKE2b.DeriveKey(keyEncryptionKey, inputKeyingMaterial, Constants.Personalisation, salt);
@@ -138,7 +144,8 @@ public static class FileEncryption
                 CryptographicOperations.ZeroMemory(ephemeralPrivateKey);
                 var ephemeralSharedSecret = new byte[X25519.SharedSecretSize];
                 X25519.DeriveSenderSharedSecret(ephemeralSharedSecret, privateKey, ephemeralPublicKey, presharedKey);
-                byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
+                var salt = new byte[Constants.SaltLength];
+                SecureRandom.Fill(salt);
                 var keyEncryptionKey = new byte[Constants.EncryptionKeyLength];
                 BLAKE2b.DeriveKey(keyEncryptionKey, ephemeralSharedSecret, Constants.Personalisation, salt);
                 CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
