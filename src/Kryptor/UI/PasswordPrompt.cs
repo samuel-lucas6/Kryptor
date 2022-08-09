@@ -40,7 +40,7 @@ public static class PasswordPrompt
         if (!Arrays.Compare(password, retypedPassword))
         {
             DisplayMessage.Error("The passwords don't match.");
-            Environment.Exit(exitCode: 13);
+            Environment.Exit(Constants.ErrorCode);
         }
         Arrays.ZeroMemory(retypedPassword);
     }
@@ -60,7 +60,7 @@ public static class PasswordPrompt
         char[] password = GetPassword();
         if (password.Length != 0) { return password; }
         DisplayMessage.Error("You didn't enter a password.");
-        Environment.Exit(exitCode: 13);
+        Environment.Exit(Constants.ErrorCode);
         return password;
     }
 
