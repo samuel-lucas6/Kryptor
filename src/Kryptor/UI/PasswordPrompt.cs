@@ -70,12 +70,9 @@ public static class PasswordPrompt
         ConsoleKeyInfo consoleKeyInfo;
         while ((consoleKeyInfo = Console.ReadKey(intercept: true)).Key != ConsoleKey.Enter)
         {
-            if (!char.IsControl(consoleKeyInfo.KeyChar))
-            {
+            if (!char.IsControl(consoleKeyInfo.KeyChar)) {
                 password.Add(consoleKeyInfo.KeyChar);
-            }
-            else if (consoleKeyInfo.Key == ConsoleKey.Backspace && password.Count > 0)
-            {
+            } else if (consoleKeyInfo.Key == ConsoleKey.Backspace && password.Count > 0) {
                 password.RemoveAt(password.Count - 1);
             }
         }
