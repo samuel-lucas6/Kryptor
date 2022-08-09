@@ -19,7 +19,6 @@
 using System;
 using System.IO;
 using Geralt;
-using Sodium;
 
 namespace Kryptor;
 
@@ -30,10 +29,10 @@ public static class SymmetricKeyValidation
         try
         {
             if (string.IsNullOrEmpty(symmetricKey)) { return null; }
-            if (Arrays.Compare(symmetricKey.ToCharArray(), new[] { ' ' }))
-            {
-                var key = SodiumCore.GetRandomBytes(Constants.EncryptionKeyLength);
-                DisplayMessage.SymmetricKey(Utilities.BinaryToBase64(Arrays.Concat(Constants.SymmetricKeyHeader, key)));
+            if (Arrays.Compare(symmetricKey.ToCharArray(), new[] { ' ' })) {
+                var key = new byte[Constants.EncryptionKeyLength];
+                SecureRandom.Fill(key);
+                DisplayMessage.SymmetricKey(Encodings.ToBase64(Arrays.Concat(Constants.SymmetricKeyHeader, key)));
                 return key;
             }
             if (Arrays.Compare(new[] {symmetricKey[^1]}, Constants.Base64Padding)) { return KeyString(symmetricKey); }
@@ -41,7 +40,8 @@ public static class SymmetricKeyValidation
             if (Directory.Exists(symmetricKey)) { symmetricKey = Path.Combine(symmetricKey, SecureRandom.GetString(Constants.RandomFileNameLength)); }
             if (!symmetricKey.EndsWith(Constants.KeyfileExtension)) { symmetricKey += Constants.KeyfileExtension; }
             if (File.Exists(symmetricKey)) { return ReadKeyfile(symmetricKey); }
-            var keyfileBytes = SodiumCore.GetRandomBytes(Constants.KeyfileLength);
+            var keyfileBytes = new byte[Constants.KeyfileLength];
+            SecureRandom.Fill(keyfileBytes);
             File.WriteAllBytes(symmetricKey, keyfileBytes);
             File.SetAttributes(symmetricKey, FileAttributes.ReadOnly);
             DisplayMessage.Keyfile(symmetricKey);
@@ -65,9 +65,9 @@ public static class SymmetricKeyValidation
         try
         {
             if (encodedSymmetricKey.Length != Constants.SymmetricKeyLength) { throw new ArgumentException(ErrorMessages.InvalidSymmetricKey); }
-            byte[] symmetricKey = Utilities.Base64ToBinary(encodedSymmetricKey, ignoredChars: null);
+            byte[] symmetricKey = Encodings.FromBase64(encodedSymmetricKey);
             byte[] keyHeader = Arrays.Slice(symmetricKey, sourceIndex: 0, Constants.SymmetricKeyHeader.Length);
-            bool validKey = Utilities.Compare(keyHeader, Constants.SymmetricKeyHeader);
+            bool validKey = ConstantTime.Equals(keyHeader, Constants.SymmetricKeyHeader);
             if (!validKey) { throw new NotSupportedException("This isn't a symmetric key."); }
             return Arrays.SliceFromEnd(symmetricKey, Constants.SymmetricKeyHeader.Length);
         }
@@ -83,7 +83,7 @@ public static class SymmetricKeyValidation
         try
         {
             using var keyfile = new FileStream(keyfilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
-            using var blake2b = new GenericHash.GenericHashAlgorithm(key: (byte[])null, Constants.HashLength);
+            using var blake2b = new BLAKE2bHashAlgorithm(BLAKE2b.MaxHashSize);
             return blake2b.ComputeHash(keyfile);
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
