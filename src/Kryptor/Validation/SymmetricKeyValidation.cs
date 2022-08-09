@@ -18,6 +18,7 @@
 
 using System;
 using System.IO;
+using Geralt;
 using Sodium;
 
 namespace Kryptor;
@@ -37,7 +38,7 @@ public static class SymmetricKeyValidation
             }
             if (Arrays.Compare(new[] {symmetricKey[^1]}, Constants.Base64Padding)) { return KeyString(symmetricKey); }
             if (File.Exists(symmetricKey)) { return ReadKeyfile(symmetricKey); }
-            if (Directory.Exists(symmetricKey)) { symmetricKey = Path.Combine(symmetricKey, FileHandling.GetRandomFileName()); }
+            if (Directory.Exists(symmetricKey)) { symmetricKey = Path.Combine(symmetricKey, SecureRandom.GetString(Constants.RandomFileNameLength)); }
             if (!symmetricKey.EndsWith(Constants.KeyfileExtension)) { symmetricKey += Constants.KeyfileExtension; }
             if (File.Exists(symmetricKey)) { return ReadKeyfile(symmetricKey); }
             var keyfileBytes = SodiumCore.GetRandomBytes(Constants.KeyfileLength);

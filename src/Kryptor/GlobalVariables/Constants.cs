@@ -47,6 +47,7 @@ public static class Constants
     public const string EncryptedExtension = ".kryptor";
     public const string KeyfileExtension = ".key";
     public const string ZipFileExtension = ".zip";
+    public const int RandomFileNameLength = 16;
     public const int SymmetricKeyLength = 48;
     public static readonly byte[] SymmetricKeyHeader = Encoding.UTF8.GetBytes("Rn");
     public static readonly char[] Base64Padding = { '=' };

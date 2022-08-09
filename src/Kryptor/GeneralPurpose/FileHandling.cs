@@ -20,38 +20,26 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Text;
-using Sodium;
+using Geralt;
 
 namespace Kryptor;
 
 public static class FileHandling
 {
     private static readonly char[] SeparatorChars = {Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar, Path.VolumeSeparatorChar};
-
+    
     public static bool IsDirectory(string filePath) => File.GetAttributes(filePath).HasFlag(FileAttributes.Directory);
-
+    
     public static bool IsDirectoryEmpty(string directoryPath) => !Directory.EnumerateFiles(directoryPath, searchPattern: "*", SearchOption.AllDirectories).Any();
     
     public static string[] GetAllFiles(string directoryPath) => Directory.GetFiles(directoryPath, searchPattern: "*", SearchOption.AllDirectories);
-
+    
     public static long GetFileLength(string filePath) => new FileInfo(filePath).Length;
-
+    
     public static bool HasKryptorExtension(string filePath) => filePath.EndsWith(Constants.EncryptedExtension, StringComparison.Ordinal);
-
+    
     public static string TrimTrailingSeparatorChars(string filePath) => filePath.TrimEnd(SeparatorChars);
-
-    public static string GetRandomFileName(int length = 16)
-    {
-        const string characterSet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        var stringBuilder = new StringBuilder();
-        for (int i = 0; i < length; i++)
-        {
-            stringBuilder.Append(characterSet[SodiumCore.GetRandomNumber(upperBound: characterSet.Length)]);
-        }
-        return stringBuilder.ToString();
-    }
-
+    
     public static string ReplaceFileName(string originalFilePath, string newFileName)
     {
         string directoryPath = Path.GetDirectoryName(Path.GetFullPath(originalFilePath));
@@ -62,7 +50,7 @@ public static class FileHandling
     
     public static string GetEncryptedOutputFilePath(string inputFilePath)
     {
-        if (Globals.EncryptFileNames) { inputFilePath = ReplaceFileName(inputFilePath, GetRandomFileName()); }
+        if (Globals.EncryptFileNames) { inputFilePath = ReplaceFileName(inputFilePath, SecureRandom.GetString(Constants.RandomFileNameLength)); }
         return GetUniqueFilePath(inputFilePath + Constants.EncryptedExtension);
     }
         
@@ -88,7 +76,7 @@ public static class FileHandling
         try
         {
             var magicBytes = ReadFileHeader(filePath, offset: 0, Constants.EncryptionMagicBytes.Length);
-            return Utilities.Compare(magicBytes, Constants.EncryptionMagicBytes);
+            return ConstantTime.Equals(magicBytes, Constants.EncryptionMagicBytes);
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex)) 
         { 
@@ -101,7 +89,7 @@ public static class FileHandling
         try
         {
             var formatVersion = ReadFileHeader(filePath, Constants.EncryptionMagicBytes.Length, Constants.EncryptionVersion.Length);
-            return Utilities.Compare(formatVersion, Constants.EncryptionVersion);
+            return ConstantTime.Equals(formatVersion, Constants.EncryptionVersion);
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex)) 
         { 
@@ -114,7 +102,7 @@ public static class FileHandling
         try
         {
             var magicBytes = ReadFileHeader(filePath, offset: 0, Constants.SignatureMagicBytes.Length);
-            return Utilities.Compare(magicBytes, Constants.SignatureMagicBytes);
+            return ConstantTime.Equals(magicBytes, Constants.SignatureMagicBytes);
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
@@ -127,7 +115,7 @@ public static class FileHandling
         try
         {
             var formatVersion = ReadFileHeader(filePath, Constants.SignatureMagicBytes.Length, Constants.SignatureVersion.Length);
-            return Utilities.Compare(formatVersion, Constants.SignatureVersion);
+            return ConstantTime.Equals(formatVersion, Constants.SignatureVersion);
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex)) 
         { 
