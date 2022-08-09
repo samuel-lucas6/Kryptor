@@ -20,7 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Security.Cryptography;
-using Sodium;
+using Geralt;
 
 namespace Kryptor;
 
@@ -235,7 +235,7 @@ public static class CommandLine
             Constants.EncryptionKeyLength => AsymmetricKeys.GetCurve25519PublicKey(privateKey),
             _ => AsymmetricKeys.GetEd25519PublicKey(privateKey)
         };
-        string publicKeyString = Utilities.BinaryToBase64(publicKey);
+        string publicKeyString = Encodings.ToBase64(publicKey);
         string publicKeyFilePath = AsymmetricKeys.ExportPublicKey(privateKeyPath, publicKeyString);
         DisplayMessage.PublicKey(publicKeyString, publicKeyFilePath);
     }
