@@ -22,7 +22,7 @@ using System.Text;
 using System.Buffers.Binary;
 using System.Security.Cryptography;
 using System.Runtime.InteropServices;
-using Sodium;
+using Geralt;
 using ChaCha20BLAKE2;
 
 namespace Kryptor;
@@ -46,7 +46,7 @@ public static class DecryptFile
             CryptographicOperations.ZeroMemory(fileHeader); fileHeaderHandle.Free();
             using (var outputFile = new FileStream(outputFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
             {
-                nonce = Utilities.Increment(nonce);
+                ConstantTime.Increment(nonce);
                 DecryptChunks(inputFile, outputFile, nonce, dataEncryptionKey, paddingLength);
                 CryptographicOperations.ZeroMemory(dataEncryptionKey);
             }
@@ -88,7 +88,7 @@ public static class DecryptFile
         while (inputFile.Read(ciphertextChunk, offset: 0, ciphertextChunk.Length) > 0)
         {
             byte[] plaintextChunk = XChaCha20BLAKE2b.Decrypt(ciphertextChunk, nonce, dataEncryptionKey);
-            nonce = Utilities.Increment(nonce);
+            ConstantTime.Increment(nonce);
             outputFile.Write(plaintextChunk, offset: 0, plaintextChunk.Length);
         }
         if (paddingLength != 0) { outputFile.SetLength(outputFile.Length - paddingLength); }
