@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using Geralt;
 
 namespace Kryptor;
 
@@ -46,7 +47,7 @@ public static class PasswordPrompt
     
     public static char[] UseRandomPassphrase()
     {
-        char[] password = PassphraseGenerator.GetRandomPassphrase(wordCount: 8);
+        char[] password = SecureRandom.GetPassphrase(wordCount: 8);
         Console.Write("Randomly generated passphrase: ");
         Console.WriteLine(password);
         Console.WriteLine();
