@@ -20,7 +20,6 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 using Geralt;
-using Sodium;
 
 namespace Kryptor;
 
@@ -37,7 +36,8 @@ public static class FileDecryption
                 byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
                 DisplayMessage.DerivingKeyFromPassword();
-                byte[] keyEncryptionKey = PasswordHash.ArgonHashBinary(passwordBytes, salt, Constants.Iterations, Constants.MemorySize, Constants.EncryptionKeyLength, PasswordHash.ArgonAlgorithm.Argon_2ID13);
+                var keyEncryptionKey = new byte[Constants.EncryptionKeyLength];
+                Argon2id.DeriveKey(keyEncryptionKey, passwordBytes, salt, Constants.Iterations, Constants.MemorySize);
                 fixed (byte* ignored = keyEncryptionKey) { DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey); }
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -61,7 +61,8 @@ public static class FileDecryption
                 using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
                 byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
-                byte[] keyEncryptionKey = GenericHash.HashSaltPersonal(message: Array.Empty<byte>(), symmetricKey, salt, Constants.Personalisation, Constants.EncryptionKeyLength);
+                var keyEncryptionKey = new byte[Constants.EncryptionKeyLength];
+                BLAKE2b.DeriveKey(keyEncryptionKey, symmetricKey, Constants.Personalisation, salt);
                 fixed (byte* ignored = keyEncryptionKey) { DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey); }
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
