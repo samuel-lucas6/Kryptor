@@ -16,9 +16,10 @@
     along with this program. If not, see https://www.gnu.org/licenses/.
 */
 
+using System;
 using System.Text;
 using System.Security.Cryptography;
-using Sodium;
+using Geralt;
 
 namespace Kryptor;
 
@@ -26,18 +27,30 @@ public static class Password
 {
     public static char[] GetNewPassword(char[] password)
     {
-        if (password.Length == 0) { return PasswordPrompt.EnterNewPassword(); }
-        if (password.Length == 1 && Arrays.Compare(password, new[] { ' ' })) { return PasswordPrompt.UseRandomPassphrase(); }
-        return password;
+        return password.Length switch
+        {
+            0 => PasswordPrompt.EnterNewPassword(),
+            1 when Arrays.Compare(password, new[] {' '}) => PasswordPrompt.UseRandomPassphrase(),
+            _ => password
+        };
     }
     
-    public static byte[] Prehash(char[] password, byte[] pepper = null)
+    public static byte[] Prehash(char[] password, Span<byte> pepper = default)
     {
-        if (password.Length == 0) { return null; }
-        var passwordBytes = Encoding.UTF8.GetBytes(password);
+        if (password.Length == 0) {
+            return null;
+        }
+        Span<byte> passwordBytes = stackalloc byte[Encoding.UTF8.GetMaxByteCount(password.Length)];
+        int bytesEncoded = Encoding.UTF8.GetBytes(password, passwordBytes);
         Arrays.ZeroMemory(password);
-        passwordBytes = GenericHash.Hash(passwordBytes, key: pepper, Constants.HashLength);
+        var hash = new byte[BLAKE2b.MaxHashSize];
+        if (pepper == default) {
+            BLAKE2b.ComputeHash(hash, passwordBytes[..bytesEncoded]);
+        } else {
+            BLAKE2b.ComputeTag(hash, passwordBytes[..bytesEncoded], pepper);
+        }
+        CryptographicOperations.ZeroMemory(passwordBytes);
         CryptographicOperations.ZeroMemory(pepper);
-        return passwordBytes;
+        return hash;
     }
 }
