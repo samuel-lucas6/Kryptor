@@ -102,7 +102,11 @@ public static class FileEncryption
                     X25519.DeriveSenderSharedSecret(ephemeralSharedSecret, ephemeralPrivateKey, recipientPublicKey, presharedKey);
                     CryptographicOperations.ZeroMemory(ephemeralPrivateKey);
                     byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
-                    byte[] keyEncryptionKey = KeyDerivation.Blake2b(ephemeralSharedSecret, sharedSecret, salt);
+                    byte[] inputKeyingMaterial = Arrays.Concat(ephemeralSharedSecret, sharedSecret);
+                    var keyEncryptionKey = new byte[Constants.EncryptionKeyLength];
+                    BLAKE2b.DeriveKey(keyEncryptionKey, inputKeyingMaterial, Constants.Personalisation, salt);
+                    CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
+                    CryptographicOperations.ZeroMemory(inputKeyingMaterial);
                     fixed (byte* ignored = keyEncryptionKey) { EncryptInputFile(directory ? zipFilePath : inputFilePath, directory, ephemeralPublicKey, salt, keyEncryptionKey); }
                 }
                 catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -135,7 +139,9 @@ public static class FileEncryption
                 var ephemeralSharedSecret = new byte[X25519.SharedSecretSize];
                 X25519.DeriveSenderSharedSecret(ephemeralSharedSecret, privateKey, ephemeralPublicKey, presharedKey);
                 byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
-                byte[] keyEncryptionKey = KeyDerivation.Blake2b(ephemeralSharedSecret, salt);
+                var keyEncryptionKey = new byte[Constants.EncryptionKeyLength];
+                BLAKE2b.DeriveKey(keyEncryptionKey, ephemeralSharedSecret, Constants.Personalisation, salt);
+                CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
                 fixed (byte* ignored = keyEncryptionKey) { EncryptInputFile(directory ? zipFilePath : inputFilePath, directory, ephemeralPublicKey, salt, keyEncryptionKey); }
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))

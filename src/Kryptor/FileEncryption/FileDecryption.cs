@@ -92,7 +92,11 @@ public static class FileDecryption
                 var ephemeralSharedSecret = new byte[X25519.SharedSecretSize];
                 X25519.DeriveRecipientSharedSecret(ephemeralSharedSecret, recipientPrivateKey, ephemeralPublicKey, presharedKey);
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
-                byte[] keyEncryptionKey = KeyDerivation.Blake2b(ephemeralSharedSecret, sharedSecret, salt);
+                byte[] inputKeyingMaterial = Arrays.Concat(ephemeralSharedSecret, sharedSecret);
+                var keyEncryptionKey = new byte[Constants.EncryptionKeyLength];
+                BLAKE2b.DeriveKey(keyEncryptionKey, inputKeyingMaterial, Constants.Personalisation, salt);
+                CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
+                CryptographicOperations.ZeroMemory(inputKeyingMaterial);
                 fixed (byte* ignored = keyEncryptionKey) { DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey); }
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -122,7 +126,9 @@ public static class FileDecryption
                 var ephemeralSharedSecret = new byte[X25519.SharedSecretSize];
                 X25519.DeriveSenderSharedSecret(ephemeralSharedSecret, privateKey, ephemeralPublicKey, presharedKey);
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
-                byte[] keyEncryptionKey = KeyDerivation.Blake2b(ephemeralSharedSecret, salt);
+                var keyEncryptionKey = new byte[Constants.EncryptionKeyLength];
+                BLAKE2b.DeriveKey(keyEncryptionKey, ephemeralSharedSecret, Constants.Personalisation, salt);
+                CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
                 fixed (byte* ignored = keyEncryptionKey) { DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey); }
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
