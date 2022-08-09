@@ -19,7 +19,7 @@
 using System;
 using System.IO;
 using System.Text;
-using Sodium;
+using Geralt;
 
 namespace Kryptor;
 
@@ -30,10 +30,12 @@ public static class DigitalSignatures
         if (!prehash) { prehash = FileHandling.GetFileLength(filePath) >= Constants.Mebibyte * 1024; }
         byte[] prehashed = BitConverter.GetBytes(prehash);
         byte[] fileBytes = GetFileBytes(filePath, prehash);
-        byte[] fileSignature = PublicKeyAuth.SignDetached(fileBytes, privateKey);
+        var fileSignature = new byte[Ed25519.SignatureSize];
+        Ed25519.Sign(fileSignature, fileBytes, privateKey);
         byte[] commentBytes = Encoding.UTF8.GetBytes(comment);
         byte[] signatureFileBytes = Arrays.Concat(Constants.SignatureMagicBytes, Constants.SignatureVersion, prehashed, fileSignature, commentBytes);
-        byte[] globalSignature = PublicKeyAuth.SignDetached(signatureFileBytes, privateKey);
+        var globalSignature = new byte[Ed25519.SignatureSize];
+        Ed25519.Sign(globalSignature, signatureFileBytes, privateKey);
         CreateSignatureFile(filePath, signatureFilePath, signatureFileBytes, globalSignature);
         Globals.SuccessfulCount += 1;
     }
@@ -42,7 +44,7 @@ public static class DigitalSignatures
     {
         if (!prehash) { return File.ReadAllBytes(filePath); }
         using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
-        using var blake2b = new GenericHash.GenericHashAlgorithm(key: (byte[])null, Constants.HashLength);
+        using var blake2b = new BLAKE2bHashAlgorithm(BLAKE2b.MaxHashSize);
         return blake2b.ComputeHash(fileStream);
     }
 
@@ -63,20 +65,14 @@ public static class DigitalSignatures
         byte[] formatVersion = FileHandling.ReadFileHeader(signatureFile, Constants.SignatureVersion.Length);
         byte[] prehashed = FileHandling.ReadFileHeader(signatureFile, Constants.BoolBytesLength);
         byte[] fileSignature = FileHandling.ReadFileHeader(signatureFile, Constants.SignatureLength);
-        byte[] commentBytes = GetCommentBytes(signatureFile);
+        byte[] commentBytes = FileHandling.ReadFileHeader(signatureFile, (int)(signatureFile.Length - magicBytes.Length - formatVersion.Length - prehashed.Length - fileSignature.Length - Constants.SignatureLength));
         byte[] signatureFileBytes = Arrays.Concat(magicBytes, formatVersion, prehashed, fileSignature, commentBytes);
         byte[] globalSignature = FileHandling.ReadFileHeader(signatureFile, Constants.SignatureLength);
-        bool validGlobalSignature = PublicKeyAuth.VerifyDetached(globalSignature, signatureFileBytes, publicKey);
+        bool validGlobalSignature = Ed25519.Verify(globalSignature, signatureFileBytes, publicKey);
         if (!validGlobalSignature) { comment = string.Empty; return false; }
         bool prehash = BitConverter.ToBoolean(prehashed);
         byte[] fileBytes = GetFileBytes(filePath, prehash);
         comment = Encoding.UTF8.GetString(commentBytes);
-        return PublicKeyAuth.VerifyDetached(fileSignature, fileBytes, publicKey);
-    }
-
-    private static byte[] GetCommentBytes(FileStream signatureFile)
-    {
-        int offset = Constants.SignatureMagicBytes.Length + Constants.SignatureVersion.Length + Constants.BoolBytesLength + Constants.SignatureLength;
-        return FileHandling.ReadFileHeader(signatureFile, (int)(signatureFile.Length - offset - Constants.SignatureLength));
+        return Ed25519.Verify(fileSignature, fileBytes, publicKey);
     }
 }
