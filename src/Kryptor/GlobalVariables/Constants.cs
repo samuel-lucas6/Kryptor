@@ -43,18 +43,19 @@ public static class Constants
 
     // File encryption
     public static readonly byte[] EncryptionMagicBytes = Encoding.UTF8.GetBytes("KRYPTOR");
-    public static readonly byte[] EncryptionVersion = BitConversion.GetBytes((short)4);
+    public static readonly byte[] EncryptionVersion = { 0x04, 0x00 };
     public const string EncryptedExtension = ".kryptor";
     public const string KeyfileExtension = ".key";
     public const string ZipFileExtension = ".zip";
     public const int SymmetricKeyLength = 48;
     public static readonly byte[] SymmetricKeyHeader = Encoding.UTF8.GetBytes("Rn");
-    public static readonly char[] Base64Padding = {'='};
+    public static readonly char[] Base64Padding = { '=' };
     public const int KeyfileLength = 64;
     public const int FileStreamBufferSize = 131072;
     public const int FileChunkSize = 16384;
-    public const int BoolBitConverterLength = 1;
-    public const int IntBitConverterLength = 4;
+    public const int BoolBytesLength = 1;
+    public const int IntBytesLength = 4;
+    public const int LongBytesLength = 8;
     public const int FileNameHeaderLength = 255;
     public const int EncryptedHeaderLength = 328;
     public static readonly int FileHeadersLength = EncryptionMagicBytes.Length + EncryptionVersion.Length + EphemeralPublicKeyLength + SaltLength + XChaChaNonceLength + EncryptedHeaderLength;
@@ -75,11 +76,11 @@ public static class Constants
     public const int SigningPrivateKeyLength = 188;
     public static readonly byte[] Curve25519KeyHeader = Encoding.UTF8.GetBytes("Cu");
     public static readonly byte[] Ed25519KeyHeader = Encoding.UTF8.GetBytes("Ed");
-    public static readonly byte[] PrivateKeyVersion = BitConversion.GetBytes((short)1);
+    public static readonly byte[] PrivateKeyVersion = { 0x01, 0x00 };
 
     // File signing
     public const string SignatureExtension = ".signature";
     public static readonly byte[] SignatureMagicBytes = Encoding.UTF8.GetBytes("SIGNATURE");
-    public static readonly byte[] SignatureVersion = BitConversion.GetBytes((short)1);
+    public static readonly byte[] SignatureVersion = { 0x01, 0x00 };
     public const int SignatureLength = 64;
 }

@@ -19,6 +19,7 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Buffers.Binary;
 using System.Security.Cryptography;
 using Sodium;
 using ChaCha20BLAKE2;
@@ -59,21 +60,23 @@ public static class EncryptFile
     private static byte[] EncryptFileHeader(string inputFilePath, bool directory, byte[] ephemeralPublicKey, byte[] dataEncryptionKey, byte[] nonce, byte[] keyEncryptionKey)
     {
         long fileLength = FileHandling.GetFileLength(inputFilePath);
-        byte[] paddingLength;
-        if (fileLength == 0) { paddingLength = BitConversion.GetBytes(Constants.FileChunkSize); }
-        else
-        {
+        var paddingLength = new byte[Constants.IntBytesLength];
+        if (fileLength == 0) {
+            BinaryPrimitives.WriteInt32LittleEndian(paddingLength, Constants.FileChunkSize);
+        } else {
             int lastChunkRemainder = Convert.ToInt32(fileLength % Constants.FileChunkSize);
-            paddingLength = BitConversion.GetBytes(lastChunkRemainder == 0 ? lastChunkRemainder : Constants.FileChunkSize - lastChunkRemainder);
+            BinaryPrimitives.WriteInt32LittleEndian(paddingLength, lastChunkRemainder == 0 ? lastChunkRemainder : Constants.FileChunkSize - lastChunkRemainder);
         }
         byte[] isDirectory = BitConverter.GetBytes(directory);
         byte[] fileName = Encoding.UTF8.GetBytes(Path.GetFileName(inputFilePath));
         var paddedFileName = new byte[Constants.FileNameHeaderLength];
         if (Globals.EncryptFileNames) { Array.Copy(fileName, paddedFileName, fileName.Length); }
-        byte[] fileNameLength = !Globals.EncryptFileNames ? BitConversion.GetBytes(0) : BitConversion.GetBytes(fileName.Length);
+        var fileNameLength = new byte[Constants.IntBytesLength];
+        BinaryPrimitives.WriteInt32LittleEndian(fileNameLength, !Globals.EncryptFileNames ? 0 : fileName.Length);
         byte[] fileHeader = Arrays.Concat(paddingLength, isDirectory, fileNameLength, paddedFileName, dataEncryptionKey);
         long chunkCount = (long)Math.Ceiling((double)(fileLength != 0 ? fileLength : 1) / Constants.FileChunkSize);
-        byte[] ciphertextLength = BitConversion.GetBytes(chunkCount * Constants.CiphertextChunkLength);
+        var ciphertextLength = new byte[Constants.LongBytesLength];
+        BinaryPrimitives.WriteInt64LittleEndian(ciphertextLength, chunkCount * Constants.CiphertextChunkLength);
         byte[] additionalData = Arrays.Concat(ciphertextLength, Constants.EncryptionMagicBytes, Constants.EncryptionVersion, ephemeralPublicKey);
         fileHeader = XChaCha20BLAKE2b.Encrypt(fileHeader, nonce, keyEncryptionKey, additionalData);
         return fileHeader;

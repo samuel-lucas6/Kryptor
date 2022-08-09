@@ -18,9 +18,10 @@
 
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
+using System.Buffers.Binary;
 using System.Security.Cryptography;
+using System.Runtime.InteropServices;
 using Sodium;
 using ChaCha20BLAKE2;
 
@@ -37,9 +38,9 @@ public static class DecryptFile
             byte[] encryptedFileHeader = FileHeaders.ReadEncryptedHeader(inputFile);
             byte[] fileHeader = DecryptFileHeader(inputFile, ephemeralPublicKey, encryptedFileHeader, nonce, keyEncryptionKey);
             var fileHeaderHandle = GCHandle.Alloc(fileHeader, GCHandleType.Pinned);
-            int paddingLength = BitConversion.ToInt32(Arrays.Slice(fileHeader, sourceIndex: 0, Constants.IntBitConverterLength));
-            bool isDirectory = BitConverter.ToBoolean(Arrays.Slice(fileHeader, sourceIndex: Constants.IntBitConverterLength, length: Constants.BoolBitConverterLength));
-            int fileNameLength = BitConversion.ToInt32(Arrays.Slice(fileHeader, Constants.IntBitConverterLength + Constants.BoolBitConverterLength, Constants.IntBitConverterLength));
+            int paddingLength = BinaryPrimitives.ReadInt32LittleEndian(Arrays.Slice(fileHeader, sourceIndex: 0, Constants.IntBytesLength));
+            bool isDirectory = BitConverter.ToBoolean(Arrays.Slice(fileHeader, sourceIndex: Constants.IntBytesLength, length: Constants.BoolBytesLength));
+            int fileNameLength = BinaryPrimitives.ReadInt32LittleEndian(Arrays.Slice(fileHeader, Constants.IntBytesLength + Constants.BoolBytesLength, Constants.IntBytesLength));
             byte[] fileName = fileNameLength == 0 ? Array.Empty<byte>() : Arrays.Slice(fileHeader, fileHeader.Length - dataEncryptionKey.Length - Constants.FileNameHeaderLength, fileNameLength);
             Array.Copy(fileHeader, fileHeader.Length - dataEncryptionKey.Length, dataEncryptionKey, destinationIndex: 0, dataEncryptionKey.Length);
             CryptographicOperations.ZeroMemory(fileHeader); fileHeaderHandle.Free();
@@ -67,7 +68,8 @@ public static class DecryptFile
     {
         try
         {
-            byte[] ciphertextLength = BitConversion.GetBytes(inputFile.Length - Constants.FileHeadersLength);
+            var ciphertextLength = new byte[Constants.LongBytesLength];
+            BinaryPrimitives.WriteInt64LittleEndian(ciphertextLength, inputFile.Length - Constants.FileHeadersLength);
             byte[] magicBytes = FileHandling.ReadFileHeader(inputFile, offset: 0, Constants.EncryptionMagicBytes.Length);
             byte[] formatVersion = FileHandling.ReadFileHeader(inputFile, Constants.EncryptionMagicBytes.Length, Constants.EncryptionVersion.Length);
             byte[] additionalData = Arrays.Concat(ciphertextLength, magicBytes, formatVersion, ephemeralPublicKey);

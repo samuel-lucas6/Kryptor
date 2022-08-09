@@ -61,7 +61,7 @@ public static class DigitalSignatures
         using var signatureFile = new FileStream(signatureFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
         byte[] magicBytes = FileHandling.ReadFileHeader(signatureFile, Constants.SignatureMagicBytes.Length);
         byte[] formatVersion = FileHandling.ReadFileHeader(signatureFile, Constants.SignatureVersion.Length);
-        byte[] prehashed = FileHandling.ReadFileHeader(signatureFile, Constants.BoolBitConverterLength);
+        byte[] prehashed = FileHandling.ReadFileHeader(signatureFile, Constants.BoolBytesLength);
         byte[] fileSignature = FileHandling.ReadFileHeader(signatureFile, Constants.SignatureLength);
         byte[] commentBytes = GetCommentBytes(signatureFile);
         byte[] signatureFileBytes = Arrays.Concat(magicBytes, formatVersion, prehashed, fileSignature, commentBytes);
@@ -76,7 +76,7 @@ public static class DigitalSignatures
 
     private static byte[] GetCommentBytes(FileStream signatureFile)
     {
-        int offset = Constants.SignatureMagicBytes.Length + Constants.SignatureVersion.Length + Constants.BoolBitConverterLength + Constants.SignatureLength;
+        int offset = Constants.SignatureMagicBytes.Length + Constants.SignatureVersion.Length + Constants.BoolBytesLength + Constants.SignatureLength;
         return FileHandling.ReadFileHeader(signatureFile, (int)(signatureFile.Length - offset - Constants.SignatureLength));
     }
 }
