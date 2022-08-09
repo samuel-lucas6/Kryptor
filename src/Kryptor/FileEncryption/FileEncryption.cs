@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using Geralt;
 using Sodium;
 
 namespace Kryptor;
@@ -86,14 +87,20 @@ public static class FileEncryption
         foreach (byte[] recipientPublicKey in recipientPublicKeys)
         {
             if (i++ == recipientPublicKeys.Count - 1) { Globals.Overwrite = overwrite; }
-            byte[] sharedSecret = KeyExchange.GetSharedSecretEncryption(senderPrivateKey, recipientPublicKey, presharedKey);
+            var sharedSecret = new byte[X25519.SharedSecretSize];
+            X25519.DeriveSenderSharedSecret(sharedSecret, senderPrivateKey, recipientPublicKey, presharedKey);
             foreach (string inputFilePath in filePaths)
             {
                 Console.WriteLine();
                 try
                 {
                     bool directory = IsDirectory(inputFilePath, out string zipFilePath);
-                    byte[] ephemeralSharedSecret = KeyExchange.GetPublicKeyEphemeralSharedSecret(recipientPublicKey, out byte[] ephemeralPublicKey, presharedKey);
+                    var ephemeralPublicKey = new byte[X25519.PublicKeySize];
+                    var ephemeralPrivateKey = new byte[X25519.PrivateKeySize];
+                    X25519.GenerateKeyPair(ephemeralPublicKey, ephemeralPrivateKey);
+                    var ephemeralSharedSecret = new byte[X25519.SharedSecretSize];
+                    X25519.DeriveSenderSharedSecret(ephemeralSharedSecret, ephemeralPrivateKey, recipientPublicKey, presharedKey);
+                    CryptographicOperations.ZeroMemory(ephemeralPrivateKey);
                     byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
                     byte[] keyEncryptionKey = KeyDerivation.Blake2b(ephemeralSharedSecret, sharedSecret, salt);
                     fixed (byte* ignored = keyEncryptionKey) { EncryptInputFile(directory ? zipFilePath : inputFilePath, directory, ephemeralPublicKey, salt, keyEncryptionKey); }
@@ -121,7 +128,12 @@ public static class FileEncryption
             try
             {
                 bool directory = IsDirectory(inputFilePath, out string zipFilePath);
-                byte[] ephemeralSharedSecret = KeyExchange.GetPrivateKeyEphemeralSharedSecret(privateKey, out byte[] ephemeralPublicKey, presharedKey);
+                var ephemeralPublicKey = new byte[X25519.PublicKeySize];
+                var ephemeralPrivateKey = new byte[X25519.PrivateKeySize];
+                X25519.GenerateKeyPair(ephemeralPublicKey, ephemeralPrivateKey);
+                CryptographicOperations.ZeroMemory(ephemeralPrivateKey);
+                var ephemeralSharedSecret = new byte[X25519.SharedSecretSize];
+                X25519.DeriveSenderSharedSecret(ephemeralSharedSecret, privateKey, ephemeralPublicKey, presharedKey);
                 byte[] salt = SodiumCore.GetRandomBytes(Constants.SaltLength);
                 byte[] keyEncryptionKey = KeyDerivation.Blake2b(ephemeralSharedSecret, salt);
                 fixed (byte* ignored = keyEncryptionKey) { EncryptInputFile(directory ? zipFilePath : inputFilePath, directory, ephemeralPublicKey, salt, keyEncryptionKey); }

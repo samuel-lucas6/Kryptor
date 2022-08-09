@@ -19,6 +19,7 @@
 using System;
 using System.IO;
 using System.Security.Cryptography;
+using Geralt;
 using Sodium;
 
 namespace Kryptor;
@@ -79,7 +80,8 @@ public static class FileDecryption
         if (filePaths == null || recipientPrivateKey == null || senderPublicKey == null) { return; }
         recipientPrivateKey = PrivateKey.Decrypt(recipientPrivateKey, password);
         if (recipientPrivateKey == null) { return; }
-        byte[] sharedSecret = KeyExchange.GetSharedSecretDecryption(recipientPrivateKey, senderPublicKey, presharedKey);
+        var sharedSecret = new byte[X25519.SharedSecretSize];
+        X25519.DeriveRecipientSharedSecret(sharedSecret, recipientPrivateKey, senderPublicKey, presharedKey);
         foreach (string inputFilePath in filePaths)
         {
             Console.WriteLine();
@@ -87,7 +89,8 @@ public static class FileDecryption
             {
                 using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
                 byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
-                byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecretDecryption(recipientPrivateKey, ephemeralPublicKey, presharedKey);
+                var ephemeralSharedSecret = new byte[X25519.SharedSecretSize];
+                X25519.DeriveRecipientSharedSecret(ephemeralSharedSecret, recipientPrivateKey, ephemeralPublicKey, presharedKey);
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
                 byte[] keyEncryptionKey = KeyDerivation.Blake2b(ephemeralSharedSecret, sharedSecret, salt);
                 fixed (byte* ignored = keyEncryptionKey) { DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey); }
@@ -116,7 +119,8 @@ public static class FileDecryption
             {
                 using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
                 byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
-                byte[] ephemeralSharedSecret = KeyExchange.GetSharedSecretEncryption(privateKey, ephemeralPublicKey, presharedKey);
+                var ephemeralSharedSecret = new byte[X25519.SharedSecretSize];
+                X25519.DeriveSenderSharedSecret(ephemeralSharedSecret, privateKey, ephemeralPublicKey, presharedKey);
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
                 byte[] keyEncryptionKey = KeyDerivation.Blake2b(ephemeralSharedSecret, salt);
                 fixed (byte* ignored = keyEncryptionKey) { DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey); }
