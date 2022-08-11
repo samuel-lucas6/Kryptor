@@ -79,15 +79,23 @@ public static class DisplayMessage
 
     public static void SuccessfullyEncrypted(bool space = true)
     {
-        if (Globals.TotalCount <= 0) { return; }
-        if (space) { Console.WriteLine(); }
+        if (Globals.TotalCount <= 0) {
+            return;
+        }
+        if (space) {
+            Console.WriteLine();
+        }
         WriteLine($"Successfully encrypted: {Globals.SuccessfulCount}/{Globals.TotalCount}", Globals.SuccessfulCount == Globals.TotalCount ? ConsoleColor.Green : ConsoleColor.DarkRed);
     }
 
     public static void SuccessfullyDecrypted(bool space = true)
     {
-        if (Globals.TotalCount <= 0) { return; }
-        if (space) { Console.WriteLine(); }
+        if (Globals.TotalCount <= 0) {
+            return;
+        }
+        if (space) {
+            Console.WriteLine();
+        }
         WriteLine($"Successfully decrypted: {Globals.SuccessfulCount}/{Globals.TotalCount}", Globals.SuccessfulCount == Globals.TotalCount ? ConsoleColor.Green : ConsoleColor.DarkRed);
     }
 
@@ -119,7 +127,9 @@ public static class DisplayMessage
     {
         Console.WriteLine();
         Console.WriteLine($"Public key: {publicKey}");
-        if (!string.IsNullOrEmpty(publicKeyFilePath)) { Console.WriteLine($"Public key file: \"{publicKeyFilePath}\""); }
+        if (!string.IsNullOrEmpty(publicKeyFilePath)) {
+            Console.WriteLine($"Public key file: \"{publicKeyFilePath}\"");
+        }
     }
     
     public static void SigningFile(string filePath)
@@ -129,7 +139,9 @@ public static class DisplayMessage
         
     public static void SuccessfullySigned()
     {
-        if (Globals.TotalCount <= 0) { return; }
+        if (Globals.TotalCount <= 0) {
+            return;
+        }
         Console.WriteLine();
         WriteLine($"Successfully signed: {Globals.SuccessfulCount}/{Globals.TotalCount}", Globals.SuccessfulCount == Globals.TotalCount ? ConsoleColor.Green : ConsoleColor.DarkRed);
     }

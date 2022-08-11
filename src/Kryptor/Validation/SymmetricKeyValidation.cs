@@ -28,18 +28,30 @@ public static class SymmetricKeyValidation
     {
         try
         {
-            if (string.IsNullOrEmpty(symmetricKey)) { return null; }
+            if (string.IsNullOrEmpty(symmetricKey)) {
+                return null;
+            }
             if (Arrays.Compare(symmetricKey.ToCharArray(), new[] { ' ' })) {
                 var key = GC.AllocateArray<byte>(Constants.EncryptionKeyLength, pinned: true);
                 SecureRandom.Fill(key);
                 DisplayMessage.SymmetricKey(Encodings.ToBase64(Arrays.Concat(Constants.SymmetricKeyHeader, key)));
                 return key;
             }
-            if (Arrays.Compare(new[] {symmetricKey[^1]}, Constants.Base64Padding)) { return KeyString(symmetricKey); }
-            if (File.Exists(symmetricKey)) { return ReadKeyfile(symmetricKey); }
-            if (Directory.Exists(symmetricKey)) { symmetricKey = Path.Combine(symmetricKey, SecureRandom.GetString(Constants.RandomFileNameLength)); }
-            if (!symmetricKey.EndsWith(Constants.KeyfileExtension)) { symmetricKey += Constants.KeyfileExtension; }
-            if (File.Exists(symmetricKey)) { return ReadKeyfile(symmetricKey); }
+            if (Arrays.Compare(new[] {symmetricKey[^1]}, Constants.Base64Padding)) {
+                return KeyString(symmetricKey);
+            }
+            if (File.Exists(symmetricKey)) {
+                return ReadKeyfile(symmetricKey);
+            }
+            if (Directory.Exists(symmetricKey)) {
+                symmetricKey = Path.Combine(symmetricKey, SecureRandom.GetString(Constants.RandomFileNameLength));
+            }
+            if (!symmetricKey.EndsWith(Constants.KeyfileExtension)) {
+                symmetricKey += Constants.KeyfileExtension;
+            }
+            if (File.Exists(symmetricKey)) {
+                return ReadKeyfile(symmetricKey);
+            }
             var keyfileBytes = GC.AllocateArray<byte>(Constants.KeyfileLength, pinned: true);
             SecureRandom.Fill(keyfileBytes);
             File.WriteAllBytes(symmetricKey, keyfileBytes);
@@ -56,7 +68,9 @@ public static class SymmetricKeyValidation
     
     public static byte[] GetDecryptionSymmetricKey(string symmetricKey)
     {
-        if (string.IsNullOrEmpty(symmetricKey)) { return null; }
+        if (string.IsNullOrEmpty(symmetricKey)) {
+            return null;
+        }
         return Arrays.Compare(new[] {symmetricKey[^1]}, Constants.Base64Padding) ? KeyString(symmetricKey) : ReadKeyfile(symmetricKey);
     }
 
@@ -64,11 +78,15 @@ public static class SymmetricKeyValidation
     {
         try
         {
-            if (encodedSymmetricKey.Length != Constants.SymmetricKeyLength) { throw new ArgumentException(ErrorMessages.InvalidSymmetricKey); }
+            if (encodedSymmetricKey.Length != Constants.SymmetricKeyLength) {
+                throw new ArgumentException(ErrorMessages.InvalidSymmetricKey);
+            }
             byte[] symmetricKey = Encodings.FromBase64(encodedSymmetricKey);
             byte[] keyHeader = Arrays.Slice(symmetricKey, sourceIndex: 0, Constants.SymmetricKeyHeader.Length);
             bool validKey = ConstantTime.Equals(keyHeader, Constants.SymmetricKeyHeader);
-            if (!validKey) { throw new NotSupportedException("This isn't a symmetric key."); }
+            if (!validKey) {
+                throw new NotSupportedException("This isn't a symmetric key.");
+            }
             return Arrays.SliceFromEnd(symmetricKey, Constants.SymmetricKeyHeader.Length);
         }
         catch (Exception ex)

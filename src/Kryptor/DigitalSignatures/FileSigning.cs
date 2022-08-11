@@ -28,15 +28,18 @@ public static class FileSigning
 
     public static void SignEachFile(byte[] privateKey, string comment, bool prehash, string[] signatureFilePaths, string[] filePaths)
     {
-        if (privateKey == null || filePaths == null) { return; }
-        if (string.IsNullOrEmpty(comment)) { comment = DefaultComment; }
+        if (privateKey == null || filePaths == null) {
+            return;
+        }
+        if (string.IsNullOrEmpty(comment)) {
+            comment = DefaultComment;
+        }
         for (int i = 0; i < filePaths.Length; i++)
         {
             try
             {
                 Console.WriteLine();
-                if (FileHandling.IsDirectory(filePaths[i]))
-                {
+                if (FileHandling.IsDirectory(filePaths[i])) {
                     Console.WriteLine($"Signing each file in \"{Path.GetFileName(filePaths[i])}\" directory...");
                     string[] files = FileHandling.GetAllFiles(filePaths[i]);
                     Globals.TotalCount += files.Length - 1;
@@ -68,22 +71,31 @@ public static class FileSigning
        
     public static void VerifyEachFile(string[] signatureFilePaths, string[] filePaths, byte[] publicKey)
     {
-        if (filePaths == null || publicKey == null) { return; }
+        if (filePaths == null || publicKey == null) {
+            return;
+        }
         signatureFilePaths ??= new string[filePaths.Length];
         for (int i = 0; i < filePaths.Length; i++)
         {
-            if (string.IsNullOrEmpty(signatureFilePaths[i])) { signatureFilePaths[i] = filePaths[i] + Constants.SignatureExtension; }
+            if (string.IsNullOrEmpty(signatureFilePaths[i])) {
+                signatureFilePaths[i] = filePaths[i] + Constants.SignatureExtension;
+            }
             try
             {
                 Console.WriteLine($"Verifying \"{Path.GetFileName(signatureFilePaths[i])}\"...");
                 bool validSignature = DigitalSignatures.VerifySignature(signatureFilePaths[i], filePaths[i], publicKey, out string comment);
-                if (!validSignature) { DisplayMessage.WriteLine("Bad signature.", ConsoleColor.DarkRed); }
-                else
-                {
-                    DisplayMessage.WriteLine("Good signature.", ConsoleColor.Green);
-                    if (!string.IsNullOrWhiteSpace(comment)) { Console.WriteLine($"Authenticated comment: {comment}"); }
+                if (!validSignature) {
+                    DisplayMessage.WriteLine("Bad signature.", ConsoleColor.DarkRed);
                 }
-                if (i != filePaths.Length - 1) { Console.WriteLine(); }
+                else {
+                    DisplayMessage.WriteLine("Good signature.", ConsoleColor.Green);
+                    if (!string.IsNullOrWhiteSpace(comment)) {
+                        Console.WriteLine($"Authenticated comment: {comment}");
+                    }
+                }
+                if (i != filePaths.Length - 1) {
+                    Console.WriteLine();
+                }
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {

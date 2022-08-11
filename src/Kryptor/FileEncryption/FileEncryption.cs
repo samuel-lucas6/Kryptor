@@ -27,7 +27,9 @@ public static class FileEncryption
 {
     public static void EncryptEachFileWithPassword(string[] filePaths, byte[] passwordBytes)
     {
-        if (filePaths == null || passwordBytes == null) { return; }
+        if (filePaths == null || passwordBytes == null) {
+            return;
+        }
         foreach (string inputFilePath in filePaths)
         {
             try
@@ -55,7 +57,9 @@ public static class FileEncryption
     
     public static void EncryptEachFileWithSymmetricKey(string[] filePaths, byte[] symmetricKey)
     {
-        if (filePaths == null || symmetricKey == null) { return; }
+        if (filePaths == null || symmetricKey == null) {
+            return;
+        }
         foreach (string inputFilePath in filePaths)
         {
             try
@@ -82,16 +86,22 @@ public static class FileEncryption
     
     public static void EncryptEachFileWithPublicKey(byte[] senderPrivateKey, char[] password, List<byte[]> recipientPublicKeys, byte[] presharedKey, string[] filePaths)
     {
-        if (filePaths == null || senderPrivateKey == null || recipientPublicKeys == null) { return; }
+        if (filePaths == null || senderPrivateKey == null || recipientPublicKeys == null) {
+            return;
+        }
         senderPrivateKey = PrivateKey.Decrypt(senderPrivateKey, password);
-        if (senderPrivateKey == null) { return; }
+        if (senderPrivateKey == null) {
+            return;
+        }
         Globals.TotalCount *= recipientPublicKeys.Count;
         bool overwrite = Globals.Overwrite;
         Globals.Overwrite = false;
         int i = 0;
         foreach (byte[] recipientPublicKey in recipientPublicKeys)
         {
-            if (i++ == recipientPublicKeys.Count - 1) { Globals.Overwrite = overwrite; }
+            if (i++ == recipientPublicKeys.Count - 1) {
+                Globals.Overwrite = overwrite;
+            }
             var sharedSecret = GC.AllocateArray<byte>(X25519.SharedSecretSize, pinned: true);
             X25519.DeriveSenderSharedSecret(sharedSecret, senderPrivateKey, recipientPublicKey, presharedKey);
             foreach (string inputFilePath in filePaths)
@@ -130,9 +140,13 @@ public static class FileEncryption
 
     public static void EncryptEachFileWithPrivateKey(byte[] privateKey, char[] password, byte[] presharedKey, string[] filePaths)
     {
-        if (filePaths == null || privateKey == null) { return; }
+        if (filePaths == null || privateKey == null) {
+            return;
+        }
         privateKey = PrivateKey.Decrypt(privateKey, password);
-        if (privateKey == null) { return; }
+        if (privateKey == null) {
+            return;
+        }
         foreach (string inputFilePath in filePaths)
         {
             Console.WriteLine();
@@ -166,7 +180,9 @@ public static class FileEncryption
     {
         bool directory = FileHandling.IsDirectory(inputFilePath);
         zipFilePath = inputFilePath + Constants.ZipFileExtension;
-        if (directory) { FileHandling.CreateZipFile(inputFilePath, zipFilePath); }
+        if (directory) {
+            FileHandling.CreateZipFile(inputFilePath, zipFilePath);
+        }
         return directory;
     }
     

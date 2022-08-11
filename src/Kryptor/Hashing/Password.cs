@@ -46,7 +46,8 @@ public static class Password
         var hash = GC.AllocateArray<byte>(BLAKE2b.MaxHashSize, pinned: true);
         if (pepper == default) {
             BLAKE2b.ComputeHash(hash, passwordBytes[..bytesEncoded]);
-        } else {
+        }
+        else {
             BLAKE2b.ComputeTag(hash, passwordBytes[..bytesEncoded], pepper);
         }
         CryptographicOperations.ZeroMemory(passwordBytes);

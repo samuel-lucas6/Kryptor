@@ -28,7 +28,9 @@ public static class PasswordPrompt
     {
         Console.WriteLine("Enter a password (leave empty for a random passphrase):");
         char[] password = GetPassword();
-        if (password.Length == 0) { return UseRandomPassphrase(); }
+        if (password.Length == 0) {
+            return UseRandomPassphrase();
+        }
         RetypeNewPassword(password);
         return password;
     }
@@ -37,8 +39,7 @@ public static class PasswordPrompt
     {
         Console.WriteLine("Retype password:");
         char[] retypedPassword = GetPassword();
-        if (!Arrays.Compare(password, retypedPassword))
-        {
+        if (!Arrays.Compare(password, retypedPassword)) {
             DisplayMessage.Error("The passwords don't match.");
             Environment.Exit(Constants.ErrorCode);
         }
@@ -58,7 +59,9 @@ public static class PasswordPrompt
     {
         Console.WriteLine(isPrivateKey == false ? "Enter your password:" : "Enter your private key password:");
         char[] password = GetPassword();
-        if (password.Length != 0) { return password; }
+        if (password.Length != 0) {
+            return password;
+        }
         DisplayMessage.Error("You didn't enter a password.");
         Environment.Exit(Constants.ErrorCode);
         return password;
@@ -72,7 +75,8 @@ public static class PasswordPrompt
         {
             if (!char.IsControl(consoleKeyInfo.KeyChar)) {
                 password.Add(consoleKeyInfo.KeyChar);
-            } else if (consoleKeyInfo.Key == ConsoleKey.Backspace && password.Count > 0) {
+            }
+            else if (consoleKeyInfo.Key == ConsoleKey.Backspace && password.Count > 0) {
                 password.RemoveAt(password.Count - 1);
             }
         }

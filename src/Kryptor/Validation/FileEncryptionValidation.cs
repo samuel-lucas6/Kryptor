@@ -35,33 +35,32 @@ public static class FileEncryptionValidation
 
     private static IEnumerable<string> GetFileEncryptionErrors(bool usePassword, string symmetricKey)
     {
-        if (!usePassword && string.IsNullOrEmpty(symmetricKey)) { yield return PasswordOrSymmetricKeyError; }
-        if (Path.EndsInDirectorySeparator(symmetricKey) && !Directory.Exists(symmetricKey))
-        {
+        if (!usePassword && string.IsNullOrEmpty(symmetricKey)) {
+            yield return PasswordOrSymmetricKeyError;
+        }
+        if (Path.EndsInDirectorySeparator(symmetricKey) && !Directory.Exists(symmetricKey)) {
             yield return ErrorMessages.GetFilePathError(symmetricKey, "Please specify a valid directory for the keyfile.");
         }
-        else if (File.Exists(symmetricKey) && FileHandling.GetFileLength(symmetricKey) < Constants.KeyfileLength)
-        {
+        else if (File.Exists(symmetricKey) && FileHandling.GetFileLength(symmetricKey) < Constants.KeyfileLength) {
             yield return ErrorMessages.GetFilePathError(symmetricKey, "Please specify a keyfile that's at least 64 bytes in size.");
         }
-        else if (!string.IsNullOrEmpty(symmetricKey) && Arrays.Compare(new[] {symmetricKey[^1]}, Constants.Base64Padding) && symmetricKey.Length != Constants.SymmetricKeyLength)
-        {
+        else if (!string.IsNullOrEmpty(symmetricKey) && Arrays.Compare(new[] {symmetricKey[^1]}, Constants.Base64Padding) && symmetricKey.Length != Constants.SymmetricKeyLength) {
             yield return ErrorMessages.GetKeyStringError(symmetricKey, ErrorMessages.InvalidSymmetricKey);
         }
     }
 
     private static IEnumerable<string> GetEncryptionFilePathErrors(string[] filePaths)
     {
-        if (filePaths == null)
-        {
+        if (filePaths == null) {
             yield return FileOrDirectoryError;
         }
-        else
-        {
+        else {
             foreach (string inputFilePath in filePaths)
             {
                 string errorMessage = FilePathValidation.GetFileEncryptionError(inputFilePath);
-                if (!string.IsNullOrEmpty(errorMessage)) { yield return ErrorMessages.GetFilePathError(inputFilePath, errorMessage); }
+                if (!string.IsNullOrEmpty(errorMessage)) {
+                    yield return ErrorMessages.GetFilePathError(inputFilePath, errorMessage);
+                }
             }
         }
     }
@@ -78,20 +77,16 @@ public static class FileEncryptionValidation
         {
             yield return errorMessage;
         }
-        if (publicKeyPaths == null)
-        {
+        if (publicKeyPaths == null) {
             yield return ErrorMessages.NoPublicKey;
         }
-        else
-        {
+        else {
             foreach (string publicKeyPath in publicKeyPaths)
             {
-                if (!publicKeyPath.EndsWith(Constants.PublicKeyExtension))
-                {
+                if (!publicKeyPath.EndsWith(Constants.PublicKeyExtension)) {
                     yield return ErrorMessages.GetFilePathError(publicKeyPath, ErrorMessages.InvalidPublicKeyFile);
                 }
-                else if (!File.Exists(publicKeyPath))
-                {
+                else if (!File.Exists(publicKeyPath)) {
                     yield return ErrorMessages.GetFilePathError(publicKeyPath, ErrorMessages.NonExistentPublicKeyFile);
                 }
             }
@@ -110,20 +105,16 @@ public static class FileEncryptionValidation
         {
             yield return errorMessage;
         }
-        if (encodedPublicKeys == null)
-        {
+        if (encodedPublicKeys == null) {
             yield return ErrorMessages.NoPublicKey;
         }
-        else
-        {
+        else {
             foreach (string encodedPublicKey in encodedPublicKeys)
             {
-                if (encodedPublicKey.EndsWith(Constants.PublicKeyExtension))
-                {
+                if (encodedPublicKey.EndsWith(Constants.PublicKeyExtension)) {
                     yield return ErrorMessages.GetFilePathError(encodedPublicKey, "Please specify only public key strings or only public key files.");
                 }
-                else if (encodedPublicKey.Length != Constants.PublicKeyLength)
-                {
+                else if (encodedPublicKey.Length != Constants.PublicKeyLength) {
                     yield return ErrorMessages.GetKeyStringError(encodedPublicKey, ErrorMessages.InvalidPublicKey);
                 }
             }
@@ -138,16 +129,13 @@ public static class FileEncryptionValidation
 
     private static IEnumerable<string> GetFileEncryptionErrors(string privateKeyPath)
     {
-        if (string.Equals(privateKeyPath, Constants.DefaultEncryptionPrivateKeyPath) && !File.Exists(Constants.DefaultEncryptionPrivateKeyPath))
-        {
+        if (string.Equals(privateKeyPath, Constants.DefaultEncryptionPrivateKeyPath) && !File.Exists(Constants.DefaultEncryptionPrivateKeyPath)) {
             yield return ErrorMessages.NonExistentDefaultPrivateKeyFile;
         }
-        else if (!string.IsNullOrEmpty(privateKeyPath) && !privateKeyPath.EndsWith(Constants.PrivateKeyExtension))
-        {
+        else if (!string.IsNullOrEmpty(privateKeyPath) && !privateKeyPath.EndsWith(Constants.PrivateKeyExtension)) {
             yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.InvalidPrivateKeyFile);
         }
-        else if (!string.IsNullOrEmpty(privateKeyPath) && !File.Exists(privateKeyPath))
-        {
+        else if (!string.IsNullOrEmpty(privateKeyPath) && !File.Exists(privateKeyPath)) {
             yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.NonExistentPrivateKeyFile);
         }
     }
@@ -160,29 +148,29 @@ public static class FileEncryptionValidation
 
     private static IEnumerable<string> GetFileDecryptionErrors(bool usePassword, string symmetricKey)
     {
-        if (!usePassword && string.IsNullOrEmpty(symmetricKey)) { yield return PasswordOrSymmetricKeyError; }
-        if (!string.IsNullOrEmpty(symmetricKey) && Arrays.Compare(new[] {symmetricKey[^1]}, Constants.Base64Padding) && symmetricKey.Length != Constants.SymmetricKeyLength)
-        {
+        if (!usePassword && string.IsNullOrEmpty(symmetricKey)) {
+            yield return PasswordOrSymmetricKeyError;
+        }
+        if (!string.IsNullOrEmpty(symmetricKey) && Arrays.Compare(new[] {symmetricKey[^1]}, Constants.Base64Padding) && symmetricKey.Length != Constants.SymmetricKeyLength) {
             yield return ErrorMessages.GetKeyStringError(symmetricKey, ErrorMessages.InvalidSymmetricKey);
         }
-        else if (!string.IsNullOrEmpty(symmetricKey) && !Arrays.Compare(new[] {symmetricKey[^1]}, Constants.Base64Padding) && !File.Exists(symmetricKey))
-        {
+        else if (!string.IsNullOrEmpty(symmetricKey) && !Arrays.Compare(new[] {symmetricKey[^1]}, Constants.Base64Padding) && !File.Exists(symmetricKey)) {
             yield return ErrorMessages.GetFilePathError(symmetricKey, "Please specify a valid symmetric key string or a keyfile that exists.");
         }
     }
 
     private static IEnumerable<string> GetDecryptionFilePathErrors(string[] filePaths)
     {
-        if (filePaths == null)
-        {
+        if (filePaths == null) {
             yield return FileOrDirectoryError;
         }
-        else
-        {
+        else {
             foreach (string inputFilePath in filePaths)
             {
                 string errorMessage = FilePathValidation.GetFileDecryptionError(inputFilePath);
-                if (!string.IsNullOrEmpty(errorMessage)) { yield return ErrorMessages.GetFilePathError(inputFilePath, errorMessage); }
+                if (!string.IsNullOrEmpty(errorMessage)) {
+                    yield return ErrorMessages.GetFilePathError(inputFilePath, errorMessage);
+                }
             }
         }
     }
@@ -199,20 +187,16 @@ public static class FileEncryptionValidation
         {
             yield return errorMessage;
         }
-        if (publicKeyPaths == null)
-        {
+        if (publicKeyPaths == null) {
             yield return ErrorMessages.NoPublicKey;
         }
-        else if (publicKeyPaths.Length > 1)
-        {
+        else if (publicKeyPaths.Length > 1) {
             yield return ErrorMessages.MultiplePublicKeys;
         }
-        else if (!publicKeyPaths[0].EndsWith(Constants.PublicKeyExtension))
-        {
+        else if (!publicKeyPaths[0].EndsWith(Constants.PublicKeyExtension)) {
             yield return ErrorMessages.GetFilePathError(publicKeyPaths[0], ErrorMessages.InvalidPublicKeyFile);
         }
-        else if (!File.Exists(publicKeyPaths[0]))
-        {
+        else if (!File.Exists(publicKeyPaths[0])) {
             yield return ErrorMessages.GetFilePathError(publicKeyPaths[0], ErrorMessages.NonExistentPublicKeyFile);
         }
     }
@@ -229,16 +213,13 @@ public static class FileEncryptionValidation
         {
             yield return errorMessage;
         }
-        if (encodedPublicKeys == null)
-        {
+        if (encodedPublicKeys == null) {
             yield return ErrorMessages.NoPublicKey;
         }
-        else if (encodedPublicKeys.Length > 1)
-        {
+        else if (encodedPublicKeys.Length > 1) {
             yield return ErrorMessages.MultiplePublicKeys;
         }
-        else if (encodedPublicKeys[0].Length != Constants.PublicKeyLength)
-        {
+        else if (encodedPublicKeys[0].Length != Constants.PublicKeyLength) {
             yield return ErrorMessages.GetKeyStringError(encodedPublicKeys[0], ErrorMessages.InvalidPublicKey);
         }
     }

@@ -27,7 +27,9 @@ public static class DigitalSignatures
 {
     public static void SignFile(string filePath, string signatureFilePath, string comment, bool prehash, byte[] privateKey)
     {
-        if (!prehash) { prehash = FileHandling.GetFileLength(filePath) >= Constants.Mebibyte * 1024; }
+        if (!prehash) {
+            prehash = FileHandling.GetFileLength(filePath) >= Constants.Mebibyte * 1024;
+        }
         byte[] prehashed = BitConverter.GetBytes(prehash);
         byte[] fileBytes = GetFileBytes(filePath, prehash);
         var fileSignature = new byte[Ed25519.SignatureSize];
@@ -42,7 +44,9 @@ public static class DigitalSignatures
 
     private static byte[] GetFileBytes(string filePath, bool prehash)
     {
-        if (!prehash) { return File.ReadAllBytes(filePath); }
+        if (!prehash) {
+            return File.ReadAllBytes(filePath);
+        }
         using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
         using var blake2b = new BLAKE2bHashAlgorithm(BLAKE2b.MaxHashSize);
         return blake2b.ComputeHash(fileStream);
@@ -50,8 +54,12 @@ public static class DigitalSignatures
 
     private static void CreateSignatureFile(string filePath, string signatureFilePath, byte[] signatureFileBytes, byte[] globalSignature)
     {
-        if (string.IsNullOrEmpty(signatureFilePath)) { signatureFilePath = filePath + Constants.SignatureExtension; }
-        if (File.Exists(signatureFilePath)) { File.SetAttributes(signatureFilePath, FileAttributes.Normal); }
+        if (string.IsNullOrEmpty(signatureFilePath)) {
+            signatureFilePath = filePath + Constants.SignatureExtension;
+        }
+        if (File.Exists(signatureFilePath)) {
+            File.SetAttributes(signatureFilePath, FileAttributes.Normal);
+        }
         using var signatureFile = new FileStream(signatureFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
         signatureFile.Write(signatureFileBytes, offset: 0, signatureFileBytes.Length);
         signatureFile.Write(globalSignature, offset: 0, globalSignature.Length);
@@ -69,7 +77,10 @@ public static class DigitalSignatures
         byte[] signatureFileBytes = Arrays.Concat(magicBytes, formatVersion, prehashed, fileSignature, commentBytes);
         byte[] globalSignature = FileHandling.ReadFileHeader(signatureFile, Constants.SignatureLength);
         bool validGlobalSignature = Ed25519.Verify(globalSignature, signatureFileBytes, publicKey);
-        if (!validGlobalSignature) { comment = string.Empty; return false; }
+        if (!validGlobalSignature) {
+            comment = string.Empty;
+            return false;
+        }
         bool prehash = BitConverter.ToBoolean(prehashed);
         byte[] fileBytes = GetFileBytes(filePath, prehash);
         comment = Encoding.UTF8.GetString(commentBytes);

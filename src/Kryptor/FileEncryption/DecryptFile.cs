@@ -52,14 +52,22 @@ public static class DecryptFile
             }
             inputFile.Dispose();
             Globals.SuccessfulCount += 1;
-            if (fileNameLength != 0) { outputFilePath = FileHandling.RenameFile(outputFilePath, Encoding.UTF8.GetString(fileName)); }
-            if (isDirectory) { FileHandling.ExtractZipFile(outputFilePath); }
-            if (Globals.Overwrite) { FileHandling.DeleteFile(inputFile.Name); }
+            if (fileNameLength != 0) {
+                outputFilePath = FileHandling.RenameFile(outputFilePath, Encoding.UTF8.GetString(fileName));
+            }
+            if (isDirectory) {
+                FileHandling.ExtractZipFile(outputFilePath);
+            }
+            if (Globals.Overwrite) {
+                FileHandling.DeleteFile(inputFile.Name);
+            }
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
         {
             CryptographicOperations.ZeroMemory(dataEncryptionKey);
-            if (ex is not ArgumentException) { FileHandling.DeleteFile(outputFilePath); }
+            if (ex is not ArgumentException) {
+                FileHandling.DeleteFile(outputFilePath);
+            }
             throw;
         }
     }
@@ -91,6 +99,8 @@ public static class DecryptFile
             ConstantTime.Increment(nonce);
             outputFile.Write(plaintextChunk, offset: 0, plaintextChunk.Length);
         }
-        if (paddingLength != 0) { outputFile.SetLength(outputFile.Length - paddingLength); }
+        if (paddingLength != 0) {
+            outputFile.SetLength(outputFile.Length - paddingLength);
+        }
     }
 }

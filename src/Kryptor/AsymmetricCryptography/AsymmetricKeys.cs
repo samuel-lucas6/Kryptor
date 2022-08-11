@@ -64,7 +64,9 @@ public static class AsymmetricKeys
         string publicKeyFilePath = Path.ChangeExtension(privateKeyFilePath, Constants.PublicKeyExtension);
         try
         {
-            if (File.Exists(publicKeyFilePath)) { return null; }
+            if (File.Exists(publicKeyFilePath)) {
+                return null;
+            }
             CreateKeyFile(publicKeyFilePath, publicKey);
             return publicKeyFilePath;
         }
@@ -77,7 +79,9 @@ public static class AsymmetricKeys
 
     private static void CreateKeyFile(string filePath, string asymmetricKey)
     {
-        if (File.Exists(filePath)) { File.SetAttributes(filePath, FileAttributes.Normal); }
+        if (File.Exists(filePath)) {
+            File.SetAttributes(filePath, FileAttributes.Normal);
+        }
         File.WriteAllText(filePath, asymmetricKey);
         File.SetAttributes(filePath, FileAttributes.ReadOnly);
     }

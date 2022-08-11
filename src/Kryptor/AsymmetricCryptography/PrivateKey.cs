@@ -44,10 +44,14 @@ public static class PrivateKey
 
     public static byte[] Decrypt(byte[] privateKey, char[] password)
     {
-        if (privateKey == null) { return null; }
+        if (privateKey == null) {
+            return null;
+        }
         try
         {
-            if (password.Length == 0) { password = PasswordPrompt.EnterYourPassword(isPrivateKey: true); }
+            if (password.Length == 0) {
+                password = PasswordPrompt.EnterYourPassword(isPrivateKey: true);
+            }
             Console.WriteLine("Decrypting private key...");
             var passwordBytes = Password.Prehash(password);
             byte[] additionalData = Arrays.Slice(privateKey, sourceIndex: 0, Constants.Curve25519KeyHeader.Length + Constants.PrivateKeyVersion.Length);

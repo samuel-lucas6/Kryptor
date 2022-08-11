@@ -63,8 +63,7 @@ public static class Updates
 
     public static void Update(string latestVersion)
     {
-        if (!Environment.Is64BitOperatingSystem || !OperatingSystem.IsWindows() & !OperatingSystem.IsLinux() & !OperatingSystem.IsMacOS())
-        {
+        if (!Environment.Is64BitOperatingSystem || !OperatingSystem.IsWindows() & !OperatingSystem.IsLinux() & !OperatingSystem.IsMacOS()) {
             throw new PlatformNotSupportedException("There are no official releases for your operating system.");
         }
         Console.WriteLine("Downloading update...");
@@ -82,7 +81,9 @@ public static class Updates
         DownloadFile(downloadLink, downloadFilePath);
         VerifyDownloadSignature(signatureFilePath, downloadFilePath, latestVersion);
         string extractedDirectoryPath = Path.Combine(LocalApplicationDataPath, ExecutableFileName);
-        if (!Directory.Exists(extractedDirectoryPath)) { Directory.CreateDirectory(extractedDirectoryPath); }
+        if (!Directory.Exists(extractedDirectoryPath)) {
+            Directory.CreateDirectory(extractedDirectoryPath);
+        }
         ZipFile.ExtractToDirectory(downloadFilePath, extractedDirectoryPath, overwriteFiles: true);
         File.Delete(downloadFilePath);
         string executableFilePath = Path.Combine(extractedDirectoryPath, OperatingSystem.IsWindows() ? $"{ExecutableFileName}.exe" : ExecutableFileName);
@@ -105,7 +106,9 @@ public static class Updates
         byte[] publicKey = AsymmetricKeyValidation.SigningPublicKeyString("RWRudj7GpRdUxpojSmgHBOoNGUoD37H0WOUMAcT0yZcobg==");
         bool validSignature = DigitalSignatures.VerifySignature(signatureFilePath, downloadFilePath, publicKey, out string comment);
         File.Delete(signatureFilePath);
-        if (validSignature && string.Equals(comment, $"Kryptor v{latestVersion}")) { return; }
+        if (validSignature && string.Equals(comment, $"Kryptor v{latestVersion}")) {
+            return;
+        }
         File.Delete(downloadFilePath);
         throw new CryptographicException("Bad signature. Update aborted.");
     }
@@ -113,12 +116,10 @@ public static class Updates
     private static void ReplaceExecutable(byte[] downloadedExecutable)
     {
         string executableFilePath = Environment.ProcessPath ?? throw new ArgumentNullException(nameof(executableFilePath));
-        if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
-        {
+        if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS()) {
             File.WriteAllBytes(executableFilePath, downloadedExecutable);
         }
-        else
-        {
+        else {
             string newExecutableFilePath = Path.Combine(LocalApplicationDataPath, $"{ExecutableFileName}.exe");
             string batFilePath = Path.Combine(LocalApplicationDataPath, $"{ExecutableFileName}.bat");
             File.WriteAllBytes(newExecutableFilePath, downloadedExecutable);

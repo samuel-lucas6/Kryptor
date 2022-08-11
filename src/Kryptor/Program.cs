@@ -106,40 +106,31 @@ public class Program
         Console.WriteLine();
         try
         {
-            if (GenerateKeys)
-            {
+            if (GenerateKeys) {
                 CommandLine.GenerateNewKeyPair(GetPassword(Password.value), FilePaths == null ? Constants.DefaultKeyDirectory : FilePaths[0], Encrypt, Sign);
             }
-            else if (Encrypt)
-            {
+            else if (Encrypt) {
                 CommandLine.Encrypt(Password.optionSpecified, GetPassword(Password.value), SymmetricKey, PrivateKey.optionSpecified, GetEncryptionPrivateKey(PrivateKey.value), PublicKeys, FilePaths);
             }
-            else if (Decrypt)
-            {
+            else if (Decrypt) {
                 CommandLine.Decrypt(Password.optionSpecified, GetPassword(Password.value), SymmetricKey, PrivateKey.optionSpecified, GetEncryptionPrivateKey(PrivateKey.value), PublicKeys, FilePaths);
             }
-            else if (RecoverPublicKey)
-            {
+            else if (RecoverPublicKey) {
                 CommandLine.RecoverPublicKey(PrivateKey.value, GetPassword(Password.value));
             }
-            else if (Sign)
-            {
+            else if (Sign) {
                 CommandLine.Sign(GetSigningPrivateKey(PrivateKey.value), GetPassword(Password.value), Comment, Prehash, Signatures, FilePaths);
             }
-            else if (Verify)
-            {
+            else if (Verify) {
                 CommandLine.Verify(PublicKeys, Signatures, FilePaths);
             }
-            else if (CheckForUpdates)
-            {
+            else if (CheckForUpdates) {
                 CommandLine.CheckForUpdates();
             }
-            else if (About)
-            {
+            else if (About) {
                 CommandLine.DisplayAbout();
             }
-            else
-            {
+            else {
                 DisplayMessage.Error("Unknown command. Please specify -h|--help for a list of options and examples.");
             }
         }
@@ -155,9 +146,10 @@ public class Program
         try
         {
             string vcruntimeFilePath = Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), "vcruntime140.dll");
-            if (!OperatingSystem.IsWindows() || File.Exists(vcruntimeFilePath)) { return; }
-            if (Environment.Is64BitOperatingSystem)
-            {
+            if (!OperatingSystem.IsWindows() || File.Exists(vcruntimeFilePath)) {
+                return;
+            }
+            if (Environment.Is64BitOperatingSystem) {
                 File.WriteAllBytes(vcruntimeFilePath, Properties.Resources.vcruntime140x64);
                 return;
             }

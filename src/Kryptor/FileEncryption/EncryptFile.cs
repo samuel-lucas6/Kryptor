@@ -46,8 +46,12 @@ public static class EncryptFile
                 CryptographicOperations.ZeroMemory(dataEncryptionKey);
             }
             Globals.SuccessfulCount += 1;
-            if (Globals.Overwrite) { FileHandling.OverwriteFile(inputFilePath, outputFilePath); }
-            else if (directory) { FileHandling.DeleteFile(inputFilePath); }
+            if (Globals.Overwrite) {
+                FileHandling.OverwriteFile(inputFilePath, outputFilePath);
+            }
+            else if (directory) {
+                FileHandling.DeleteFile(inputFilePath);
+            }
             FileHandling.SetFileAttributesReadOnly(outputFilePath);
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -64,14 +68,17 @@ public static class EncryptFile
         var paddingLength = new byte[Constants.IntBytesLength];
         if (fileLength == 0) {
             BinaryPrimitives.WriteInt32LittleEndian(paddingLength, Constants.FileChunkSize);
-        } else {
+        }
+        else {
             int lastChunkRemainder = Convert.ToInt32(fileLength % Constants.FileChunkSize);
             BinaryPrimitives.WriteInt32LittleEndian(paddingLength, lastChunkRemainder == 0 ? lastChunkRemainder : Constants.FileChunkSize - lastChunkRemainder);
         }
         byte[] isDirectory = BitConverter.GetBytes(directory);
         byte[] fileName = Encoding.UTF8.GetBytes(Path.GetFileName(inputFilePath));
         var paddedFileName = new byte[Constants.FileNameHeaderLength];
-        if (Globals.EncryptFileNames) { Array.Copy(fileName, paddedFileName, fileName.Length); }
+        if (Globals.EncryptFileNames) {
+            Array.Copy(fileName, paddedFileName, fileName.Length);
+        }
         var fileNameLength = new byte[Constants.IntBytesLength];
         BinaryPrimitives.WriteInt32LittleEndian(fileNameLength, !Globals.EncryptFileNames ? 0 : fileName.Length);
         byte[] fileHeader = Arrays.Concat(paddingLength, isDirectory, fileNameLength, paddedFileName, dataEncryptionKey);

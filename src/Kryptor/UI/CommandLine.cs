@@ -28,29 +28,23 @@ public static class CommandLine
 {
     public static void Encrypt(bool usePassword, char[] password, string symmetricKey, bool usePrivateKey, string privateKeyPath, string[] publicKeys, string[] filePaths)
     {
-        if (!usePrivateKey && publicKeys == null && usePassword)
-        {
+        if (!usePrivateKey && publicKeys == null && usePassword) {
             FileEncryptionWithPassword(password, symmetricKey, filePaths);
         }
-        else if (!usePrivateKey && publicKeys == null && !string.IsNullOrEmpty(symmetricKey))
-        {
+        else if (!usePrivateKey && publicKeys == null && !string.IsNullOrEmpty(symmetricKey)) {
             FileEncryptionWithSymmetricKey(symmetricKey, filePaths);
         }
-        else if (publicKeys != null && !string.IsNullOrEmpty(privateKeyPath))
-        {
-            if (publicKeys[0].EndsWith(Constants.PublicKeyExtension))
-            {
+        else if (publicKeys != null && !string.IsNullOrEmpty(privateKeyPath)) {
+            if (publicKeys[0].EndsWith(Constants.PublicKeyExtension)) {
                 FileEncryptionWithPublicKeyFile(privateKeyPath, password, publicKeys, symmetricKey, filePaths);
                 return;
             }
             FileEncryptionWithPublicKeyString(privateKeyPath, password, publicKeys, symmetricKey, filePaths);
         }
-        else if (!string.IsNullOrEmpty(privateKeyPath))
-        {
+        else if (!string.IsNullOrEmpty(privateKeyPath)) {
             FileEncryptionWithPrivateKey(privateKeyPath, password, symmetricKey, filePaths);
         }
-        else
-        {
+        else {
             DisplayMessage.Error(ErrorMessages.EncryptionMethod);
         }
     }
@@ -58,7 +52,9 @@ public static class CommandLine
     private static void FileEncryptionWithPassword(char[] password, string symmetricKey, string[] filePaths)
     {
         bool validUserInput = FileEncryptionValidation.FileEncryptionWithPassword(usePassword: true, symmetricKey, filePaths);
-        if (!validUserInput) { return; }
+        if (!validUserInput) {
+            return;
+        }
         password = Password.GetNewPassword(password);
         byte[] pepper = SymmetricKeyValidation.GetEncryptionSymmetricKey(symmetricKey);
         var passwordBytes = !string.IsNullOrEmpty(symmetricKey) && pepper == null ? null : Password.Prehash(password, pepper);
@@ -68,7 +64,9 @@ public static class CommandLine
     private static void FileEncryptionWithSymmetricKey(string symmetricKey, string[] filePaths)
     {
         bool validUserInput = FileEncryptionValidation.FileEncryptionWithPassword(usePassword: false, symmetricKey, filePaths);
-        if (!validUserInput) { return; }
+        if (!validUserInput) {
+            return;
+        }
         var symmetricKeyBytes = SymmetricKeyValidation.GetEncryptionSymmetricKey(symmetricKey);
         FileEncryption.EncryptEachFileWithSymmetricKey(filePaths, symmetricKeyBytes);
     }
@@ -76,60 +74,66 @@ public static class CommandLine
     private static void FileEncryptionWithPublicKeyFile(string senderPrivateKeyPath, char[] password, string[] recipientPublicKeyPaths, string symmetricKey, string[] filePaths)
     {
         bool validUserInput = FileEncryptionValidation.FileEncryptionWithPublicKeyFile(senderPrivateKeyPath, recipientPublicKeyPaths, symmetricKey, filePaths);
-        if (!validUserInput) { return; }
+        if (!validUserInput) {
+            return;
+        }
         byte[] senderPrivateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(senderPrivateKeyPath);
         List<byte[]> recipientPublicKeys = AsymmetricKeyValidation.EncryptionPublicKeyFile(recipientPublicKeyPaths);
         byte[] presharedKey = SymmetricKeyValidation.GetEncryptionSymmetricKey(symmetricKey);
-        if (!string.IsNullOrEmpty(symmetricKey) && presharedKey == null) { return; }
+        if (!string.IsNullOrEmpty(symmetricKey) && presharedKey == null) {
+            return;
+        }
         FileEncryption.EncryptEachFileWithPublicKey(senderPrivateKey, password, recipientPublicKeys, presharedKey, filePaths);
     }
 
     private static void FileEncryptionWithPublicKeyString(string senderPrivateKeyPath, char[] password, string[] recipientPublicKeyStrings, string symmetricKey, string[] filePaths)
     {
         bool validUserInput = FileEncryptionValidation.FileEncryptionWithPublicKeyString(senderPrivateKeyPath, recipientPublicKeyStrings, symmetricKey, filePaths);
-        if (!validUserInput) { return; }
+        if (!validUserInput) {
+            return;
+        }
         byte[] senderPrivateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(senderPrivateKeyPath);
         List<byte[]> recipientPublicKeys = AsymmetricKeyValidation.EncryptionPublicKeyString(recipientPublicKeyStrings);
         byte[] presharedKey = SymmetricKeyValidation.GetEncryptionSymmetricKey(symmetricKey);
-        if (!string.IsNullOrEmpty(symmetricKey) && presharedKey == null) { return; }
+        if (!string.IsNullOrEmpty(symmetricKey) && presharedKey == null) {
+            return;
+        }
         FileEncryption.EncryptEachFileWithPublicKey(senderPrivateKey, password, recipientPublicKeys, presharedKey, filePaths);
     }
 
     private static void FileEncryptionWithPrivateKey(string privateKeyPath, char[] password, string symmetricKey, string[] filePaths)
     {
         bool validUserInput = FileEncryptionValidation.FileEncryptionWithPrivateKey(privateKeyPath, symmetricKey, filePaths);
-        if (!validUserInput) { return; }
+        if (!validUserInput) {
+            return;
+        }
         byte[] privateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(privateKeyPath);
         byte[] presharedKey = SymmetricKeyValidation.GetEncryptionSymmetricKey(symmetricKey);
-        if (!string.IsNullOrEmpty(symmetricKey) && presharedKey == null) { return; }
+        if (!string.IsNullOrEmpty(symmetricKey) && presharedKey == null) {
+            return;
+        }
         FileEncryption.EncryptEachFileWithPrivateKey(privateKey, password, presharedKey, filePaths);
     }
 
     public static void Decrypt(bool usePassword, char[] password, string symmetricKey, bool usePrivateKey, string privateKeyPath, string[] publicKeys, string[] filePaths)
     {
-        if (!usePrivateKey && publicKeys == null && usePassword)
-        {
+        if (!usePrivateKey && publicKeys == null && usePassword) {
             FileDecryptionWithPassword(password, symmetricKey, filePaths);
         }
-        else if (!usePrivateKey && publicKeys == null && !string.IsNullOrEmpty(symmetricKey))
-        {
+        else if (!usePrivateKey && publicKeys == null && !string.IsNullOrEmpty(symmetricKey)) {
             FileDecryptionWithSymmetricKey(symmetricKey, filePaths);
         }
-        else if (publicKeys != null && !string.IsNullOrEmpty(privateKeyPath))
-        {
-            if (publicKeys[0].EndsWith(Constants.PublicKeyExtension))
-            {
+        else if (publicKeys != null && !string.IsNullOrEmpty(privateKeyPath)) {
+            if (publicKeys[0].EndsWith(Constants.PublicKeyExtension)) {
                 FileDecryptionWithPublicKeyFile(privateKeyPath, password, publicKeys, symmetricKey, filePaths);
                 return;
             }
             FileDecryptionWithPublicKeyString(privateKeyPath, password, publicKeys, symmetricKey, filePaths);
         }
-        else if (!string.IsNullOrEmpty(privateKeyPath))
-        {
+        else if (!string.IsNullOrEmpty(privateKeyPath)) {
             FileDecryptionWithPrivateKey(privateKeyPath, password, symmetricKey, filePaths);
         }
-        else
-        {
+        else {
             DisplayMessage.Error(ErrorMessages.EncryptionMethod);
         }
     }
@@ -137,8 +141,12 @@ public static class CommandLine
     private static void FileDecryptionWithPassword(char[] password, string symmetricKey, string[] filePaths)
     {
         bool validUserInput = FileEncryptionValidation.FileDecryptionWithPassword(usePassword: true, symmetricKey, filePaths);
-        if (!validUserInput) { return; }
-        if (password.Length == 0) { password = PasswordPrompt.EnterYourPassword(); }
+        if (!validUserInput) {
+            return;
+        }
+        if (password.Length == 0) {
+            password = PasswordPrompt.EnterYourPassword();
+        }
         byte[] pepper = SymmetricKeyValidation.GetDecryptionSymmetricKey(symmetricKey);
         var passwordBytes = !string.IsNullOrEmpty(symmetricKey) && pepper == null ? null : Password.Prehash(password, pepper);
         FileDecryption.DecryptEachFileWithPassword(filePaths, passwordBytes);
@@ -147,7 +155,9 @@ public static class CommandLine
     private static void FileDecryptionWithSymmetricKey(string symmetricKey, string[] filePaths)
     {
         bool validUserInput = FileEncryptionValidation.FileDecryptionWithPassword(usePassword: false, symmetricKey, filePaths);
-        if (!validUserInput) { return; }
+        if (!validUserInput) {
+            return;
+        }
         byte[] symmetricKeyBytes = SymmetricKeyValidation.GetDecryptionSymmetricKey(symmetricKey);
         FileDecryption.DecryptEachFileWithSymmetricKey(filePaths, symmetricKeyBytes);
     }
@@ -155,32 +165,44 @@ public static class CommandLine
     private static void FileDecryptionWithPublicKeyFile(string recipientPrivateKeyPath, char[] password, string[] senderPublicKeyPaths, string symmetricKey, string[] filePaths)
     {
         bool validUserInput = FileEncryptionValidation.FileDecryptionWithPublicKeyFile(recipientPrivateKeyPath, senderPublicKeyPaths, symmetricKey, filePaths);
-        if (!validUserInput) { return; }
+        if (!validUserInput) {
+            return;
+        }
         byte[] recipientPrivateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(recipientPrivateKeyPath);
         List<byte[]> senderPublicKey = AsymmetricKeyValidation.EncryptionPublicKeyFile(senderPublicKeyPaths);
         byte[] presharedKey = !string.IsNullOrEmpty(symmetricKey) ? SymmetricKeyValidation.GetDecryptionSymmetricKey(symmetricKey) : null;
-        if (!string.IsNullOrEmpty(symmetricKey) && presharedKey == null) { return; }
+        if (!string.IsNullOrEmpty(symmetricKey) && presharedKey == null) {
+            return;
+        }
         FileDecryption.DecryptEachFileWithPublicKey(recipientPrivateKey, password, senderPublicKey?[0], presharedKey, filePaths);
     }
 
     private static void FileDecryptionWithPublicKeyString(string recipientPrivateKeyPath, char[] password, string[] senderPublicKeyStrings, string symmetricKey, string[] filePaths)
     {
         bool validUserInput = FileEncryptionValidation.FileDecryptionWithPublicKeyString(recipientPrivateKeyPath, senderPublicKeyStrings, symmetricKey, filePaths);
-        if (!validUserInput) { return; }
+        if (!validUserInput) {
+            return;
+        }
         byte[] recipientPrivateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(recipientPrivateKeyPath);
         List<byte[]> senderPublicKey = AsymmetricKeyValidation.EncryptionPublicKeyString(senderPublicKeyStrings);
         byte[] presharedKey = !string.IsNullOrEmpty(symmetricKey) ? SymmetricKeyValidation.GetDecryptionSymmetricKey(symmetricKey) : null;
-        if (!string.IsNullOrEmpty(symmetricKey) && presharedKey == null) { return; }
+        if (!string.IsNullOrEmpty(symmetricKey) && presharedKey == null) {
+            return;
+        }
         FileDecryption.DecryptEachFileWithPublicKey(recipientPrivateKey, password, senderPublicKey?[0], presharedKey, filePaths);
     }
 
     private static void FileDecryptionWithPrivateKey(string privateKeyPath, char[] password, string symmetricKey, string[] filePaths)
     {
         bool validUserInput = FileEncryptionValidation.FileDecryptionWithPrivateKey(privateKeyPath, symmetricKey, filePaths);
-        if (!validUserInput) { return; }
+        if (!validUserInput) {
+            return;
+        }
         byte[] privateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(privateKeyPath);
         byte[] presharedKey = !string.IsNullOrEmpty(symmetricKey) ? SymmetricKeyValidation.GetDecryptionSymmetricKey(symmetricKey) : null;
-        if (!string.IsNullOrEmpty(symmetricKey) && presharedKey == null) { return; }
+        if (!string.IsNullOrEmpty(symmetricKey) && presharedKey == null) {
+            return;
+        }
         FileDecryption.DecryptEachFileWithPrivateKey(privateKey, password, presharedKey, filePaths);
     }
 
@@ -190,15 +212,15 @@ public static class CommandLine
         {
             int keyPairType = GetKeyPairType(encryption, signing);
             bool validUserInput = FilePathValidation.GenerateKeyPair(exportDirectoryPath, keyPairType, encryption, signing);
-            if (!validUserInput) { return; }
+            if (!validUserInput) {
+                return;
+            }
             string publicKey, privateKey, publicKeyFilePath, privateKeyFilePath;
-            if (keyPairType == 1)
-            {
+            if (keyPairType == 1) {
                 (publicKey, privateKey) = AsymmetricKeys.GenerateEncryptionKeyPair(password);
                 (publicKeyFilePath, privateKeyFilePath) = AsymmetricKeys.ExportKeyPair(exportDirectoryPath, Constants.DefaultEncryptionKeyFileName, publicKey, privateKey);
             }
-            else
-            {
+            else {
                 (publicKey, privateKey) = AsymmetricKeys.GenerateSigningKeyPair(password);
                 (publicKeyFilePath, privateKeyFilePath) = AsymmetricKeys.ExportKeyPair(exportDirectoryPath, Constants.DefaultSigningKeyFileName, publicKey, privateKey);
             }
@@ -212,8 +234,12 @@ public static class CommandLine
 
     private static int GetKeyPairType(bool encryption, bool signing)
     {
-        if (encryption) { return 1; }
-        if (signing) { return 2; }
+        if (encryption) {
+            return 1;
+        }
+        if (signing) {
+            return 2;
+        }
         Console.WriteLine("Please select a key pair type (type 1 or 2):");
         Console.WriteLine("1) Encryption");
         Console.WriteLine("2) Signing");
@@ -226,10 +252,14 @@ public static class CommandLine
     public static void RecoverPublicKey(string privateKeyPath, char[] password)
     {
         bool validUserInput = FilePathValidation.RecoverPublicKey(privateKeyPath);
-        if (!validUserInput) { return; }
+        if (!validUserInput) {
+            return;
+        }
         byte[] privateKey = AsymmetricKeyValidation.GetPrivateKeyFromFile(privateKeyPath);
         privateKey = PrivateKey.Decrypt(privateKey, password);
-        if (privateKey == null) { return; }
+        if (privateKey == null) {
+            return;
+        }
         byte[] publicKey = privateKey.Length switch
         {
             Constants.EncryptionKeyLength => AsymmetricKeys.GetCurve25519PublicKey(privateKey),
@@ -243,7 +273,9 @@ public static class CommandLine
     public static void Sign(string privateKeyPath, char[] password, string comment, bool prehash, string[] signatureFilePaths, string[] filePaths)
     {
         bool validUserInput = SigningValidation.Sign(privateKeyPath, comment, signatureFilePaths, filePaths);
-        if (!validUserInput) { return; }
+        if (!validUserInput) {
+            return;
+        }
         byte[] privateKey = AsymmetricKeyValidation.SigningPrivateKeyFile(privateKeyPath);
         privateKey = PrivateKey.Decrypt(privateKey, password);
         FileSigning.SignEachFile(privateKey, comment, prehash, signatureFilePaths, filePaths);
@@ -251,8 +283,7 @@ public static class CommandLine
 
     public static void Verify(string[] publicKeys, string[] signatureFilePaths, string[] filePaths)
     {
-        if (publicKeys == null || publicKeys[0].EndsWith(Constants.PublicKeyExtension))
-        {
+        if (publicKeys == null || publicKeys[0].EndsWith(Constants.PublicKeyExtension)) {
             VerifyWithPublicKeyFile(publicKeys, signatureFilePaths, filePaths);
             return;
         }
@@ -262,7 +293,9 @@ public static class CommandLine
     private static void VerifyWithPublicKeyFile(string[] publicKeyPaths, string[] signatureFilePaths, string[] filePaths)
     {
         bool validUserInput = SigningValidation.VerifyWithPublicKeyFile(publicKeyPaths, signatureFilePaths, filePaths);
-        if (!validUserInput) { return; }
+        if (!validUserInput) {
+            return;
+        }
         byte[] publicKey = AsymmetricKeyValidation.SigningPublicKeyFile(publicKeyPaths[0]);
         FileSigning.VerifyEachFile(signatureFilePaths, filePaths, publicKey);
     }
@@ -270,7 +303,9 @@ public static class CommandLine
     private static void VerifyWithPublicKeyString(string[] encodedPublicKeys, string[] signatureFilePaths, string[] filePaths)
     {
         bool validUserInput = SigningValidation.VerifyWithPublicKeyString(encodedPublicKeys, signatureFilePaths, filePaths);
-        if (!validUserInput) { return; }
+        if (!validUserInput) {
+            return;
+        }
         byte[] publicKey = AsymmetricKeyValidation.SigningPublicKeyString(encodedPublicKeys[0]);
         FileSigning.VerifyEachFile(signatureFilePaths, filePaths, publicKey);
     }
@@ -280,8 +315,7 @@ public static class CommandLine
         try
         {
             bool updateAvailable = Updates.CheckForUpdates(out string latestVersion);
-            if (!updateAvailable)
-            {
+            if (!updateAvailable) {
                 DisplayMessage.WriteLine("Kryptor is up-to-date.", ConsoleColor.Green);
                 return;
             }
@@ -291,7 +325,9 @@ public static class CommandLine
             Console.WriteLine();
             Console.WriteLine("Would you like Kryptor to automatically install this update now? (type y or n)");
             string userInput = Console.ReadLine()?.ToLower();
-            if (!string.IsNullOrEmpty(userInput)) { Console.WriteLine(); }
+            if (!string.IsNullOrEmpty(userInput)) {
+                Console.WriteLine();
+            }
             switch (userInput)
             {
                 case "y":
@@ -309,8 +345,7 @@ public static class CommandLine
         }
         catch (Exception ex) when (ex is WebException or PlatformNotSupportedException or FormatException or OverflowException or InvalidOperationException || ExceptionFilters.Cryptography(ex))
         {
-            if (ex is PlatformNotSupportedException or CryptographicException)
-            {
+            if (ex is PlatformNotSupportedException or CryptographicException) {
                 DisplayMessage.Exception(ex.GetType().Name, ex.Message);
                 return;
             }

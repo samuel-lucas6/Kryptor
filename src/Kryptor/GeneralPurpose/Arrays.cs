@@ -64,7 +64,6 @@ public static class Arrays
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
     public static void ZeroMemory(char[] array)
     {
-        if (array.Length == 0) { return; }
         Array.Clear(array);
     }
 }
