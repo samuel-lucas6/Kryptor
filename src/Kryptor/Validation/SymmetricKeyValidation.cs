@@ -30,7 +30,7 @@ public static class SymmetricKeyValidation
         {
             if (string.IsNullOrEmpty(symmetricKey)) { return null; }
             if (Arrays.Compare(symmetricKey.ToCharArray(), new[] { ' ' })) {
-                var key = new byte[Constants.EncryptionKeyLength];
+                var key = GC.AllocateArray<byte>(Constants.EncryptionKeyLength, pinned: true);
                 SecureRandom.Fill(key);
                 DisplayMessage.SymmetricKey(Encodings.ToBase64(Arrays.Concat(Constants.SymmetricKeyHeader, key)));
                 return key;
@@ -40,7 +40,7 @@ public static class SymmetricKeyValidation
             if (Directory.Exists(symmetricKey)) { symmetricKey = Path.Combine(symmetricKey, SecureRandom.GetString(Constants.RandomFileNameLength)); }
             if (!symmetricKey.EndsWith(Constants.KeyfileExtension)) { symmetricKey += Constants.KeyfileExtension; }
             if (File.Exists(symmetricKey)) { return ReadKeyfile(symmetricKey); }
-            var keyfileBytes = new byte[Constants.KeyfileLength];
+            var keyfileBytes = GC.AllocateArray<byte>(Constants.KeyfileLength, pinned: true);
             SecureRandom.Fill(keyfileBytes);
             File.WriteAllBytes(symmetricKey, keyfileBytes);
             File.SetAttributes(symmetricKey, FileAttributes.ReadOnly);

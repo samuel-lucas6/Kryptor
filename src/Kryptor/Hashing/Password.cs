@@ -43,7 +43,7 @@ public static class Password
         Span<byte> passwordBytes = stackalloc byte[Encoding.UTF8.GetMaxByteCount(password.Length)];
         int bytesEncoded = Encoding.UTF8.GetBytes(password, passwordBytes);
         Arrays.ZeroMemory(password);
-        var hash = new byte[BLAKE2b.MaxHashSize];
+        var hash = GC.AllocateArray<byte>(BLAKE2b.MaxHashSize, pinned: true);
         if (pepper == default) {
             BLAKE2b.ComputeHash(hash, passwordBytes[..bytesEncoded]);
         } else {

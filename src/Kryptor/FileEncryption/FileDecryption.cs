@@ -25,7 +25,7 @@ namespace Kryptor;
 
 public static class FileDecryption
 {
-    public static unsafe void DecryptEachFileWithPassword(string[] filePaths, byte[] passwordBytes)
+    public static void DecryptEachFileWithPassword(string[] filePaths, byte[] passwordBytes)
     {
         if (filePaths == null || passwordBytes == null) { return; }
         foreach (string inputFilePath in filePaths)
@@ -36,9 +36,9 @@ public static class FileDecryption
                 byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
                 DisplayMessage.DerivingKeyFromPassword();
-                var keyEncryptionKey = new byte[Constants.EncryptionKeyLength];
+                var keyEncryptionKey = GC.AllocateArray<byte>(Constants.EncryptionKeyLength, pinned: true);
                 Argon2id.DeriveKey(keyEncryptionKey, passwordBytes, salt, Constants.Iterations, Constants.MemorySize);
-                fixed (byte* ignored = keyEncryptionKey) { DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey); }
+                DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
@@ -51,7 +51,7 @@ public static class FileDecryption
         DisplayMessage.SuccessfullyDecrypted(space: false);
     }
     
-    public static unsafe void DecryptEachFileWithSymmetricKey(string[] filePaths, byte[] symmetricKey)
+    public static void DecryptEachFileWithSymmetricKey(string[] filePaths, byte[] symmetricKey)
     {
         if (filePaths == null || symmetricKey == null) { return; }
         foreach (string inputFilePath in filePaths)
@@ -61,9 +61,9 @@ public static class FileDecryption
                 using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
                 byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
-                var keyEncryptionKey = new byte[Constants.EncryptionKeyLength];
+                var keyEncryptionKey = GC.AllocateArray<byte>(Constants.EncryptionKeyLength, pinned: true);
                 BLAKE2b.DeriveKey(keyEncryptionKey, symmetricKey, Constants.Personalisation, salt);
-                fixed (byte* ignored = keyEncryptionKey) { DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey); }
+                DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
@@ -76,12 +76,12 @@ public static class FileDecryption
         DisplayMessage.SuccessfullyDecrypted(space: false);
     }
 
-    public static unsafe void DecryptEachFileWithPublicKey(byte[] recipientPrivateKey, char[] password, byte[] senderPublicKey, byte[] presharedKey, string[] filePaths)
+    public static void DecryptEachFileWithPublicKey(byte[] recipientPrivateKey, char[] password, byte[] senderPublicKey, byte[] presharedKey, string[] filePaths)
     {
         if (filePaths == null || recipientPrivateKey == null || senderPublicKey == null) { return; }
         recipientPrivateKey = PrivateKey.Decrypt(recipientPrivateKey, password);
         if (recipientPrivateKey == null) { return; }
-        var sharedSecret = new byte[X25519.SharedSecretSize];
+        var sharedSecret = GC.AllocateArray<byte>(X25519.SharedSecretSize, pinned: true);
         X25519.DeriveRecipientSharedSecret(sharedSecret, recipientPrivateKey, senderPublicKey, presharedKey);
         foreach (string inputFilePath in filePaths)
         {
@@ -90,15 +90,16 @@ public static class FileDecryption
             {
                 using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
                 byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
-                var ephemeralSharedSecret = new byte[X25519.SharedSecretSize];
+                var ephemeralSharedSecret = GC.AllocateArray<byte>(X25519.SharedSecretSize, pinned: true);
                 X25519.DeriveRecipientSharedSecret(ephemeralSharedSecret, recipientPrivateKey, ephemeralPublicKey, presharedKey);
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
-                byte[] inputKeyingMaterial = Arrays.Concat(ephemeralSharedSecret, sharedSecret);
-                var keyEncryptionKey = new byte[Constants.EncryptionKeyLength];
+                var inputKeyingMaterial = GC.AllocateArray<byte>(ephemeralSharedSecret.Length + sharedSecret.Length, pinned: true);
+                Spans.Concat(inputKeyingMaterial, ephemeralSharedSecret, sharedSecret);
+                var keyEncryptionKey = GC.AllocateArray<byte>(Constants.EncryptionKeyLength, pinned: true);
                 BLAKE2b.DeriveKey(keyEncryptionKey, inputKeyingMaterial, Constants.Personalisation, salt);
                 CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
                 CryptographicOperations.ZeroMemory(inputKeyingMaterial);
-                fixed (byte* ignored = keyEncryptionKey) { DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey); }
+                DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
@@ -112,7 +113,7 @@ public static class FileDecryption
         DisplayMessage.SuccessfullyDecrypted();
     }
     
-    public static unsafe void DecryptEachFileWithPrivateKey(byte[] privateKey, char[] password, byte[] presharedKey, string[] filePaths)
+    public static void DecryptEachFileWithPrivateKey(byte[] privateKey, char[] password, byte[] presharedKey, string[] filePaths)
     {
         if (filePaths == null || privateKey == null) { return; }
         privateKey = PrivateKey.Decrypt(privateKey, password);
@@ -124,13 +125,13 @@ public static class FileDecryption
             {
                 using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.RandomAccess);
                 byte[] ephemeralPublicKey = FileHeaders.ReadEphemeralPublicKey(inputFile);
-                var ephemeralSharedSecret = new byte[X25519.SharedSecretSize];
+                var ephemeralSharedSecret = GC.AllocateArray<byte>(X25519.SharedSecretSize, pinned: true);
                 X25519.DeriveSenderSharedSecret(ephemeralSharedSecret, privateKey, ephemeralPublicKey, presharedKey);
                 byte[] salt = FileHeaders.ReadSalt(inputFile);
-                var keyEncryptionKey = new byte[Constants.EncryptionKeyLength];
+                var keyEncryptionKey = GC.AllocateArray<byte>(Constants.EncryptionKeyLength, pinned: true);
                 BLAKE2b.DeriveKey(keyEncryptionKey, ephemeralSharedSecret, Constants.Personalisation, salt);
                 CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
-                fixed (byte* ignored = keyEncryptionKey) { DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey); }
+                DecryptInputFile(inputFile, ephemeralPublicKey, keyEncryptionKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {

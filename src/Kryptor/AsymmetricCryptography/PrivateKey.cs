@@ -30,7 +30,7 @@ public static class PrivateKey
         var salt = new byte[Constants.SaltLength];
         SecureRandom.Fill(salt);
         DisplayMessage.DerivingKeyFromPassword();
-        var key = new byte[Constants.EncryptionKeyLength];
+        var key = GC.AllocateArray<byte>(Constants.EncryptionKeyLength, pinned: true);
         Argon2id.DeriveKey(key, passwordBytes, salt, Constants.Iterations, Constants.MemorySize);
         CryptographicOperations.ZeroMemory(passwordBytes);
         var nonce = new byte[Constants.XChaChaNonceLength];
@@ -54,7 +54,7 @@ public static class PrivateKey
             byte[] salt = Arrays.Slice(privateKey, additionalData.Length, Constants.SaltLength);
             byte[] nonce = Arrays.Slice(privateKey, additionalData.Length + salt.Length, Constants.XChaChaNonceLength);
             byte[] encryptedPrivateKey = Arrays.SliceFromEnd(privateKey, additionalData.Length + salt.Length + nonce.Length);
-            var key = new byte[Constants.EncryptionKeyLength];
+            var key = GC.AllocateArray<byte>(Constants.EncryptionKeyLength, pinned: true);
             Argon2id.DeriveKey(key, passwordBytes, salt, Constants.Iterations, Constants.MemorySize);
             CryptographicOperations.ZeroMemory(passwordBytes);
             byte[] decryptedPrivateKey = XChaCha20BLAKE2b.Decrypt(encryptedPrivateKey, nonce, key, additionalData);

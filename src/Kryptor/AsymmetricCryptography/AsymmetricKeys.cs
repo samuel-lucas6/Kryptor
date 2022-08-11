@@ -30,7 +30,7 @@ public static class AsymmetricKeys
         password = Password.GetNewPassword(password);
         var passwordBytes = Password.Prehash(password);
         var publicKey = new byte[X25519.PublicKeySize];
-        var privateKey = new byte[X25519.PrivateKeySize];
+        var privateKey = GC.AllocateArray<byte>(X25519.PrivateKeySize, pinned: true);
         X25519.GenerateKeyPair(publicKey, privateKey);
         publicKey = Arrays.Concat(Constants.Curve25519KeyHeader, publicKey);
         byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, Constants.Curve25519KeyHeader, privateKey);
@@ -42,7 +42,7 @@ public static class AsymmetricKeys
         password = Password.GetNewPassword(password);
         var passwordBytes = Password.Prehash(password);
         var publicKey = new byte[Ed25519.PublicKeySize];
-        var privateKey = new byte[Ed25519.PrivateKeySize];
+        var privateKey = GC.AllocateArray<byte>(Ed25519.PrivateKeySize, pinned: true);
         Ed25519.GenerateKeyPair(publicKey, privateKey);
         publicKey = Arrays.Concat(Constants.Ed25519KeyHeader, publicKey);
         byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, Constants.Ed25519KeyHeader, privateKey);

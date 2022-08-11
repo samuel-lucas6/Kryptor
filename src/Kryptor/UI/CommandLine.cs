@@ -51,7 +51,7 @@ public static class CommandLine
         }
         else
         {
-            DisplayMessage.Error(ErrorMessages.PasswordBasedEncryption);
+            DisplayMessage.Error(ErrorMessages.EncryptionMethod);
         }
     }
 
@@ -130,7 +130,7 @@ public static class CommandLine
         }
         else
         {
-            DisplayMessage.Error(ErrorMessages.PasswordBasedEncryption);
+            DisplayMessage.Error(ErrorMessages.EncryptionMethod);
         }
     }
 

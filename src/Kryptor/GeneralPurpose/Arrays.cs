@@ -21,6 +21,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
+using Geralt;
 using Sodium;
 
 namespace Kryptor;
@@ -52,7 +53,8 @@ public static class Arrays
     {
         var aBytes = Encoding.UTF8.GetBytes(a);
         var bBytes = Encoding.UTF8.GetBytes(b);
-        var key = SodiumCore.GetRandomBytes(Constants.HashLength);
+        var key = GC.AllocateArray<byte>(Constants.EncryptionKeyLength, pinned: true);
+        SecureRandom.Fill(key);
         aBytes = GenericHash.Hash(aBytes, key, Constants.HashLength);
         bBytes = GenericHash.Hash(bBytes, key, Constants.HashLength);
         CryptographicOperations.ZeroMemory(key);
