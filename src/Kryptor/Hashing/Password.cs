@@ -30,7 +30,7 @@ public static class Password
         return password.Length switch
         {
             0 => PasswordPrompt.EnterNewPassword(),
-            1 when Arrays.Compare(password, new[] {' '}) => PasswordPrompt.UseRandomPassphrase(),
+            1 when ConstantTime.Equals(Encoding.UTF8.GetBytes(password), Encoding.UTF8.GetBytes(" ")) => PasswordPrompt.UseRandomPassphrase(),
             _ => password
         };
     }
@@ -42,7 +42,7 @@ public static class Password
         }
         Span<byte> passwordBytes = stackalloc byte[Encoding.UTF8.GetMaxByteCount(password.Length)];
         int bytesEncoded = Encoding.UTF8.GetBytes(password, passwordBytes);
-        Arrays.ZeroMemory(password);
+        Array.Clear(password);
         var hash = GC.AllocateArray<byte>(BLAKE2b.MaxHashSize, pinned: true);
         if (pepper == default) {
             BLAKE2b.ComputeHash(hash, passwordBytes[..bytesEncoded]);

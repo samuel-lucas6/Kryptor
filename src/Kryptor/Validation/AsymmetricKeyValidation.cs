@@ -37,7 +37,7 @@ public static class AsymmetricKeyValidation
                     return null;
                 }
                 ValidateEncryptionKeyAlgorithm(publicKey);
-                publicKeys.Add(Arrays.SliceFromEnd(publicKey, Constants.Curve25519KeyHeader.Length));
+                publicKeys.Add(publicKey[Constants.Curve25519KeyHeader.Length..]);
             }
             return publicKeys;
         }
@@ -57,7 +57,7 @@ public static class AsymmetricKeyValidation
                 return null;
             }
             ValidateSigningKeyAlgorithm(publicKey);
-            return Arrays.SliceFromEnd(publicKey, Constants.Ed25519KeyHeader.Length);
+            return publicKey[Constants.Ed25519KeyHeader.Length..];
         }
         catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
         {
@@ -93,7 +93,7 @@ public static class AsymmetricKeyValidation
             {
                 byte[] publicKey = Encodings.FromBase64(encodedPublicKey);
                 ValidateEncryptionKeyAlgorithm(publicKey);
-                publicKeys.Add(Arrays.SliceFromEnd(publicKey, Constants.Curve25519KeyHeader.Length));
+                publicKeys.Add(publicKey[Constants.Curve25519KeyHeader.Length..]);
             }
             return publicKeys;
         }
@@ -110,7 +110,7 @@ public static class AsymmetricKeyValidation
         {
             byte[] publicKey = Encodings.FromBase64(encodedPublicKey);
             ValidateSigningKeyAlgorithm(publicKey);
-            return Arrays.SliceFromEnd(publicKey, Constants.Ed25519KeyHeader.Length);
+            return publicKey[Constants.Ed25519KeyHeader.Length..];
         }
         catch (Exception ex)
         {

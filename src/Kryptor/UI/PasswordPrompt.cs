@@ -17,6 +17,7 @@
 */
 
 using System;
+using System.Text;
 using System.Collections.Generic;
 using Geralt;
 
@@ -39,11 +40,11 @@ public static class PasswordPrompt
     {
         Console.WriteLine("Retype password:");
         char[] retypedPassword = GetPassword();
-        if (!Arrays.Compare(password, retypedPassword)) {
+        if (!ConstantTime.Equals(Encoding.UTF8.GetBytes(password), Encoding.UTF8.GetBytes(retypedPassword))) {
             DisplayMessage.Error("The passwords don't match.");
             Environment.Exit(Constants.ErrorCode);
         }
-        Arrays.ZeroMemory(retypedPassword);
+        Array.Clear(retypedPassword);
     }
     
     public static char[] UseRandomPassphrase()

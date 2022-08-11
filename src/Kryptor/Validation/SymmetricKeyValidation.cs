@@ -18,6 +18,7 @@
 
 using System;
 using System.IO;
+using System.Text;
 using Geralt;
 
 namespace Kryptor;
@@ -31,13 +32,13 @@ public static class SymmetricKeyValidation
             if (string.IsNullOrEmpty(symmetricKey)) {
                 return null;
             }
-            if (Arrays.Compare(symmetricKey.ToCharArray(), new[] { ' ' })) {
+            if (ConstantTime.Equals(Encoding.UTF8.GetBytes(symmetricKey), Encoding.UTF8.GetBytes(" "))) {
                 var key = GC.AllocateArray<byte>(Constants.EncryptionKeyLength, pinned: true);
                 SecureRandom.Fill(key);
                 DisplayMessage.SymmetricKey(Encodings.ToBase64(Arrays.Concat(Constants.SymmetricKeyHeader, key)));
                 return key;
             }
-            if (Arrays.Compare(new[] {symmetricKey[^1]}, Constants.Base64Padding)) {
+            if (ConstantTime.Equals(Encoding.UTF8.GetBytes(new[] { symmetricKey[^1] }), Constants.Base64Padding) ) {
                 return KeyString(symmetricKey);
             }
             if (File.Exists(symmetricKey)) {
@@ -71,7 +72,7 @@ public static class SymmetricKeyValidation
         if (string.IsNullOrEmpty(symmetricKey)) {
             return null;
         }
-        return Arrays.Compare(new[] {symmetricKey[^1]}, Constants.Base64Padding) ? KeyString(symmetricKey) : ReadKeyfile(symmetricKey);
+        return ConstantTime.Equals(Encoding.UTF8.GetBytes(new[] { symmetricKey[^1] }), Constants.Base64Padding)  ? KeyString(symmetricKey) : ReadKeyfile(symmetricKey);
     }
 
     private static byte[] KeyString(string encodedSymmetricKey)
@@ -87,7 +88,7 @@ public static class SymmetricKeyValidation
             if (!validKey) {
                 throw new NotSupportedException("This isn't a symmetric key.");
             }
-            return Arrays.SliceFromEnd(symmetricKey, Constants.SymmetricKeyHeader.Length);
+            return symmetricKey[Constants.SymmetricKeyHeader.Length..];
         }
         catch (Exception ex)
         {

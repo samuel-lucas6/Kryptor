@@ -50,7 +50,7 @@ public static class Constants
     public const int RandomFileNameLength = 16;
     public const int SymmetricKeyLength = 48;
     public static readonly byte[] SymmetricKeyHeader = Encoding.UTF8.GetBytes("Rn");
-    public static readonly char[] Base64Padding = { '=' };
+    public static readonly byte[] Base64Padding = Encoding.UTF8.GetBytes("=");
     public const int KeyfileLength = 64;
     public const int FileStreamBufferSize = 131072;
     public const int FileChunkSize = 16384;
