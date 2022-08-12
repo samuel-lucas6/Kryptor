@@ -63,7 +63,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Geralt" Version="1.0.1" />
+    <PackageReference Include="Geralt" Version="1.0.2" />
     <PackageReference Include="libsodium" Version="1.0.18.2" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.0.1" />
     <PackageReference Include="Sodium.Core" Version="1.2.3" />
