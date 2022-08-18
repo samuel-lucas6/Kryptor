@@ -21,38 +21,33 @@ using System.IO;
 using System.Text;
 using System.Buffers.Binary;
 using System.Security.Cryptography;
-using System.Runtime.InteropServices;
 using Geralt;
-using ChaCha20BLAKE2;
+using cAEAD;
 
 namespace Kryptor;
 
 public static class DecryptFile
 {
-    public static void Decrypt(FileStream inputFile, string outputFilePath, byte[] ephemeralPublicKey, byte[] keyEncryptionKey)
+    public static void Decrypt(FileStream inputFile, string outputFilePath, Span<byte> unencryptedHeaders, Span<byte> nonce, Span<byte> headerKey)
     {
-        var dataEncryptionKey = GC.AllocateArray<byte>(Constants.EncryptionKeyLength, pinned: true);
+        Span<byte> fileKey = stackalloc byte[ChaCha20.KeySize];
         try
         {
-            byte[] nonce = FileHeaders.ReadNonce(inputFile);
-            byte[] encryptedFileHeader = FileHeaders.ReadEncryptedHeader(inputFile);
-            byte[] fileHeader = DecryptFileHeader(inputFile, ephemeralPublicKey, encryptedFileHeader, nonce, keyEncryptionKey);
-            var fileHeaderHandle = GCHandle.Alloc(fileHeader, GCHandleType.Pinned);
-            int paddingLength = BinaryPrimitives.ReadInt32LittleEndian(Arrays.Slice(fileHeader, sourceIndex: 0, Constants.IntBytesLength));
-            bool isDirectory = BitConverter.ToBoolean(Arrays.Slice(fileHeader, sourceIndex: Constants.IntBytesLength, length: Constants.BoolBytesLength));
-            int fileNameLength = BinaryPrimitives.ReadInt32LittleEndian(Arrays.Slice(fileHeader, Constants.IntBytesLength + Constants.BoolBytesLength, Constants.IntBytesLength));
-            byte[] fileName = fileNameLength == 0 ? Array.Empty<byte>() : Arrays.Slice(fileHeader, fileHeader.Length - dataEncryptionKey.Length - Constants.FileNameHeaderLength, fileNameLength);
-            Array.Copy(fileHeader, fileHeader.Length - dataEncryptionKey.Length, dataEncryptionKey, destinationIndex: 0, dataEncryptionKey.Length);
-            CryptographicOperations.ZeroMemory(fileHeader); fileHeaderHandle.Free();
+            Span<byte> header = DecryptHeader(inputFile, unencryptedHeaders, nonce, headerKey);
+            int paddingLength = BinaryPrimitives.ReadInt32LittleEndian(header[..Constants.IntBytesLength]);
+            bool isDirectory = BitConverter.ToBoolean(header.Slice(Constants.IntBytesLength, Constants.BoolBytesLength));
+            int fileNameLength = BinaryPrimitives.ReadInt32LittleEndian(header.Slice(Constants.IntBytesLength + Constants.BoolBytesLength, Constants.IntBytesLength));
+            Span<byte> fileName = stackalloc byte[fileNameLength];
+            header.Slice(header.Length - fileKey.Length - Constants.FileNameHeaderLength, fileNameLength).CopyTo(fileName);
+            header[^fileKey.Length..].CopyTo(fileKey);
+            CryptographicOperations.ZeroMemory(header);
             using (var outputFile = new FileStream(outputFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
             {
                 ConstantTime.Increment(nonce);
-                DecryptChunks(inputFile, outputFile, nonce, dataEncryptionKey, paddingLength);
-                CryptographicOperations.ZeroMemory(dataEncryptionKey);
+                DecryptChunks(inputFile, outputFile, paddingLength, nonce, fileKey);
             }
             inputFile.Dispose();
-            Globals.SuccessfulCount += 1;
-            if (fileNameLength != 0) {
+            if (fileNameLength > 0) {
                 outputFilePath = FileHandling.RenameFile(outputFilePath, Encoding.UTF8.GetString(fileName));
             }
             if (isDirectory) {
@@ -64,7 +59,9 @@ public static class DecryptFile
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
         {
-            CryptographicOperations.ZeroMemory(dataEncryptionKey);
+            CryptographicOperations.ZeroMemory(headerKey);
+            CryptographicOperations.ZeroMemory(fileKey);
+            CryptographicOperations.ZeroMemory(nonce);
             if (ex is not ArgumentException) {
                 FileHandling.DeleteFile(outputFilePath);
             }
@@ -72,16 +69,20 @@ public static class DecryptFile
         }
     }
 
-    private static byte[] DecryptFileHeader(FileStream inputFile, byte[] ephemeralPublicKey, byte[] encryptedFileHeader, byte[] nonce, byte[] keyEncryptionKey)
+    private static Span<byte> DecryptHeader(FileStream inputFile, Span<byte> unencryptedHeaders, Span<byte> nonce, Span<byte> headerKey)
     {
         try
         {
-            var ciphertextLength = new byte[Constants.LongBytesLength];
+            Span<byte> ciphertextHeader = stackalloc byte[Constants.EncryptedHeaderLength];
+            inputFile.Read(ciphertextHeader);
+            Span<byte> ciphertextLength = stackalloc byte[Constants.LongBytesLength];
             BinaryPrimitives.WriteInt64LittleEndian(ciphertextLength, inputFile.Length - Constants.FileHeadersLength);
-            byte[] magicBytes = FileHandling.ReadFileHeader(inputFile, offset: 0, Constants.EncryptionMagicBytes.Length);
-            byte[] formatVersion = FileHandling.ReadFileHeader(inputFile, Constants.EncryptionMagicBytes.Length, Constants.EncryptionVersion.Length);
-            byte[] additionalData = Arrays.Concat(ciphertextLength, magicBytes, formatVersion, ephemeralPublicKey);
-            return XChaCha20BLAKE2b.Decrypt(encryptedFileHeader, nonce, keyEncryptionKey, additionalData);
+            Span<byte> associatedData = stackalloc byte[ciphertextLength.Length + unencryptedHeaders.Length];
+            Spans.Concat(associatedData, ciphertextLength, unencryptedHeaders);
+            Span<byte> plaintextHeader = GC.AllocateArray<byte>(ciphertextHeader.Length - BLAKE2b.TagSize, pinned: true);
+            ChaCha20BLAKE2b.Decrypt(plaintextHeader, ciphertextHeader, nonce, headerKey, associatedData);
+            CryptographicOperations.ZeroMemory(headerKey);
+            return plaintextHeader;
         }
         catch (CryptographicException ex)
         {
@@ -89,18 +90,19 @@ public static class DecryptFile
         }
     }
 
-    private static void DecryptChunks(Stream inputFile, Stream outputFile, byte[] nonce, byte[] dataEncryptionKey, int paddingLength)
+    private static void DecryptChunks(Stream inputFile, Stream outputFile, int paddingLength, Span<byte> nonce, Span<byte> fileKey)
     {
-        var ciphertextChunk = new byte[Constants.CiphertextChunkLength];
-        inputFile.Seek(Constants.FileHeadersLength, SeekOrigin.Begin);
-        while (inputFile.Read(ciphertextChunk, offset: 0, ciphertextChunk.Length) > 0)
-        {
-            byte[] plaintextChunk = XChaCha20BLAKE2b.Decrypt(ciphertextChunk, nonce, dataEncryptionKey);
+        Span<byte> ciphertextChunk = new byte[Constants.CiphertextChunkLength];
+        Span<byte> plaintextChunk = new byte[Constants.FileChunkSize];
+        while (inputFile.Read(ciphertextChunk) > 0) {
+            ChaCha20BLAKE2b.Decrypt(plaintextChunk, ciphertextChunk, nonce, fileKey);
             ConstantTime.Increment(nonce);
-            outputFile.Write(plaintextChunk, offset: 0, plaintextChunk.Length);
+            outputFile.Write(plaintextChunk);
         }
-        if (paddingLength != 0) {
+        if (paddingLength > 0) {
             outputFile.SetLength(outputFile.Length - paddingLength);
         }
+        CryptographicOperations.ZeroMemory(fileKey);
+        CryptographicOperations.ZeroMemory(nonce);
     }
 }

@@ -64,14 +64,14 @@ public static class FileHandling
     {
         var header = new byte[length];
         fileStream.Seek(offset, SeekOrigin.Begin);
-        fileStream.Read(header, offset: 0, header.Length);
+        fileStream.Read(header);
         return header;
     }
 
     public static byte[] ReadFileHeader(FileStream fileStream, int length)
     {
         var header = new byte[length];
-        fileStream.Read(header, offset: 0, header.Length);
+        fileStream.Read(header);
         return header;
     }
 
@@ -252,7 +252,7 @@ public static class FileHandling
         return directoryPath;
     }
 
-    public static void SetFileAttributesReadOnly(string filePath)
+    public static void SetReadOnly(string filePath)
     {
         try
         {

@@ -19,7 +19,7 @@
 using System;
 using System.IO;
 using System.Text;
-using ChaCha20BLAKE2;
+using Geralt;
 
 namespace Kryptor;
 
@@ -29,18 +29,17 @@ public static class Constants
     public const int ErrorCode = -1;
     
     // Cryptography
+    public const int HeaderKeySize = ChaCha20.KeySize + ChaCha20.NonceSize;
     public const int EncryptionKeyLength = 32;
-    public const int EphemeralPublicKeyLength = 32;
     public const int SaltLength = 16;
     public const int XChaChaNonceLength = 24;
-    public const int HashLength = 64;
     
     // Key derivation
     public const int Mebibyte = 1048576;
     public const int MemorySize = 256 * Mebibyte;
     public const int Iterations = 12;
     public static readonly byte[] Personalisation = Encoding.UTF8.GetBytes("Kryptor.Personal");
-
+    
     // File encryption
     public static readonly byte[] EncryptionMagicBytes = Encoding.UTF8.GetBytes("KRYPTOR");
     public static readonly byte[] EncryptionVersion = { 0x04, 0x00 };
@@ -59,9 +58,10 @@ public static class Constants
     public const int LongBytesLength = 8;
     public const int FileNameHeaderLength = 255;
     public const int EncryptedHeaderLength = 328;
-    public static readonly int FileHeadersLength = EncryptionMagicBytes.Length + EncryptionVersion.Length + EphemeralPublicKeyLength + SaltLength + XChaChaNonceLength + EncryptedHeaderLength;
-    public const int CiphertextChunkLength = FileChunkSize + (int)TagLength.Medium;
-
+    public static readonly int FileHeadersLength = EncryptionMagicBytes.Length + EncryptionVersion.Length + X25519.PublicKeySize + Argon2id.SaltSize + EncryptedHeaderLength;
+    public static readonly int UnencryptedHeadersLength = FileHeadersLength - EncryptedHeaderLength;
+    public const int CiphertextChunkLength = FileChunkSize + BLAKE2b.TagSize;
+    
     // Asymmetric keys
     public static readonly string DefaultKeyDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), EncryptedExtension);
     public const string DefaultEncryptionKeyFileName = "encryption";
@@ -78,7 +78,7 @@ public static class Constants
     public static readonly byte[] Curve25519KeyHeader = Encoding.UTF8.GetBytes("Cu");
     public static readonly byte[] Ed25519KeyHeader = Encoding.UTF8.GetBytes("Ed");
     public static readonly byte[] PrivateKeyVersion = { 0x01, 0x00 };
-
+    
     // File signing
     public const string SignatureExtension = ".signature";
     public static readonly byte[] SignatureMagicBytes = Encoding.UTF8.GetBytes("SIGNATURE");
