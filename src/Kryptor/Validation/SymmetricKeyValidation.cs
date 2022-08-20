@@ -31,13 +31,13 @@ public static class SymmetricKeyValidation
         if (string.IsNullOrEmpty(symmetricKey)) {
             return default;
         }
-        Span<byte> symmetricKeyBytes = stackalloc byte[Encoding.UTF8.GetMaxByteCount(symmetricKey.Length)];
+        Span<byte> symmetricKeyBytes = GC.AllocateArray<byte>(Encoding.UTF8.GetMaxByteCount(symmetricKey.Length), pinned: true);
         int bytesEncoded = Encoding.UTF8.GetBytes(symmetricKey, symmetricKeyBytes);
         if (ConstantTime.Equals(symmetricKeyBytes[..bytesEncoded], Encoding.UTF8.GetBytes(" "))) {
             return GenerateKeyString();
         }
-        CryptographicOperations.ZeroMemory(symmetricKeyBytes);
-        if (ConstantTime.Equals(Encoding.UTF8.GetBytes(new[] {symmetricKey[^1]}), Constants.Base64Padding)) {
+        if (ConstantTime.Equals(symmetricKeyBytes[(bytesEncoded - 1)..bytesEncoded], Constants.Base64Padding)) {
+            CryptographicOperations.ZeroMemory(symmetricKeyBytes);
             return KeyString(symmetricKey);
         }
 

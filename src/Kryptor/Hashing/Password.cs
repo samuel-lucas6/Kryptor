@@ -40,7 +40,7 @@ public static class Password
         if (password.Length == 0) {
             return default;
         }
-        Span<byte> passwordBytes = stackalloc byte[Encoding.UTF8.GetMaxByteCount(password.Length)];
+        Span<byte> passwordBytes = GC.AllocateArray<byte>(Encoding.UTF8.GetMaxByteCount(password.Length), pinned: true);
         int bytesEncoded = Encoding.UTF8.GetBytes(password, passwordBytes);
         Array.Clear(password);
         Span<byte> hash = GC.AllocateArray<byte>(BLAKE2b.MaxHashSize, pinned: true);
