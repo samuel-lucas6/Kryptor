@@ -84,13 +84,9 @@ public static class FileEncryption
         DisplayMessage.SuccessfullyEncrypted(space: false);
     }
     
-    public static void EncryptEachFileWithPublicKey(byte[] senderPrivateKey, char[] password, List<byte[]> recipientPublicKeys, byte[] presharedKey, string[] filePaths)
+    public static void EncryptEachFileWithPublicKey(Span<byte> senderPrivateKey, List<byte[]> recipientPublicKeys, byte[] presharedKey, string[] filePaths)
     {
-        if (filePaths == null || senderPrivateKey == null || recipientPublicKeys == null) {
-            return;
-        }
-        senderPrivateKey = PrivateKey.Decrypt(senderPrivateKey, password);
-        if (senderPrivateKey == null) {
+        if (filePaths == null || senderPrivateKey == default || recipientPublicKeys == null) {
             return;
         }
         Globals.TotalCount *= recipientPublicKeys.Count;
@@ -136,13 +132,9 @@ public static class FileEncryption
         DisplayMessage.SuccessfullyEncrypted();
     }
 
-    public static void EncryptEachFileWithPrivateKey(byte[] privateKey, char[] password, byte[] presharedKey, string[] filePaths)
+    public static void EncryptEachFileWithPrivateKey(Span<byte> privateKey, byte[] presharedKey, string[] filePaths)
     {
-        if (filePaths == null || privateKey == null) {
-            return;
-        }
-        privateKey = PrivateKey.Decrypt(privateKey, password);
-        if (privateKey == null) {
+        if (filePaths == null || privateKey == default) {
             return;
         }
         Span<byte> salt = stackalloc byte[BLAKE2b.SaltSize];

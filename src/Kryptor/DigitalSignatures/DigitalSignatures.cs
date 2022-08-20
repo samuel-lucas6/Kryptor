@@ -25,7 +25,7 @@ namespace Kryptor;
 
 public static class DigitalSignatures
 {
-    public static void SignFile(string filePath, string signatureFilePath, string comment, bool prehash, byte[] privateKey)
+    public static void SignFile(string filePath, string signatureFilePath, string comment, bool prehash, Span<byte> privateKey)
     {
         if (!prehash) {
             prehash = FileHandling.GetFileLength(filePath) >= Constants.Mebibyte * 1024;
@@ -39,7 +39,7 @@ public static class DigitalSignatures
         var globalSignature = new byte[Ed25519.SignatureSize];
         Ed25519.Sign(globalSignature, signatureFileBytes, privateKey);
         CreateSignatureFile(filePath, signatureFilePath, signatureFileBytes, globalSignature);
-        Globals.SuccessfulCount += 1;
+        Globals.SuccessfulCount++;
     }
 
     private static byte[] GetFileBytes(string filePath, bool prehash)

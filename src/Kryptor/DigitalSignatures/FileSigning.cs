@@ -26,9 +26,9 @@ public static class FileSigning
 {
     private const string DefaultComment = "This file has not been tampered with.";
 
-    public static void SignEachFile(byte[] privateKey, string comment, bool prehash, string[] signatureFilePaths, string[] filePaths)
+    public static void SignEachFile(Span<byte> privateKey, string comment, bool prehash, string[] signatureFilePaths, string[] filePaths)
     {
-        if (privateKey == null || filePaths == null) {
+        if (privateKey == default || filePaths == null) {
             return;
         }
         if (string.IsNullOrEmpty(comment)) {

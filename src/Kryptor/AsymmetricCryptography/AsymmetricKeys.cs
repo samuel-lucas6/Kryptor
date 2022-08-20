@@ -33,7 +33,7 @@ public static class AsymmetricKeys
         var privateKey = GC.AllocateArray<byte>(X25519.PrivateKeySize, pinned: true);
         X25519.GenerateKeyPair(publicKey, privateKey);
         publicKey = Arrays.Concat(Constants.Curve25519KeyHeader, publicKey);
-        byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, Constants.Curve25519KeyHeader, privateKey);
+        Span<byte> encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, Constants.Curve25519KeyHeader, privateKey);
         return (Encodings.ToBase64(publicKey), Encodings.ToBase64(encryptedPrivateKey));
     }
 
@@ -45,7 +45,7 @@ public static class AsymmetricKeys
         var privateKey = GC.AllocateArray<byte>(Ed25519.PrivateKeySize, pinned: true);
         Ed25519.GenerateKeyPair(publicKey, privateKey);
         publicKey = Arrays.Concat(Constants.Ed25519KeyHeader, publicKey);
-        byte[] encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, Constants.Ed25519KeyHeader, privateKey);
+        Span<byte> encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, Constants.Ed25519KeyHeader, privateKey);
         return (Encodings.ToBase64(publicKey), Encodings.ToBase64(encryptedPrivateKey));
     }
 
@@ -77,7 +77,7 @@ public static class AsymmetricKeys
         }
     }
 
-    private static void CreateKeyFile(string filePath, string asymmetricKey)
+    public static void CreateKeyFile(string filePath, string asymmetricKey)
     {
         if (File.Exists(filePath)) {
             File.SetAttributes(filePath, FileAttributes.Normal);
@@ -86,19 +86,23 @@ public static class AsymmetricKeys
         File.SetAttributes(filePath, FileAttributes.ReadOnly);
     }
 
-    public static byte[] GetCurve25519PublicKey(byte[] privateKey)
+    public static Span<byte> GetCurve25519PublicKey(Span<byte> privateKey)
     {
-        var publicKey = new byte[X25519.PublicKeySize];
+        Span<byte> publicKey = stackalloc byte[X25519.PublicKeySize];
         X25519.ComputePublicKey(publicKey, privateKey);
         CryptographicOperations.ZeroMemory(privateKey);
-        return Arrays.Concat(Constants.Curve25519KeyHeader, publicKey);
+        Span<byte> fullPublicKey = new byte[Constants.Curve25519KeyHeader.Length + publicKey.Length];
+        Spans.Concat(fullPublicKey, Constants.Curve25519KeyHeader, publicKey);
+        return fullPublicKey;
     }
 
-    public static byte[] GetEd25519PublicKey(byte[] privateKey)
+    public static Span<byte> GetEd25519PublicKey(Span<byte> privateKey)
     {
-        var publicKey = new byte[Ed25519.PublicKeySize];
+        Span<byte> publicKey = stackalloc byte[Ed25519.PublicKeySize];
         Ed25519.ComputePublicKey(publicKey, privateKey);
         CryptographicOperations.ZeroMemory(privateKey);
-        return Arrays.Concat(Constants.Ed25519KeyHeader, publicKey);
+        Span<byte> fullPublicKey = new byte[Constants.Ed25519KeyHeader.Length + publicKey.Length];
+        Spans.Concat(fullPublicKey, Constants.Ed25519KeyHeader, publicKey);
+        return fullPublicKey;
     }
 }

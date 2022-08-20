@@ -28,13 +28,8 @@ public static class Constants
     // Error handling
     public const int ErrorCode = -1;
     
-    // Cryptography
-    public const int HeaderKeySize = ChaCha20.KeySize + ChaCha20.NonceSize;
-    public const int EncryptionKeyLength = 32;
-    public const int SaltLength = 16;
-    public const int XChaChaNonceLength = 24;
-    
     // Key derivation
+    public const int HeaderKeySize = ChaCha20.KeySize + ChaCha20.NonceSize;
     public const int Mebibyte = 1048576;
     public const int MemorySize = 256 * Mebibyte;
     public const int Iterations = 12;
@@ -73,11 +68,15 @@ public static class Constants
     public static readonly string DefaultSigningPublicKeyPath = Path.Combine(DefaultKeyDirectory, DefaultSigningKeyFileName + PublicKeyExtension);
     public static readonly string DefaultSigningPrivateKeyPath = Path.Combine(DefaultKeyDirectory, DefaultSigningKeyFileName + PrivateKeyExtension);
     public const int PublicKeyLength = 48;
-    public const int EncryptionPrivateKeyLength = 144;
-    public const int SigningPrivateKeyLength = 188;
+    public const int V2EncryptionPrivateKeyLength = 112;
+    public const int V1EncryptionPrivateKeyLength = 144;
+    public const int V2SigningPrivateKeyLength = 156;
+    public const int V1SigningPrivateKeyLength = 188;
+    public const int KeyAlgorithmLength = 2;
     public static readonly byte[] Curve25519KeyHeader = Encoding.UTF8.GetBytes("Cu");
     public static readonly byte[] Ed25519KeyHeader = Encoding.UTF8.GetBytes("Ed");
-    public static readonly byte[] PrivateKeyVersion = { 0x01, 0x00 };
+    public static readonly byte[] PrivateKeyVersion1 = { 0x01, 0x00 };
+    public static readonly byte[] PrivateKeyVersion2 = { 0x02, 0x00 };
     
     // File signing
     public const string SignatureExtension = ".signature";

@@ -17,8 +17,9 @@
 */
 
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
+using System.Security.Cryptography;
 using Geralt;
 
 namespace Kryptor;
@@ -119,86 +120,112 @@ public static class AsymmetricKeyValidation
         }
     }
 
-    private static void ValidateEncryptionKeyAlgorithm(byte[] asymmetricKey)
+    private static void ValidateEncryptionKeyAlgorithm(Span<byte> asymmetricKey)
     {
-        byte[] keyAlgorithm = Arrays.Slice(asymmetricKey, sourceIndex: 0, Constants.Curve25519KeyHeader.Length);
+        Span<byte> keyAlgorithm = asymmetricKey[..Constants.Curve25519KeyHeader.Length];
         bool validKey = ConstantTime.Equals(keyAlgorithm, Constants.Curve25519KeyHeader);
         if (!validKey) {
             throw new NotSupportedException("This key algorithm isn't supported for encryption.");
         }
     }
 
-    private static void ValidateSigningKeyAlgorithm(byte[] asymmetricKey)
+    private static void ValidateSigningKeyAlgorithm(Span<byte> asymmetricKey)
     {
-        byte[] keyAlgorithm = Arrays.Slice(asymmetricKey, sourceIndex: 0, Constants.Ed25519KeyHeader.Length);
+        Span<byte> keyAlgorithm = asymmetricKey[..Constants.Ed25519KeyHeader.Length];
         bool validKey = ConstantTime.Equals(keyAlgorithm, Constants.Ed25519KeyHeader);
         if (!validKey) {
             throw new NotSupportedException("This key algorithm isn't supported for signing.");
         }
     }
 
-    public static byte[] EncryptionPrivateKeyFile(string privateKeyPath)
+    public static Span<byte> EncryptionPrivateKeyFile(string privateKeyPath, char[] password)
     {
         try
         {
-            byte[] privateKey = GetPrivateKeyFromFile(privateKeyPath);
-            if (privateKey == null) {
-                return null;
-            }
+            Span<byte> privateKey = GetPrivateKeyFromFile(privateKeyPath);
             ValidateEncryptionKeyAlgorithm(privateKey);
-            return privateKey;
+            return DecryptPrivateKey(privateKeyPath, password, privateKey);
         }
-        catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
+        catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
-            DisplayMessage.FilePathException(privateKeyPath, ex.GetType().Name, "Please specify a valid encryption private key.");
-            return null;
+            if (ex is CryptographicException) {
+                DisplayMessage.Error(ex.Message);
+                return default;
+            }
+            DisplayMessage.FilePathException(privateKeyPath, ex.GetType().Name, ex.Message);
+            return default;
         }
     }
 
-    public static byte[] SigningPrivateKeyFile(string privateKeyPath)
+    public static Span<byte> SigningPrivateKeyFile(string privateKeyPath, char[] password)
     {
         try
         {
-            byte[] privateKey = GetPrivateKeyFromFile(privateKeyPath);
-            if (privateKey == null) {
-                return null;
-            }
+            Span<byte> privateKey = GetPrivateKeyFromFile(privateKeyPath);
             ValidateSigningKeyAlgorithm(privateKey);
-            return privateKey;
+            return DecryptPrivateKey(privateKeyPath, password, privateKey);
         }
-        catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
+        catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
-            DisplayMessage.FilePathException(privateKeyPath, ex.GetType().Name, "Please specify a valid signing private key.");
-            return null;
+            if (ex is CryptographicException) {
+                DisplayMessage.Error(ex.Message);
+                return default;
+            }
+            DisplayMessage.FilePathException(privateKeyPath, ex.GetType().Name, ex.Message);
+            return default;
         }
     }
 
-    public static byte[] GetPrivateKeyFromFile(string privateKeyPath)
+    public static Span<byte> GetPrivateKeyFromFile(string privateKeyPath)
     {
         try
         {
             string encodedPrivateKey = File.ReadAllText(privateKeyPath);
-            if (encodedPrivateKey.Length != Constants.EncryptionPrivateKeyLength && encodedPrivateKey.Length != Constants.SigningPrivateKeyLength) {
-                DisplayMessage.FilePathError(privateKeyPath, "Please specify a valid private key file.");
-                return null;
+            if (encodedPrivateKey.Length != Constants.V2EncryptionPrivateKeyLength && encodedPrivateKey.Length != Constants.V2SigningPrivateKeyLength && encodedPrivateKey.Length != Constants.V1EncryptionPrivateKeyLength && encodedPrivateKey.Length != Constants.V1SigningPrivateKeyLength) {
+                throw new ArgumentException("Please specify a valid private key file.");
             }
-            byte[] privateKey = Encodings.FromBase64(encodedPrivateKey);
-            ValidateKeyVersion(privateKey);
-            return privateKey;
+            return Encodings.FromBase64(encodedPrivateKey);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ExceptionFilters.FileAccess(ex) || ex is FormatException)
         {
-            DisplayMessage.FilePathException(privateKeyPath, ex.GetType().Name, ex is NotSupportedException ? ex.Message : "Unable to retrieve the private key, or the private key is invalid.");
-            return null;
+            throw new ArgumentException(ex is ArgumentException or FormatException ? ex.Message : "Unable to read the private key file.", ex);
         }
     }
 
-    private static void ValidateKeyVersion(byte[] privateKey)
+    public static Span<byte> DecryptPrivateKey(string privateKeyPath, char[] password, Span<byte> privateKey)
     {
-        byte[] keyVersion = Arrays.Slice(privateKey, Constants.Curve25519KeyHeader.Length, Constants.PrivateKeyVersion.Length);
-        bool validKeyVersion = ConstantTime.Equals(keyVersion, Constants.PrivateKeyVersion);
-        if (!validKeyVersion) {
+        Span<byte> keyVersion = privateKey.Slice(Constants.KeyAlgorithmLength, Constants.PrivateKeyVersion2.Length);
+        bool version2 = ConstantTime.Equals(keyVersion, Constants.PrivateKeyVersion2);
+        bool version1 = ConstantTime.Equals(keyVersion, Constants.PrivateKeyVersion1);
+        if (!version2 && !version1) {
             throw new NotSupportedException("This private key version isn't supported.");
         }
+        
+        if (password.Length == 0) {
+            password = PasswordPrompt.EnterYourPassword(isPrivateKey: true);
+        }
+        Console.WriteLine("Decrypting private key...");
+        Span<byte> passwordBytes = Password.Prehash(password);
+        
+        if (version2) {
+            return PrivateKey.DecryptV2(passwordBytes, privateKey);
+        }
+        
+        Span<byte> decryptedPrivateKey = PrivateKey.DecryptV1(passwordBytes, privateKey);
+        Span<byte> unencryptedPrivateKey = GC.AllocateArray<byte>(decryptedPrivateKey.Length, pinned: true);
+        decryptedPrivateKey.CopyTo(unencryptedPrivateKey);
+        Span<byte> keyAlgorithm = privateKey[..Constants.KeyAlgorithmLength];
+        try
+        {
+            Console.WriteLine("Updating private key format...");
+            Span<byte> v2PrivateKey = PrivateKey.Encrypt(passwordBytes, keyAlgorithm, decryptedPrivateKey);
+            AsymmetricKeys.CreateKeyFile(privateKeyPath, Encodings.ToBase64(v2PrivateKey));
+            Console.WriteLine("Private key format successfully updated.");
+        }
+        catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
+        {
+            DisplayMessage.FilePathException(privateKeyPath, ex.GetType().Name, "Unable to update private key to latest format.");
+        }
+        return unencryptedPrivateKey;
     }
 }

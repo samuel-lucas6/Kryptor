@@ -33,7 +33,7 @@ public static class SymmetricKeyValidation
                 return null;
             }
             if (ConstantTime.Equals(Encoding.UTF8.GetBytes(symmetricKey), Encoding.UTF8.GetBytes(" "))) {
-                var key = GC.AllocateArray<byte>(Constants.EncryptionKeyLength, pinned: true);
+                var key = GC.AllocateArray<byte>(ChaCha20.KeySize, pinned: true);
                 SecureRandom.Fill(key);
                 DisplayMessage.SymmetricKey(Encodings.ToBase64(Arrays.Concat(Constants.SymmetricKeyHeader, key)));
                 return key;
