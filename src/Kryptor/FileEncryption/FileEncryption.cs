@@ -98,7 +98,7 @@ public static class FileEncryption
         Span<byte> ephemeralPublicKey = stackalloc byte[X25519.PublicKeySize], ephemeralPrivateKey = stackalloc byte[X25519.PrivateKeySize];
         Span<byte> inputKeyingMaterial = stackalloc byte[ephemeralSharedSecret.Length + sharedSecret.Length];
         Span<byte> headerKey = stackalloc byte[Constants.HeaderKeySize];
-        foreach (byte[] recipientPublicKey in recipientPublicKeys)
+        foreach (Span<byte> recipientPublicKey in recipientPublicKeys)
         {
             if (i++ == recipientPublicKeys.Count - 1) {
                 Globals.Overwrite = overwrite;

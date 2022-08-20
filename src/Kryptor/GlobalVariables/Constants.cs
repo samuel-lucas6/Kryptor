@@ -46,6 +46,7 @@ public static class Constants
     public static readonly byte[] SymmetricKeyHeader = Encoding.UTF8.GetBytes("Rn");
     public static readonly byte[] Base64Padding = Encoding.UTF8.GetBytes("=");
     public const int KeyfileLength = 64;
+    public const int DefaultFileStreamBufferSize = 4096;
     public const int FileStreamBufferSize = 131072;
     public const int FileChunkSize = 16384;
     public const int BoolBytesLength = 1;
@@ -82,5 +83,4 @@ public static class Constants
     public const string SignatureExtension = ".signature";
     public static readonly byte[] SignatureMagicBytes = Encoding.UTF8.GetBytes("SIGNATURE");
     public static readonly byte[] SignatureVersion = { 0x01, 0x00 };
-    public const int SignatureLength = 64;
 }

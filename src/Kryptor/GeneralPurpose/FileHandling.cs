@@ -57,29 +57,14 @@ public static class FileHandling
         }
         return GetUniqueFilePath(inputFilePath + Constants.EncryptedExtension);
     }
-        
+    
     public static string GetDecryptedOutputFilePath(string inputFilePath) => GetUniqueFilePath(Path.ChangeExtension(inputFilePath, extension: null));
-
-    public static byte[] ReadFileHeader(FileStream fileStream, long offset, int length)
-    {
-        var header = new byte[length];
-        fileStream.Seek(offset, SeekOrigin.Begin);
-        fileStream.Read(header);
-        return header;
-    }
-
-    public static byte[] ReadFileHeader(FileStream fileStream, int length)
-    {
-        var header = new byte[length];
-        fileStream.Read(header);
-        return header;
-    }
-
+    
     public static bool? IsKryptorFile(string filePath)
     {
         try
         {
-            var magicBytes = ReadFileHeader(filePath, offset: 0, Constants.EncryptionMagicBytes.Length);
+            Span<byte> magicBytes = ReadFileHeader(filePath, offset: 0, Constants.EncryptionMagicBytes.Length);
             return ConstantTime.Equals(magicBytes, Constants.EncryptionMagicBytes);
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex)) 
@@ -92,8 +77,8 @@ public static class FileHandling
     {
         try
         {
-            var formatVersion = ReadFileHeader(filePath, Constants.EncryptionMagicBytes.Length, Constants.EncryptionVersion.Length);
-            return ConstantTime.Equals(formatVersion, Constants.EncryptionVersion);
+            Span<byte> version = ReadFileHeader(filePath, Constants.EncryptionMagicBytes.Length, Constants.EncryptionVersion.Length);
+            return ConstantTime.Equals(version, Constants.EncryptionVersion);
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex)) 
         { 
@@ -105,7 +90,7 @@ public static class FileHandling
     {
         try
         {
-            var magicBytes = ReadFileHeader(filePath, offset: 0, Constants.SignatureMagicBytes.Length);
+            Span<byte> magicBytes = ReadFileHeader(filePath, offset: 0, Constants.SignatureMagicBytes.Length);
             return ConstantTime.Equals(magicBytes, Constants.SignatureMagicBytes);
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
@@ -118,8 +103,8 @@ public static class FileHandling
     {
         try
         {
-            var formatVersion = ReadFileHeader(filePath, Constants.SignatureMagicBytes.Length, Constants.SignatureVersion.Length);
-            return ConstantTime.Equals(formatVersion, Constants.SignatureVersion);
+            Span<byte> version = ReadFileHeader(filePath, Constants.SignatureMagicBytes.Length, Constants.SignatureVersion.Length);
+            return ConstantTime.Equals(version, Constants.SignatureVersion);
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex)) 
         { 
@@ -127,10 +112,13 @@ public static class FileHandling
         }
     }
     
-    private static byte[] ReadFileHeader(string filePath, long offset, int length)
+    private static Span<byte> ReadFileHeader(string filePath, long offset, int length)
     {
-        using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
-        return ReadFileHeader(fileStream, offset, length);
+        using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.DefaultFileStreamBufferSize, FileOptions.SequentialScan);
+        fileStream.Seek(offset, SeekOrigin.Begin);
+        Span<byte> header = new byte[length];
+        fileStream.Read(header);
+        return header;
     }
 
     public static void OverwriteFile(string fileToDelete, string fileToCopy)

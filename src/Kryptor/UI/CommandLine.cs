@@ -57,7 +57,7 @@ public static class CommandLine
         }
         password = Password.GetNewPassword(password);
         Span<byte> pepper = SymmetricKeyValidation.GetEncryptionSymmetricKey(symmetricKey);
-        var passwordBytes = !string.IsNullOrEmpty(symmetricKey) && pepper == default ? null : Password.Prehash(password, pepper);
+        Span<byte> passwordBytes = !string.IsNullOrEmpty(symmetricKey) && pepper == default ? default : Password.Prehash(password, pepper);
         FileEncryption.EncryptEachFileWithPassword(filePaths, passwordBytes);
     }
     
@@ -148,7 +148,7 @@ public static class CommandLine
             password = PasswordPrompt.EnterYourPassword();
         }
         Span<byte> pepper = SymmetricKeyValidation.GetDecryptionSymmetricKey(symmetricKey);
-        var passwordBytes = !string.IsNullOrEmpty(symmetricKey) && pepper == default ? null : Password.Prehash(password, pepper);
+        Span<byte> passwordBytes = !string.IsNullOrEmpty(symmetricKey) && pepper == default ? default : Password.Prehash(password, pepper);
         FileDecryption.DecryptEachFileWithPassword(filePaths, passwordBytes);
     }
     

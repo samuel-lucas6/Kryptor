@@ -35,15 +35,15 @@ public static class Password
         };
     }
     
-    public static byte[] Prehash(char[] password, Span<byte> pepper = default)
+    public static Span<byte> Prehash(char[] password, Span<byte> pepper = default)
     {
         if (password.Length == 0) {
-            return null;
+            return default;
         }
         Span<byte> passwordBytes = stackalloc byte[Encoding.UTF8.GetMaxByteCount(password.Length)];
         int bytesEncoded = Encoding.UTF8.GetBytes(password, passwordBytes);
         Array.Clear(password);
-        var hash = GC.AllocateArray<byte>(BLAKE2b.MaxHashSize, pinned: true);
+        Span<byte> hash = GC.AllocateArray<byte>(BLAKE2b.MaxHashSize, pinned: true);
         if (pepper == default) {
             BLAKE2b.ComputeHash(hash, passwordBytes[..bytesEncoded]);
         }

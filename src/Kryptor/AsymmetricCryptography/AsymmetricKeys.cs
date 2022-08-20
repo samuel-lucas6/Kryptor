@@ -28,25 +28,31 @@ public static class AsymmetricKeys
     public static (string publicKey, string privateKey) GenerateEncryptionKeyPair(char[] password)
     {
         password = Password.GetNewPassword(password);
-        var passwordBytes = Password.Prehash(password);
-        var publicKey = new byte[X25519.PublicKeySize];
-        var privateKey = GC.AllocateArray<byte>(X25519.PrivateKeySize, pinned: true);
+        Span<byte> passwordBytes = Password.Prehash(password);
+        
+        Span<byte> publicKey = stackalloc byte[X25519.PublicKeySize];
+        Span<byte> privateKey = stackalloc byte[X25519.PrivateKeySize];
         X25519.GenerateKeyPair(publicKey, privateKey);
-        publicKey = Arrays.Concat(Constants.Curve25519KeyHeader, publicKey);
+        
+        Span<byte> fullPublicKey = stackalloc byte[Constants.Curve25519KeyHeader.Length + publicKey.Length];
+        Spans.Concat(fullPublicKey, Constants.Curve25519KeyHeader, publicKey);
         Span<byte> encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, Constants.Curve25519KeyHeader, privateKey);
-        return (Encodings.ToBase64(publicKey), Encodings.ToBase64(encryptedPrivateKey));
+        return (Encodings.ToBase64(fullPublicKey), Encodings.ToBase64(encryptedPrivateKey));
     }
 
     public static (string publicKey, string privateKey) GenerateSigningKeyPair(char[] password)
     {
         password = Password.GetNewPassword(password);
-        var passwordBytes = Password.Prehash(password);
-        var publicKey = new byte[Ed25519.PublicKeySize];
-        var privateKey = GC.AllocateArray<byte>(Ed25519.PrivateKeySize, pinned: true);
+        Span<byte> passwordBytes = Password.Prehash(password);
+        
+        Span<byte> publicKey = stackalloc byte[Ed25519.PublicKeySize];
+        Span<byte> privateKey = stackalloc byte[Ed25519.PrivateKeySize];
         Ed25519.GenerateKeyPair(publicKey, privateKey);
-        publicKey = Arrays.Concat(Constants.Ed25519KeyHeader, publicKey);
+        
+        Span<byte> fullPublicKey = stackalloc byte[Constants.Ed25519KeyHeader.Length + publicKey.Length];
+        Spans.Concat(fullPublicKey, Constants.Ed25519KeyHeader, publicKey);
         Span<byte> encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, Constants.Ed25519KeyHeader, privateKey);
-        return (Encodings.ToBase64(publicKey), Encodings.ToBase64(encryptedPrivateKey));
+        return (Encodings.ToBase64(fullPublicKey), Encodings.ToBase64(encryptedPrivateKey));
     }
 
     public static (string publicKeyPath, string privateKeyPath) ExportKeyPair(string directoryPath, string fileName, string publicKey, string privateKey)

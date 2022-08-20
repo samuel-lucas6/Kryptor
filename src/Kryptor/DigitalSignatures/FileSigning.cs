@@ -49,6 +49,7 @@ public static class FileSigning
                         {
                             DisplayMessage.SigningFile(file);
                             DigitalSignatures.SignFile(file, signatureFilePath: string.Empty, comment, prehash, privateKey);
+                            Globals.SuccessfulCount++;
                         }
                         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
                         {
@@ -59,6 +60,7 @@ public static class FileSigning
                 }
                 DisplayMessage.SigningFile(filePaths[i]);
                 DigitalSignatures.SignFile(filePaths[i], signatureFilePaths == null ? string.Empty : signatureFilePaths[i], comment, prehash, privateKey);
+                Globals.SuccessfulCount++;
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
