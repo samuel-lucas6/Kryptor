@@ -42,28 +42,28 @@ public static class AsymmetricKeyValidation
             }
             return publicKeys;
         }
-        catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
+        catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
             DisplayMessage.Exception(ex.GetType().Name, publicKeyPaths == null || publicKeyPaths.Length == 1 ? "Please specify a valid encryption public key." : "Please specify valid encryption public keys.");
             return null;
         }
     }
 
-    public static byte[] SigningPublicKeyFile(string publicKeyPath)
+    public static Span<byte> SigningPublicKeyFile(string publicKeyPath)
     {
         try
         {
-            byte[] publicKey = GetPublicKeyFromFile(publicKeyPath);
-            if (publicKey == null) {
-                return null;
+            Span<byte> publicKey = GetPublicKeyFromFile(publicKeyPath);
+            if (publicKey == default) {
+                return default;
             }
             ValidateSigningKeyAlgorithm(publicKey);
             return publicKey[Constants.Ed25519KeyHeader.Length..];
         }
-        catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
+        catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
             DisplayMessage.FilePathException(publicKeyPath, ex.GetType().Name, "Please specify a valid signing public key.");
-            return null;
+            return default;
         }
     }
     
@@ -72,15 +72,14 @@ public static class AsymmetricKeyValidation
         try
         {
             string encodedPublicKey = File.ReadAllText(publicKeyPath);
-            if (encodedPublicKey.Length == Constants.PublicKeyLength) {
-                return Encodings.FromBase64(encodedPublicKey);
+            if (encodedPublicKey.Length != Constants.PublicKeyLength) {
+                throw new ArgumentException("Please specify a valid public key file.");
             }
-            DisplayMessage.FilePathError(publicKeyPath, ErrorMessages.InvalidPublicKey);
-            return null;
+            return Encodings.FromBase64(encodedPublicKey);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
-            DisplayMessage.FilePathException(publicKeyPath, ex.GetType().Name, "Unable to retrieve the public key, or the public key is invalid.");
+            DisplayMessage.FilePathException(publicKeyPath, ex.GetType().Name, ex is ArgumentException or FormatException ? ex.Message : "Unable to read the public key file.");
             return null;
         }
     }
@@ -98,33 +97,32 @@ public static class AsymmetricKeyValidation
             }
             return publicKeys;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
             DisplayMessage.Exception(ex.GetType().Name, encodedPublicKeys == null || encodedPublicKeys.Length == 1 ? "Please enter a valid encryption public key." : "Please enter valid encryption public keys.");
             return null;
         }
     }
 
-    public static byte[] SigningPublicKeyString(string encodedPublicKey)
+    public static Span<byte> SigningPublicKeyString(string encodedPublicKey)
     {
         try
         {
-            byte[] publicKey = Encodings.FromBase64(encodedPublicKey);
+            Span<byte> publicKey = Encodings.FromBase64(encodedPublicKey);
             ValidateSigningKeyAlgorithm(publicKey);
             return publicKey[Constants.Ed25519KeyHeader.Length..];
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
             DisplayMessage.KeyStringException(encodedPublicKey, ex.GetType().Name, "Please enter a valid signing public key.");
-            return null;
+            return default;
         }
     }
 
     private static void ValidateEncryptionKeyAlgorithm(Span<byte> asymmetricKey)
     {
         Span<byte> keyAlgorithm = asymmetricKey[..Constants.Curve25519KeyHeader.Length];
-        bool validKey = ConstantTime.Equals(keyAlgorithm, Constants.Curve25519KeyHeader);
-        if (!validKey) {
+        if (!ConstantTime.Equals(keyAlgorithm, Constants.Curve25519KeyHeader)) {
             throw new NotSupportedException("This key algorithm isn't supported for encryption.");
         }
     }
@@ -132,8 +130,7 @@ public static class AsymmetricKeyValidation
     private static void ValidateSigningKeyAlgorithm(Span<byte> asymmetricKey)
     {
         Span<byte> keyAlgorithm = asymmetricKey[..Constants.Ed25519KeyHeader.Length];
-        bool validKey = ConstantTime.Equals(keyAlgorithm, Constants.Ed25519KeyHeader);
-        if (!validKey) {
+        if (!ConstantTime.Equals(keyAlgorithm, Constants.Ed25519KeyHeader)) {
             throw new NotSupportedException("This key algorithm isn't supported for signing.");
         }
     }

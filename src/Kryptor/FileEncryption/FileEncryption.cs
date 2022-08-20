@@ -25,9 +25,9 @@ namespace Kryptor;
 
 public static class FileEncryption
 {
-    public static void EncryptEachFileWithPassword(string[] filePaths, byte[] passwordBytes)
+    public static void EncryptEachFileWithPassword(string[] filePaths, Span<byte> passwordBytes)
     {
-        if (filePaths == null || passwordBytes == null) {
+        if (filePaths == null || passwordBytes == default) {
             return;
         }
         Span<byte> salt = stackalloc byte[Argon2id.SaltSize];
@@ -55,9 +55,9 @@ public static class FileEncryption
         DisplayMessage.SuccessfullyEncrypted(space: false);
     }
     
-    public static void EncryptEachFileWithSymmetricKey(string[] filePaths, byte[] symmetricKey)
+    public static void EncryptEachFileWithSymmetricKey(string[] filePaths, Span<byte> symmetricKey)
     {
-        if (filePaths == null || symmetricKey == null) {
+        if (filePaths == null || symmetricKey == default) {
             return;
         }
         Span<byte> salt = stackalloc byte[BLAKE2b.SaltSize];
@@ -84,7 +84,7 @@ public static class FileEncryption
         DisplayMessage.SuccessfullyEncrypted(space: false);
     }
     
-    public static void EncryptEachFileWithPublicKey(Span<byte> senderPrivateKey, List<byte[]> recipientPublicKeys, byte[] presharedKey, string[] filePaths)
+    public static void EncryptEachFileWithPublicKey(Span<byte> senderPrivateKey, List<byte[]> recipientPublicKeys, Span<byte> preSharedKey, string[] filePaths)
     {
         if (filePaths == null || senderPrivateKey == default || recipientPublicKeys == null) {
             return;
@@ -103,7 +103,7 @@ public static class FileEncryption
             if (i++ == recipientPublicKeys.Count - 1) {
                 Globals.Overwrite = overwrite;
             }
-            X25519.DeriveSenderSharedSecret(sharedSecret, senderPrivateKey, recipientPublicKey, presharedKey);
+            X25519.DeriveSenderSharedSecret(sharedSecret, senderPrivateKey, recipientPublicKey, preSharedKey);
             foreach (string inputFilePath in filePaths)
             {
                 Console.WriteLine();
@@ -111,7 +111,7 @@ public static class FileEncryption
                 {
                     bool isDirectory = IsDirectory(inputFilePath, out string zipFilePath);
                     X25519.GenerateKeyPair(ephemeralPublicKey, ephemeralPrivateKey);
-                    X25519.DeriveSenderSharedSecret(ephemeralSharedSecret, ephemeralPrivateKey, recipientPublicKey, presharedKey);
+                    X25519.DeriveSenderSharedSecret(ephemeralSharedSecret, ephemeralPrivateKey, recipientPublicKey, preSharedKey);
                     CryptographicOperations.ZeroMemory(ephemeralPrivateKey);
                     SecureRandom.Fill(salt);
                     Spans.Concat(inputKeyingMaterial, ephemeralSharedSecret, sharedSecret);
@@ -128,11 +128,11 @@ public static class FileEncryption
             CryptographicOperations.ZeroMemory(sharedSecret);
         }
         CryptographicOperations.ZeroMemory(senderPrivateKey);
-        CryptographicOperations.ZeroMemory(presharedKey);
+        CryptographicOperations.ZeroMemory(preSharedKey);
         DisplayMessage.SuccessfullyEncrypted();
     }
 
-    public static void EncryptEachFileWithPrivateKey(Span<byte> privateKey, byte[] presharedKey, string[] filePaths)
+    public static void EncryptEachFileWithPrivateKey(Span<byte> privateKey, Span<byte> preSharedKey, string[] filePaths)
     {
         if (filePaths == null || privateKey == default) {
             return;
@@ -149,7 +149,7 @@ public static class FileEncryption
                 bool isDirectory = IsDirectory(inputFilePath, out string zipFilePath);
                 X25519.GenerateKeyPair(ephemeralPublicKey, ephemeralPrivateKey);
                 CryptographicOperations.ZeroMemory(ephemeralPrivateKey);
-                X25519.DeriveSenderSharedSecret(ephemeralSharedSecret, privateKey, ephemeralPublicKey, presharedKey);
+                X25519.DeriveSenderSharedSecret(ephemeralSharedSecret, privateKey, ephemeralPublicKey, preSharedKey);
                 SecureRandom.Fill(salt);
                 BLAKE2b.DeriveKey(headerKey, ephemeralSharedSecret, Constants.Personalisation, salt);
                 CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
@@ -161,7 +161,7 @@ public static class FileEncryption
             }
         }
         CryptographicOperations.ZeroMemory(privateKey);
-        CryptographicOperations.ZeroMemory(presharedKey);
+        CryptographicOperations.ZeroMemory(preSharedKey);
         DisplayMessage.SuccessfullyEncrypted();
     }
 

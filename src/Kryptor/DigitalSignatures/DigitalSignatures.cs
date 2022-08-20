@@ -66,7 +66,7 @@ public static class DigitalSignatures
         File.SetAttributes(signatureFilePath, FileAttributes.ReadOnly);
     }
 
-    public static bool VerifySignature(string signatureFilePath, string filePath, byte[] publicKey, out string comment)
+    public static bool VerifySignature(string signatureFilePath, string filePath, Span<byte> publicKey, out string comment)
     {
         using var signatureFile = new FileStream(signatureFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
         byte[] magicBytes = FileHandling.ReadFileHeader(signatureFile, Constants.SignatureMagicBytes.Length);

@@ -25,9 +25,9 @@ namespace Kryptor;
 
 public static class FileDecryption
 {
-    public static void DecryptEachFileWithPassword(string[] filePaths, byte[] passwordBytes)
+    public static void DecryptEachFileWithPassword(string[] filePaths, Span<byte> passwordBytes)
     {
-        if (filePaths == null || passwordBytes == null) {
+        if (filePaths == null || passwordBytes == default) {
             return;
         }
         Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeadersLength];
@@ -58,9 +58,9 @@ public static class FileDecryption
         DisplayMessage.SuccessfullyDecrypted(space: false);
     }
     
-    public static void DecryptEachFileWithSymmetricKey(string[] filePaths, byte[] symmetricKey)
+    public static void DecryptEachFileWithSymmetricKey(string[] filePaths, Span<byte> symmetricKey)
     {
-        if (filePaths == null || symmetricKey == null) {
+        if (filePaths == null || symmetricKey == default) {
             return;
         }
         Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeadersLength];
@@ -90,13 +90,13 @@ public static class FileDecryption
         DisplayMessage.SuccessfullyDecrypted(space: false);
     }
 
-    public static void DecryptEachFileWithPublicKey(Span<byte> recipientPrivateKey, byte[] senderPublicKey, byte[] presharedKey, string[] filePaths)
+    public static void DecryptEachFileWithPublicKey(Span<byte> recipientPrivateKey, Span<byte> senderPublicKey, Span<byte> preSharedKey, string[] filePaths)
     {
-        if (filePaths == null || recipientPrivateKey == default || senderPublicKey == null) {
+        if (filePaths == null || recipientPrivateKey == default || senderPublicKey == default) {
             return;
         }
         Span<byte> sharedSecret = stackalloc byte[X25519.SharedSecretSize], ephemeralSharedSecret = stackalloc byte[X25519.SharedSecretSize];
-        X25519.DeriveRecipientSharedSecret(sharedSecret, recipientPrivateKey, senderPublicKey, presharedKey);
+        X25519.DeriveRecipientSharedSecret(sharedSecret, recipientPrivateKey, senderPublicKey, preSharedKey);
         Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeadersLength];
         Span<byte> inputKeyingMaterial = stackalloc byte[ephemeralSharedSecret.Length + sharedSecret.Length];
         Span<byte> headerKey = stackalloc byte[Constants.HeaderKeySize];
@@ -109,7 +109,7 @@ public static class FileDecryption
                 inputFile.Read(unencryptedHeaders);
                 Span<byte> ephemeralPublicKey = unencryptedHeaders.Slice(Constants.UnencryptedHeadersLength - BLAKE2b.SaltSize - X25519.PublicKeySize, X25519.PublicKeySize);
                 Span<byte> salt = unencryptedHeaders[^BLAKE2b.SaltSize..];
-                X25519.DeriveRecipientSharedSecret(ephemeralSharedSecret, recipientPrivateKey, ephemeralPublicKey, presharedKey);
+                X25519.DeriveRecipientSharedSecret(ephemeralSharedSecret, recipientPrivateKey, ephemeralPublicKey, preSharedKey);
                 Spans.Concat(inputKeyingMaterial, ephemeralSharedSecret, sharedSecret);
                 BLAKE2b.DeriveKey(headerKey, inputKeyingMaterial, Constants.Personalisation, salt);
                 CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
@@ -128,11 +128,11 @@ public static class FileDecryption
         }
         CryptographicOperations.ZeroMemory(recipientPrivateKey);
         CryptographicOperations.ZeroMemory(sharedSecret);
-        CryptographicOperations.ZeroMemory(presharedKey);
+        CryptographicOperations.ZeroMemory(preSharedKey);
         DisplayMessage.SuccessfullyDecrypted();
     }
     
-    public static void DecryptEachFileWithPrivateKey(Span<byte> privateKey, byte[] presharedKey, string[] filePaths)
+    public static void DecryptEachFileWithPrivateKey(Span<byte> privateKey, Span<byte> preSharedKey, string[] filePaths)
     {
         if (filePaths == null || privateKey == default) {
             return;
@@ -149,7 +149,7 @@ public static class FileDecryption
                 inputFile.Read(unencryptedHeaders);
                 Span<byte> ephemeralPublicKey = unencryptedHeaders.Slice(Constants.UnencryptedHeadersLength - BLAKE2b.SaltSize - X25519.PublicKeySize, X25519.PublicKeySize);
                 Span<byte> salt = unencryptedHeaders[^BLAKE2b.SaltSize..];
-                X25519.DeriveSenderSharedSecret(ephemeralSharedSecret, privateKey, ephemeralPublicKey, presharedKey);
+                X25519.DeriveSenderSharedSecret(ephemeralSharedSecret, privateKey, ephemeralPublicKey, preSharedKey);
                 BLAKE2b.DeriveKey(headerKey, ephemeralSharedSecret, Constants.Personalisation, salt);
                 CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
                 DecryptInputFile(inputFile, unencryptedHeaders, headerKey);
@@ -165,7 +165,7 @@ public static class FileDecryption
             }
         }
         CryptographicOperations.ZeroMemory(privateKey);
-        CryptographicOperations.ZeroMemory(presharedKey);
+        CryptographicOperations.ZeroMemory(preSharedKey);
         DisplayMessage.SuccessfullyDecrypted();
     }
     

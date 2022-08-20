@@ -69,9 +69,9 @@ public static class FileSigning
         DisplayMessage.SuccessfullySigned();
     }
        
-    public static void VerifyEachFile(string[] signatureFilePaths, string[] filePaths, byte[] publicKey)
+    public static void VerifyEachFile(string[] signatureFilePaths, string[] filePaths, Span<byte> publicKey)
     {
-        if (filePaths == null || publicKey == null) {
+        if (filePaths == null || publicKey == default) {
             return;
         }
         signatureFilePaths ??= new string[filePaths.Length];
