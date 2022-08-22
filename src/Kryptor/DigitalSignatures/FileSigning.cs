@@ -26,36 +26,20 @@ public static class FileSigning
 {
     private const string DefaultComment = "This file has not been tampered with.";
 
-    public static void SignEachFile(Span<byte> privateKey, string comment, bool prehash, string[] signatureFilePaths, string[] filePaths)
+    public static void SignEachFile(string[] filePaths, string[] signatureFilePaths, string comment, bool prehash, Span<byte> privateKey)
     {
-        if (privateKey == default || filePaths == null) {
+        if (filePaths == null || privateKey == default) {
             return;
         }
         if (string.IsNullOrEmpty(comment)) {
             comment = DefaultComment;
         }
-        for (int i = 0; i < filePaths.Length; i++)
-        {
+        for (int i = 0; i < filePaths.Length; i++) {
             try
             {
                 Console.WriteLine();
-                if (FileHandling.IsDirectory(filePaths[i])) {
-                    Console.WriteLine($"Signing each file in \"{Path.GetFileName(filePaths[i])}\" directory...");
-                    string[] files = FileHandling.GetAllFiles(filePaths[i]);
-                    Globals.TotalCount += files.Length - 1;
-                    foreach (string file in files)
-                    {
-                        try
-                        {
-                            DisplayMessage.SigningFile(file);
-                            DigitalSignatures.SignFile(file, signatureFilePath: string.Empty, comment, prehash, privateKey);
-                            Globals.SuccessfulCount++;
-                        }
-                        catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
-                        {
-                            DisplayMessage.FilePathException(file, ex.GetType().Name, "Unable to sign the file.");
-                        }
-                    }
+                if (File.GetAttributes(filePaths[i]).HasFlag(FileAttributes.Directory)) {
+                    SignDirectoryFiles(filePaths[i], comment, prehash, privateKey);
                     continue;
                 }
                 DisplayMessage.SigningFile(filePaths[i]);
@@ -70,7 +54,27 @@ public static class FileSigning
         CryptographicOperations.ZeroMemory(privateKey);
         DisplayMessage.SuccessfullySigned();
     }
-       
+
+    private static void SignDirectoryFiles(string directoryPath, string comment, bool prehash, Span<byte> privateKey)
+    {
+        Console.WriteLine($"Signing each file in \"{Path.GetFileName(directoryPath)}\" directory...");
+        string[] filePaths = Directory.GetFiles(directoryPath, searchPattern: "*", SearchOption.AllDirectories);
+        Globals.TotalCount += filePaths.Length - 1;
+        foreach (string filePath in filePaths)
+        {
+            try
+            {
+                DisplayMessage.SigningFile(filePath);
+                DigitalSignatures.SignFile(filePath, signatureFilePath: string.Empty, comment, prehash, privateKey);
+                Globals.SuccessfulCount++;
+            }
+            catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
+            {
+                DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to sign the file.");
+            }
+        }
+    }
+    
     public static void VerifyEachFile(string[] signatureFilePaths, string[] filePaths, Span<byte> publicKey)
     {
         if (filePaths == null || publicKey == default) {
@@ -79,11 +83,11 @@ public static class FileSigning
         signatureFilePaths ??= new string[filePaths.Length];
         for (int i = 0; i < filePaths.Length; i++)
         {
-            if (string.IsNullOrEmpty(signatureFilePaths[i])) {
-                signatureFilePaths[i] = filePaths[i] + Constants.SignatureExtension;
-            }
             try
             {
+                if (string.IsNullOrEmpty(signatureFilePaths[i])) {
+                    signatureFilePaths[i] = filePaths[i] + Constants.SignatureExtension;
+                }
                 Console.WriteLine($"Verifying \"{Path.GetFileName(signatureFilePaths[i])}\"...");
                 bool validSignature = DigitalSignatures.VerifySignature(signatureFilePaths[i], filePaths[i], publicKey, out string comment);
                 if (!validSignature) {

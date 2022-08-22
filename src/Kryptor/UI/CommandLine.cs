@@ -285,7 +285,7 @@ public static class CommandLine
             return;
         }
         Span<byte> privateKey = AsymmetricKeyValidation.SigningPrivateKeyFile(privateKeyPath, password);
-        FileSigning.SignEachFile(privateKey, comment, prehash, signatureFilePaths, filePaths);
+        FileSigning.SignEachFile(filePaths, signatureFilePaths, comment, prehash, privateKey);
     }
 
     public static void Verify(string[] publicKeys, string[] signatureFilePaths, string[] filePaths)
