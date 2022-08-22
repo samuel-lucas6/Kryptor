@@ -18,27 +18,17 @@
 
 using System;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
+using System.IO.Compression;
 using Geralt;
 
 namespace Kryptor;
 
 public static class FileHandling
 {
-    private static readonly char[] SeparatorChars = {Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar, Path.VolumeSeparatorChar};
-    
-    public static bool IsDirectory(string filePath) => File.GetAttributes(filePath).HasFlag(FileAttributes.Directory);
-    
     public static bool IsDirectoryEmpty(string directoryPath) => !Directory.EnumerateFiles(directoryPath, searchPattern: "*", SearchOption.AllDirectories).Any();
     
-    public static string[] GetAllFiles(string directoryPath) => Directory.GetFiles(directoryPath, searchPattern: "*", SearchOption.AllDirectories);
-    
-    public static long GetFileLength(string filePath) => new FileInfo(filePath).Length;
-    
-    public static bool HasKryptorExtension(string filePath) => filePath.EndsWith(Constants.EncryptedExtension, StringComparison.Ordinal);
-    
-    public static string TrimTrailingSeparatorChars(string filePath) => filePath.TrimEnd(SeparatorChars);
+    public static string TrimTrailingSeparatorChars(string filePath) => filePath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar, Path.VolumeSeparatorChar);
     
     public static string ReplaceFileName(string originalFilePath, string newFileName)
     {
@@ -50,16 +40,6 @@ public static class FileHandling
         return newPath;
     }
     
-    public static string GetEncryptedOutputFilePath(string inputFilePath)
-    {
-        if (Globals.EncryptFileNames) {
-            inputFilePath = ReplaceFileName(inputFilePath, SecureRandom.GetString(Constants.RandomFileNameLength));
-        }
-        return GetUniqueFilePath(inputFilePath + Constants.EncryptedExtension);
-    }
-    
-    public static string GetDecryptedOutputFilePath(string inputFilePath) => GetUniqueFilePath(Path.ChangeExtension(inputFilePath, extension: null));
-    
     public static bool? IsKryptorFile(string filePath)
     {
         try
@@ -67,21 +47,21 @@ public static class FileHandling
             Span<byte> magicBytes = ReadFileHeader(filePath, offset: 0, Constants.EncryptionMagicBytes.Length);
             return ConstantTime.Equals(magicBytes, Constants.EncryptionMagicBytes);
         }
-        catch (Exception ex) when (ExceptionFilters.FileAccess(ex)) 
-        { 
+        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
+        {
             return null;
         }
     }
     
-    public static bool? IsValidEncryptedFileVersion(string filePath)
+    public static bool? IsValidEncryptionVersion(string filePath)
     {
         try
         {
             Span<byte> version = ReadFileHeader(filePath, Constants.EncryptionMagicBytes.Length, Constants.EncryptionVersion.Length);
             return ConstantTime.Equals(version, Constants.EncryptionVersion);
         }
-        catch (Exception ex) when (ExceptionFilters.FileAccess(ex)) 
-        { 
+        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
+        {
             return null;
         }
     }
@@ -99,22 +79,22 @@ public static class FileHandling
         }
     }
     
-    public static bool? IsValidSignatureFileVersion(string filePath)
+    public static bool? IsValidSignatureVersion(string filePath)
     {
         try
         {
             Span<byte> version = ReadFileHeader(filePath, Constants.SignatureMagicBytes.Length, Constants.SignatureVersion.Length);
             return ConstantTime.Equals(version, Constants.SignatureVersion);
         }
-        catch (Exception ex) when (ExceptionFilters.FileAccess(ex)) 
-        { 
+        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
+        {
             return null;
         }
     }
     
     private static Span<byte> ReadFileHeader(string filePath, long offset, int length)
     {
-        using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.DefaultFileStreamBufferSize, FileOptions.SequentialScan);
+        using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
         fileStream.Seek(offset, SeekOrigin.Begin);
         Span<byte> header = new byte[length];
         fileStream.Read(header);
@@ -151,14 +131,14 @@ public static class FileHandling
         }
     }
 
-    public static void DeleteDirectory(string directoryPath)
+    private static void DeleteDirectory(string directoryPath)
     {
         try
         {
             if (!Directory.Exists(directoryPath)) {
                 return;
             }
-            foreach (string filePath in GetAllFiles(directoryPath))
+            foreach (string filePath in Directory.GetFiles(directoryPath, searchPattern: "*", SearchOption.AllDirectories))
             {
                 File.SetAttributes(filePath, FileAttributes.Normal);
             }

@@ -43,7 +43,7 @@ public static class FileEncryptionValidation
         if (Path.EndsInDirectorySeparator(symmetricKey) && !Directory.Exists(symmetricKey)) {
             yield return ErrorMessages.GetFilePathError(symmetricKey, "Please specify a valid directory for the keyfile.");
         }
-        else if (File.Exists(symmetricKey) && FileHandling.GetFileLength(symmetricKey) < Constants.KeyfileLength) {
+        else if (File.Exists(symmetricKey) && new FileInfo(symmetricKey).Length < Constants.KeyfileLength) {
             yield return ErrorMessages.GetFilePathError(symmetricKey, "Please specify a keyfile that's at least 64 bytes in size.");
         }
         else if (!string.IsNullOrEmpty(symmetricKey) && ConstantTime.Equals(Encoding.UTF8.GetBytes(new[] { symmetricKey[^1] }), Constants.Base64Padding) && symmetricKey.Length != Constants.SymmetricKeyLength) {

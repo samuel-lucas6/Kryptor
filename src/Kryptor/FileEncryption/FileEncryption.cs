@@ -17,6 +17,7 @@
 */
 
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using Geralt;
@@ -52,7 +53,7 @@ public static class FileEncryption
             Console.WriteLine();
         }
         CryptographicOperations.ZeroMemory(passwordBytes);
-        DisplayMessage.SuccessfullyEncrypted(space: false);
+        DisplayMessage.SuccessfullyEncrypted(insertSpace: false);
     }
     
     public static void EncryptEachFileWithSymmetricKey(string[] filePaths, Span<byte> symmetricKey)
@@ -81,7 +82,7 @@ public static class FileEncryption
             Console.WriteLine();
         }
         CryptographicOperations.ZeroMemory(symmetricKey);
-        DisplayMessage.SuccessfullyEncrypted(space: false);
+        DisplayMessage.SuccessfullyEncrypted(insertSpace: false);
     }
     
     public static void EncryptEachFileWithPublicKey(Span<byte> senderPrivateKey, List<byte[]> recipientPublicKeys, Span<byte> preSharedKey, string[] filePaths)
@@ -167,7 +168,7 @@ public static class FileEncryption
 
     private static bool IsDirectory(string inputFilePath, out string zipFilePath)
     {
-        bool isDirectory = FileHandling.IsDirectory(inputFilePath);
+        bool isDirectory = File.GetAttributes(inputFilePath).HasFlag(FileAttributes.Directory);
         zipFilePath = inputFilePath + Constants.ZipFileExtension;
         if (isDirectory) {
             FileHandling.CreateZipFile(inputFilePath, zipFilePath);
@@ -177,12 +178,16 @@ public static class FileEncryption
     
     private static void EncryptInputFile(string inputFilePath, bool isDirectory, Span<byte> ephemeralPublicKey, Span<byte> salt, Span<byte> headerKey)
     {
-        string outputFilePath = FileHandling.GetEncryptedOutputFilePath(inputFilePath);
+        string outputFilePath = !Globals.EncryptFileNames ? inputFilePath : FileHandling.ReplaceFileName(inputFilePath, SecureRandom.GetString(Constants.RandomFileNameLength));
+        outputFilePath = FileHandling.GetUniqueFilePath(outputFilePath + Constants.EncryptedExtension);
         DisplayMessage.EncryptingFile(inputFilePath, outputFilePath);
+        
         Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeadersLength];
         Spans.Concat(unencryptedHeaders, Constants.EncryptionMagicBytes, Constants.EncryptionVersion, ephemeralPublicKey, salt);
+        
         Span<byte> encryptionKey = headerKey[..ChaCha20.KeySize];
         Span<byte> nonce = headerKey[encryptionKey.Length..];
+        
         EncryptFile.Encrypt(inputFilePath, outputFilePath, isDirectory, unencryptedHeaders, nonce, encryptionKey);
         Globals.SuccessfulCount++;
     }

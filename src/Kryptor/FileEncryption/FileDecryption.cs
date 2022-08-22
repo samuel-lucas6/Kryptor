@@ -55,7 +55,7 @@ public static class FileDecryption
             Console.WriteLine();
         }
         CryptographicOperations.ZeroMemory(passwordBytes);
-        DisplayMessage.SuccessfullyDecrypted(space: false);
+        DisplayMessage.SuccessfullyDecrypted(insertSpace: false);
     }
     
     public static void DecryptEachFileWithSymmetricKey(string[] filePaths, Span<byte> symmetricKey)
@@ -87,7 +87,7 @@ public static class FileDecryption
             Console.WriteLine();
         }
         CryptographicOperations.ZeroMemory(symmetricKey);
-        DisplayMessage.SuccessfullyDecrypted(space: false);
+        DisplayMessage.SuccessfullyDecrypted(insertSpace: false);
     }
 
     public static void DecryptEachFileWithPublicKey(Span<byte> recipientPrivateKey, Span<byte> senderPublicKey, Span<byte> preSharedKey, string[] filePaths)
@@ -171,10 +171,12 @@ public static class FileDecryption
     
     private static void DecryptInputFile(FileStream inputFile, Span<byte> unencryptedHeaders, Span<byte> headerKey)
     {
-        string outputFilePath = FileHandling.GetDecryptedOutputFilePath(inputFile.Name);
+        string outputFilePath = FileHandling.GetUniqueFilePath(Path.ChangeExtension(inputFile.Name, extension: null));
         DisplayMessage.DecryptingFile(inputFile.Name, outputFilePath);
+        
         Span<byte> encryptionKey = headerKey[..ChaCha20.KeySize];
         Span<byte> nonce = headerKey[encryptionKey.Length..];
+        
         DecryptFile.Decrypt(inputFile, outputFilePath, unencryptedHeaders, nonce, encryptionKey);
         Globals.SuccessfulCount++;
     }
