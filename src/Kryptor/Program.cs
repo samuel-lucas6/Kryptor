@@ -134,7 +134,7 @@ public class Program
                 DisplayMessage.Error("Unknown command. Please specify -h|--help for a list of options and examples.");
             }
         }
-        catch (DllNotFoundException ex)
+        catch (PlatformNotSupportedException ex)
         {
             DisplayMessage.Exception(ex.GetType().Name, "The libsodium cryptographic library requires the Microsoft Visual C++ Redistributable for Visual Studio 2015-2022 to function on Windows. Please install this runtime or move the Kryptor executable to a directory that doesn't require administrative privileges.");
         }
@@ -162,9 +162,9 @@ public class Program
 
     private static char[] GetPassword(string password) => string.IsNullOrEmpty(password) ? Array.Empty<char>() : password.ToCharArray();
 
-    private static string GetEncryptionPrivateKey(string privateKey) => string.IsNullOrEmpty(privateKey) ? Constants.DefaultEncryptionPrivateKeyPath : privateKey;
+    private static string GetEncryptionPrivateKey(string privateKeyPath) => string.IsNullOrEmpty(privateKeyPath) ? Constants.DefaultEncryptionPrivateKeyPath : privateKeyPath;
 
-    private static string GetSigningPrivateKey(string privateKey) => string.IsNullOrEmpty(privateKey) ? Constants.DefaultSigningPrivateKeyPath : privateKey;
+    private static string GetSigningPrivateKey(string privateKeyPath) => string.IsNullOrEmpty(privateKeyPath) ? Constants.DefaultSigningPrivateKeyPath : privateKeyPath;
 
     public static string GetVersion() => Assembly.GetExecutingAssembly().GetName().Version?.ToString()[..^2];
 }
