@@ -25,10 +25,10 @@ namespace Kryptor;
 
 public static class DisplayMessage
 {
-    public static void Error(string errorMessage)
+    public static void Error(string message)
     {
         Environment.ExitCode = Constants.ErrorCode;
-        WriteLine($"Error: {errorMessage}", ConsoleColor.DarkRed);
+        WriteLine($"Error: {message}", ConsoleColor.DarkRed);
     }
 
     public static void FilePathError(string filePath, string message)
@@ -37,22 +37,22 @@ public static class DisplayMessage
         Error($"\"{Path.GetFileName(FileHandling.TrimTrailingSeparatorChars(filePath))}\" - {message}");
     }
 
-    public static void Exception(string exceptionName, string errorMessage)
+    public static void Exception(string exceptionName, string message)
     {
         Environment.ExitCode = Constants.ErrorCode;
-        WriteLine($"{exceptionName}: {errorMessage}", ConsoleColor.DarkRed);
+        WriteLine($"{exceptionName}: {message}", ConsoleColor.DarkRed);
     }
 
-    public static void FilePathException(string filePath, string exceptionName, string errorMessage)
+    public static void FilePathException(string filePath, string exceptionName, string message)
     {
         Environment.ExitCode = Constants.ErrorCode;
-        WriteLine($"{exceptionName}: \"{Path.GetFileName(FileHandling.TrimTrailingSeparatorChars(filePath))}\" - {errorMessage}", ConsoleColor.DarkRed);
+        WriteLine($"{exceptionName}: \"{Path.GetFileName(FileHandling.TrimTrailingSeparatorChars(filePath))}\" - {message}", ConsoleColor.DarkRed);
     }
     
-    public static void KeyStringException(string keyString, string exceptionName, string errorMessage)
+    public static void KeyStringException(string keyString, string exceptionName, string message)
     {
         Environment.ExitCode = Constants.ErrorCode;
-        WriteLine($"{exceptionName}: \"{keyString}\" - {errorMessage}", ConsoleColor.DarkRed);
+        WriteLine($"{exceptionName}: \"{keyString}\" - {message}", ConsoleColor.DarkRed);
     }
     
     public static void DerivingKeyFromPassword() => Console.WriteLine("Deriving encryption key from password...");
@@ -77,25 +77,17 @@ public static class DisplayMessage
         Console.WriteLine($"Decrypting \"{Path.GetFileName(inputFilePath)}\" => \"{Path.GetFileName(outputFilePath)}\"...");
     }
 
-    public static void SuccessfullyEncrypted(bool space = true)
+    public static void SuccessfullyEncrypted(bool insertSpace = true)
     {
-        if (Globals.TotalCount <= 0) {
-            return;
-        }
-        if (space) {
-            Console.WriteLine();
-        }
+        if (Globals.TotalCount <= 0) { return; }
+        if (insertSpace) { Console.WriteLine(); }
         WriteLine($"Successfully encrypted: {Globals.SuccessfulCount}/{Globals.TotalCount}", Globals.SuccessfulCount == Globals.TotalCount ? ConsoleColor.Green : ConsoleColor.DarkRed);
     }
 
-    public static void SuccessfullyDecrypted(bool space = true)
+    public static void SuccessfullyDecrypted(bool insertSpace = true)
     {
-        if (Globals.TotalCount <= 0) {
-            return;
-        }
-        if (space) {
-            Console.WriteLine();
-        }
+        if (Globals.TotalCount <= 0) { return; }
+        if (insertSpace) { Console.WriteLine(); }
         WriteLine($"Successfully decrypted: {Globals.SuccessfulCount}/{Globals.TotalCount}", Globals.SuccessfulCount == Globals.TotalCount ? ConsoleColor.Green : ConsoleColor.DarkRed);
     }
 
@@ -139,9 +131,7 @@ public static class DisplayMessage
         
     public static void SuccessfullySigned()
     {
-        if (Globals.TotalCount <= 0) {
-            return;
-        }
+        if (Globals.TotalCount <= 0) { return; }
         Console.WriteLine();
         WriteLine($"Successfully signed: {Globals.SuccessfulCount}/{Globals.TotalCount}", Globals.SuccessfulCount == Globals.TotalCount ? ConsoleColor.Green : ConsoleColor.DarkRed);
     }
