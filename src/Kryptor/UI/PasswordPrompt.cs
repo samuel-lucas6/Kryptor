@@ -19,6 +19,7 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using Geralt;
 
 namespace Kryptor;
@@ -40,11 +41,14 @@ public static class PasswordPrompt
     {
         Console.WriteLine("Retype password:");
         char[] retypedPassword = GetPassword();
-        if (!ConstantTime.Equals(Encoding.UTF8.GetBytes(password), Encoding.UTF8.GetBytes(retypedPassword))) {
+        Span<byte> passwordBytes = Encoding.UTF8.GetBytes(password), retypedPasswordBytes = Encoding.UTF8.GetBytes(retypedPassword);
+        if (!ConstantTime.Equals(passwordBytes, retypedPasswordBytes)) {
             DisplayMessage.Error("The passwords don't match.");
             Environment.Exit(Constants.ErrorCode);
         }
         Array.Clear(retypedPassword);
+        CryptographicOperations.ZeroMemory(passwordBytes);
+        CryptographicOperations.ZeroMemory(retypedPasswordBytes);
     }
     
     public static char[] UseRandomPassphrase()
@@ -60,11 +64,10 @@ public static class PasswordPrompt
     {
         Console.WriteLine(isPrivateKey == false ? "Enter your password:" : "Enter your private key password:");
         char[] password = GetPassword();
-        if (password.Length != 0) {
-            return password;
+        if (password.Length == 0) {
+            DisplayMessage.Error("You didn't enter a password.");
+            Environment.Exit(Constants.ErrorCode);
         }
-        DisplayMessage.Error("You didn't enter a password.");
-        Environment.Exit(Constants.ErrorCode);
         return password;
     }
 
