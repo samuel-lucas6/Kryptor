@@ -43,6 +43,7 @@ public static class Password
         Span<byte> passwordBytes = GC.AllocateArray<byte>(Encoding.UTF8.GetMaxByteCount(password.Length), pinned: true);
         int bytesEncoded = Encoding.UTF8.GetBytes(password, passwordBytes);
         Array.Clear(password);
+        
         Span<byte> hash = GC.AllocateArray<byte>(BLAKE2b.MaxHashSize, pinned: true);
         if (pepper == default) {
             BLAKE2b.ComputeHash(hash, passwordBytes[..bytesEncoded]);
