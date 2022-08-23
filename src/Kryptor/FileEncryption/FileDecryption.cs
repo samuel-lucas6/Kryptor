@@ -171,7 +171,7 @@ public static class FileDecryption
     
     private static void DecryptInputFile(FileStream inputFile, Span<byte> unencryptedHeaders, Span<byte> headerKey)
     {
-        string outputFilePath = FileHandling.GetUniqueFilePath(Path.ChangeExtension(inputFile.Name, extension: null));
+        string outputFilePath = FileHandling.GetUniqueFilePath(FileHandling.RemoveFileNameNumber(Path.ChangeExtension(inputFile.Name, extension: null)));
         DisplayMessage.DecryptingFile(inputFile.Name, outputFilePath);
         
         Span<byte> encryptionKey = headerKey[..ChaCha20.KeySize];

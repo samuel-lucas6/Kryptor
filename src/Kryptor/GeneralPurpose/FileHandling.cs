@@ -152,17 +152,16 @@ public static class FileHandling
 
     public static string GetUniqueFilePath(string filePath)
     {
-        filePath = RemoveFileNameNumber(filePath);
         if (!File.Exists(filePath)) {
             return filePath;
         }
-        string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
+        string fileNameNoExtension = Path.GetFileNameWithoutExtension(filePath);
         int fileNumber = 2;
         string fileExtension = Path.GetExtension(filePath);
         string directoryPath = Path.GetDirectoryName(filePath);
         do
         {
-            string newFileName = $"{fileNameWithoutExtension} ({fileNumber}){fileExtension}";
+            string newFileName = $"{fileNameNoExtension} ({fileNumber}){fileExtension}";
             filePath = Path.Combine(directoryPath, newFileName);
             fileNumber++;
         }
@@ -170,7 +169,7 @@ public static class FileHandling
         return filePath;
     }
 
-    private static string RemoveFileNameNumber(string filePath)
+    public static string RemoveFileNameNumber(string filePath)
     {
         if (!filePath.EndsWith(')') || !char.IsDigit(filePath[^2])) {
             return filePath;
