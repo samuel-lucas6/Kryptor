@@ -170,17 +170,13 @@ public static class FileHandling
         return filePath;
     }
 
-    public static string RemoveFileNameNumber(string filePath)
+    private static string RemoveFileNameNumber(string filePath)
     {
-        string fileExtension = Path.GetExtension(filePath);
-        if (!string.IsNullOrEmpty(fileExtension) && filePath.EndsWith(')') && filePath[^4].Equals(' ') && filePath[^3].Equals('(') && char.IsDigit(filePath[^2])) {
-            return filePath.Remove(startIndex: filePath.Length - 4);
+        if (!filePath.EndsWith(')') || !char.IsDigit(filePath[^2])) {
+            return filePath;
         }
-        int lengthNoExtension = filePath.Length - fileExtension.Length;
-        if (filePath[lengthNoExtension - 1].Equals(')') && filePath[lengthNoExtension - 4].Equals(' ') && filePath[lengthNoExtension - 3].Equals('(') && char.IsDigit(filePath[lengthNoExtension - 2])) {
-            return filePath.Remove(startIndex: lengthNoExtension - 4) + fileExtension;
-        }
-        return filePath;
+        int index = filePath.LastIndexOf(" (", StringComparison.Ordinal);
+        return filePath[..index];
     }
     
     public static string RenameFile(string filePath, string newFileName)
