@@ -41,7 +41,7 @@ public static class FilePathValidation
         if (Path.GetFileName(Path.TrimEndingDirectorySeparator(inputFilePath)).IndexOfAny(IllegalFileNameChars) != -1) { return "This file/directory name contains illegal characters for Windows, Linux, and/or macOS.";}
         if (Directory.Exists(inputFilePath)) { return FileHandling.IsDirectoryEmpty(inputFilePath) ? DirectoryEmpty : null; }
         if (!File.Exists(inputFilePath)) { return FileOrDirectoryDoesNotExist; }
-        bool? validMagicBytes = FileHandling.IsKryptorFile(inputFilePath);
+        bool? validMagicBytes = FileHandling.IsValidEncryptedFile(inputFilePath, out bool? _);
         if (validMagicBytes == null) { return FileInaccessible; }
         if (inputFilePath.EndsWith(Constants.EncryptedExtension) || validMagicBytes == true) { return "This file has already been encrypted."; }
         return null;
@@ -51,10 +51,9 @@ public static class FilePathValidation
     {
         if (Directory.Exists(inputFilePath)) { return FileHandling.IsDirectoryEmpty(inputFilePath) ? DirectoryEmpty : null; }
         if (!File.Exists(inputFilePath)) { return FileOrDirectoryDoesNotExist; }
-        bool? validMagicBytes = FileHandling.IsKryptorFile(inputFilePath);
+        bool? validMagicBytes = FileHandling.IsValidEncryptedFile(inputFilePath, out bool? validVersion);
         if (validMagicBytes == null) { return FileInaccessible; }
         if (!inputFilePath.EndsWith(Constants.EncryptedExtension) || validMagicBytes == false) { return "This file hasn't been encrypted."; }
-        bool? validVersion = FileHandling.IsValidEncryptionVersion(inputFilePath);
         if (validVersion == false) { return "This file format isn't supported in this version of Kryptor."; }
         return validVersion == null ? FileInaccessible : null;
     }
@@ -142,10 +141,9 @@ public static class FilePathValidation
         if (!File.Exists(filePath)) { return "This file doesn't exist."; }
         if (string.IsNullOrEmpty(signatureFilePath)) { return null; }
         if (!File.Exists(signatureFilePath)) { return "Unable to find the signature file. Please specify it manually using -t|--signature."; }
-        bool? validMagicBytes = FileHandling.IsSignatureFile(signatureFilePath);
+        bool? validMagicBytes = FileHandling.IsValidSignatureFile(signatureFilePath, out bool? validVersion);
         if (validMagicBytes == null) { return SignatureFileInaccessible; }
         if (validMagicBytes == false) { return "The signature file that was found doesn't have a valid format."; }
-        bool? validVersion = FileHandling.IsValidSignatureVersion(signatureFilePath);
         if (validVersion == false) { return "The signature file that was found doesn't have a valid version."; }
         return validVersion == null ? SignatureFileInaccessible : null;
     }
@@ -154,10 +152,9 @@ public static class FilePathValidation
     {
         if (!signatureFilePath.EndsWith(Constants.SignatureExtension)) { return InvalidSignatureFile; }
         if (!File.Exists(signatureFilePath)) { return "Please specify a signature file that exists."; }
-        bool? validMagicBytes = FileHandling.IsSignatureFile(signatureFilePath);
+        bool? validMagicBytes = FileHandling.IsValidSignatureFile(signatureFilePath, out bool? validVersion);
         if (validMagicBytes == null) { return SignatureFileInaccessible; }
         if (validMagicBytes == false) { return InvalidSignatureFile; }
-        bool? validVersion = FileHandling.IsValidSignatureVersion(signatureFilePath);
         if (validVersion == false) { return "This signature file doesn't have a valid version."; }
         return validVersion == null ? SignatureFileInaccessible : null;
     }

@@ -20,7 +20,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.IO.Compression;
-using Geralt;
 
 namespace Kryptor;
 
@@ -40,65 +39,42 @@ public static class FileHandling
         return newPath;
     }
     
-    public static bool? IsKryptorFile(string filePath)
+    public static bool? IsValidEncryptedFile(string filePath, out bool? validVersion)
     {
         try
         {
-            Span<byte> magicBytes = ReadFileHeader(filePath, offset: 0, Constants.EncryptionMagicBytes.Length);
-            return ConstantTime.Equals(magicBytes, Constants.EncryptionMagicBytes);
+            using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.DefaultFileStreamBufferSize, FileOptions.SequentialScan);
+            Span<byte> magicBytes = stackalloc byte[Constants.EncryptionMagicBytes.Length];
+            fileStream.Read(magicBytes);
+            Span<byte> version = stackalloc byte[Constants.EncryptionVersion.Length];
+            fileStream.Read(version);
+            validVersion = version.SequenceEqual(Constants.EncryptionVersion);
+            return magicBytes.SequenceEqual(Constants.EncryptionMagicBytes);
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
+            validVersion = null;
             return null;
         }
     }
-    
-    public static bool? IsValidEncryptionVersion(string filePath)
+
+    public static bool? IsValidSignatureFile(string filePath, out bool? validVersion)
     {
         try
         {
-            Span<byte> version = ReadFileHeader(filePath, Constants.EncryptionMagicBytes.Length, Constants.EncryptionVersion.Length);
-            return ConstantTime.Equals(version, Constants.EncryptionVersion);
+            using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.DefaultFileStreamBufferSize, FileOptions.SequentialScan);
+            Span<byte> magicBytes = stackalloc byte[Constants.SignatureMagicBytes.Length];
+            fileStream.Read(magicBytes);
+            Span<byte> version = stackalloc byte[Constants.SignatureVersion.Length];
+            fileStream.Read(version);
+            validVersion = version.SequenceEqual(Constants.SignatureVersion);
+            return magicBytes.SequenceEqual(Constants.SignatureMagicBytes);
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
+            validVersion = null;
             return null;
         }
-    }
-    
-    public static bool? IsSignatureFile(string filePath)
-    {
-        try
-        {
-            Span<byte> magicBytes = ReadFileHeader(filePath, offset: 0, Constants.SignatureMagicBytes.Length);
-            return ConstantTime.Equals(magicBytes, Constants.SignatureMagicBytes);
-        }
-        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
-        {
-            return null;
-        }
-    }
-    
-    public static bool? IsValidSignatureVersion(string filePath)
-    {
-        try
-        {
-            Span<byte> version = ReadFileHeader(filePath, Constants.SignatureMagicBytes.Length, Constants.SignatureVersion.Length);
-            return ConstantTime.Equals(version, Constants.SignatureVersion);
-        }
-        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
-        {
-            return null;
-        }
-    }
-    
-    private static Span<byte> ReadFileHeader(string filePath, long offset, int length)
-    {
-        using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-        fileStream.Seek(offset, SeekOrigin.Begin);
-        Span<byte> header = new byte[length];
-        fileStream.Read(header);
-        return header;
     }
 
     public static void OverwriteFile(string fileToDelete, string fileToCopy)
@@ -130,26 +106,7 @@ public static class FileHandling
             DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to delete the file.");
         }
     }
-
-    private static void DeleteDirectory(string directoryPath)
-    {
-        try
-        {
-            if (!Directory.Exists(directoryPath)) {
-                return;
-            }
-            foreach (string filePath in Directory.GetFiles(directoryPath, searchPattern: "*", SearchOption.AllDirectories))
-            {
-                File.SetAttributes(filePath, FileAttributes.Normal);
-            }
-            Directory.Delete(directoryPath, recursive: true);
-        }
-        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
-        {
-            DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to delete the directory.");
-        }
-    }
-
+    
     public static string GetUniqueFilePath(string filePath)
     {
         if (!File.Exists(filePath)) {
@@ -167,6 +124,18 @@ public static class FileHandling
         }
         while (File.Exists(filePath));
         return filePath;
+    }
+    
+    public static void SetReadOnly(string filePath)
+    {
+        try
+        {
+            File.SetAttributes(filePath, FileAttributes.ReadOnly);
+        }
+        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
+        {
+            DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to mark the file as read-only.");
+        }
     }
 
     public static string RemoveFileNameNumber(string filePath)
@@ -193,37 +162,8 @@ public static class FileHandling
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
-            DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to restore the original file name.");
+            DisplayMessage.FilePathException(filePath, ex.GetType().Name, $"Unable to restore the file name to \"{newFileName}\".");
             return filePath;
-        }
-    }
-
-    public static string GetUniqueDirectoryPath(string directoryPath)
-    {
-        if (!Directory.Exists(directoryPath)) {
-            return directoryPath;
-        }
-        string parentDirectory = Directory.GetParent(directoryPath)?.FullName;
-        string directoryName = Path.GetFileName(directoryPath);
-        int directoryNumber = 2;
-        do
-        {
-            directoryPath = Path.Combine(parentDirectory ?? string.Empty, $"{directoryName} ({directoryNumber})");
-            directoryNumber++;
-        }
-        while (Directory.Exists(directoryPath));
-        return directoryPath;
-    }
-
-    public static void SetReadOnly(string filePath)
-    {
-        try
-        {
-            File.SetAttributes(filePath, FileAttributes.ReadOnly);
-        }
-        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
-        {
-            DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to mark the file as read-only.");
         }
     }
     
@@ -233,6 +173,25 @@ public static class FileHandling
         ZipFile.CreateFromDirectory(directoryPath, zipFilePath, CompressionLevel.NoCompression, includeBaseDirectory: false);
         if (Globals.Overwrite) {
             DeleteDirectory(directoryPath);
+        }
+    }
+    
+    private static void DeleteDirectory(string directoryPath)
+    {
+        try
+        {
+            if (!Directory.Exists(directoryPath)) {
+                return;
+            }
+            foreach (string filePath in Directory.GetFiles(directoryPath, searchPattern: "*", SearchOption.AllDirectories))
+            {
+                File.SetAttributes(filePath, FileAttributes.Normal);
+            }
+            Directory.Delete(directoryPath, recursive: true);
+        }
+        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
+        {
+            DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to delete the directory.");
         }
     }
 
@@ -249,5 +208,22 @@ public static class FileHandling
         {
             DisplayMessage.FilePathException(zipFilePath, ex.GetType().Name, "Unable to extract the file.");
         }
+    }
+    
+    private static string GetUniqueDirectoryPath(string directoryPath)
+    {
+        if (!Directory.Exists(directoryPath)) {
+            return directoryPath;
+        }
+        string parentDirectory = Directory.GetParent(directoryPath)?.FullName;
+        string directoryName = Path.GetFileName(directoryPath);
+        int directoryNumber = 2;
+        do
+        {
+            directoryPath = Path.Combine(parentDirectory ?? string.Empty, $"{directoryName} ({directoryNumber})");
+            directoryNumber++;
+        }
+        while (Directory.Exists(directoryPath));
+        return directoryPath;
     }
 }
