@@ -156,7 +156,7 @@ public static class FileHandling
             }
             string newFilePath = ReplaceFileName(filePath, newFileName);
             newFilePath = GetUniqueFilePath(newFilePath);
-            Console.WriteLine($"Renaming \"{Path.GetFileName(filePath)}\" => \"{Path.GetFileName(newFilePath)}\"...");
+            DisplayMessage.InputToOutput("Renaming", filePath, newFilePath);
             File.Move(filePath, newFilePath);
             return newFilePath;
         }
@@ -169,7 +169,7 @@ public static class FileHandling
     
     public static void CreateZipFile(string directoryPath, string zipFilePath)
     {
-        DisplayMessage.CreatingZipFile(directoryPath, zipFilePath);
+        DisplayMessage.InputToOutput("Zipping", directoryPath, zipFilePath);
         ZipFile.CreateFromDirectory(directoryPath, zipFilePath, CompressionLevel.NoCompression, includeBaseDirectory: false);
         if (Globals.Overwrite) {
             DeleteDirectory(directoryPath);
@@ -200,7 +200,7 @@ public static class FileHandling
         try
         {
             string directoryPath = GetUniqueDirectoryPath(zipFilePath[..^Path.GetExtension(zipFilePath).Length]);
-            DisplayMessage.ExtractingZipFile(zipFilePath, directoryPath);
+            DisplayMessage.InputToOutput("Extracting", zipFilePath, directoryPath);
             ZipFile.ExtractToDirectory(zipFilePath, directoryPath);
             DeleteFile(zipFilePath);
         }

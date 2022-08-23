@@ -180,7 +180,7 @@ public static class FileEncryption
     {
         string outputFilePath = !Globals.EncryptFileNames ? inputFilePath : FileHandling.ReplaceFileName(inputFilePath, SecureRandom.GetString(Constants.RandomFileNameLength));
         outputFilePath = FileHandling.GetUniqueFilePath(outputFilePath + Constants.EncryptedExtension);
-        DisplayMessage.EncryptingFile(inputFilePath, outputFilePath);
+        DisplayMessage.InputToOutput("Encrypting", inputFilePath, outputFilePath);
         
         Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeadersLength];
         Spans.Concat(unencryptedHeaders, Constants.EncryptionMagicBytes, Constants.EncryptionVersion, ephemeralPublicKey, salt);

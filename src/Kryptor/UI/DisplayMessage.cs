@@ -56,25 +56,10 @@ public static class DisplayMessage
     }
     
     public static void DerivingKeyFromPassword() => Console.WriteLine("Deriving encryption key from password...");
-    
-    public static void CreatingZipFile(string directoryPath, string zipFilePath)
-    {
-        Console.WriteLine($"Zipping \"{Path.GetFileName(directoryPath)}\" => \"{Path.GetFileName(zipFilePath)}\"...");
-    }
-    
-    public static void ExtractingZipFile(string zipFilePath, string directoryPath)
-    {
-        Console.WriteLine($"Extracting \"{Path.GetFileName(zipFilePath)}\" => \"{Path.GetFileName(directoryPath)}\"...");
-    }
-    
-    public static void EncryptingFile(string inputFilePath, string outputFilePath)
-    {
-        Console.WriteLine($"Encrypting \"{Path.GetFileName(inputFilePath)}\" => \"{Path.GetFileName(outputFilePath)}\"...");
-    }
 
-    public static void DecryptingFile(string inputFilePath, string outputFilePath)
+    public static void InputToOutput(string activity, string inputFilePath, string outputFilePath)
     {
-        Console.WriteLine($"Decrypting \"{Path.GetFileName(inputFilePath)}\" => \"{Path.GetFileName(outputFilePath)}\"...");
+        Console.WriteLine($"{activity} \"{Path.GetFileName(inputFilePath)}\" => \"{Path.GetFileName(outputFilePath)}\"...");
     }
 
     public static void SuccessfullyEncrypted(bool insertSpace = true)
