@@ -38,5 +38,4 @@ public static class ErrorMessages
     public static string GetFilePathError(string filePath, string errorMessage) => $"\"{Path.GetFileName(FileHandling.TrimTrailingSeparatorChars(filePath))}\" - {errorMessage}";
     
     public static string GetKeyStringError(string keyString, string errorMessage) => $"\"{keyString}\" - {errorMessage}";
-
 }

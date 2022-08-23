@@ -28,7 +28,7 @@ public static class DigitalSignatures
     public static void SignFile(string filePath, string signatureFilePath, string comment, bool prehash, Span<byte> privateKey)
     {
         if (!prehash) {
-            prehash = new FileInfo(filePath).Length >= Constants.Mebibyte * 1024;
+            prehash = new FileInfo(filePath).Length >= 1073741824;
         }
         Span<byte> prehashed = BitConverter.GetBytes(prehash);
         Span<byte> fileBytes = GetFileBytes(filePath, prehash);

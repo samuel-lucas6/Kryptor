@@ -30,8 +30,7 @@ public static class Constants
     
     // Key derivation
     public const int HeaderKeySize = ChaCha20.KeySize + ChaCha20.NonceSize;
-    public const int Mebibyte = 1048576;
-    public const int MemorySize = 256 * Mebibyte;
+    public const int MemorySize = 268435456;
     public const int Iterations = 12;
     public static readonly byte[] Personalisation = Encoding.UTF8.GetBytes("Kryptor.Personal");
     
@@ -48,7 +47,6 @@ public static class Constants
     public const int KeyfileLength = 64;
     public const int DefaultFileStreamBufferSize = 4096;
     public const int FileStreamBufferSize = 131072;
-    public const int FileChunkSize = 16384;
     public const int BoolBytesLength = 1;
     public const int IntBytesLength = 4;
     public const int LongBytesLength = 8;
@@ -56,6 +54,7 @@ public static class Constants
     public const int EncryptedHeaderLength = 328;
     public static readonly int FileHeadersLength = EncryptionMagicBytes.Length + EncryptionVersion.Length + X25519.PublicKeySize + Argon2id.SaltSize + EncryptedHeaderLength;
     public static readonly int UnencryptedHeadersLength = FileHeadersLength - EncryptedHeaderLength;
+    public const int FileChunkSize = 16384;
     public const int CiphertextChunkLength = FileChunkSize + BLAKE2b.TagSize;
     
     // Asymmetric keys
