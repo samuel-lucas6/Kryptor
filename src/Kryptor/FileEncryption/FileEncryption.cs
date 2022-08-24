@@ -26,9 +26,9 @@ namespace Kryptor;
 
 public static class FileEncryption
 {
-    public static void EncryptEachFileWithPassword(string[] filePaths, Span<byte> passwordBytes)
+    public static void EncryptEachFileWithPassword(string[] filePaths, Span<byte> password)
     {
-        if (filePaths == null || passwordBytes == default) {
+        if (filePaths == null || password == default) {
             return;
         }
         Span<byte> salt = stackalloc byte[Argon2id.SaltSize];
@@ -43,7 +43,7 @@ public static class FileEncryption
                 // Fill unused header with random public key
                 X25519.GenerateKeyPair(ephemeralPublicKey, ephemeralPrivateKey);
                 DisplayMessage.DerivingKeyFromPassword();
-                Argon2id.DeriveKey(headerKey, passwordBytes, salt, Constants.Iterations, Constants.MemorySize);
+                Argon2id.DeriveKey(headerKey, password, salt, Constants.Iterations, Constants.MemorySize);
                 EncryptInputFile(isDirectory ? zipFilePath : inputFilePath, isDirectory, ephemeralPublicKey, salt, headerKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -52,7 +52,7 @@ public static class FileEncryption
             }
             Console.WriteLine();
         }
-        CryptographicOperations.ZeroMemory(passwordBytes);
+        CryptographicOperations.ZeroMemory(password);
         DisplayMessage.SuccessfullyEncrypted(insertSpace: false);
     }
     

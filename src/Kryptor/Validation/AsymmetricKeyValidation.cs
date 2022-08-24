@@ -135,7 +135,7 @@ public static class AsymmetricKeyValidation
         }
     }
 
-    public static Span<byte> EncryptionPrivateKeyFile(string privateKeyPath, char[] password)
+    public static Span<byte> EncryptionPrivateKeyFile(string privateKeyPath, Span<byte> password)
     {
         try
         {
@@ -154,7 +154,7 @@ public static class AsymmetricKeyValidation
         }
     }
 
-    public static Span<byte> SigningPrivateKeyFile(string privateKeyPath, char[] password)
+    public static Span<byte> SigningPrivateKeyFile(string privateKeyPath, Span<byte> password)
     {
         try
         {
@@ -189,7 +189,7 @@ public static class AsymmetricKeyValidation
         }
     }
 
-    public static Span<byte> DecryptPrivateKey(string privateKeyPath, char[] password, Span<byte> privateKey)
+    public static Span<byte> DecryptPrivateKey(string privateKeyPath, Span<byte> password, Span<byte> privateKey)
     {
         Span<byte> keyVersion = privateKey.Slice(Constants.KeyAlgorithmLength, Constants.PrivateKeyVersion2.Length);
         bool version2 = ConstantTime.Equals(keyVersion, Constants.PrivateKeyVersion2);
@@ -202,20 +202,23 @@ public static class AsymmetricKeyValidation
             password = PasswordPrompt.EnterYourPassword(isPrivateKey: true);
         }
         Console.WriteLine("Decrypting private key...");
-        Span<byte> passwordBytes = Password.Prehash(password);
         
         if (version2) {
-            return PrivateKey.DecryptV2(passwordBytes, privateKey);
+            return PrivateKey.DecryptV2(password, privateKey);
         }
+
+        Span<byte> prehashedPassword = stackalloc byte[BLAKE2b.MaxHashSize];
+        BLAKE2b.ComputeHash(prehashedPassword, password);
+        Span<byte> decryptedPrivateKey = PrivateKey.DecryptV1(prehashedPassword, privateKey);
+        CryptographicOperations.ZeroMemory(prehashedPassword);
         
-        Span<byte> decryptedPrivateKey = PrivateKey.DecryptV1(passwordBytes, privateKey);
         Span<byte> unencryptedPrivateKey = GC.AllocateArray<byte>(decryptedPrivateKey.Length, pinned: true);
         decryptedPrivateKey.CopyTo(unencryptedPrivateKey);
         Span<byte> keyAlgorithm = privateKey[..Constants.KeyAlgorithmLength];
         try
         {
             Console.WriteLine("Updating private key format...");
-            Span<byte> v2PrivateKey = PrivateKey.Encrypt(passwordBytes, keyAlgorithm, decryptedPrivateKey);
+            Span<byte> v2PrivateKey = PrivateKey.Encrypt(password, keyAlgorithm, decryptedPrivateKey);
             AsymmetricKeys.CreateKeyFile(privateKeyPath, Encodings.ToBase64(v2PrivateKey));
             Console.WriteLine("Private key format successfully updated.");
         }

@@ -26,10 +26,10 @@ namespace Kryptor;
 
 public static class PasswordPrompt
 {
-    public static char[] EnterNewPassword()
+    public static Span<byte> EnterNewPassword()
     {
         Console.WriteLine("Enter a password (leave empty for a random passphrase):");
-        char[] password = GetPassword();
+        Span<byte> password = GetPassword();
         if (password.Length == 0) {
             return UseRandomPassphrase();
         }
@@ -37,33 +37,30 @@ public static class PasswordPrompt
         return password;
     }
 
-    private static void RetypeNewPassword(char[] password)
+    private static void RetypeNewPassword(Span<byte> password)
     {
         Console.WriteLine("Retype password:");
-        char[] retypedPassword = GetPassword();
-        Span<byte> passwordBytes = Encoding.UTF8.GetBytes(password), retypedPasswordBytes = Encoding.UTF8.GetBytes(retypedPassword);
-        if (!ConstantTime.Equals(passwordBytes, retypedPasswordBytes)) {
+        Span<byte> retypedPassword = GetPassword();
+        if (!ConstantTime.Equals(password, retypedPassword)) {
             DisplayMessage.Error("The passwords don't match.");
             Environment.Exit(Constants.ErrorCode);
         }
-        Array.Clear(retypedPassword);
-        CryptographicOperations.ZeroMemory(passwordBytes);
-        CryptographicOperations.ZeroMemory(retypedPasswordBytes);
+        CryptographicOperations.ZeroMemory(retypedPassword);
     }
     
-    public static char[] UseRandomPassphrase()
+    public static Span<byte> UseRandomPassphrase()
     {
-        char[] password = SecureRandom.GetPassphrase(wordCount: 8);
+        char[] passphrase = SecureRandom.GetPassphrase(wordCount: 8);
         Console.Write("Randomly generated passphrase: ");
-        Console.WriteLine(password);
+        Console.WriteLine(passphrase);
         Console.WriteLine();
-        return password;
+        return Encoding.UTF8.GetBytes(passphrase);
     }
 
-    public static char[] EnterYourPassword(bool isPrivateKey = false)
+    public static Span<byte> EnterYourPassword(bool isPrivateKey = false)
     {
         Console.WriteLine(isPrivateKey == false ? "Enter your password:" : "Enter your private key password:");
-        char[] password = GetPassword();
+        Span<byte> password = GetPassword();
         if (password.Length == 0) {
             DisplayMessage.Error("You didn't enter a password.");
             Environment.Exit(Constants.ErrorCode);
@@ -71,7 +68,7 @@ public static class PasswordPrompt
         return password;
     }
 
-    private static char[] GetPassword()
+    private static Span<byte> GetPassword()
     {
         var password = new List<char>();
         ConsoleKeyInfo consoleKeyInfo;
@@ -85,6 +82,6 @@ public static class PasswordPrompt
             }
         }
         Console.WriteLine();
-        return password.ToArray();
+        return Encoding.UTF8.GetBytes(password.ToArray());
     }
 }

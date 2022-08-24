@@ -25,10 +25,9 @@ namespace Kryptor;
 
 public static class AsymmetricKeys
 {
-    public static (string publicKey, string privateKey) GenerateEncryptionKeyPair(char[] password)
+    public static (string publicKey, string privateKey) GenerateEncryptionKeyPair(Span<byte> password)
     {
         password = Password.GetNewPassword(password);
-        Span<byte> passwordBytes = Password.Prehash(password);
         
         Span<byte> publicKey = stackalloc byte[X25519.PublicKeySize];
         Span<byte> privateKey = stackalloc byte[X25519.PrivateKeySize];
@@ -36,14 +35,13 @@ public static class AsymmetricKeys
         
         Span<byte> fullPublicKey = stackalloc byte[Constants.Curve25519KeyHeader.Length + publicKey.Length];
         Spans.Concat(fullPublicKey, Constants.Curve25519KeyHeader, publicKey);
-        Span<byte> encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, Constants.Curve25519KeyHeader, privateKey);
+        Span<byte> encryptedPrivateKey = PrivateKey.Encrypt(password, Constants.Curve25519KeyHeader, privateKey);
         return (Encodings.ToBase64(fullPublicKey), Encodings.ToBase64(encryptedPrivateKey));
     }
 
-    public static (string publicKey, string privateKey) GenerateSigningKeyPair(char[] password)
+    public static (string publicKey, string privateKey) GenerateSigningKeyPair(Span<byte> password)
     {
         password = Password.GetNewPassword(password);
-        Span<byte> passwordBytes = Password.Prehash(password);
         
         Span<byte> publicKey = stackalloc byte[Ed25519.PublicKeySize];
         Span<byte> privateKey = stackalloc byte[Ed25519.PrivateKeySize];
@@ -51,7 +49,7 @@ public static class AsymmetricKeys
         
         Span<byte> fullPublicKey = stackalloc byte[Constants.Ed25519KeyHeader.Length + publicKey.Length];
         Spans.Concat(fullPublicKey, Constants.Ed25519KeyHeader, publicKey);
-        Span<byte> encryptedPrivateKey = PrivateKey.Encrypt(passwordBytes, Constants.Ed25519KeyHeader, privateKey);
+        Span<byte> encryptedPrivateKey = PrivateKey.Encrypt(password, Constants.Ed25519KeyHeader, privateKey);
         return (Encodings.ToBase64(fullPublicKey), Encodings.ToBase64(encryptedPrivateKey));
     }
 

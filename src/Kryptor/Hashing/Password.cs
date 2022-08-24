@@ -25,33 +25,24 @@ namespace Kryptor;
 
 public static class Password
 {
-    public static char[] GetNewPassword(char[] password)
+    public static Span<byte> GetNewPassword(Span<byte> password)
     {
         return password.Length switch
         {
             0 => PasswordPrompt.EnterNewPassword(),
-            1 when ConstantTime.Equals(Encoding.UTF8.GetBytes(password), Encoding.UTF8.GetBytes(" ")) => PasswordPrompt.UseRandomPassphrase(),
+            1 when ConstantTime.Equals(password, Encoding.UTF8.GetBytes(" ")) => PasswordPrompt.UseRandomPassphrase(),
             _ => password
         };
     }
     
-    public static Span<byte> Prehash(char[] password, Span<byte> pepper = default)
+    public static Span<byte> Pepper(Span<byte> password, Span<byte> pepper)
     {
-        if (password.Length == 0) {
+        if (password.Length == 0 || pepper == default) {
             return default;
         }
-        Span<byte> passwordBytes = GC.AllocateArray<byte>(Encoding.UTF8.GetMaxByteCount(password.Length), pinned: true);
-        int bytesEncoded = Encoding.UTF8.GetBytes(password, passwordBytes);
-        Array.Clear(password);
-        
         Span<byte> hash = GC.AllocateArray<byte>(BLAKE2b.MaxHashSize, pinned: true);
-        if (pepper == default) {
-            BLAKE2b.ComputeHash(hash, passwordBytes[..bytesEncoded]);
-        }
-        else {
-            BLAKE2b.ComputeTag(hash, passwordBytes[..bytesEncoded], pepper);
-        }
-        CryptographicOperations.ZeroMemory(passwordBytes);
+        BLAKE2b.ComputeTag(hash, password, pepper);
+        CryptographicOperations.ZeroMemory(password);
         CryptographicOperations.ZeroMemory(pepper);
         return hash;
     }

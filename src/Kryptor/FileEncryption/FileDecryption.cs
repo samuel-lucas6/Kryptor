@@ -25,9 +25,9 @@ namespace Kryptor;
 
 public static class FileDecryption
 {
-    public static void DecryptEachFileWithPassword(string[] filePaths, Span<byte> passwordBytes)
+    public static void DecryptEachFileWithPassword(string[] filePaths, Span<byte> password)
     {
-        if (filePaths == null || passwordBytes == default) {
+        if (filePaths == null || password == default) {
             return;
         }
         Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeadersLength];
@@ -40,7 +40,7 @@ public static class FileDecryption
                 inputFile.Read(unencryptedHeaders);
                 Span<byte> salt = unencryptedHeaders[^Argon2id.SaltSize..];
                 DisplayMessage.DerivingKeyFromPassword();
-                Argon2id.DeriveKey(headerKey, passwordBytes, salt, Constants.Iterations, Constants.MemorySize);
+                Argon2id.DeriveKey(headerKey, password, salt, Constants.Iterations, Constants.MemorySize);
                 DecryptInputFile(inputFile, unencryptedHeaders, headerKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -54,7 +54,7 @@ public static class FileDecryption
             }
             Console.WriteLine();
         }
-        CryptographicOperations.ZeroMemory(passwordBytes);
+        CryptographicOperations.ZeroMemory(password);
         DisplayMessage.SuccessfullyDecrypted(insertSpace: false);
     }
     

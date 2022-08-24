@@ -18,6 +18,7 @@
 
 using System;
 using System.IO;
+using System.Text;
 using System.Reflection;
 using McMaster.Extensions.CommandLineUtils;
 
@@ -160,7 +161,7 @@ public class Program
         }
     }
 
-    private static char[] GetPassword(string password) => string.IsNullOrEmpty(password) ? Array.Empty<char>() : password.ToCharArray();
+    private static Span<byte> GetPassword(string password) => string.IsNullOrEmpty(password) ? default : Encoding.UTF8.GetBytes(password);
 
     private static string GetEncryptionPrivateKey(string privateKeyPath) => string.IsNullOrEmpty(privateKeyPath) ? Constants.DefaultEncryptionPrivateKeyPath : privateKeyPath;
 
