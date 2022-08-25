@@ -194,9 +194,9 @@ public static class CommandLine
 
     public static void RecoverPublicKey(string privateKeyPath, Span<byte> password)
     {
-        FilePathValidation.RecoverPublicKey(privateKeyPath);
         try
         {
+            FilePathValidation.RecoverPublicKey(privateKeyPath);
             Span<byte> privateKey = AsymmetricKeyValidation.GetPrivateKeyFromFile(privateKeyPath);
             privateKey = AsymmetricKeyValidation.DecryptPrivateKey(privateKeyPath, password, privateKey);
             Span<byte> publicKey = privateKey.Length switch
@@ -227,27 +227,18 @@ public static class CommandLine
 
     public static void Verify(string[] publicKeys, string[] signatureFilePaths, string[] filePaths)
     {
+        Span<byte> publicKey;
         if (publicKeys == null || publicKeys[0].EndsWith(Constants.PublicKeyExtension)) {
-            VerifyWithPublicKeyFile(publicKeys, signatureFilePaths, filePaths);
-            return;
+            SigningValidation.VerifyWithPublicKeyFile(publicKeys, signatureFilePaths, filePaths);
+            publicKey = AsymmetricKeyValidation.SigningPublicKeyFile(publicKeys[0]);
         }
-        VerifyWithPublicKeyString(publicKeys, signatureFilePaths, filePaths);
-    }
-
-    private static void VerifyWithPublicKeyFile(string[] publicKeyPaths, string[] signatureFilePaths, string[] filePaths)
-    {
-        SigningValidation.VerifyWithPublicKeyFile(publicKeyPaths, signatureFilePaths, filePaths);
-        Span<byte> publicKey = AsymmetricKeyValidation.SigningPublicKeyFile(publicKeyPaths[0]);
+        else {
+            SigningValidation.VerifyWithPublicKeyString(publicKeys, signatureFilePaths, filePaths);
+            publicKey = AsymmetricKeyValidation.SigningPublicKeyString(publicKeys[0]);
+        }
         FileSigning.VerifyEachFile(signatureFilePaths, filePaths, publicKey);
     }
     
-    private static void VerifyWithPublicKeyString(string[] encodedPublicKeys, string[] signatureFilePaths, string[] filePaths)
-    {
-        SigningValidation.VerifyWithPublicKeyString(encodedPublicKeys, signatureFilePaths, filePaths);
-        Span<byte> publicKey = AsymmetricKeyValidation.SigningPublicKeyString(encodedPublicKeys[0]);
-        FileSigning.VerifyEachFile(signatureFilePaths, filePaths, publicKey);
-    }
-
     public static void CheckForUpdates()
     {
         try
