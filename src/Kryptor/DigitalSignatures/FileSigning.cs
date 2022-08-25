@@ -29,7 +29,7 @@ public static class FileSigning
     public static void SignEachFile(string[] filePaths, string[] signatureFilePaths, string comment, bool prehash, Span<byte> privateKey)
     {
         if (filePaths == null || privateKey == default) {
-            return;
+            throw new UserInputException();
         }
         if (string.IsNullOrEmpty(comment)) {
             comment = DefaultComment;
@@ -78,7 +78,7 @@ public static class FileSigning
     public static void VerifyEachFile(string[] signatureFilePaths, string[] filePaths, Span<byte> publicKey)
     {
         if (filePaths == null || publicKey == default) {
-            return;
+            throw new UserInputException();
         }
         signatureFilePaths ??= new string[filePaths.Length];
         for (int i = 0; i < filePaths.Length; i++)

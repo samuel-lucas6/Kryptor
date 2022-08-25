@@ -29,10 +29,10 @@ public static class FileEncryptionValidation
     private const string FileOrDirectoryError = "Please specify a file/directory.";
     private const string PasswordOrSymmetricKeyError = "Please specify whether to use a password and/or symmetric key.";
 
-    public static bool FileEncryptionWithPassword(bool usePassword, string symmetricKey, string[] filePaths)
+    public static void FileEncryptionWithPassword(bool usePassword, string symmetricKey, string[] filePaths)
     {
         IEnumerable<string> errorMessages = GetFileEncryptionErrors(usePassword, symmetricKey).Concat(GetEncryptionFilePathErrors(filePaths));
-        return DisplayMessage.AnyErrors(errorMessages);
+        DisplayMessage.AllErrors(errorMessages);
     }
 
     private static IEnumerable<string> GetFileEncryptionErrors(bool usePassword, string symmetricKey)
@@ -67,10 +67,10 @@ public static class FileEncryptionValidation
         }
     }
 
-    public static bool FileEncryptionWithPublicKeyFile(string privateKeyPath, string[] publicKeyPaths, string symmetricKey, string[] filePaths)
+    public static void FileEncryptionWithPublicKeyFile(string privateKeyPath, string[] publicKeyPaths, string symmetricKey, string[] filePaths)
     {
         IEnumerable<string> errorMessages = GetFileEncryptionWithPublicKeyFileErrors(privateKeyPath, publicKeyPaths).Concat(GetFileEncryptionErrors(usePassword: true, symmetricKey)).Concat(GetEncryptionFilePathErrors(filePaths));
-        return DisplayMessage.AnyErrors(errorMessages);
+        DisplayMessage.AllErrors(errorMessages);
     }
 
     private static IEnumerable<string> GetFileEncryptionWithPublicKeyFileErrors(string privateKeyPath, string[] publicKeyPaths)
@@ -95,10 +95,10 @@ public static class FileEncryptionValidation
         }
     }
 
-    public static bool FileEncryptionWithPublicKeyString(string privateKeyPath, string[] encodedPublicKeys, string symmetricKey, string[] filePaths)
+    public static void FileEncryptionWithPublicKeyString(string privateKeyPath, string[] encodedPublicKeys, string symmetricKey, string[] filePaths)
     {
         IEnumerable<string> errorMessages = GetFileEncryptionWithPublicKeyStringErrors(privateKeyPath, encodedPublicKeys).Concat(GetFileEncryptionErrors(usePassword: true, symmetricKey)).Concat(GetEncryptionFilePathErrors(filePaths));
-        return DisplayMessage.AnyErrors(errorMessages);
+        DisplayMessage.AllErrors(errorMessages);
     }
 
     private static IEnumerable<string> GetFileEncryptionWithPublicKeyStringErrors(string privateKeyPath, string[] encodedPublicKeys)
@@ -123,10 +123,10 @@ public static class FileEncryptionValidation
         }
     }
 
-    public static bool FileEncryptionWithPrivateKey(string privateKeyPath, string symmetricKey, string[] filePaths)
+    public static void FileEncryptionWithPrivateKey(string privateKeyPath, string symmetricKey, string[] filePaths)
     {
         IEnumerable<string> errorMessages = GetFileEncryptionErrors(privateKeyPath).Concat(GetFileEncryptionErrors(usePassword: true, symmetricKey)).Concat(GetEncryptionFilePathErrors(filePaths));
-        return DisplayMessage.AnyErrors(errorMessages);
+        DisplayMessage.AllErrors(errorMessages);
     }
 
     private static IEnumerable<string> GetFileEncryptionErrors(string privateKeyPath)
@@ -142,10 +142,10 @@ public static class FileEncryptionValidation
         }
     }
 
-    public static bool FileDecryptionWithPassword(bool usePassword, string symmetricKey, string[] filePaths)
+    public static void FileDecryptionWithPassword(bool usePassword, string symmetricKey, string[] filePaths)
     {
         IEnumerable<string> errorMessages = GetFileDecryptionErrors(usePassword, symmetricKey).Concat(GetDecryptionFilePathErrors(filePaths));
-        return DisplayMessage.AnyErrors(errorMessages);
+        DisplayMessage.AllErrors(errorMessages);
     }
 
     private static IEnumerable<string> GetFileDecryptionErrors(bool usePassword, string symmetricKey)
@@ -177,10 +177,10 @@ public static class FileEncryptionValidation
         }
     }
 
-    public static bool FileDecryptionWithPublicKeyFile(string privateKeyPath, string[] publicKeyPaths, string symmetricKey, string[] filePaths)
+    public static void FileDecryptionWithPublicKeyFile(string privateKeyPath, string[] publicKeyPaths, string symmetricKey, string[] filePaths)
     {
         IEnumerable<string> errorMessages = GetFileDecryptionWithPublicKeyFileErrors(privateKeyPath, publicKeyPaths).Concat(GetFileDecryptionErrors(usePassword: true, symmetricKey)).Concat(GetDecryptionFilePathErrors(filePaths));
-        return DisplayMessage.AnyErrors(errorMessages);
+        DisplayMessage.AllErrors(errorMessages);
     }
     
     private static IEnumerable<string> GetFileDecryptionWithPublicKeyFileErrors(string privateKeyPath, string[] publicKeyPaths)
@@ -203,10 +203,10 @@ public static class FileEncryptionValidation
         }
     }
 
-    public static bool FileDecryptionWithPublicKeyString(string privateKeyPath, string[] encodedPublicKeys, string symmetricKey, string[] filePaths)
+    public static void FileDecryptionWithPublicKeyString(string privateKeyPath, string[] encodedPublicKeys, string symmetricKey, string[] filePaths)
     {
         IEnumerable<string> errorMessages = GetFileDecryptionWithPublicKeyStringErrors(privateKeyPath, encodedPublicKeys).Concat(GetFileDecryptionErrors(usePassword: true, symmetricKey)).Concat(GetDecryptionFilePathErrors(filePaths));
-        return DisplayMessage.AnyErrors(errorMessages);
+        DisplayMessage.AllErrors(errorMessages);
     }
     
     private static IEnumerable<string> GetFileDecryptionWithPublicKeyStringErrors(string privateKeyPath, string[] encodedPublicKeys)
@@ -226,9 +226,9 @@ public static class FileEncryptionValidation
         }
     }
 
-    public static bool FileDecryptionWithPrivateKey(string privateKeyPath, string symmetricKey, string[] filePaths)
+    public static void FileDecryptionWithPrivateKey(string privateKeyPath, string symmetricKey, string[] filePaths)
     {
         IEnumerable<string> errorMessages = GetFileEncryptionErrors(privateKeyPath).Concat(GetFileDecryptionErrors(usePassword: true, symmetricKey)).Concat(GetDecryptionFilePathErrors(filePaths));
-        return DisplayMessage.AnyErrors(errorMessages);
+        DisplayMessage.AllErrors(errorMessages);
     }
 }

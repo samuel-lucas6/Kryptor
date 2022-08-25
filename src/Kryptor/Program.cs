@@ -129,15 +129,17 @@ public class Program
                 CommandLine.CheckForUpdates();
             }
             else if (About) {
-                CommandLine.DisplayAbout();
+                DisplayMessage.About();
             }
             else {
                 DisplayMessage.Error("Unknown command. Please specify -h|--help for a list of options and examples.");
             }
         }
-        catch (PlatformNotSupportedException ex)
+        catch (Exception ex) when (ex is UserInputException or PlatformNotSupportedException)
         {
-            DisplayMessage.Exception(ex.GetType().Name, "The libsodium cryptographic library requires the Microsoft Visual C++ Redistributable for Visual Studio 2015-2022 to function on Windows. Please install this runtime or move the Kryptor executable to a directory that doesn't require administrative privileges.");
+            if (ex is PlatformNotSupportedException) {
+                DisplayMessage.Exception(ex.GetType().Name, "The libsodium cryptographic library requires the Microsoft Visual C++ Redistributable for Visual Studio 2015-2022 to function on Windows. Please install this runtime or move the Kryptor executable to a directory that doesn't require administrative privileges.");
+            }
         }
         return Environment.ExitCode;
     }

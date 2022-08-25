@@ -23,10 +23,10 @@ namespace Kryptor;
 
 public static class SigningValidation
 {
-    public static bool Sign(string privateKeyPath, string comment, string[] signatureFilePaths, string[] filePaths)
+    public static void Sign(string privateKeyPath, string comment, string[] signatureFilePaths, string[] filePaths)
     {
         IEnumerable<string> errorMessages = GetSignErrors(privateKeyPath, comment, signatureFilePaths, filePaths);
-        return DisplayMessage.AnyErrors(errorMessages);
+        DisplayMessage.AllErrors(errorMessages);
     }
 
     private static IEnumerable<string> GetSignErrors(string privateKeyPath, string comment, string[] signatureFilePaths, string[] filePaths)
@@ -72,10 +72,10 @@ public static class SigningValidation
         }
     }
 
-    public static bool VerifyWithPublicKeyString(string[] encodedPublicKeys, string[] signatureFilePaths, string[] filePaths)
+    public static void VerifyWithPublicKeyString(string[] encodedPublicKeys, string[] signatureFilePaths, string[] filePaths)
     {
         IEnumerable<string> errorMessages = GetVerifyWithPublicKeyStringErrors(encodedPublicKeys, signatureFilePaths, filePaths);
-        return DisplayMessage.AnyErrors(errorMessages);
+        DisplayMessage.AllErrors(errorMessages);
     }
 
     private static IEnumerable<string> GetVerifyWithPublicKeyStringErrors(string[] encodedPublicKeys, string[] signatureFilePaths, string[] filePaths)
@@ -95,10 +95,10 @@ public static class SigningValidation
         }
     }
 
-    public static bool VerifyWithPublicKeyFile(string[] publicKeyPaths, string[] signatureFilePaths, string[] filePaths)
+    public static void VerifyWithPublicKeyFile(string[] publicKeyPaths, string[] signatureFilePaths, string[] filePaths)
     {
         IEnumerable<string> errorMessages = GetVerifyWithPublicKeyFileErrors(publicKeyPaths, signatureFilePaths, filePaths);
-        return DisplayMessage.AnyErrors(errorMessages);
+        DisplayMessage.AllErrors(errorMessages);
     }
 
     private static IEnumerable<string> GetVerifyWithPublicKeyFileErrors(string[] publicKeyPaths, string[] signatureFilePaths, string[] filePaths)

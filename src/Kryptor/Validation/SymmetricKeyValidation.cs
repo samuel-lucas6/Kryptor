@@ -86,7 +86,7 @@ public static class SymmetricKeyValidation
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
             DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to randomly generate a keyfile.");
-            return default;
+            throw new UserInputException(ex.Message, ex);
         }
     }
 
@@ -107,7 +107,7 @@ public static class SymmetricKeyValidation
         catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
             DisplayMessage.KeyStringException(encodedSymmetricKey, ex.GetType().Name, ErrorMessages.InvalidSymmetricKey);
-            return default;
+            throw new UserInputException(ex.Message, ex);
         }
     }
 
@@ -122,7 +122,7 @@ public static class SymmetricKeyValidation
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
             DisplayMessage.FilePathException(keyfilePath, ex.GetType().Name, "Unable to read the keyfile.");
-            return default;
+            throw new UserInputException(ex.Message, ex);
         }
     }
 }

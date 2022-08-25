@@ -29,7 +29,7 @@ public static class FileEncryption
     public static void EncryptEachFileWithPassword(string[] filePaths, Span<byte> password)
     {
         if (filePaths == null || password == default) {
-            return;
+            throw new UserInputException();
         }
         Span<byte> salt = stackalloc byte[Argon2id.SaltSize];
         Span<byte> ephemeralPublicKey = stackalloc byte[X25519.PublicKeySize], ephemeralPrivateKey = stackalloc byte[X25519.PrivateKeySize];
@@ -59,7 +59,7 @@ public static class FileEncryption
     public static void EncryptEachFileWithSymmetricKey(string[] filePaths, Span<byte> symmetricKey)
     {
         if (filePaths == null || symmetricKey == default) {
-            return;
+            throw new UserInputException();
         }
         Span<byte> salt = stackalloc byte[BLAKE2b.SaltSize];
         Span<byte> ephemeralPublicKey = stackalloc byte[X25519.PublicKeySize], ephemeralPrivateKey = stackalloc byte[X25519.PrivateKeySize];
@@ -88,7 +88,7 @@ public static class FileEncryption
     public static void EncryptEachFileWithPublicKey(Span<byte> senderPrivateKey, List<byte[]> recipientPublicKeys, Span<byte> preSharedKey, string[] filePaths)
     {
         if (filePaths == null || senderPrivateKey == default || recipientPublicKeys == null) {
-            return;
+            throw new UserInputException();
         }
         Globals.TotalCount *= recipientPublicKeys.Count;
         bool overwrite = Globals.Overwrite;
@@ -136,7 +136,7 @@ public static class FileEncryption
     public static void EncryptEachFileWithPrivateKey(Span<byte> privateKey, Span<byte> preSharedKey, string[] filePaths)
     {
         if (filePaths == null || privateKey == default) {
-            return;
+            throw new UserInputException();
         }
         Span<byte> salt = stackalloc byte[BLAKE2b.SaltSize];
         Span<byte> ephemeralPublicKey = stackalloc byte[X25519.PublicKeySize], ephemeralPrivateKey = stackalloc byte[X25519.PrivateKeySize];

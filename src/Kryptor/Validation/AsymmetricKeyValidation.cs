@@ -34,9 +34,6 @@ public static class AsymmetricKeyValidation
             foreach (string publicKeyPath in publicKeyPaths)
             {
                 byte[] publicKey = GetPublicKeyFromFile(publicKeyPath);
-                if (publicKey == null) {
-                    return null;
-                }
                 ValidateEncryptionKeyAlgorithm(publicKey);
                 publicKeys.Add(publicKey[Constants.Curve25519KeyHeader.Length..]);
             }
@@ -45,7 +42,7 @@ public static class AsymmetricKeyValidation
         catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
             DisplayMessage.Exception(ex.GetType().Name, publicKeyPaths == null || publicKeyPaths.Length == 1 ? "Please specify a valid encryption public key." : "Please specify valid encryption public keys.");
-            return null;
+            throw new UserInputException(ex.Message, ex);
         }
     }
 
@@ -54,16 +51,13 @@ public static class AsymmetricKeyValidation
         try
         {
             Span<byte> publicKey = GetPublicKeyFromFile(publicKeyPath);
-            if (publicKey == default) {
-                return default;
-            }
             ValidateSigningKeyAlgorithm(publicKey);
             return publicKey[Constants.Ed25519KeyHeader.Length..];
         }
         catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
             DisplayMessage.FilePathException(publicKeyPath, ex.GetType().Name, "Please specify a valid signing public key.");
-            return default;
+            throw new UserInputException(ex.Message, ex);
         }
     }
     
@@ -80,7 +74,7 @@ public static class AsymmetricKeyValidation
         catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
             DisplayMessage.FilePathException(publicKeyPath, ex.GetType().Name, ex is ArgumentException or FormatException ? ex.Message : "Unable to read the public key file.");
-            return null;
+            throw new UserInputException(ex.Message, ex);
         }
     }
 
@@ -100,7 +94,7 @@ public static class AsymmetricKeyValidation
         catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
             DisplayMessage.Exception(ex.GetType().Name, encodedPublicKeys == null || encodedPublicKeys.Length == 1 ? "Please enter a valid encryption public key." : "Please enter valid encryption public keys.");
-            return null;
+            throw new UserInputException(ex.Message, ex);
         }
     }
 
@@ -115,7 +109,7 @@ public static class AsymmetricKeyValidation
         catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
             DisplayMessage.KeyStringException(encodedPublicKey, ex.GetType().Name, "Please enter a valid signing public key.");
-            return default;
+            throw new UserInputException(ex.Message, ex);
         }
     }
 
@@ -147,10 +141,10 @@ public static class AsymmetricKeyValidation
         {
             if (ex is CryptographicException) {
                 DisplayMessage.Error(ex.Message);
-                return default;
+                throw new UserInputException(ex.Message, ex);
             }
             DisplayMessage.FilePathException(privateKeyPath, ex.GetType().Name, ex.Message);
-            return default;
+            throw new UserInputException(ex.Message, ex);
         }
     }
 
@@ -166,10 +160,10 @@ public static class AsymmetricKeyValidation
         {
             if (ex is CryptographicException) {
                 DisplayMessage.Error(ex.Message);
-                return default;
+                throw new UserInputException(ex.Message, ex);
             }
             DisplayMessage.FilePathException(privateKeyPath, ex.GetType().Name, ex.Message);
-            return default;
+            throw new UserInputException(ex.Message, ex);
         }
     }
 

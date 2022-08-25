@@ -28,7 +28,7 @@ public static class FileDecryption
     public static void DecryptEachFileWithPassword(string[] filePaths, Span<byte> password)
     {
         if (filePaths == null || password == default) {
-            return;
+            throw new UserInputException();
         }
         Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeadersLength];
         Span<byte> headerKey = stackalloc byte[Constants.HeaderKeySize];
@@ -61,7 +61,7 @@ public static class FileDecryption
     public static void DecryptEachFileWithSymmetricKey(string[] filePaths, Span<byte> symmetricKey)
     {
         if (filePaths == null || symmetricKey == default) {
-            return;
+            throw new UserInputException();
         }
         Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeadersLength];
         Span<byte> headerKey = stackalloc byte[Constants.HeaderKeySize];
@@ -93,7 +93,7 @@ public static class FileDecryption
     public static void DecryptEachFileWithPublicKey(Span<byte> recipientPrivateKey, Span<byte> senderPublicKey, Span<byte> preSharedKey, string[] filePaths)
     {
         if (filePaths == null || recipientPrivateKey == default || senderPublicKey == default) {
-            return;
+            throw new UserInputException();
         }
         Span<byte> sharedSecret = stackalloc byte[X25519.SharedSecretSize], ephemeralSharedSecret = stackalloc byte[X25519.SharedSecretSize];
         X25519.DeriveRecipientSharedSecret(sharedSecret, recipientPrivateKey, senderPublicKey, preSharedKey);
@@ -135,7 +135,7 @@ public static class FileDecryption
     public static void DecryptEachFileWithPrivateKey(Span<byte> privateKey, Span<byte> preSharedKey, string[] filePaths)
     {
         if (filePaths == null || privateKey == default) {
-            return;
+            throw new UserInputException();
         }
         Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeadersLength];
         Span<byte> ephemeralSharedSecret = stackalloc byte[X25519.SharedSecretSize];

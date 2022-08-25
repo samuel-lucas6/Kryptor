@@ -58,10 +58,10 @@ public static class FilePathValidation
         return validVersion == null ? FileInaccessible : null;
     }
 
-    public static bool GenerateKeyPair(string directoryPath, int keyPairType, bool encryption, bool signing)
+    public static void GenerateKeyPair(string directoryPath, int keyPairType, bool encryption, bool signing)
     {
         IEnumerable<string> errorMessages = GetGenerateKeyPairError(directoryPath, keyPairType, encryption, signing);
-        return DisplayMessage.AnyErrors(errorMessages);
+        DisplayMessage.AllErrors(errorMessages);
     }
 
     private static IEnumerable<string> GetGenerateKeyPairError(string directoryPath, int keyPairType, bool encryption, bool signing)
@@ -100,10 +100,10 @@ public static class FilePathValidation
         }
     }
 
-    public static bool RecoverPublicKey(string privateKeyPath)
+    public static void RecoverPublicKey(string privateKeyPath)
     {
         IEnumerable<string> errorMessages = GetRecoverPublicKeyError(privateKeyPath);
-        return DisplayMessage.AnyErrors(errorMessages);
+        DisplayMessage.AllErrors(errorMessages);
     }
 
     private static IEnumerable<string> GetRecoverPublicKeyError(string privateKeyPath)

@@ -38,7 +38,7 @@ public static class Password
     public static Span<byte> Pepper(Span<byte> password, Span<byte> pepper)
     {
         if (password.Length == 0 || pepper == default) {
-            return default;
+            throw new UserInputException();
         }
         Span<byte> hash = GC.AllocateArray<byte>(BLAKE2b.MaxHashSize, pinned: true);
         BLAKE2b.ComputeTag(hash, password, pepper);
