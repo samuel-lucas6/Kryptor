@@ -116,13 +116,11 @@ public static class FileHandling
         int fileNumber = 2;
         string fileExtension = Path.GetExtension(filePath);
         string directoryPath = Path.GetDirectoryName(filePath);
-        do
-        {
+        do {
             string newFileName = $"{fileNameNoExtension} ({fileNumber}){fileExtension}";
             filePath = Path.Combine(directoryPath, newFileName);
             fileNumber++;
-        }
-        while (File.Exists(filePath));
+        } while (File.Exists(filePath));
         return filePath;
     }
     
@@ -183,8 +181,7 @@ public static class FileHandling
             if (!Directory.Exists(directoryPath)) {
                 return;
             }
-            foreach (string filePath in Directory.GetFiles(directoryPath, searchPattern: "*", SearchOption.AllDirectories))
-            {
+            foreach (string filePath in Directory.GetFiles(directoryPath, searchPattern: "*", SearchOption.AllDirectories)) {
                 File.SetAttributes(filePath, FileAttributes.Normal);
             }
             Directory.Delete(directoryPath, recursive: true);
@@ -218,12 +215,10 @@ public static class FileHandling
         string parentDirectory = Directory.GetParent(directoryPath)?.FullName;
         string directoryName = Path.GetFileName(directoryPath);
         int directoryNumber = 2;
-        do
-        {
+        do {
             directoryPath = Path.Combine(parentDirectory ?? string.Empty, $"{directoryName} ({directoryNumber})");
             directoryNumber++;
-        }
-        while (Directory.Exists(directoryPath));
+        } while (Directory.Exists(directoryPath));
         return directoryPath;
     }
 }

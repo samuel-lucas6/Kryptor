@@ -72,8 +72,7 @@ public static class PasswordPrompt
     {
         var password = new List<char>();
         ConsoleKeyInfo consoleKeyInfo;
-        while ((consoleKeyInfo = Console.ReadKey(intercept: true)).Key != ConsoleKey.Enter)
-        {
+        while ((consoleKeyInfo = Console.ReadKey(intercept: true)).Key != ConsoleKey.Enter) {
             if (!char.IsControl(consoleKeyInfo.KeyChar)) {
                 password.Add(consoleKeyInfo.KeyChar);
             }

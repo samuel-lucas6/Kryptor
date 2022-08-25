@@ -31,8 +31,7 @@ public static class AsymmetricKeyValidation
         try
         {
             var publicKeys = new List<byte[]>();
-            foreach (string publicKeyPath in publicKeyPaths)
-            {
+            foreach (string publicKeyPath in publicKeyPaths) {
                 byte[] publicKey = GetPublicKeyFromFile(publicKeyPath);
                 ValidateEncryptionKeyAlgorithm(publicKey);
                 publicKeys.Add(publicKey[Constants.Curve25519KeyHeader.Length..]);
@@ -83,8 +82,7 @@ public static class AsymmetricKeyValidation
         try
         {
             var publicKeys = new List<byte[]>();
-            foreach (string encodedPublicKey in encodedPublicKeys)
-            {
+            foreach (string encodedPublicKey in encodedPublicKeys) {
                 byte[] publicKey = Encodings.FromBase64(encodedPublicKey);
                 ValidateEncryptionKeyAlgorithm(publicKey);
                 publicKeys.Add(publicKey[Constants.Curve25519KeyHeader.Length..]);

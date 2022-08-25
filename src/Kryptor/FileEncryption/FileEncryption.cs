@@ -34,8 +34,7 @@ public static class FileEncryption
         Span<byte> salt = stackalloc byte[Argon2id.SaltSize];
         Span<byte> ephemeralPublicKey = stackalloc byte[X25519.PublicKeySize], ephemeralPrivateKey = stackalloc byte[X25519.PrivateKeySize];
         Span<byte> headerKey = stackalloc byte[Constants.HeaderKeySize];
-        foreach (string inputFilePath in filePaths)
-        {
+        foreach (string inputFilePath in filePaths) {
             try
             {
                 bool isDirectory = IsDirectory(inputFilePath, out string zipFilePath);
@@ -64,8 +63,7 @@ public static class FileEncryption
         Span<byte> salt = stackalloc byte[BLAKE2b.SaltSize];
         Span<byte> ephemeralPublicKey = stackalloc byte[X25519.PublicKeySize], ephemeralPrivateKey = stackalloc byte[X25519.PrivateKeySize];
         Span<byte> headerKey = stackalloc byte[Constants.HeaderKeySize];
-        foreach (string inputFilePath in filePaths)
-        {
+        foreach (string inputFilePath in filePaths) {
             try
             {
                 bool isDirectory = IsDirectory(inputFilePath, out string zipFilePath);
@@ -99,14 +97,12 @@ public static class FileEncryption
         Span<byte> ephemeralPublicKey = stackalloc byte[X25519.PublicKeySize], ephemeralPrivateKey = stackalloc byte[X25519.PrivateKeySize];
         Span<byte> inputKeyingMaterial = stackalloc byte[ephemeralSharedSecret.Length + sharedSecret.Length];
         Span<byte> headerKey = stackalloc byte[Constants.HeaderKeySize];
-        foreach (Span<byte> recipientPublicKey in recipientPublicKeys)
-        {
+        foreach (Span<byte> recipientPublicKey in recipientPublicKeys) {
             if (i++ == recipientPublicKeys.Count - 1) {
                 Globals.Overwrite = overwrite;
             }
             X25519.DeriveSenderSharedSecret(sharedSecret, senderPrivateKey, recipientPublicKey, preSharedKey);
-            foreach (string inputFilePath in filePaths)
-            {
+            foreach (string inputFilePath in filePaths) {
                 Console.WriteLine();
                 try
                 {
@@ -142,8 +138,7 @@ public static class FileEncryption
         Span<byte> ephemeralPublicKey = stackalloc byte[X25519.PublicKeySize], ephemeralPrivateKey = stackalloc byte[X25519.PrivateKeySize];
         Span<byte> ephemeralSharedSecret = stackalloc byte[X25519.SharedSecretSize];
         Span<byte> headerKey = stackalloc byte[Constants.HeaderKeySize];
-        foreach (string inputFilePath in filePaths)
-        {
+        foreach (string inputFilePath in filePaths) {
             Console.WriteLine();
             try
             {

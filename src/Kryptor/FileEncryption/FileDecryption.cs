@@ -32,8 +32,7 @@ public static class FileDecryption
         }
         Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeadersLength];
         Span<byte> headerKey = stackalloc byte[Constants.HeaderKeySize];
-        foreach (string inputFilePath in filePaths)
-        {
+        foreach (string inputFilePath in filePaths) {
             try
             {
                 using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
@@ -65,8 +64,7 @@ public static class FileDecryption
         }
         Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeadersLength];
         Span<byte> headerKey = stackalloc byte[Constants.HeaderKeySize];
-        foreach (string inputFilePath in filePaths)
-        {
+        foreach (string inputFilePath in filePaths) {
             try
             {
                 using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
@@ -100,8 +98,7 @@ public static class FileDecryption
         Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeadersLength];
         Span<byte> inputKeyingMaterial = stackalloc byte[ephemeralSharedSecret.Length + sharedSecret.Length];
         Span<byte> headerKey = stackalloc byte[Constants.HeaderKeySize];
-        foreach (string inputFilePath in filePaths)
-        {
+        foreach (string inputFilePath in filePaths) {
             Console.WriteLine();
             try
             {
@@ -140,8 +137,7 @@ public static class FileDecryption
         Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeadersLength];
         Span<byte> ephemeralSharedSecret = stackalloc byte[X25519.SharedSecretSize];
         Span<byte> headerKey = stackalloc byte[Constants.HeaderKeySize];
-        foreach (string inputFilePath in filePaths)
-        {
+        foreach (string inputFilePath in filePaths) {
             Console.WriteLine();
             try
             {

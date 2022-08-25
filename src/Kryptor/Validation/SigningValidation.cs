@@ -44,8 +44,7 @@ public static class SigningValidation
             yield return "Please enter a shorter comment. The maximum length is 500 characters.";
         }
         if (signatureFilePaths != null) {
-            foreach (string signatureFilePath in signatureFilePaths)
-            {
+            foreach (string signatureFilePath in signatureFilePaths) {
                 if (!signatureFilePath.EndsWith(Constants.SignatureExtension)) {
                     yield return ErrorMessages.GetFilePathError(signatureFilePath, "Please specify a .signature file.");
                 }
@@ -58,11 +57,9 @@ public static class SigningValidation
             yield return "Please specify a file to sign.";
         }
         else {
-            foreach (string filePath in filePaths)
-            {
+            foreach (string filePath in filePaths) {
                 IEnumerable<string> errorMessages = FilePathValidation.GetFileSigningError(filePath, signatureFilePaths);
-                foreach (string errorMessage in errorMessages)
-                {
+                foreach (string errorMessage in errorMessages) {
                     yield return ErrorMessages.GetFilePathError(filePath, errorMessage);
                 }
             }
@@ -89,8 +86,7 @@ public static class SigningValidation
         else if (encodedPublicKeys[0].Length != Constants.PublicKeyLength) {
             yield return ErrorMessages.GetKeyStringError(encodedPublicKeys[0], ErrorMessages.InvalidPublicKey);
         }
-        foreach (string errorMessage in GetVerifyFilePathsErrors(filePaths, signatureFilePaths))
-        {
+        foreach (string errorMessage in GetVerifyFilePathsErrors(filePaths, signatureFilePaths)) {
             yield return errorMessage;
         }
     }
@@ -115,8 +111,7 @@ public static class SigningValidation
         else if (!File.Exists(publicKeyPaths[0])) {
             yield return ErrorMessages.GetFilePathError(publicKeyPaths[0], ErrorMessages.NonExistentPublicKeyFile);
         }
-        foreach (string errorMessage in GetVerifyFilePathsErrors(filePaths, signatureFilePaths))
-        {
+        foreach (string errorMessage in GetVerifyFilePathsErrors(filePaths, signatureFilePaths)) {
             yield return errorMessage;
         }
     }
@@ -127,8 +122,7 @@ public static class SigningValidation
             yield return "Please specify a file to verify.";
         }
         else {
-            foreach (string filePath in filePaths)
-            {
+            foreach (string filePath in filePaths) {
                 string errorMessage = FilePathValidation.GetSignatureVerifyError(filePath, signatureFilePaths == null ? filePath + Constants.SignatureExtension : string.Empty);
                 if (!string.IsNullOrEmpty(errorMessage)) {
                     yield return ErrorMessages.GetFilePathError(filePath, errorMessage);
@@ -139,8 +133,7 @@ public static class SigningValidation
             if (filePaths != null && signatureFilePaths.Length != filePaths.Length) {
                 yield return "Please specify the same number of signature files and files to verify.";
             }
-            foreach (string signatureFilePath in signatureFilePaths)
-            {
+            foreach (string signatureFilePath in signatureFilePaths) {
                 string errorMessage = FilePathValidation.GetSignatureFileError(signatureFilePath);
                 if (!string.IsNullOrEmpty(errorMessage)) {
                     yield return ErrorMessages.GetFilePathError(signatureFilePath, errorMessage);

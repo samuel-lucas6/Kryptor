@@ -57,8 +57,7 @@ public static class FileEncryptionValidation
             yield return FileOrDirectoryError;
         }
         else {
-            foreach (string inputFilePath in filePaths)
-            {
+            foreach (string inputFilePath in filePaths) {
                 string errorMessage = FilePathValidation.GetFileEncryptionError(inputFilePath);
                 if (!string.IsNullOrEmpty(errorMessage)) {
                     yield return ErrorMessages.GetFilePathError(inputFilePath, errorMessage);
@@ -75,16 +74,14 @@ public static class FileEncryptionValidation
 
     private static IEnumerable<string> GetFileEncryptionWithPublicKeyFileErrors(string privateKeyPath, string[] publicKeyPaths)
     {
-        foreach (string errorMessage in GetFileEncryptionErrors(privateKeyPath))
-        {
+        foreach (string errorMessage in GetFileEncryptionErrors(privateKeyPath)) {
             yield return errorMessage;
         }
         if (publicKeyPaths == null) {
             yield return ErrorMessages.NoPublicKey;
         }
         else {
-            foreach (string publicKeyPath in publicKeyPaths)
-            {
+            foreach (string publicKeyPath in publicKeyPaths) {
                 if (!publicKeyPath.EndsWith(Constants.PublicKeyExtension)) {
                     yield return ErrorMessages.GetFilePathError(publicKeyPath, ErrorMessages.InvalidPublicKeyFile);
                 }
@@ -103,16 +100,14 @@ public static class FileEncryptionValidation
 
     private static IEnumerable<string> GetFileEncryptionWithPublicKeyStringErrors(string privateKeyPath, string[] encodedPublicKeys)
     {
-        foreach (string errorMessage in GetFileEncryptionErrors(privateKeyPath))
-        {
+        foreach (string errorMessage in GetFileEncryptionErrors(privateKeyPath)) {
             yield return errorMessage;
         }
         if (encodedPublicKeys == null) {
             yield return ErrorMessages.NoPublicKey;
         }
         else {
-            foreach (string encodedPublicKey in encodedPublicKeys)
-            {
+            foreach (string encodedPublicKey in encodedPublicKeys) {
                 if (encodedPublicKey.EndsWith(Constants.PublicKeyExtension)) {
                     yield return ErrorMessages.GetFilePathError(encodedPublicKey, "Please specify only public key strings or only public key files.");
                 }
@@ -167,8 +162,7 @@ public static class FileEncryptionValidation
             yield return FileOrDirectoryError;
         }
         else {
-            foreach (string inputFilePath in filePaths)
-            {
+            foreach (string inputFilePath in filePaths) {
                 string errorMessage = FilePathValidation.GetFileDecryptionError(inputFilePath);
                 if (!string.IsNullOrEmpty(errorMessage)) {
                     yield return ErrorMessages.GetFilePathError(inputFilePath, errorMessage);
@@ -185,8 +179,7 @@ public static class FileEncryptionValidation
     
     private static IEnumerable<string> GetFileDecryptionWithPublicKeyFileErrors(string privateKeyPath, string[] publicKeyPaths)
     {
-        foreach (string errorMessage in GetFileEncryptionErrors(privateKeyPath))
-        {
+        foreach (string errorMessage in GetFileEncryptionErrors(privateKeyPath)) {
             yield return errorMessage;
         }
         if (publicKeyPaths == null) {
@@ -211,8 +204,7 @@ public static class FileEncryptionValidation
     
     private static IEnumerable<string> GetFileDecryptionWithPublicKeyStringErrors(string privateKeyPath, string[] encodedPublicKeys)
     {
-        foreach (string errorMessage in GetFileEncryptionErrors(privateKeyPath))
-        {
+        foreach (string errorMessage in GetFileEncryptionErrors(privateKeyPath)) {
             yield return errorMessage;
         }
         if (encodedPublicKeys == null) {

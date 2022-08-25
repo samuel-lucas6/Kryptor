@@ -60,8 +60,7 @@ public static class FileSigning
         Console.WriteLine($"Signing each file in \"{Path.GetFileName(directoryPath)}\" directory...");
         string[] filePaths = Directory.GetFiles(directoryPath, searchPattern: "*", SearchOption.AllDirectories);
         Globals.TotalCount += filePaths.Length - 1;
-        foreach (string filePath in filePaths)
-        {
+        foreach (string filePath in filePaths) {
             try
             {
                 DisplayMessage.SigningFile(filePath);
@@ -81,8 +80,7 @@ public static class FileSigning
             throw new UserInputException();
         }
         signatureFilePaths ??= new string[filePaths.Length];
-        for (int i = 0; i < filePaths.Length; i++)
-        {
+        for (int i = 0; i < filePaths.Length; i++) {
             try
             {
                 if (string.IsNullOrEmpty(signatureFilePaths[i])) {
