@@ -35,7 +35,7 @@ public static class FileDecryption
         foreach (string inputFilePath in filePaths) {
             try
             {
-                using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
+                using var inputFile = new FileStream(inputFilePath, FileHandling.GetFileStreamReadOptions(inputFilePath));
                 inputFile.Read(unencryptedHeaders);
                 Span<byte> salt = unencryptedHeaders[^Argon2id.SaltSize..];
                 DisplayMessage.DerivingKeyFromPassword();
@@ -67,7 +67,7 @@ public static class FileDecryption
         foreach (string inputFilePath in filePaths) {
             try
             {
-                using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
+                using var inputFile = new FileStream(inputFilePath, FileHandling.GetFileStreamReadOptions(inputFilePath));
                 inputFile.Read(unencryptedHeaders);
                 Span<byte> salt = unencryptedHeaders[^BLAKE2b.SaltSize..];
                 BLAKE2b.DeriveKey(headerKey, symmetricKey, Constants.Personalisation, salt);
@@ -102,7 +102,7 @@ public static class FileDecryption
             Console.WriteLine();
             try
             {
-                using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
+                using var inputFile = new FileStream(inputFilePath, FileHandling.GetFileStreamReadOptions(inputFilePath));
                 inputFile.Read(unencryptedHeaders);
                 Span<byte> ephemeralPublicKey = unencryptedHeaders.Slice(Constants.UnencryptedHeadersLength - BLAKE2b.SaltSize - X25519.PublicKeySize, X25519.PublicKeySize);
                 Span<byte> salt = unencryptedHeaders[^BLAKE2b.SaltSize..];
@@ -141,7 +141,7 @@ public static class FileDecryption
             Console.WriteLine();
             try
             {
-                using var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
+                using var inputFile = new FileStream(inputFilePath, FileHandling.GetFileStreamReadOptions(inputFilePath));
                 inputFile.Read(unencryptedHeaders);
                 Span<byte> ephemeralPublicKey = unencryptedHeaders.Slice(Constants.UnencryptedHeadersLength - BLAKE2b.SaltSize - X25519.PublicKeySize, X25519.PublicKeySize);
                 Span<byte> salt = unencryptedHeaders[^BLAKE2b.SaltSize..];

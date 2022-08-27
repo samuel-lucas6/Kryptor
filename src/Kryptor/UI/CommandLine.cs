@@ -257,8 +257,7 @@ public static class CommandLine
             if (!string.IsNullOrEmpty(userInput)) {
                 Console.WriteLine();
             }
-            switch (userInput)
-            {
+            switch (userInput) {
                 case "y":
                     Updates.Update(latestVersion);
                     break;

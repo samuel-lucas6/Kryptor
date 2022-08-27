@@ -45,18 +45,17 @@ public static class Constants
     public static readonly byte[] SymmetricKeyHeader = Encoding.UTF8.GetBytes("Rn");
     public static readonly byte[] Base64Padding = Encoding.UTF8.GetBytes("=");
     public const int KeyfileLength = 64;
-    public const int DefaultFileStreamBufferSize = 4096;
     public const int FileStreamBufferSize = 131072;
     public const int BoolBytesLength = 1;
     public const int IntBytesLength = 4;
     public const int LongBytesLength = 8;
     public const int FileNameHeaderLength = 255;
-    public const int EncryptedHeaderLength = 328;
+    public const int EncryptedHeaderLength = IntBytesLength + BoolBytesLength + IntBytesLength + FileNameHeaderLength + ChaCha20.KeySize + BLAKE2b.TagSize;
     public static readonly int FileHeadersLength = EncryptionMagicBytes.Length + EncryptionVersion.Length + X25519.PublicKeySize + Argon2id.SaltSize + EncryptedHeaderLength;
     public static readonly int UnencryptedHeadersLength = FileHeadersLength - EncryptedHeaderLength;
     public const int FileChunkSize = 16384;
     public const int CiphertextChunkLength = FileChunkSize + BLAKE2b.TagSize;
-    
+
     // Asymmetric keys
     public static readonly string DefaultKeyDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), EncryptedExtension);
     public const string DefaultEncryptionKeyFileName = "encryption";

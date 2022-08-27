@@ -115,7 +115,7 @@ public static class SymmetricKeyValidation
     {
         try
         {
-            using var keyfile = new FileStream(keyfilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
+            using var keyfile = new FileStream(keyfilePath, FileHandling.GetFileStreamReadOptions(keyfilePath));
             using var blake2b = new BLAKE2bHashAlgorithm(Constants.KeyfileLength);
             return blake2b.ComputeHash(keyfile);
         }

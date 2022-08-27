@@ -39,11 +39,36 @@ public static class FileHandling
         return newPath;
     }
     
+    public static FileStreamOptions GetFileStreamReadOptions(string filePath, bool onlyReadingHeaders = false)
+    {
+        long fileLength = new FileInfo(filePath).Length;
+        return new FileStreamOptions
+        {
+            Mode = FileMode.Open,
+            Access = FileAccess.Read,
+            Share = FileShare.Read,
+            BufferSize = GetFileStreamBufferSize(fileLength, onlyReadingHeaders),
+            Options = fileLength < 10737418240 || !onlyReadingHeaders ? FileOptions.None : FileOptions.SequentialScan
+        };
+    }
+
+    private static int GetFileStreamBufferSize(long fileLength, bool onlyReadingHeaders = false)
+    {
+        if (onlyReadingHeaders) { return 0; }
+        return fileLength switch
+        {
+            <= 262144 => 0,
+            <= 5242880 => 81920,
+            < 104857600 => 131072,
+            >= 104857600 => 1048576
+        };
+    }
+    
     public static bool? IsValidEncryptedFile(string filePath, out bool? validVersion)
     {
         try
         {
-            using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.DefaultFileStreamBufferSize, FileOptions.SequentialScan);
+            using var fileStream = new FileStream(filePath, GetFileStreamReadOptions(filePath, onlyReadingHeaders: true));
             Span<byte> magicBytes = stackalloc byte[Constants.EncryptionMagicBytes.Length];
             fileStream.Read(magicBytes);
             Span<byte> version = stackalloc byte[Constants.EncryptionVersion.Length];
@@ -62,7 +87,7 @@ public static class FileHandling
     {
         try
         {
-            using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.DefaultFileStreamBufferSize, FileOptions.SequentialScan);
+            using var fileStream = new FileStream(filePath, GetFileStreamReadOptions(filePath, onlyReadingHeaders: true));
             Span<byte> magicBytes = stackalloc byte[Constants.SignatureMagicBytes.Length];
             fileStream.Read(magicBytes);
             Span<byte> version = stackalloc byte[Constants.SignatureVersion.Length];

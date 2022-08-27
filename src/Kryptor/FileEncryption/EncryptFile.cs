@@ -34,7 +34,7 @@ public static class EncryptFile
         SecureRandom.Fill(fileKey);
         try
         {
-            using (var inputFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
+            using (var inputFile = new FileStream(inputFilePath, FileHandling.GetFileStreamReadOptions(inputFilePath)))
             using (var outputFile = new FileStream(outputFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
             {
                 Span<byte> encryptedHeader = EncryptFileHeader(inputFile.Length, isDirectory, Path.GetFileName(inputFilePath), unencryptedHeaders, fileKey, nonce, headerKey);

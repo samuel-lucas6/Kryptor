@@ -50,7 +50,7 @@ public static class DigitalSignatures
         if (!prehash) {
             return File.ReadAllBytes(filePath);
         }
-        using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan);
+        using var fileStream = new FileStream(filePath, FileHandling.GetFileStreamReadOptions(filePath));
         using var blake2b = new BLAKE2bHashAlgorithm(BLAKE2b.MaxHashSize);
         return blake2b.ComputeHash(fileStream);
     }
@@ -63,7 +63,7 @@ public static class DigitalSignatures
         if (File.Exists(signatureFilePath)) {
             File.SetAttributes(signatureFilePath, FileAttributes.Normal);
         }
-        using var signatureFile = new FileStream(signatureFilePath, FileMode.Create, FileAccess.Write, FileShare.Read, Constants.DefaultFileStreamBufferSize, FileOptions.SequentialScan);
+        using var signatureFile = new FileStream(signatureFilePath, FileMode.Create, FileAccess.Write, FileShare.Read);
         signatureFile.Write(signatureFileBytes);
         signatureFile.Write(globalSignature);
         File.SetAttributes(signatureFilePath, FileAttributes.ReadOnly);
