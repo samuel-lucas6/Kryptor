@@ -45,7 +45,6 @@ public static class Constants
     public static readonly byte[] SymmetricKeyHeader = Encoding.UTF8.GetBytes("Rn");
     public static readonly byte[] Base64Padding = Encoding.UTF8.GetBytes("=");
     public const int KeyfileLength = 64;
-    public const int FileStreamBufferSize = 131072;
     public const int BoolBytesLength = 1;
     public const int IntBytesLength = 4;
     public const int LongBytesLength = 8;

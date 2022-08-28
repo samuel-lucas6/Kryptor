@@ -51,7 +51,7 @@ public static class FileHandling
             Options = fileLength < 10737418240 || !onlyReadingHeaders ? FileOptions.None : FileOptions.SequentialScan
         };
     }
-
+    
     private static int GetFileStreamBufferSize(long fileLength, bool onlyReadingHeaders = false)
     {
         if (onlyReadingHeaders) { return 0; }
@@ -61,6 +61,19 @@ public static class FileHandling
             <= 5242880 => 81920,
             < 104857600 => 131072,
             >= 104857600 => 1048576
+        };
+    }
+    
+    public static FileStreamOptions GetFileStreamWriteOptions(long preAllocationSize)
+    {
+        return new FileStreamOptions
+        {
+            Mode = FileMode.Create,
+            Access = FileAccess.Write,
+            Share = FileShare.Read,
+            BufferSize = GetFileStreamBufferSize(preAllocationSize),
+            Options = FileOptions.None,
+            PreallocationSize = preAllocationSize
         };
     }
     

@@ -63,7 +63,7 @@ public static class DigitalSignatures
         if (File.Exists(signatureFilePath)) {
             File.SetAttributes(signatureFilePath, FileAttributes.Normal);
         }
-        using var signatureFile = new FileStream(signatureFilePath, FileMode.Create, FileAccess.Write, FileShare.Read);
+        using var signatureFile = new FileStream(signatureFilePath, FileHandling.GetFileStreamWriteOptions(signatureFileBytes.Length + globalSignature.Length));
         signatureFile.Write(signatureFileBytes);
         signatureFile.Write(globalSignature);
         File.SetAttributes(signatureFilePath, FileAttributes.ReadOnly);

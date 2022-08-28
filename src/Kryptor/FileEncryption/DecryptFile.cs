@@ -41,7 +41,7 @@ public static class DecryptFile
             header.Slice(header.Length - fileKey.Length - Constants.FileNameHeaderLength, fileNameLength).CopyTo(fileName);
             header[^fileKey.Length..].CopyTo(fileKey);
             CryptographicOperations.ZeroMemory(header);
-            using (var outputFile = new FileStream(outputFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, Constants.FileStreamBufferSize, FileOptions.SequentialScan))
+            using (var outputFile = new FileStream(outputFilePath, FileHandling.GetFileStreamWriteOptions(inputFile.Length - Constants.FileHeadersLength)))
             {
                 ConstantTime.Increment(nonce);
                 DecryptChunks(inputFile, outputFile, paddingLength, nonce, fileKey);
