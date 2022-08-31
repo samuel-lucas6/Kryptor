@@ -71,11 +71,11 @@ public static class EncryptFile
 
         Span<byte> plaintextLength = stackalloc byte[Constants.LongBytesLength];
         BinaryPrimitives.WriteInt64LittleEndian(plaintextLength, fileLength);
-        Span<byte> paddedFileName = GetFileName(fileName, out Span<byte> fileNameLength);
+        Span<byte> paddedFileName = GetPaddedFileName(fileName);
         Span<byte> spare = stackalloc byte[Constants.LongBytesLength * 4]; spare.Clear();
         Span<byte> directory = BitConverter.GetBytes(isDirectory);
         Span<byte> plaintextHeader = stackalloc byte[Constants.EncryptedHeaderLength - BLAKE2b.TagSize];
-        Spans.Concat(plaintextHeader, fileKey, plaintextLength, fileNameLength, paddedFileName, spare, directory);
+        Spans.Concat(plaintextHeader, fileKey, plaintextLength, paddedFileName, spare, directory);
         
         Span<byte> ciphertextHeader = new byte[plaintextHeader.Length + BLAKE2b.TagSize];
         ChaCha20BLAKE2b.Encrypt(ciphertextHeader, plaintextHeader, nonce, headerKey, associatedData);
@@ -84,16 +84,20 @@ public static class EncryptFile
         return ciphertextHeader;
     }
 
-    private static Span<byte> GetFileName(string fileName, out Span<byte> fileNameLength)
+    private static Span<byte> GetPaddedFileName(string fileName)
     {
+        Span<byte> paddedFileName = new byte[Constants.FileNameHeaderLength];
+        if (!Globals.EncryptFileNames) {
+            Padding.Fill(paddedFileName);
+            return paddedFileName;
+        }
+        
         Span<byte> fileNameBytes = new byte[Encoding.UTF8.GetMaxByteCount(fileName.Length)];
         int bytesEncoded = Encoding.UTF8.GetBytes(fileName, fileNameBytes);
-        Span<byte> paddedFileName = new byte[Constants.FileNameHeaderLength];
-        if (Globals.EncryptFileNames) {
-            fileNameBytes[..bytesEncoded].CopyTo(paddedFileName);
+        if (bytesEncoded > paddedFileName.Length) {
+            throw new ArgumentException("The encoded file name is too long to be stored. Please rename the file.");
         }
-        fileNameLength = new byte[Constants.IntBytesLength];
-        BinaryPrimitives.WriteInt32LittleEndian(fileNameLength, !Globals.EncryptFileNames ? 0 : bytesEncoded);
+        Padding.Pad(paddedFileName, fileNameBytes[..bytesEncoded], paddedFileName.Length);
         return paddedFileName;
     }
 

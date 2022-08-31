@@ -46,10 +46,9 @@ public static class Constants
     public static readonly byte[] Base64Padding = Encoding.UTF8.GetBytes("=");
     public const int KeyfileLength = 64;
     public const int BoolBytesLength = 1;
-    public const int IntBytesLength = 4;
     public const int LongBytesLength = 8;
     public const int FileNameHeaderLength = 255;
-    public const int EncryptedHeaderLength = LongBytesLength + BoolBytesLength + IntBytesLength + FileNameHeaderLength + LongBytesLength * 4 + ChaCha20.KeySize + BLAKE2b.TagSize;
+    public const int EncryptedHeaderLength = ChaCha20.KeySize + LongBytesLength + FileNameHeaderLength + LongBytesLength * 4 + BoolBytesLength + BLAKE2b.TagSize;
     public static readonly int FileHeadersLength = EncryptionMagicBytes.Length + EncryptionVersion.Length + X25519.PublicKeySize + Argon2id.SaltSize + EncryptedHeaderLength;
     public static readonly int UnencryptedHeadersLength = FileHeadersLength - EncryptedHeaderLength;
     public const int FileChunkSize = 16384;

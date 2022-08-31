@@ -36,9 +36,9 @@ public static class DecryptFile
             Span<byte> header = DecryptHeader(inputFile, unencryptedHeaders, nonce, headerKey);
             header[..fileKey.Length].CopyTo(fileKey);
             long plaintextLength = BinaryPrimitives.ReadInt64LittleEndian(header.Slice(fileKey.Length, Constants.LongBytesLength));
-            int fileNameLength = BinaryPrimitives.ReadInt32LittleEndian(header.Slice(fileKey.Length + Constants.LongBytesLength, Constants.IntBytesLength));
-            Span<byte> fileName = stackalloc byte[fileNameLength];
-            header.Slice(header.Length - Constants.BoolBytesLength - Constants.LongBytesLength * 4 - Constants.FileNameHeaderLength, fileNameLength).CopyTo(fileName);
+            Span<byte> fileName = stackalloc byte[Constants.FileNameHeaderLength];
+            header.Slice(fileKey.Length + Constants.LongBytesLength, Constants.FileNameHeaderLength).CopyTo(fileName);
+            int fileNameLength = Padding.GetUnpaddedLength(fileName, fileName.Length);
             bool isDirectory = BitConverter.ToBoolean(header[^Constants.BoolBytesLength..]);
             CryptographicOperations.ZeroMemory(header);
             using (var outputFile = new FileStream(outputFilePath, FileHandling.GetFileStreamWriteOptions(inputFile.Length - Constants.FileHeadersLength)))
@@ -48,7 +48,7 @@ public static class DecryptFile
             }
             inputFile.Dispose();
             if (fileNameLength > 0) {
-                outputFilePath = FileHandling.RenameFile(outputFilePath, Encoding.UTF8.GetString(fileName));
+                outputFilePath = FileHandling.RenameFile(outputFilePath, Encoding.UTF8.GetString(fileName[..fileNameLength]));
             }
             if (isDirectory) {
                 FileHandling.ExtractZipFile(outputFilePath);
