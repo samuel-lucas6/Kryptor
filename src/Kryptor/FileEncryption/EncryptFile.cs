@@ -73,8 +73,9 @@ public static class EncryptFile
         BinaryPrimitives.WriteInt64LittleEndian(plaintextLength, fileLength);
         Span<byte> directory = BitConverter.GetBytes(isDirectory);
         Span<byte> paddedFileName = GetFileName(fileName, out Span<byte> fileNameLength);
+        Span<byte> spare = stackalloc byte[Constants.LongBytesLength * 4]; spare.Clear();
         Span<byte> plaintextHeader = stackalloc byte[Constants.EncryptedHeaderLength - BLAKE2b.TagSize];
-        Spans.Concat(plaintextHeader, plaintextLength, directory, fileNameLength, paddedFileName, fileKey);
+        Spans.Concat(plaintextHeader, plaintextLength, directory, fileNameLength, paddedFileName, spare, fileKey);
         
         Span<byte> ciphertextHeader = new byte[plaintextHeader.Length + BLAKE2b.TagSize];
         ChaCha20BLAKE2b.Encrypt(ciphertextHeader, plaintextHeader, nonce, headerKey, associatedData);

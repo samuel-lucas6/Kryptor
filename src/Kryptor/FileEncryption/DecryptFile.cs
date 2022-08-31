@@ -38,7 +38,7 @@ public static class DecryptFile
             bool isDirectory = BitConverter.ToBoolean(header.Slice(Constants.LongBytesLength, Constants.BoolBytesLength));
             int fileNameLength = BinaryPrimitives.ReadInt32LittleEndian(header.Slice(Constants.LongBytesLength + Constants.BoolBytesLength, Constants.IntBytesLength));
             Span<byte> fileName = stackalloc byte[fileNameLength];
-            header.Slice(header.Length - fileKey.Length - Constants.FileNameHeaderLength, fileNameLength).CopyTo(fileName);
+            header.Slice(header.Length - fileKey.Length - Constants.LongBytesLength * 4 - Constants.FileNameHeaderLength, fileNameLength).CopyTo(fileName);
             header[^fileKey.Length..].CopyTo(fileKey);
             CryptographicOperations.ZeroMemory(header);
             using (var outputFile = new FileStream(outputFilePath, FileHandling.GetFileStreamWriteOptions(inputFile.Length - Constants.FileHeadersLength)))
