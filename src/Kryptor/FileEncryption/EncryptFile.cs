@@ -68,12 +68,13 @@ public static class EncryptFile
         BinaryPrimitives.WriteInt64LittleEndian(ciphertextLength, chunkCount * Constants.CiphertextChunkLength);
         Span<byte> associatedData = stackalloc byte[ciphertextLength.Length + unencryptedHeaders.Length];
         Spans.Concat(associatedData, ciphertextLength, unencryptedHeaders);
-        
-        Span<byte> paddingLength = GetPaddingLength(fileLength);
+
+        Span<byte> plaintextLength = stackalloc byte[Constants.LongBytesLength];
+        BinaryPrimitives.WriteInt64LittleEndian(plaintextLength, fileLength);
         Span<byte> directory = BitConverter.GetBytes(isDirectory);
         Span<byte> paddedFileName = GetFileName(fileName, out Span<byte> fileNameLength);
         Span<byte> plaintextHeader = stackalloc byte[Constants.EncryptedHeaderLength - BLAKE2b.TagSize];
-        Spans.Concat(plaintextHeader, paddingLength, directory, fileNameLength, paddedFileName, fileKey);
+        Spans.Concat(plaintextHeader, plaintextLength, directory, fileNameLength, paddedFileName, fileKey);
         
         Span<byte> ciphertextHeader = new byte[plaintextHeader.Length + BLAKE2b.TagSize];
         ChaCha20BLAKE2b.Encrypt(ciphertextHeader, plaintextHeader, nonce, headerKey, associatedData);
@@ -81,19 +82,7 @@ public static class EncryptFile
         CryptographicOperations.ZeroMemory(headerKey);
         return ciphertextHeader;
     }
-    
-    private static Span<byte> GetPaddingLength(long fileLength)
-    {
-        Span<byte> paddingLength = new byte[Constants.IntBytesLength];
-        if (fileLength == 0) {
-            BinaryPrimitives.WriteInt32LittleEndian(paddingLength, Constants.FileChunkSize);
-            return paddingLength;
-        }
-        int lastChunkRemainder = Convert.ToInt32(fileLength % Constants.FileChunkSize);
-        BinaryPrimitives.WriteInt32LittleEndian(paddingLength, lastChunkRemainder != 0 ? Constants.FileChunkSize - lastChunkRemainder : 0);
-        return paddingLength;
-    }
-    
+
     private static Span<byte> GetFileName(string fileName, out Span<byte> fileNameLength)
     {
         Span<byte> fileNameBytes = stackalloc byte[Encoding.UTF8.GetMaxByteCount(fileName.Length)];

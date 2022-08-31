@@ -34,9 +34,9 @@ public static class DecryptFile
         try
         {
             Span<byte> header = DecryptHeader(inputFile, unencryptedHeaders, nonce, headerKey);
-            int paddingLength = BinaryPrimitives.ReadInt32LittleEndian(header[..Constants.IntBytesLength]);
-            bool isDirectory = BitConverter.ToBoolean(header.Slice(Constants.IntBytesLength, Constants.BoolBytesLength));
-            int fileNameLength = BinaryPrimitives.ReadInt32LittleEndian(header.Slice(Constants.IntBytesLength + Constants.BoolBytesLength, Constants.IntBytesLength));
+            long plaintextLength = BinaryPrimitives.ReadInt64LittleEndian(header[..Constants.LongBytesLength]);
+            bool isDirectory = BitConverter.ToBoolean(header.Slice(Constants.LongBytesLength, Constants.BoolBytesLength));
+            int fileNameLength = BinaryPrimitives.ReadInt32LittleEndian(header.Slice(Constants.LongBytesLength + Constants.BoolBytesLength, Constants.IntBytesLength));
             Span<byte> fileName = stackalloc byte[fileNameLength];
             header.Slice(header.Length - fileKey.Length - Constants.FileNameHeaderLength, fileNameLength).CopyTo(fileName);
             header[^fileKey.Length..].CopyTo(fileKey);
@@ -44,7 +44,7 @@ public static class DecryptFile
             using (var outputFile = new FileStream(outputFilePath, FileHandling.GetFileStreamWriteOptions(inputFile.Length - Constants.FileHeadersLength)))
             {
                 ConstantTime.Increment(nonce);
-                DecryptChunks(inputFile, outputFile, paddingLength, nonce, fileKey);
+                DecryptChunks(inputFile, outputFile, plaintextLength, nonce, fileKey);
             }
             inputFile.Dispose();
             if (fileNameLength > 0) {
@@ -90,7 +90,7 @@ public static class DecryptFile
         }
     }
 
-    private static void DecryptChunks(Stream inputFile, Stream outputFile, int paddingLength, Span<byte> nonce, Span<byte> fileKey)
+    private static void DecryptChunks(Stream inputFile, Stream outputFile, long plaintextLength, Span<byte> nonce, Span<byte> fileKey)
     {
         Span<byte> ciphertextChunk = new byte[Constants.CiphertextChunkLength];
         Span<byte> plaintextChunk = new byte[Constants.FileChunkSize];
@@ -99,9 +99,7 @@ public static class DecryptFile
             ConstantTime.Increment(nonce);
             outputFile.Write(plaintextChunk);
         }
-        if (paddingLength > 0) {
-            outputFile.SetLength(outputFile.Length - paddingLength);
-        }
+        outputFile.SetLength(plaintextLength);
         CryptographicOperations.ZeroMemory(fileKey);
         CryptographicOperations.ZeroMemory(nonce);
     }

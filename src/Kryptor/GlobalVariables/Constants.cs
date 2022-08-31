@@ -49,7 +49,7 @@ public static class Constants
     public const int IntBytesLength = 4;
     public const int LongBytesLength = 8;
     public const int FileNameHeaderLength = 255;
-    public const int EncryptedHeaderLength = IntBytesLength + BoolBytesLength + IntBytesLength + FileNameHeaderLength + ChaCha20.KeySize + BLAKE2b.TagSize;
+    public const int EncryptedHeaderLength = LongBytesLength + BoolBytesLength + IntBytesLength + FileNameHeaderLength + ChaCha20.KeySize + BLAKE2b.TagSize;
     public static readonly int FileHeadersLength = EncryptionMagicBytes.Length + EncryptionVersion.Length + X25519.PublicKeySize + Argon2id.SaltSize + EncryptedHeaderLength;
     public static readonly int UnencryptedHeadersLength = FileHeadersLength - EncryptedHeaderLength;
     public const int FileChunkSize = 16384;
