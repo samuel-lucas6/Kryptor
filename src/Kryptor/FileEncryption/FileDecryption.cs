@@ -31,7 +31,7 @@ public static class FileDecryption
             throw new UserInputException();
         }
         Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeadersLength];
-        Span<byte> headerKey = stackalloc byte[Constants.HeaderKeySize];
+        Span<byte> headerKey = stackalloc byte[ChaCha20.KeySize];
         foreach (string inputFilePath in filePaths) {
             try
             {
@@ -63,7 +63,7 @@ public static class FileDecryption
             throw new UserInputException();
         }
         Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeadersLength];
-        Span<byte> headerKey = stackalloc byte[Constants.HeaderKeySize];
+        Span<byte> headerKey = stackalloc byte[ChaCha20.KeySize];
         foreach (string inputFilePath in filePaths) {
             try
             {
@@ -97,7 +97,7 @@ public static class FileDecryption
         X25519.DeriveRecipientSharedSecret(sharedSecret, recipientPrivateKey, senderPublicKey, preSharedKey);
         Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeadersLength];
         Span<byte> inputKeyingMaterial = stackalloc byte[ephemeralSharedSecret.Length + sharedSecret.Length];
-        Span<byte> headerKey = stackalloc byte[Constants.HeaderKeySize];
+        Span<byte> headerKey = stackalloc byte[ChaCha20.KeySize];
         foreach (string inputFilePath in filePaths) {
             Console.WriteLine();
             try
@@ -136,7 +136,7 @@ public static class FileDecryption
         }
         Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeadersLength];
         Span<byte> ephemeralSharedSecret = stackalloc byte[X25519.SharedSecretSize];
-        Span<byte> headerKey = stackalloc byte[Constants.HeaderKeySize];
+        Span<byte> headerKey = stackalloc byte[ChaCha20.KeySize];
         foreach (string inputFilePath in filePaths) {
             Console.WriteLine();
             try
@@ -170,10 +170,7 @@ public static class FileDecryption
         string outputFilePath = FileHandling.GetUniqueFilePath(FileHandling.RemoveFileNameNumber(Path.ChangeExtension(inputFile.Name, extension: null)));
         DisplayMessage.InputToOutput("Decrypting", inputFile.Name, outputFilePath);
         
-        Span<byte> encryptionKey = headerKey[..ChaCha20.KeySize];
-        Span<byte> nonce = headerKey[encryptionKey.Length..];
-        
-        DecryptFile.Decrypt(inputFile, outputFilePath, unencryptedHeaders, nonce, encryptionKey);
+        DecryptFile.Decrypt(inputFile, outputFilePath, unencryptedHeaders, headerKey);
         Globals.SuccessfulCount++;
     }
 }

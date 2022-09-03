@@ -33,7 +33,7 @@ public static class FileEncryption
         }
         Span<byte> salt = stackalloc byte[Argon2id.SaltSize];
         Span<byte> ephemeralPublicKey = stackalloc byte[X25519.PublicKeySize], ephemeralPrivateKey = stackalloc byte[X25519.PrivateKeySize];
-        Span<byte> headerKey = stackalloc byte[Constants.HeaderKeySize];
+        Span<byte> headerKey = stackalloc byte[ChaCha20.KeySize];
         foreach (string inputFilePath in filePaths) {
             try
             {
@@ -62,7 +62,7 @@ public static class FileEncryption
         }
         Span<byte> salt = stackalloc byte[BLAKE2b.SaltSize];
         Span<byte> ephemeralPublicKey = stackalloc byte[X25519.PublicKeySize], ephemeralPrivateKey = stackalloc byte[X25519.PrivateKeySize];
-        Span<byte> headerKey = stackalloc byte[Constants.HeaderKeySize];
+        Span<byte> headerKey = stackalloc byte[ChaCha20.KeySize];
         foreach (string inputFilePath in filePaths) {
             try
             {
@@ -96,7 +96,7 @@ public static class FileEncryption
         Span<byte> salt = stackalloc byte[BLAKE2b.SaltSize];
         Span<byte> ephemeralPublicKey = stackalloc byte[X25519.PublicKeySize], ephemeralPrivateKey = stackalloc byte[X25519.PrivateKeySize];
         Span<byte> inputKeyingMaterial = stackalloc byte[ephemeralSharedSecret.Length + sharedSecret.Length];
-        Span<byte> headerKey = stackalloc byte[Constants.HeaderKeySize];
+        Span<byte> headerKey = stackalloc byte[ChaCha20.KeySize];
         foreach (Span<byte> recipientPublicKey in recipientPublicKeys) {
             if (i++ == recipientPublicKeys.Count - 1) {
                 Globals.Overwrite = overwrite;
@@ -137,7 +137,7 @@ public static class FileEncryption
         Span<byte> salt = stackalloc byte[BLAKE2b.SaltSize];
         Span<byte> ephemeralPublicKey = stackalloc byte[X25519.PublicKeySize], ephemeralPrivateKey = stackalloc byte[X25519.PrivateKeySize];
         Span<byte> ephemeralSharedSecret = stackalloc byte[X25519.SharedSecretSize];
-        Span<byte> headerKey = stackalloc byte[Constants.HeaderKeySize];
+        Span<byte> headerKey = stackalloc byte[ChaCha20.KeySize];
         foreach (string inputFilePath in filePaths) {
             Console.WriteLine();
             try
@@ -179,11 +179,8 @@ public static class FileEncryption
         
         Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeadersLength];
         Spans.Concat(unencryptedHeaders, Constants.EncryptionMagicBytes, Constants.EncryptionVersion, ephemeralPublicKey, salt);
-        
-        Span<byte> encryptionKey = headerKey[..ChaCha20.KeySize];
-        Span<byte> nonce = headerKey[encryptionKey.Length..];
-        
-        EncryptFile.Encrypt(inputFilePath, outputFilePath, isDirectory, unencryptedHeaders, nonce, encryptionKey);
+
+        EncryptFile.Encrypt(inputFilePath, outputFilePath, isDirectory, unencryptedHeaders, headerKey);
         Globals.SuccessfulCount++;
     }
 }

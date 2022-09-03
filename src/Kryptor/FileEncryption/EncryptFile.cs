@@ -28,7 +28,7 @@ namespace Kryptor;
 
 public static class EncryptFile
 {
-    public static void Encrypt(string inputFilePath, string outputFilePath, bool isDirectory, Span<byte> unencryptedHeaders, Span<byte> nonce, Span<byte> headerKey)
+    public static void Encrypt(string inputFilePath, string outputFilePath, bool isDirectory, Span<byte> unencryptedHeaders, Span<byte> headerKey)
     {
         Span<byte> fileKey = stackalloc byte[ChaCha20.KeySize];
         SecureRandom.Fill(fileKey);
@@ -38,6 +38,7 @@ public static class EncryptFile
             {
                 long chunkCount = ((inputFile.Length != 0 ? inputFile.Length : 1) + Constants.FileChunkSize - 1) / Constants.FileChunkSize;
                 using var outputFile = new FileStream(outputFilePath, FileHandling.GetFileStreamWriteOptions(chunkCount * Constants.CiphertextChunkLength + Constants.FileHeadersLength));
+                Span<byte> nonce = stackalloc byte[ChaCha20.NonceSize]; nonce.Clear();
                 Span<byte> encryptedHeader = EncryptFileHeader(chunkCount, unencryptedHeaders, fileKey, inputFile.Length, Path.GetFileName(inputFilePath), isDirectory, nonce, headerKey);
                 outputFile.Write(unencryptedHeaders);
                 outputFile.Write(encryptedHeader);
@@ -56,7 +57,6 @@ public static class EncryptFile
         {
             CryptographicOperations.ZeroMemory(headerKey);
             CryptographicOperations.ZeroMemory(fileKey);
-            CryptographicOperations.ZeroMemory(nonce);
             FileHandling.DeleteFile(outputFilePath);
             throw;
         }

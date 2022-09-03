@@ -28,11 +28,12 @@ namespace Kryptor;
 
 public static class DecryptFile
 {
-    public static void Decrypt(FileStream inputFile, string outputFilePath, Span<byte> unencryptedHeaders, Span<byte> nonce, Span<byte> headerKey)
+    public static void Decrypt(FileStream inputFile, string outputFilePath, Span<byte> unencryptedHeaders, Span<byte> headerKey)
     {
         Span<byte> fileKey = stackalloc byte[ChaCha20.KeySize];
         try
         {
+            Span<byte> nonce = stackalloc byte[ChaCha20.NonceSize]; nonce.Clear();
             Span<byte> header = DecryptHeader(inputFile, unencryptedHeaders, nonce, headerKey);
             header[..fileKey.Length].CopyTo(fileKey);
             long plaintextLength = BinaryPrimitives.ReadInt64LittleEndian(header.Slice(fileKey.Length, Constants.LongBytesLength));
@@ -61,7 +62,6 @@ public static class DecryptFile
         {
             CryptographicOperations.ZeroMemory(headerKey);
             CryptographicOperations.ZeroMemory(fileKey);
-            CryptographicOperations.ZeroMemory(nonce);
             if (ex is not ArgumentException) {
                 FileHandling.DeleteFile(outputFilePath);
             }

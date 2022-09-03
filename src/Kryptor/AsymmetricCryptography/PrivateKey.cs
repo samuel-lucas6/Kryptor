@@ -32,20 +32,18 @@ public static class PrivateKey
         Span<byte> salt = stackalloc byte[Argon2id.SaltSize];
         SecureRandom.Fill(salt);
 
-        Span<byte> outputKeyingMaterial = stackalloc byte[Constants.HeaderKeySize];
-        Argon2id.DeriveKey(outputKeyingMaterial, password, salt, Constants.Iterations, Constants.MemorySize);
+        Span<byte> nonce = stackalloc byte[ChaCha20.NonceSize]; nonce.Clear();
+        Span<byte> key = stackalloc byte[ChaCha20.KeySize];
+        Argon2id.DeriveKey(key, password, salt, Constants.Iterations, Constants.MemorySize);
         CryptographicOperations.ZeroMemory(password);
-
-        Span<byte> encryptionKey = outputKeyingMaterial[..ChaCha20.KeySize];
-        Span<byte> nonce = outputKeyingMaterial[encryptionKey.Length..];
 
         Span<byte> associatedData = stackalloc byte[keyAlgorithm.Length + Constants.PrivateKeyVersion2.Length];
         Spans.Concat(associatedData, keyAlgorithm, Constants.PrivateKeyVersion2);
 
         Span<byte> encryptedPrivateKey = stackalloc byte[privateKey.Length + BLAKE2b.TagSize];
-        ChaCha20BLAKE2b.Encrypt(encryptedPrivateKey, privateKey, nonce, encryptionKey, associatedData);
+        ChaCha20BLAKE2b.Encrypt(encryptedPrivateKey, privateKey, nonce, key, associatedData);
         CryptographicOperations.ZeroMemory(privateKey);
-        CryptographicOperations.ZeroMemory(outputKeyingMaterial);
+        CryptographicOperations.ZeroMemory(key);
 
         Span<byte> fullPrivateKey = new byte[associatedData.Length + salt.Length + encryptedPrivateKey.Length];
         Spans.Concat(fullPrivateKey, associatedData, salt, encryptedPrivateKey);
@@ -60,16 +58,14 @@ public static class PrivateKey
             Span<byte> salt = privateKey.Slice(associatedData.Length, Argon2id.SaltSize);
             Span<byte> encryptedPrivateKey = privateKey[(associatedData.Length + salt.Length)..];
             
-            Span<byte> outputKeyingMaterial = stackalloc byte[Constants.HeaderKeySize];
-            Argon2id.DeriveKey(outputKeyingMaterial, password, salt, Constants.Iterations, Constants.MemorySize);
+            Span<byte> nonce = stackalloc byte[ChaCha20.NonceSize]; nonce.Clear();
+            Span<byte> key = stackalloc byte[ChaCha20.KeySize];
+            Argon2id.DeriveKey(key, password, salt, Constants.Iterations, Constants.MemorySize);
             CryptographicOperations.ZeroMemory(password);
-            
-            Span<byte> encryptionKey = outputKeyingMaterial[..ChaCha20.KeySize];
-            Span<byte> nonce = outputKeyingMaterial[encryptionKey.Length..];
 
             Span<byte> decryptedPrivateKey = GC.AllocateArray<byte>(encryptedPrivateKey.Length - BLAKE2b.TagSize, pinned: true);
-            ChaCha20BLAKE2b.Decrypt(decryptedPrivateKey, encryptedPrivateKey, nonce, encryptionKey, associatedData);
-            CryptographicOperations.ZeroMemory(outputKeyingMaterial);
+            ChaCha20BLAKE2b.Decrypt(decryptedPrivateKey, encryptedPrivateKey, nonce, key, associatedData);
+            CryptographicOperations.ZeroMemory(key);
             return decryptedPrivateKey;
         }
         catch (CryptographicException ex)
