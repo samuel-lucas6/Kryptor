@@ -66,11 +66,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="cAEAD">
-      <HintPath>cAEAD.dll</HintPath>
-    </Reference>
     <Reference Include="ChaCha20BLAKE2b">
       <HintPath>ChaCha20BLAKE2b.dll</HintPath>
+    </Reference>
+    <Reference Include="kcAEAD">
+      <HintPath>kcAEAD.dll</HintPath>
     </Reference>
   </ItemGroup>
 

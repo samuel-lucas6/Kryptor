@@ -22,7 +22,7 @@ using System.Text;
 using System.Buffers.Binary;
 using System.Security.Cryptography;
 using Geralt;
-using cAEAD;
+using kcAEAD;
 
 namespace Kryptor;
 
@@ -79,8 +79,8 @@ public static class DecryptFile
             BinaryPrimitives.WriteInt64LittleEndian(ciphertextLength, inputFile.Length - Constants.FileHeadersLength);
             Span<byte> associatedData = stackalloc byte[ciphertextLength.Length + unencryptedHeaders.Length];
             Spans.Concat(associatedData, ciphertextLength, unencryptedHeaders);
-            Span<byte> plaintextHeader = GC.AllocateArray<byte>(ciphertextHeader.Length - BLAKE2b.TagSize, pinned: true);
-            ChaCha20BLAKE2b.Decrypt(plaintextHeader, ciphertextHeader, nonce, headerKey, associatedData);
+            Span<byte> plaintextHeader = GC.AllocateArray<byte>(ciphertextHeader.Length - Poly1305.TagSize - kcChaCha20Poly1305.CommitmentSize, pinned: true);
+            kcChaCha20Poly1305.Decrypt(plaintextHeader, ciphertextHeader, nonce, headerKey, associatedData);
             CryptographicOperations.ZeroMemory(headerKey);
             return plaintextHeader;
         }
@@ -92,10 +92,10 @@ public static class DecryptFile
 
     private static void DecryptChunks(Stream inputFile, Stream outputFile, long plaintextLength, Span<byte> nonce, Span<byte> fileKey)
     {
-        Span<byte> ciphertextChunk = new byte[Constants.CiphertextChunkLength];
+        Span<byte> ciphertextChunk = new byte[Constants.CiphertextChunkSize];
         Span<byte> plaintextChunk = new byte[Constants.FileChunkSize];
         while (inputFile.Read(ciphertextChunk) > 0) {
-            ChaCha20BLAKE2b.Decrypt(plaintextChunk, ciphertextChunk, nonce, fileKey);
+            kcChaCha20Poly1305.Decrypt(plaintextChunk, ciphertextChunk, nonce, fileKey);
             ConstantTime.Increment(nonce);
             outputFile.Write(plaintextChunk);
         }

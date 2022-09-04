@@ -19,8 +19,8 @@
 using System;
 using System.Security.Cryptography;
 using Geralt;
+using kcAEAD;
 using ChaCha20BLAKE2;
-using ChaCha20BLAKE2b = cAEAD.ChaCha20BLAKE2b;
 
 namespace Kryptor;
 
@@ -40,8 +40,8 @@ public static class PrivateKey
         Span<byte> associatedData = stackalloc byte[keyAlgorithm.Length + Constants.PrivateKeyVersion2.Length];
         Spans.Concat(associatedData, keyAlgorithm, Constants.PrivateKeyVersion2);
 
-        Span<byte> encryptedPrivateKey = stackalloc byte[privateKey.Length + BLAKE2b.TagSize];
-        ChaCha20BLAKE2b.Encrypt(encryptedPrivateKey, privateKey, nonce, key, associatedData);
+        Span<byte> encryptedPrivateKey = stackalloc byte[kcChaCha20Poly1305.CommitmentSize + privateKey.Length + Poly1305.TagSize];
+        kcChaCha20Poly1305.Encrypt(encryptedPrivateKey, privateKey, nonce, key, associatedData);
         CryptographicOperations.ZeroMemory(privateKey);
         CryptographicOperations.ZeroMemory(key);
 
@@ -63,8 +63,8 @@ public static class PrivateKey
             Argon2id.DeriveKey(key, password, salt, Constants.Iterations, Constants.MemorySize);
             CryptographicOperations.ZeroMemory(password);
 
-            Span<byte> decryptedPrivateKey = GC.AllocateArray<byte>(encryptedPrivateKey.Length - BLAKE2b.TagSize, pinned: true);
-            ChaCha20BLAKE2b.Decrypt(decryptedPrivateKey, encryptedPrivateKey, nonce, key, associatedData);
+            Span<byte> decryptedPrivateKey = GC.AllocateArray<byte>(encryptedPrivateKey.Length - Poly1305.TagSize - kcChaCha20Poly1305.CommitmentSize, pinned: true);
+            kcChaCha20Poly1305.Decrypt(decryptedPrivateKey, encryptedPrivateKey, nonce, key, associatedData);
             CryptographicOperations.ZeroMemory(key);
             return decryptedPrivateKey;
         }

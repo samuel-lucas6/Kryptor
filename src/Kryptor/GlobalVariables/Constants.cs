@@ -20,6 +20,7 @@ using System;
 using System.IO;
 using System.Text;
 using Geralt;
+using kcAEAD;
 
 namespace Kryptor;
 
@@ -47,11 +48,11 @@ public static class Constants
     public const int BoolBytesLength = 1;
     public const int LongBytesLength = 8;
     public const int FileNameHeaderLength = 255;
-    public const int EncryptedHeaderLength = ChaCha20.KeySize + LongBytesLength + FileNameHeaderLength + LongBytesLength * 4 + BoolBytesLength + BLAKE2b.TagSize;
+    public const int EncryptedHeaderLength = kcChaCha20Poly1305.CommitmentSize + ChaCha20.KeySize + LongBytesLength + FileNameHeaderLength + LongBytesLength * 4 + BoolBytesLength + Poly1305.TagSize;
     public static readonly int FileHeadersLength = EncryptionMagicBytes.Length + EncryptionVersion.Length + X25519.PublicKeySize + Argon2id.SaltSize + EncryptedHeaderLength;
     public static readonly int UnencryptedHeadersLength = FileHeadersLength - EncryptedHeaderLength;
     public const int FileChunkSize = 16384;
-    public const int CiphertextChunkLength = FileChunkSize + BLAKE2b.TagSize;
+    public const int CiphertextChunkSize = kcChaCha20Poly1305.CommitmentSize + FileChunkSize + Poly1305.TagSize;
 
     // Asymmetric keys
     public static readonly string DefaultKeyDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), EncryptedExtension);
@@ -64,9 +65,9 @@ public static class Constants
     public static readonly string DefaultSigningPublicKeyPath = Path.Combine(DefaultKeyDirectory, DefaultSigningKeyFileName + PublicKeyExtension);
     public static readonly string DefaultSigningPrivateKeyPath = Path.Combine(DefaultKeyDirectory, DefaultSigningKeyFileName + PrivateKeyExtension);
     public const int PublicKeyLength = 48;
-    public const int V2EncryptionPrivateKeyLength = 112;
+    public const int V2EncryptionPrivateKeyLength = 136;
     public const int V1EncryptionPrivateKeyLength = 144;
-    public const int V2SigningPrivateKeyLength = 156;
+    public const int V2SigningPrivateKeyLength = 176;
     public const int V1SigningPrivateKeyLength = 188;
     public const int KeyAlgorithmLength = 2;
     public static readonly byte[] Curve25519KeyHeader = Encoding.UTF8.GetBytes("Cu");
