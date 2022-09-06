@@ -23,6 +23,7 @@ using System.Buffers.Binary;
 using System.Security.Cryptography;
 using Geralt;
 using kcAEAD;
+using Padme;
 
 namespace Kryptor;
 
@@ -36,14 +37,23 @@ public static class EncryptFile
         {
             using (var inputFile = new FileStream(inputFilePath, FileHandling.GetFileStreamReadOptions(inputFilePath)))
             {
-                long chunkCount = ((inputFile.Length != 0 ? inputFile.Length : 1) + Constants.FileChunkSize - 1) / Constants.FileChunkSize;
-                using var outputFile = new FileStream(outputFilePath, FileHandling.GetFileStreamWriteOptions(chunkCount * Constants.CiphertextChunkSize + Constants.FileHeadersLength));
+                long paddedLength = inputFile.Length < 9 ? 10 : (long)PADME.GetPaddedLength((ulong)inputFile.Length);
+                long chunkCount = (paddedLength + Constants.FileChunkSize - 1) / Constants.FileChunkSize;
+                long lastChunkPadding = paddedLength % Constants.FileChunkSize;
+                if (lastChunkPadding == 0) {
+                    lastChunkPadding = Constants.FileChunkSize;
+                }
+                long payloadLength = chunkCount * Constants.CiphertextChunkSize - (Constants.FileChunkSize - lastChunkPadding);
+                
+                using var outputFile = new FileStream(outputFilePath, FileHandling.GetFileStreamWriteOptions(payloadLength + Constants.FileHeadersLength));
                 Span<byte> nonce = stackalloc byte[ChaCha20.NonceSize]; nonce.Clear();
-                Span<byte> encryptedHeader = EncryptFileHeader(chunkCount, unencryptedHeaders, fileKey, inputFile.Length, Path.GetFileName(inputFilePath), isDirectory, nonce, headerKey);
+                Span<byte> encryptedHeader = EncryptFileHeader(payloadLength, unencryptedHeaders, fileKey, inputFile.Length, Path.GetFileName(inputFilePath), isDirectory, nonce, headerKey);
                 outputFile.Write(unencryptedHeaders);
                 outputFile.Write(encryptedHeader);
+                
                 ConstantTime.Increment(nonce);
-                EncryptChunks(inputFile, outputFile, nonce, fileKey);
+                EncryptChunks(inputFile, outputFile, (int)chunkCount, (int)lastChunkPadding, nonce, fileKey);
+                CryptographicOperations.ZeroMemory(fileKey);
             }
             if (Globals.Overwrite) {
                 FileHandling.OverwriteFile(inputFilePath, outputFilePath);
@@ -51,7 +61,6 @@ public static class EncryptFile
             else if (isDirectory) {
                 FileHandling.DeleteFile(inputFilePath);
             }
-            FileHandling.SetReadOnly(outputFilePath);
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
         {
@@ -62,17 +71,17 @@ public static class EncryptFile
         }
     }
     
-    private static Span<byte> EncryptFileHeader(long chunkCount, Span<byte> unencryptedHeaders, Span<byte> fileKey, long fileLength, string fileName, bool isDirectory, Span<byte> nonce, Span<byte> headerKey)
+    private static Span<byte> EncryptFileHeader(long payloadLength, Span<byte> unencryptedHeaders, Span<byte> fileKey, long fileLength, string fileName, bool isDirectory, Span<byte> nonce, Span<byte> headerKey)
     {
-        Span<byte> ciphertextLength = stackalloc byte[Constants.LongBytesLength];
-        BinaryPrimitives.WriteInt64LittleEndian(ciphertextLength, chunkCount * Constants.CiphertextChunkSize);
+        Span<byte> ciphertextLength = stackalloc byte[Constants.Int64BytesLength];
+        BinaryPrimitives.WriteInt64LittleEndian(ciphertextLength, payloadLength);
         Span<byte> associatedData = stackalloc byte[ciphertextLength.Length + unencryptedHeaders.Length];
         Spans.Concat(associatedData, ciphertextLength, unencryptedHeaders);
 
-        Span<byte> plaintextLength = stackalloc byte[Constants.LongBytesLength];
+        Span<byte> plaintextLength = stackalloc byte[Constants.Int64BytesLength];
         BinaryPrimitives.WriteInt64LittleEndian(plaintextLength, fileLength);
         Span<byte> paddedFileName = GetPaddedFileName(fileName);
-        Span<byte> spare = stackalloc byte[Constants.LongBytesLength * 4]; spare.Clear();
+        Span<byte> spare = stackalloc byte[Constants.Int64BytesLength * 4]; spare.Clear();
         Span<byte> directory = BitConverter.GetBytes(isDirectory);
         Span<byte> plaintextHeader = stackalloc byte[Constants.EncryptedHeaderLength - Poly1305.TagSize - kcChaCha20Poly1305.CommitmentSize];
         Spans.Concat(plaintextHeader, fileKey, plaintextLength, paddedFileName, spare, directory);
@@ -101,26 +110,35 @@ public static class EncryptFile
         return paddedFileName;
     }
 
-    private static void EncryptChunks(Stream inputFile, Stream outputFile, Span<byte> nonce, Span<byte> fileKey)
+    private static void EncryptChunks(Stream inputFile, Stream outputFile, int chunkCount, int lastChunkPadding, Span<byte> nonce, Span<byte> fileKey)
     {
         Span<byte> plaintextChunk = GC.AllocateArray<byte>(Constants.FileChunkSize, pinned: true);
         Span<byte> ciphertextChunk = new byte[Constants.CiphertextChunkSize];
-        if (inputFile.Length == 0) {
+        
+        int bytesRead, chunksRead = 0;
+        while ((bytesRead = inputFile.Read(plaintextChunk)) == plaintextChunk.Length) {
             kcChaCha20Poly1305.Encrypt(ciphertextChunk, plaintextChunk, nonce, fileKey);
+            ConstantTime.Increment(nonce);
             outputFile.Write(ciphertextChunk);
-            return;
+            chunksRead++;
         }
-        int bytesRead;
-        while ((bytesRead = inputFile.Read(plaintextChunk)) > 0) {
-            if (bytesRead < plaintextChunk.Length) {
-                CryptographicOperations.ZeroMemory(plaintextChunk[bytesRead..]);
+        
+        CryptographicOperations.ZeroMemory(plaintextChunk[bytesRead..]);
+        for (int i = chunksRead; i < chunkCount; i++) {
+            if (i == chunkCount - 1) {
+                Span<byte> plaintext = plaintextChunk[..lastChunkPadding];
+                Span<byte> ciphertext = ciphertextChunk[..(kcChaCha20Poly1305.CommitmentSize + plaintext.Length + kcChaCha20Poly1305.TagSize)];
+                kcChaCha20Poly1305.Encrypt(ciphertext, plaintext, nonce, fileKey);
+                outputFile.Write(ciphertext);
+                CryptographicOperations.ZeroMemory(plaintextChunk[..bytesRead]);
+                return;
             }
             kcChaCha20Poly1305.Encrypt(ciphertextChunk, plaintextChunk, nonce, fileKey);
             ConstantTime.Increment(nonce);
             outputFile.Write(ciphertextChunk);
+            if (i == chunksRead) {
+                CryptographicOperations.ZeroMemory(plaintextChunk[..bytesRead]);
+            }
         }
-        CryptographicOperations.ZeroMemory(plaintextChunk[..bytesRead]);
-        CryptographicOperations.ZeroMemory(fileKey);
-        CryptographicOperations.ZeroMemory(nonce);
     }
 }

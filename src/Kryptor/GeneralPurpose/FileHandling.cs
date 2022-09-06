@@ -76,25 +76,6 @@ public static class FileHandling
             PreallocationSize = preAllocationSize
         };
     }
-    
-    public static bool? IsValidEncryptedFile(string filePath, out bool? validVersion)
-    {
-        try
-        {
-            using var fileStream = new FileStream(filePath, GetFileStreamReadOptions(filePath, onlyReadingHeaders: true));
-            Span<byte> magicBytes = stackalloc byte[Constants.EncryptionMagicBytes.Length];
-            fileStream.Read(magicBytes);
-            Span<byte> version = stackalloc byte[Constants.EncryptionVersion.Length];
-            fileStream.Read(version);
-            validVersion = version.SequenceEqual(Constants.EncryptionVersion);
-            return magicBytes.SequenceEqual(Constants.EncryptionMagicBytes);
-        }
-        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
-        {
-            validVersion = null;
-            return null;
-        }
-    }
 
     public static bool? IsValidSignatureFile(string filePath, out bool? validVersion)
     {
@@ -160,18 +141,6 @@ public static class FileHandling
             fileNumber++;
         } while (File.Exists(filePath));
         return filePath;
-    }
-    
-    public static void SetReadOnly(string filePath)
-    {
-        try
-        {
-            File.SetAttributes(filePath, FileAttributes.ReadOnly);
-        }
-        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
-        {
-            DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to mark the file as read-only.");
-        }
     }
 
     public static string RemoveFileNameNumber(string filePath)

@@ -35,9 +35,7 @@ public static class Constants
     public static readonly byte[] Personalisation = Encoding.UTF8.GetBytes("Kryptor.Personal");
     
     // File encryption
-    public static readonly byte[] EncryptionMagicBytes = Encoding.UTF8.GetBytes("KRYPTOR");
-    public static readonly byte[] EncryptionVersion = { 0x04, 0x00 };
-    public const string EncryptedExtension = ".kryptor";
+    public const string EncryptedExtension = ".bin";
     public const string KeyfileExtension = ".key";
     public const string ZipFileExtension = ".zip";
     public const int RandomFileNameLength = 16;
@@ -46,16 +44,16 @@ public static class Constants
     public static readonly byte[] Base64Padding = Encoding.UTF8.GetBytes("=");
     public const int KeyfileLength = 64;
     public const int BoolBytesLength = 1;
-    public const int LongBytesLength = 8;
+    public const int Int64BytesLength = 8;
     public const int FileNameHeaderLength = 255;
-    public const int EncryptedHeaderLength = kcChaCha20Poly1305.CommitmentSize + ChaCha20.KeySize + LongBytesLength + FileNameHeaderLength + LongBytesLength * 4 + BoolBytesLength + Poly1305.TagSize;
-    public static readonly int FileHeadersLength = EncryptionMagicBytes.Length + EncryptionVersion.Length + X25519.PublicKeySize + Argon2id.SaltSize + EncryptedHeaderLength;
+    public const int EncryptedHeaderLength = kcChaCha20Poly1305.CommitmentSize + ChaCha20.KeySize + Int64BytesLength + FileNameHeaderLength + Int64BytesLength * 4 + BoolBytesLength + Poly1305.TagSize;
+    public static readonly int FileHeadersLength = X25519.PublicKeySize + Argon2id.SaltSize + EncryptedHeaderLength;
     public static readonly int UnencryptedHeadersLength = FileHeadersLength - EncryptedHeaderLength;
     public const int FileChunkSize = 16384;
     public const int CiphertextChunkSize = kcChaCha20Poly1305.CommitmentSize + FileChunkSize + Poly1305.TagSize;
 
     // Asymmetric keys
-    public static readonly string DefaultKeyDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), EncryptedExtension);
+    public static readonly string DefaultKeyDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".kryptor");
     public const string DefaultEncryptionKeyFileName = "encryption";
     public const string DefaultSigningKeyFileName = "signing";
     public const string PublicKeyExtension = ".public";

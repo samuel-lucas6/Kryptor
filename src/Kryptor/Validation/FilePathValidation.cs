@@ -40,22 +40,13 @@ public static class FilePathValidation
     {
         if (Path.GetFileName(Path.TrimEndingDirectorySeparator(inputFilePath)).IndexOfAny(IllegalFileNameChars) != -1) { return "This file/directory name contains illegal characters for Windows, Linux, and/or macOS.";}
         if (Directory.Exists(inputFilePath)) { return FileHandling.IsDirectoryEmpty(inputFilePath) ? DirectoryEmpty : null; }
-        if (!File.Exists(inputFilePath)) { return FileOrDirectoryDoesNotExist; }
-        bool? validMagicBytes = FileHandling.IsValidEncryptedFile(inputFilePath, out bool? _);
-        if (validMagicBytes == null) { return FileInaccessible; }
-        if (inputFilePath.EndsWith(Constants.EncryptedExtension) || validMagicBytes == true) { return "This file has already been encrypted."; }
-        return null;
+        return !File.Exists(inputFilePath) ? FileOrDirectoryDoesNotExist : null;
     }
 
     public static string GetFileDecryptionError(string inputFilePath)
     {
         if (Directory.Exists(inputFilePath)) { return FileHandling.IsDirectoryEmpty(inputFilePath) ? DirectoryEmpty : null; }
-        if (!File.Exists(inputFilePath)) { return FileOrDirectoryDoesNotExist; }
-        bool? validMagicBytes = FileHandling.IsValidEncryptedFile(inputFilePath, out bool? validVersion);
-        if (validMagicBytes == null) { return FileInaccessible; }
-        if (!inputFilePath.EndsWith(Constants.EncryptedExtension) || validMagicBytes == false) { return "This file hasn't been encrypted."; }
-        if (validVersion == false) { return "This file format isn't supported in this version of Kryptor."; }
-        return validVersion == null ? FileInaccessible : null;
+        return !File.Exists(inputFilePath) ? FileOrDirectoryDoesNotExist : null;
     }
 
     public static void GenerateKeyPair(string directoryPath, int keyPairType, bool encryption, bool signing)
