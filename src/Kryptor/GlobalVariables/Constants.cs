@@ -31,7 +31,7 @@ public static class Constants
     
     // Key derivation
     public const int MemorySize = 268435456;
-    public const int Iterations = 12;
+    public const int Iterations = 3;
     public static readonly byte[] Personalisation = Encoding.UTF8.GetBytes("Kryptor.Personal");
     
     // File encryption
