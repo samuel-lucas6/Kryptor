@@ -204,6 +204,7 @@ public static class CommandLine
                 X25519.PrivateKeySize => AsymmetricKeys.GetCurve25519PublicKey(privateKey),
                 _ => AsymmetricKeys.GetEd25519PublicKey(privateKey)
             };
+            CryptographicOperations.ZeroMemory(privateKey);
             string publicKeyString = Encodings.ToBase64(publicKey);
             string publicKeyFilePath = AsymmetricKeys.ExportPublicKey(privateKeyPath, publicKeyString);
             DisplayMessage.PublicKey(publicKeyString, publicKeyFilePath);

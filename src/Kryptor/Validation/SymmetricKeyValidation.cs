@@ -36,7 +36,7 @@ public static class SymmetricKeyValidation
         if (ConstantTime.Equals(symmetricKeyBytes[..bytesEncoded], Encoding.UTF8.GetBytes(" "))) {
             return GenerateKeyString();
         }
-        if (ConstantTime.Equals(symmetricKeyBytes[(bytesEncoded - 1)..bytesEncoded], Constants.Base64Padding)) {
+        if (symmetricKey.EndsWith(Constants.Base64Padding)) {
             CryptographicOperations.ZeroMemory(symmetricKeyBytes);
             return KeyString(symmetricKey);
         }
@@ -58,7 +58,7 @@ public static class SymmetricKeyValidation
         if (string.IsNullOrEmpty(symmetricKey)) {
             return default;
         }
-        return ConstantTime.Equals(Encoding.UTF8.GetBytes(new[] { symmetricKey[^1] }), Constants.Base64Padding)  ? KeyString(symmetricKey) : ReadKeyfile(symmetricKey);
+        return symmetricKey.EndsWith(Constants.Base64Padding) ? KeyString(symmetricKey) : ReadKeyfile(symmetricKey);
     }
 
     private static Span<byte> GenerateKeyString()

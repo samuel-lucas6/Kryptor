@@ -40,8 +40,8 @@ public static class Constants
     public const string ZipFileExtension = ".zip";
     public const int RandomFileNameLength = 16;
     public const int SymmetricKeyLength = 48;
-    public static readonly byte[] SymmetricKeyHeader = Encoding.UTF8.GetBytes("Rn");
-    public static readonly byte[] Base64Padding = Encoding.UTF8.GetBytes("=");
+    public static readonly byte[] SymmetricKeyHeader = { 61, 34, 184 };
+    public const char Base64Padding = '=';
     public const int KeyfileLength = 64;
     public const int BoolBytesLength = 1;
     public const int Int64BytesLength = 8;
@@ -68,8 +68,10 @@ public static class Constants
     public const int V2SigningPrivateKeyLength = 176;
     public const int V1SigningPrivateKeyLength = 188;
     public const int KeyAlgorithmLength = 2;
-    public static readonly byte[] Curve25519KeyHeader = Encoding.UTF8.GetBytes("Cu");
-    public static readonly byte[] Ed25519KeyHeader = Encoding.UTF8.GetBytes("Ed");
+    public static readonly byte[] Curve25519KeyHeader = { 10, 234 };
+    public static readonly byte[] Ed25519KeyHeader = { 17, 222 };
+    public static readonly byte[] OldCurve25519KeyHeader = Encoding.UTF8.GetBytes("Cu");
+    public static readonly byte[] OldEd25519KeyHeader = Encoding.UTF8.GetBytes("Ed");
     public static readonly byte[] PrivateKeyVersion1 = { 0x01, 0x00 };
     public static readonly byte[] PrivateKeyVersion2 = { 0x02, 0x00 };
     

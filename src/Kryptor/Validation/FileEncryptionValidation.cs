@@ -46,7 +46,7 @@ public static class FileEncryptionValidation
         else if (File.Exists(symmetricKey) && new FileInfo(symmetricKey).Length < Constants.KeyfileLength) {
             yield return ErrorMessages.GetFilePathError(symmetricKey, "Please specify a keyfile that's at least 64 bytes in size.");
         }
-        else if (!string.IsNullOrEmpty(symmetricKey) && ConstantTime.Equals(Encoding.UTF8.GetBytes(new[] { symmetricKey[^1] }), Constants.Base64Padding) && symmetricKey.Length != Constants.SymmetricKeyLength) {
+        else if (!string.IsNullOrEmpty(symmetricKey) && symmetricKey.EndsWith(Constants.Base64Padding) && symmetricKey.Length != Constants.SymmetricKeyLength) {
             yield return ErrorMessages.GetKeyStringError(symmetricKey, ErrorMessages.InvalidSymmetricKey);
         }
     }
@@ -148,10 +148,10 @@ public static class FileEncryptionValidation
         if (!usePassword && string.IsNullOrEmpty(symmetricKey)) {
             yield return PasswordOrSymmetricKeyError;
         }
-        if (!string.IsNullOrEmpty(symmetricKey) && ConstantTime.Equals(Encoding.UTF8.GetBytes(new[] { symmetricKey[^1] }), Constants.Base64Padding)  && symmetricKey.Length != Constants.SymmetricKeyLength) {
+        if (!string.IsNullOrEmpty(symmetricKey) && symmetricKey.EndsWith(Constants.Base64Padding) && symmetricKey.Length != Constants.SymmetricKeyLength) {
             yield return ErrorMessages.GetKeyStringError(symmetricKey, ErrorMessages.InvalidSymmetricKey);
         }
-        else if (!string.IsNullOrEmpty(symmetricKey) && !ConstantTime.Equals(Encoding.UTF8.GetBytes(new[] { symmetricKey[^1] }), Constants.Base64Padding)  && !File.Exists(symmetricKey)) {
+        else if (!string.IsNullOrEmpty(symmetricKey) && !symmetricKey.EndsWith(Constants.Base64Padding) && !File.Exists(symmetricKey)) {
             yield return ErrorMessages.GetFilePathError(symmetricKey, "Please specify a valid symmetric key string or a keyfile that exists.");
         }
     }

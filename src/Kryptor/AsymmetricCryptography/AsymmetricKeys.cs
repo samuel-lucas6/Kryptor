@@ -94,7 +94,6 @@ public static class AsymmetricKeys
     {
         Span<byte> publicKey = stackalloc byte[X25519.PublicKeySize];
         X25519.ComputePublicKey(publicKey, privateKey);
-        CryptographicOperations.ZeroMemory(privateKey);
         
         Span<byte> fullPublicKey = new byte[Constants.Curve25519KeyHeader.Length + publicKey.Length];
         Spans.Concat(fullPublicKey, Constants.Curve25519KeyHeader, publicKey);
@@ -105,7 +104,6 @@ public static class AsymmetricKeys
     {
         Span<byte> publicKey = stackalloc byte[Ed25519.PublicKeySize];
         Ed25519.ComputePublicKey(publicKey, privateKey);
-        CryptographicOperations.ZeroMemory(privateKey);
         
         Span<byte> fullPublicKey = new byte[Constants.Ed25519KeyHeader.Length + publicKey.Length];
         Spans.Concat(fullPublicKey, Constants.Ed25519KeyHeader, publicKey);
