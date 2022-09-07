@@ -42,7 +42,7 @@ public static class Constants
     public const int SymmetricKeyLength = 48;
     public static readonly byte[] SymmetricKeyHeader = { 61, 34, 184 };
     public const char Base64Padding = '=';
-    public const int KeyfileLength = 64;
+    public const int KeyfileLength = ChaCha20.KeySize;
     public const int BoolBytesLength = 1;
     public const int Int64BytesLength = 8;
     public const int FileNameHeaderLength = 255;
