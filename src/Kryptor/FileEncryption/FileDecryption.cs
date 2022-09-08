@@ -39,7 +39,7 @@ public static class FileDecryption
             {
                 using var inputFile = new FileStream(inputFilePath, FileHandling.GetFileStreamReadOptions(inputFilePath));
                 inputFile.Read(unencryptedHeaders);
-                Span<byte> salt = unencryptedHeaders[^Argon2id.SaltSize..];
+                Span<byte> salt = unencryptedHeaders[..Argon2id.SaltSize];
                 
                 DisplayMessage.DerivingKeyFromPassword();
                 Argon2id.DeriveKey(headerKey, password, salt, Constants.Iterations, Constants.MemorySize);
@@ -73,7 +73,7 @@ public static class FileDecryption
             {
                 using var inputFile = new FileStream(inputFilePath, FileHandling.GetFileStreamReadOptions(inputFilePath));
                 inputFile.Read(unencryptedHeaders);
-                Span<byte> salt = unencryptedHeaders[^BLAKE2b.SaltSize..];
+                Span<byte> salt = unencryptedHeaders[..BLAKE2b.SaltSize];
                 
                 BLAKE2b.DeriveKey(headerKey, symmetricKey, Constants.Personalisation, salt);
                 DecryptInputFile(inputFile, unencryptedHeaders, headerKey);
@@ -112,8 +112,8 @@ public static class FileDecryption
             {
                 using var inputFile = new FileStream(inputFilePath, FileHandling.GetFileStreamReadOptions(inputFilePath));
                 inputFile.Read(unencryptedHeaders);
-                Span<byte> ephemeralPublicKey = unencryptedHeaders[..X25519.PublicKeySize];
-                Span<byte> salt = unencryptedHeaders[^BLAKE2b.SaltSize..];
+                Span<byte> salt = unencryptedHeaders[..BLAKE2b.SaltSize];
+                Span<byte> ephemeralPublicKey = unencryptedHeaders[^X25519.PublicKeySize..];
                 
                 crypto_hidden_to_curve(unhiddenEphemeralPublicKey, ephemeralPublicKey);
                 X25519.DeriveRecipientSharedSecret(ephemeralSharedSecret, recipientPrivateKey, unhiddenEphemeralPublicKey, preSharedKey);
@@ -155,8 +155,8 @@ public static class FileDecryption
             {
                 using var inputFile = new FileStream(inputFilePath, FileHandling.GetFileStreamReadOptions(inputFilePath));
                 inputFile.Read(unencryptedHeaders);
-                Span<byte> ephemeralPublicKey = unencryptedHeaders[..X25519.PublicKeySize];
-                Span<byte> salt = unencryptedHeaders[^BLAKE2b.SaltSize..];
+                Span<byte> salt = unencryptedHeaders[..BLAKE2b.SaltSize];
+                Span<byte> ephemeralPublicKey = unencryptedHeaders[^X25519.PublicKeySize..];
                 
                 crypto_hidden_to_curve(unhiddenEphemeralPublicKey, ephemeralPublicKey);
                 X25519.DeriveSenderSharedSecret(ephemeralSharedSecret, privateKey, unhiddenEphemeralPublicKey, preSharedKey);

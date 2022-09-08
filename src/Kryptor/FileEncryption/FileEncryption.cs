@@ -32,18 +32,18 @@ public static class FileEncryption
         if (filePaths == null || password == default) {
             throw new UserInputException();
         }
-        Span<byte> ephemeralPublicKey = stackalloc byte[X25519.PublicKeySize];
         Span<byte> salt = stackalloc byte[Argon2id.SaltSize];
+        Span<byte> ephemeralPublicKey = stackalloc byte[X25519.PublicKeySize];
         Span<byte> headerKey = stackalloc byte[ChaCha20.KeySize];
         foreach (string inputFilePath in filePaths) {
             try
             {
                 bool isDirectory = IsDirectory(inputFilePath, out string zipFilePath);
-                SecureRandom.Fill(ephemeralPublicKey);
                 SecureRandom.Fill(salt);
+                SecureRandom.Fill(ephemeralPublicKey);
                 DisplayMessage.DerivingKeyFromPassword();
                 Argon2id.DeriveKey(headerKey, password, salt, Constants.Iterations, Constants.MemorySize);
-                EncryptInputFile(isDirectory ? zipFilePath : inputFilePath, isDirectory, ephemeralPublicKey, salt, headerKey);
+                EncryptInputFile(isDirectory ? zipFilePath : inputFilePath, isDirectory, salt, ephemeralPublicKey, headerKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
@@ -60,17 +60,17 @@ public static class FileEncryption
         if (filePaths == null || symmetricKey == default) {
             throw new UserInputException();
         }
-        Span<byte> ephemeralPublicKey = stackalloc byte[X25519.PublicKeySize];
         Span<byte> salt = stackalloc byte[BLAKE2b.SaltSize];
+        Span<byte> ephemeralPublicKey = stackalloc byte[X25519.PublicKeySize];
         Span<byte> headerKey = stackalloc byte[ChaCha20.KeySize];
         foreach (string inputFilePath in filePaths) {
             try
             {
                 bool isDirectory = IsDirectory(inputFilePath, out string zipFilePath);
-                SecureRandom.Fill(ephemeralPublicKey);
                 SecureRandom.Fill(salt);
+                SecureRandom.Fill(ephemeralPublicKey);
                 BLAKE2b.DeriveKey(headerKey, symmetricKey, Constants.Personalisation, salt);
-                EncryptInputFile(isDirectory ? zipFilePath : inputFilePath, isDirectory, ephemeralPublicKey, salt, headerKey);
+                EncryptInputFile(isDirectory ? zipFilePath : inputFilePath, isDirectory, salt, ephemeralPublicKey, headerKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
@@ -128,7 +128,7 @@ public static class FileEncryption
                     BLAKE2b.DeriveKey(headerKey, inputKeyingMaterial, Constants.Personalisation, salt);
                     CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
                     CryptographicOperations.ZeroMemory(inputKeyingMaterial);
-                    EncryptInputFile(isDirectory ? zipFilePath : inputFilePath, isDirectory, ephemeralPublicKey, salt, headerKey);
+                    EncryptInputFile(isDirectory ? zipFilePath : inputFilePath, isDirectory, salt, ephemeralPublicKey, headerKey);
                 }
                 catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
                 {
@@ -169,7 +169,7 @@ public static class FileEncryption
                 X25519.DeriveSenderSharedSecret(ephemeralSharedSecret, privateKey, unhiddenEphemeralPublicKey, preSharedKey);
                 BLAKE2b.DeriveKey(headerKey, ephemeralSharedSecret, Constants.Personalisation, salt);
                 CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
-                EncryptInputFile(isDirectory ? zipFilePath : inputFilePath, isDirectory, ephemeralPublicKey, salt, headerKey);
+                EncryptInputFile(isDirectory ? zipFilePath : inputFilePath, isDirectory, salt, ephemeralPublicKey, headerKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
@@ -191,14 +191,14 @@ public static class FileEncryption
         return isDirectory;
     }
     
-    private static void EncryptInputFile(string inputFilePath, bool isDirectory, Span<byte> ephemeralPublicKey, Span<byte> salt, Span<byte> headerKey)
+    private static void EncryptInputFile(string inputFilePath, bool isDirectory, Span<byte> salt, Span<byte> ephemeralPublicKey, Span<byte> headerKey)
     {
         string outputFilePath = !Globals.EncryptFileNames ? inputFilePath + Constants.EncryptedExtension : FileHandling.ReplaceFileName(inputFilePath, SecureRandom.GetString(Constants.RandomFileNameLength));
         outputFilePath = FileHandling.GetUniqueFilePath(outputFilePath);
         DisplayMessage.InputToOutput("Encrypting", inputFilePath, outputFilePath);
         
         Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeadersLength];
-        Spans.Concat(unencryptedHeaders, ephemeralPublicKey, salt);
+        Spans.Concat(unencryptedHeaders, salt, ephemeralPublicKey);
 
         EncryptFile.Encrypt(inputFilePath, outputFilePath, isDirectory, unencryptedHeaders, headerKey);
         Globals.SuccessfulCount++;
