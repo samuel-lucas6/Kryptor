@@ -23,6 +23,7 @@ using System.Buffers.Binary;
 using System.Security.Cryptography;
 using Geralt;
 using kcAEAD;
+using ChaCha20Poly1305 = Geralt.ChaCha20Poly1305;
 
 namespace Kryptor;
 
@@ -30,10 +31,10 @@ public static class DecryptFile
 {
     public static void Decrypt(FileStream inputFile, string outputFilePath, Span<byte> unencryptedHeaders, Span<byte> headerKey)
     {
-        Span<byte> fileKey = stackalloc byte[ChaCha20.KeySize];
+        Span<byte> fileKey = stackalloc byte[ChaCha20Poly1305.KeySize];
         try
         {
-            Span<byte> nonce = stackalloc byte[ChaCha20.NonceSize]; nonce.Clear();
+            Span<byte> nonce = stackalloc byte[ChaCha20Poly1305.NonceSize]; nonce.Clear();
             Span<byte> header = DecryptHeader(inputFile, unencryptedHeaders, nonce, headerKey);
             header[..fileKey.Length].CopyTo(fileKey);
             long plaintextLength = BinaryPrimitives.ReadInt64LittleEndian(header.Slice(fileKey.Length, Constants.Int64BytesLength));
@@ -84,7 +85,7 @@ public static class DecryptFile
             Span<byte> associatedData = stackalloc byte[ciphertextLength.Length + unencryptedHeaders.Length];
             Spans.Concat(associatedData, ciphertextLength, unencryptedHeaders);
             
-            Span<byte> plaintextHeader = GC.AllocateArray<byte>(ciphertextHeader.Length - Poly1305.TagSize - kcChaCha20Poly1305.CommitmentSize, pinned: true);
+            Span<byte> plaintextHeader = GC.AllocateArray<byte>(ciphertextHeader.Length - ChaCha20Poly1305.TagSize - kcChaCha20Poly1305.CommitmentSize, pinned: true);
             kcChaCha20Poly1305.Decrypt(plaintextHeader, ciphertextHeader, nonce, headerKey, associatedData);
             CryptographicOperations.ZeroMemory(headerKey);
             return plaintextHeader;
@@ -103,12 +104,12 @@ public static class DecryptFile
         while ((bytesRead = inputFile.Read(ciphertextChunk)) > 0) {
             if (bytesRead < ciphertextChunk.Length) {
                 Span<byte> ciphertext = ciphertextChunk[..bytesRead];
-                Span<byte> plaintext = plaintextChunk[..(ciphertext.Length - kcChaCha20Poly1305.CommitmentSize - kcChaCha20Poly1305.TagSize)];
-                kcChaCha20Poly1305.Decrypt(plaintext, ciphertext, nonce, fileKey);
+                Span<byte> plaintext = plaintextChunk[..(ciphertext.Length - ChaCha20Poly1305.TagSize)];
+                ChaCha20Poly1305.Decrypt(plaintext, ciphertext, nonce, fileKey);
                 outputFile.Write(plaintext);
                 continue;
             }
-            kcChaCha20Poly1305.Decrypt(plaintextChunk, ciphertextChunk, nonce, fileKey);
+            ChaCha20Poly1305.Decrypt(plaintextChunk, ciphertextChunk, nonce, fileKey);
             ConstantTime.Increment(nonce);
             outputFile.Write(plaintextChunk);
         }

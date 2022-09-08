@@ -50,7 +50,7 @@ public static class Constants
     public static readonly int FileHeadersLength = X25519.PublicKeySize + Argon2id.SaltSize + EncryptedHeaderLength;
     public static readonly int UnencryptedHeadersLength = FileHeadersLength - EncryptedHeaderLength;
     public const int FileChunkSize = 16384;
-    public const int CiphertextChunkSize = kcChaCha20Poly1305.CommitmentSize + FileChunkSize + Poly1305.TagSize;
+    public const int CiphertextChunkSize = FileChunkSize + Poly1305.TagSize;
 
     // Asymmetric keys
     public static readonly string DefaultKeyDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".kryptor");
