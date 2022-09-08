@@ -52,9 +52,9 @@ public static class CommandLine
     private static void FileEncryptionWithPassword(Span<byte> password, string symmetricKey, string[] filePaths)
     {
         FileEncryptionValidation.FileEncryptionWithPassword(usePassword: true, symmetricKey, filePaths);
-        password = Password.GetNewPassword(password);
+        password = PasswordPrompt.GetNewPassword(password);
         Span<byte> pepper = SymmetricKeyValidation.GetEncryptionSymmetricKey(symmetricKey);
-        FileEncryption.EncryptEachFileWithPassword(filePaths, string.IsNullOrEmpty(symmetricKey) ? password : Password.Pepper(password, pepper));
+        FileEncryption.EncryptEachFileWithPassword(filePaths, password, pepper);
     }
     
     private static void FileEncryptionWithSymmetricKey(string symmetricKey, string[] filePaths)
@@ -120,7 +120,7 @@ public static class CommandLine
             password = PasswordPrompt.EnterYourPassword();
         }
         Span<byte> pepper = SymmetricKeyValidation.GetDecryptionSymmetricKey(symmetricKey);
-        FileDecryption.DecryptEachFileWithPassword(filePaths, string.IsNullOrEmpty(symmetricKey) ? password : Password.Pepper(password, pepper));
+        FileDecryption.DecryptEachFileWithPassword(filePaths, password, pepper);
     }
     
     private static void FileDecryptionWithSymmetricKey(string symmetricKey, string[] filePaths)

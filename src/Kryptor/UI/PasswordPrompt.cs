@@ -26,7 +26,17 @@ namespace Kryptor;
 
 public static class PasswordPrompt
 {
-    public static Span<byte> EnterNewPassword()
+    public static Span<byte> GetNewPassword(Span<byte> password)
+    {
+        return password.Length switch
+        {
+            0 => EnterNewPassword(),
+            1 when ConstantTime.Equals(password, Encoding.UTF8.GetBytes(" ")) => UseRandomPassphrase(),
+            _ => password
+        };
+    }
+    
+    private static Span<byte> EnterNewPassword()
     {
         Console.WriteLine("Enter a password (leave empty for a random passphrase):");
         Span<byte> password = GetPassword();
@@ -48,7 +58,7 @@ public static class PasswordPrompt
         CryptographicOperations.ZeroMemory(retypedPassword);
     }
     
-    public static Span<byte> UseRandomPassphrase()
+    private static Span<byte> UseRandomPassphrase()
     {
         char[] passphrase = SecureRandom.GetPassphrase(wordCount: 8);
         Console.Write("Randomly generated passphrase: ");

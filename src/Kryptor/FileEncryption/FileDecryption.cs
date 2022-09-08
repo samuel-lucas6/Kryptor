@@ -26,12 +26,18 @@ namespace Kryptor;
 
 public static class FileDecryption
 {
-    public static void DecryptEachFileWithPassword(string[] filePaths, Span<byte> password)
+    public static void DecryptEachFileWithPassword(string[] filePaths, Span<byte> password, Span<byte> pepper)
     {
         if (filePaths == null || password == default) {
             throw new UserInputException();
         }
         Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeadersLength];
+        Span<byte> inputKeyingMaterial = stackalloc byte[BLAKE2b.MaxKeySize], hashedPassword = inputKeyingMaterial[..ChaCha20.KeySize];
+        if (pepper != default) {
+            pepper.CopyTo(inputKeyingMaterial[^pepper.Length..]);
+            CryptographicOperations.ZeroMemory(pepper);
+        }
+        Span<byte> emptySalt = stackalloc byte[BLAKE2b.SaltSize]; emptySalt.Clear();
         Span<byte> headerKey = stackalloc byte[ChaCha20.KeySize];
         
         foreach (string inputFilePath in filePaths) {
@@ -40,10 +46,12 @@ public static class FileDecryption
                 using var inputFile = new FileStream(inputFilePath, FileHandling.GetFileStreamReadOptions(inputFilePath));
                 inputFile.Read(unencryptedHeaders);
                 Span<byte> salt = unencryptedHeaders[..Argon2id.SaltSize];
+                Span<byte> ephemeralPublicKey = unencryptedHeaders[^X25519.PublicKeySize..];
                 
                 DisplayMessage.DerivingKeyFromPassword();
-                Argon2id.DeriveKey(headerKey, password, salt, Constants.Iterations, Constants.MemorySize);
-                DecryptInputFile(inputFile, unencryptedHeaders, headerKey);
+                Argon2id.DeriveKey(hashedPassword, password, salt, Constants.Iterations, Constants.MemorySize);
+                BLAKE2b.DeriveKey(headerKey, pepper == default ? hashedPassword : inputKeyingMaterial, Constants.Personalisation, emptySalt, info: ephemeralPublicKey);
+                DecryptInputFile(inputFile, headerKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
@@ -57,6 +65,7 @@ public static class FileDecryption
             Console.WriteLine();
         }
         CryptographicOperations.ZeroMemory(password);
+        CryptographicOperations.ZeroMemory(inputKeyingMaterial);
         DisplayMessage.SuccessfullyDecrypted(insertSpace: false);
     }
     
@@ -74,9 +83,10 @@ public static class FileDecryption
                 using var inputFile = new FileStream(inputFilePath, FileHandling.GetFileStreamReadOptions(inputFilePath));
                 inputFile.Read(unencryptedHeaders);
                 Span<byte> salt = unencryptedHeaders[..BLAKE2b.SaltSize];
-                
-                BLAKE2b.DeriveKey(headerKey, symmetricKey, Constants.Personalisation, salt);
-                DecryptInputFile(inputFile, unencryptedHeaders, headerKey);
+                Span<byte> ephemeralPublicKey = unencryptedHeaders[^X25519.PublicKeySize..];
+
+                BLAKE2b.DeriveKey(headerKey, symmetricKey, Constants.Personalisation, salt, info: ephemeralPublicKey);
+                DecryptInputFile(inputFile, headerKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
@@ -121,7 +131,7 @@ public static class FileDecryption
                 BLAKE2b.DeriveKey(headerKey, inputKeyingMaterial, Constants.Personalisation, salt);
                 CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
                 CryptographicOperations.ZeroMemory(inputKeyingMaterial);
-                DecryptInputFile(inputFile, unencryptedHeaders, headerKey);
+                DecryptInputFile(inputFile, headerKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
@@ -162,7 +172,7 @@ public static class FileDecryption
                 X25519.DeriveSenderSharedSecret(ephemeralSharedSecret, privateKey, unhiddenEphemeralPublicKey, preSharedKey);
                 BLAKE2b.DeriveKey(headerKey, ephemeralSharedSecret, Constants.Personalisation, salt);
                 CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
-                DecryptInputFile(inputFile, unencryptedHeaders, headerKey);
+                DecryptInputFile(inputFile, headerKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
@@ -179,12 +189,12 @@ public static class FileDecryption
         DisplayMessage.SuccessfullyDecrypted();
     }
     
-    private static void DecryptInputFile(FileStream inputFile, Span<byte> unencryptedHeaders, Span<byte> headerKey)
+    private static void DecryptInputFile(FileStream inputFile, Span<byte> headerKey)
     {
         string outputFilePath = FileHandling.GetUniqueFilePath(FileHandling.RemoveFileNameNumber(Path.ChangeExtension(inputFile.Name, extension: null)));
         DisplayMessage.InputToOutput("Decrypting", inputFile.Name, outputFilePath);
         
-        DecryptFile.Decrypt(inputFile, outputFilePath, unencryptedHeaders, headerKey);
+        DecryptFile.Decrypt(inputFile, outputFilePath, headerKey);
         Globals.SuccessfulCount++;
     }
 }

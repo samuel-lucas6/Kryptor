@@ -18,7 +18,6 @@
 
 using System;
 using System.IO;
-using System.Security.Cryptography;
 using Geralt;
 
 namespace Kryptor;
@@ -27,7 +26,7 @@ public static class AsymmetricKeys
 {
     public static (string publicKey, string privateKey) GenerateEncryptionKeyPair(Span<byte> password)
     {
-        password = Password.GetNewPassword(password);
+        password = PasswordPrompt.GetNewPassword(password);
         
         Span<byte> publicKey = stackalloc byte[X25519.PublicKeySize];
         Span<byte> privateKey = stackalloc byte[X25519.PrivateKeySize];
@@ -41,7 +40,7 @@ public static class AsymmetricKeys
 
     public static (string publicKey, string privateKey) GenerateSigningKeyPair(Span<byte> password)
     {
-        password = Password.GetNewPassword(password);
+        password = PasswordPrompt.GetNewPassword(password);
         
         Span<byte> publicKey = stackalloc byte[Ed25519.PublicKeySize];
         Span<byte> privateKey = stackalloc byte[Ed25519.PrivateKeySize];

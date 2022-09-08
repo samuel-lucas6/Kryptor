@@ -29,13 +29,13 @@ namespace Kryptor;
 
 public static class DecryptFile
 {
-    public static void Decrypt(FileStream inputFile, string outputFilePath, Span<byte> unencryptedHeaders, Span<byte> headerKey)
+    public static void Decrypt(FileStream inputFile, string outputFilePath, Span<byte> headerKey)
     {
         Span<byte> fileKey = stackalloc byte[ChaCha20Poly1305.KeySize];
         try
         {
             Span<byte> nonce = stackalloc byte[ChaCha20Poly1305.NonceSize]; nonce.Clear();
-            Span<byte> header = DecryptHeader(inputFile, unencryptedHeaders, nonce, headerKey);
+            Span<byte> header = DecryptHeader(inputFile, nonce, headerKey);
             header[..fileKey.Length].CopyTo(fileKey);
             long plaintextLength = BinaryPrimitives.ReadInt64LittleEndian(header.Slice(fileKey.Length, Constants.Int64BytesLength));
             Span<byte> fileName = stackalloc byte[Constants.FileNameHeaderLength];
@@ -73,18 +73,16 @@ public static class DecryptFile
         }
     }
 
-    private static Span<byte> DecryptHeader(FileStream inputFile, Span<byte> unencryptedHeaders, Span<byte> nonce, Span<byte> headerKey)
+    private static Span<byte> DecryptHeader(FileStream inputFile, Span<byte> nonce, Span<byte> headerKey)
     {
         try
         {
             Span<byte> ciphertextHeader = stackalloc byte[Constants.EncryptedHeaderLength];
             inputFile.Read(ciphertextHeader);
             
-            Span<byte> ciphertextLength = stackalloc byte[Constants.Int64BytesLength];
-            BinaryPrimitives.WriteInt64LittleEndian(ciphertextLength, inputFile.Length - Constants.FileHeadersLength);
-            Span<byte> associatedData = stackalloc byte[ciphertextLength.Length + unencryptedHeaders.Length];
-            Spans.Concat(associatedData, ciphertextLength, unencryptedHeaders);
-            
+            Span<byte> associatedData = stackalloc byte[Constants.Int64BytesLength];
+            BinaryPrimitives.WriteInt64LittleEndian(associatedData, inputFile.Length - Constants.FileHeadersLength);
+
             Span<byte> plaintextHeader = GC.AllocateArray<byte>(ciphertextHeader.Length - ChaCha20Poly1305.TagSize - kcChaCha20Poly1305.CommitmentSize, pinned: true);
             kcChaCha20Poly1305.Decrypt(plaintextHeader, ciphertextHeader, nonce, headerKey, associatedData);
             CryptographicOperations.ZeroMemory(headerKey);

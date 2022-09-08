@@ -27,13 +27,19 @@ namespace Kryptor;
 
 public static class FileEncryption
 {
-    public static void EncryptEachFileWithPassword(string[] filePaths, Span<byte> password)
+    public static void EncryptEachFileWithPassword(string[] filePaths, Span<byte> password, Span<byte> pepper)
     {
         if (filePaths == null || password == default) {
             throw new UserInputException();
         }
         Span<byte> salt = stackalloc byte[Argon2id.SaltSize];
         Span<byte> ephemeralPublicKey = stackalloc byte[X25519.PublicKeySize];
+        Span<byte> inputKeyingMaterial = stackalloc byte[BLAKE2b.MaxKeySize], hashedPassword = inputKeyingMaterial[..ChaCha20.KeySize];
+        if (pepper != default) {
+            pepper.CopyTo(inputKeyingMaterial[^pepper.Length..]);
+            CryptographicOperations.ZeroMemory(pepper);
+        }
+        Span<byte> emptySalt = stackalloc byte[BLAKE2b.SaltSize]; emptySalt.Clear();
         Span<byte> headerKey = stackalloc byte[ChaCha20.KeySize];
         foreach (string inputFilePath in filePaths) {
             try
@@ -42,7 +48,8 @@ public static class FileEncryption
                 SecureRandom.Fill(salt);
                 SecureRandom.Fill(ephemeralPublicKey);
                 DisplayMessage.DerivingKeyFromPassword();
-                Argon2id.DeriveKey(headerKey, password, salt, Constants.Iterations, Constants.MemorySize);
+                Argon2id.DeriveKey(hashedPassword, password, salt, Constants.Iterations, Constants.MemorySize);
+                BLAKE2b.DeriveKey(headerKey, pepper == default ? hashedPassword : inputKeyingMaterial, Constants.Personalisation, emptySalt, info: ephemeralPublicKey);
                 EncryptInputFile(isDirectory ? zipFilePath : inputFilePath, isDirectory, salt, ephemeralPublicKey, headerKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -52,6 +59,7 @@ public static class FileEncryption
             Console.WriteLine();
         }
         CryptographicOperations.ZeroMemory(password);
+        CryptographicOperations.ZeroMemory(inputKeyingMaterial);
         DisplayMessage.SuccessfullyEncrypted(insertSpace: false);
     }
     
@@ -69,7 +77,7 @@ public static class FileEncryption
                 bool isDirectory = IsDirectory(inputFilePath, out string zipFilePath);
                 SecureRandom.Fill(salt);
                 SecureRandom.Fill(ephemeralPublicKey);
-                BLAKE2b.DeriveKey(headerKey, symmetricKey, Constants.Personalisation, salt);
+                BLAKE2b.DeriveKey(headerKey, symmetricKey, Constants.Personalisation, salt, info: ephemeralPublicKey);
                 EncryptInputFile(isDirectory ? zipFilePath : inputFilePath, isDirectory, salt, ephemeralPublicKey, headerKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))

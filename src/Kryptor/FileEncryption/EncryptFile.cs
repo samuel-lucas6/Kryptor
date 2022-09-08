@@ -48,7 +48,7 @@ public static class EncryptFile
                 
                 using var outputFile = new FileStream(outputFilePath, FileHandling.GetFileStreamWriteOptions(payloadLength + Constants.FileHeadersLength));
                 Span<byte> nonce = stackalloc byte[ChaCha20Poly1305.NonceSize]; nonce.Clear();
-                Span<byte> encryptedHeader = EncryptFileHeader(payloadLength, unencryptedHeaders, fileKey, inputFile.Length, Path.GetFileName(inputFilePath), isDirectory, nonce, headerKey);
+                Span<byte> encryptedHeader = EncryptFileHeader(payloadLength, fileKey, inputFile.Length, Path.GetFileName(inputFilePath), isDirectory, nonce, headerKey);
                 outputFile.Write(unencryptedHeaders);
                 outputFile.Write(encryptedHeader);
                 
@@ -72,12 +72,10 @@ public static class EncryptFile
         }
     }
     
-    private static Span<byte> EncryptFileHeader(long payloadLength, Span<byte> unencryptedHeaders, Span<byte> fileKey, long fileLength, string fileName, bool isDirectory, Span<byte> nonce, Span<byte> headerKey)
+    private static Span<byte> EncryptFileHeader(long payloadLength, Span<byte> fileKey, long fileLength, string fileName, bool isDirectory, Span<byte> nonce, Span<byte> headerKey)
     {
-        Span<byte> ciphertextLength = stackalloc byte[Constants.Int64BytesLength];
-        BinaryPrimitives.WriteInt64LittleEndian(ciphertextLength, payloadLength);
-        Span<byte> associatedData = stackalloc byte[ciphertextLength.Length + unencryptedHeaders.Length];
-        Spans.Concat(associatedData, ciphertextLength, unencryptedHeaders);
+        Span<byte> associatedData = stackalloc byte[Constants.Int64BytesLength];
+        BinaryPrimitives.WriteInt64LittleEndian(associatedData, payloadLength);
 
         Span<byte> plaintextLength = stackalloc byte[Constants.Int64BytesLength];
         BinaryPrimitives.WriteInt64LittleEndian(plaintextLength, fileLength);
