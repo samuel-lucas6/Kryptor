@@ -46,7 +46,7 @@ public static class DecryptFile
             
             using (var outputFile = new FileStream(outputFilePath, FileHandling.GetFileStreamWriteOptions(inputFile.Length - Constants.FileHeadersLength)))
             {
-                ConstantTime.Increment(nonce);
+                ConstantTime.Increment(nonce[..^1]);
                 DecryptChunks(inputFile, outputFile, plaintextLength, nonce, fileKey);
                 CryptographicOperations.ZeroMemory(fileKey);
             }
@@ -79,12 +79,9 @@ public static class DecryptFile
         {
             Span<byte> ciphertextHeader = stackalloc byte[Constants.EncryptedHeaderLength];
             inputFile.Read(ciphertextHeader);
-            
-            Span<byte> associatedData = stackalloc byte[Constants.Int64BytesLength];
-            BinaryPrimitives.WriteInt64LittleEndian(associatedData, inputFile.Length - Constants.FileHeadersLength);
 
             Span<byte> plaintextHeader = GC.AllocateArray<byte>(ciphertextHeader.Length - ChaCha20Poly1305.TagSize - kcChaCha20Poly1305.CommitmentSize, pinned: true);
-            kcChaCha20Poly1305.Decrypt(plaintextHeader, ciphertextHeader, nonce, headerKey, associatedData);
+            kcChaCha20Poly1305.Decrypt(plaintextHeader, ciphertextHeader, nonce, headerKey);
             CryptographicOperations.ZeroMemory(headerKey);
             return plaintextHeader;
         }
@@ -98,17 +95,21 @@ public static class DecryptFile
     {
         Span<byte> ciphertextChunk = new byte[Constants.CiphertextChunkSize];
         Span<byte> plaintextChunk = new byte[Constants.FileChunkSize];
+        Span<byte> counter = nonce[..^1];
         int bytesRead;
         while ((bytesRead = inputFile.Read(ciphertextChunk)) > 0) {
+            if (inputFile.Position == inputFile.Length) {
+                nonce[^1] = 1;
+            }
             if (bytesRead < ciphertextChunk.Length) {
                 Span<byte> ciphertext = ciphertextChunk[..bytesRead];
                 Span<byte> plaintext = plaintextChunk[..(ciphertext.Length - ChaCha20Poly1305.TagSize)];
                 ChaCha20Poly1305.Decrypt(plaintext, ciphertext, nonce, fileKey);
                 outputFile.Write(plaintext);
-                continue;
+                break;
             }
             ChaCha20Poly1305.Decrypt(plaintextChunk, ciphertextChunk, nonce, fileKey);
-            ConstantTime.Increment(nonce);
+            ConstantTime.Increment(counter);
             outputFile.Write(plaintextChunk);
         }
         outputFile.SetLength(plaintextLength);
