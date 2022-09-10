@@ -31,7 +31,7 @@ public static class FileDecryption
         if (filePaths == null || password == default) {
             throw new UserInputException();
         }
-        Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeadersLength];
+        Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeaderLength], wrappedFileKeys = new byte[Constants.KeyWrapHeaderLength];
         Span<byte> inputKeyingMaterial = stackalloc byte[BLAKE2b.MaxKeySize], hashedPassword = inputKeyingMaterial[..ChaCha20.KeySize];
         if (pepper != default) {
             pepper.CopyTo(inputKeyingMaterial[^pepper.Length..]);
@@ -45,13 +45,15 @@ public static class FileDecryption
             {
                 using var inputFile = new FileStream(inputFilePath, FileHandling.GetFileStreamReadOptions(inputFilePath));
                 inputFile.Read(unencryptedHeaders);
+                inputFile.Read(wrappedFileKeys);
+                
                 Span<byte> salt = unencryptedHeaders[..Argon2id.SaltSize];
                 Span<byte> ephemeralPublicKey = unencryptedHeaders[^X25519.PublicKeySize..];
                 
                 DisplayMessage.DerivingKeyFromPassword();
                 Argon2id.DeriveKey(hashedPassword, password, salt, Constants.Iterations, Constants.MemorySize);
                 BLAKE2b.DeriveKey(headerKey, pepper == default ? hashedPassword : inputKeyingMaterial, Constants.Personalisation, emptySalt, info: ephemeralPublicKey);
-                DecryptInputFile(inputFile, headerKey);
+                DecryptInputFile(inputFile, wrappedFileKeys, headerKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
@@ -74,19 +76,21 @@ public static class FileDecryption
         if (filePaths == null || symmetricKey == default) {
             throw new UserInputException();
         }
-        Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeadersLength];
+        Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeaderLength], wrappedFileKeys = new byte[Constants.KeyWrapHeaderLength];
         Span<byte> headerKey = stackalloc byte[ChaCha20.KeySize];
-        
+
         foreach (string inputFilePath in filePaths) {
             try
             {
                 using var inputFile = new FileStream(inputFilePath, FileHandling.GetFileStreamReadOptions(inputFilePath));
                 inputFile.Read(unencryptedHeaders);
+                inputFile.Read(wrappedFileKeys);
+
                 Span<byte> salt = unencryptedHeaders[..BLAKE2b.SaltSize];
                 Span<byte> ephemeralPublicKey = unencryptedHeaders[^X25519.PublicKeySize..];
 
                 BLAKE2b.DeriveKey(headerKey, symmetricKey, Constants.Personalisation, salt, info: ephemeralPublicKey);
-                DecryptInputFile(inputFile, headerKey);
+                DecryptInputFile(inputFile, wrappedFileKeys, headerKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
@@ -111,17 +115,19 @@ public static class FileDecryption
         Span<byte> sharedSecret = stackalloc byte[X25519.SharedSecretSize], ephemeralSharedSecret = stackalloc byte[X25519.SharedSecretSize];
         X25519.DeriveRecipientSharedSecret(sharedSecret, recipientPrivateKey, senderPublicKey, preSharedKey);
         
-        Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeadersLength];
+        Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeaderLength], wrappedFileKeys = new byte[Constants.KeyWrapHeaderLength];
         Span<byte> unhiddenEphemeralPublicKey = stackalloc byte[X25519.PublicKeySize];
         Span<byte> inputKeyingMaterial = stackalloc byte[ephemeralSharedSecret.Length + sharedSecret.Length];
         Span<byte> headerKey = stackalloc byte[ChaCha20.KeySize];
-        
+
         foreach (string inputFilePath in filePaths) {
             Console.WriteLine();
             try
             {
                 using var inputFile = new FileStream(inputFilePath, FileHandling.GetFileStreamReadOptions(inputFilePath));
                 inputFile.Read(unencryptedHeaders);
+                inputFile.Read(wrappedFileKeys);
+
                 Span<byte> salt = unencryptedHeaders[..BLAKE2b.SaltSize];
                 Span<byte> ephemeralPublicKey = unencryptedHeaders[^X25519.PublicKeySize..];
                 
@@ -131,7 +137,8 @@ public static class FileDecryption
                 BLAKE2b.DeriveKey(headerKey, inputKeyingMaterial, Constants.Personalisation, salt);
                 CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
                 CryptographicOperations.ZeroMemory(inputKeyingMaterial);
-                DecryptInputFile(inputFile, headerKey);
+                
+                DecryptInputFile(inputFile, wrappedFileKeys, headerKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
@@ -154,17 +161,19 @@ public static class FileDecryption
         if (filePaths == null || privateKey == default) {
             throw new UserInputException();
         }
-        Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeadersLength];
+        Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeaderLength], wrappedFileKeys = new byte[Constants.KeyWrapHeaderLength];
         Span<byte> unhiddenEphemeralPublicKey = stackalloc byte[X25519.PublicKeySize];
         Span<byte> ephemeralSharedSecret = stackalloc byte[X25519.SharedSecretSize];
         Span<byte> headerKey = stackalloc byte[ChaCha20.KeySize];
-        
+
         foreach (string inputFilePath in filePaths) {
             Console.WriteLine();
             try
             {
                 using var inputFile = new FileStream(inputFilePath, FileHandling.GetFileStreamReadOptions(inputFilePath));
                 inputFile.Read(unencryptedHeaders);
+                inputFile.Read(wrappedFileKeys);
+                
                 Span<byte> salt = unencryptedHeaders[..BLAKE2b.SaltSize];
                 Span<byte> ephemeralPublicKey = unencryptedHeaders[^X25519.PublicKeySize..];
                 
@@ -172,7 +181,8 @@ public static class FileDecryption
                 X25519.DeriveSenderSharedSecret(ephemeralSharedSecret, privateKey, unhiddenEphemeralPublicKey, preSharedKey);
                 BLAKE2b.DeriveKey(headerKey, ephemeralSharedSecret, Constants.Personalisation, salt);
                 CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
-                DecryptInputFile(inputFile, headerKey);
+                
+                DecryptInputFile(inputFile, wrappedFileKeys, headerKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
@@ -189,12 +199,34 @@ public static class FileDecryption
         DisplayMessage.SuccessfullyDecrypted();
     }
     
-    private static void DecryptInputFile(FileStream inputFile, Span<byte> headerKey)
+    private static void DecryptInputFile(FileStream inputFile, Span<byte> wrappedFileKeys, Span<byte> headerKey)
     {
         string outputFilePath = FileHandling.GetUniqueFilePath(FileHandling.RemoveFileNameNumber(Path.ChangeExtension(inputFile.Name, extension: null)));
         DisplayMessage.InputToOutput("Decrypting", inputFile.Name, outputFilePath);
         
-        DecryptFile.Decrypt(inputFile, outputFilePath, headerKey);
-        Globals.SuccessfulCount++;
+        Span<byte> fileKeys = GC.AllocateArray<byte>(Constants.KeyWrapHeaderLength, pinned: true);
+        Span<byte> nonce = stackalloc byte[ChaCha20.NonceSize]; nonce.Clear();
+
+        for (int i = 0; i < wrappedFileKeys.Length; i += ChaCha20.KeySize) {
+            ChaCha20.Decrypt(fileKeys.Slice(i, ChaCha20.KeySize), wrappedFileKeys.Slice(i, ChaCha20.KeySize), nonce, headerKey, Constants.ChaCha20Counter);
+        }
+        CryptographicOperations.ZeroMemory(headerKey);
+        
+        for (int i = 0; i < wrappedFileKeys.Length; i += ChaCha20.KeySize) {
+            try
+            {
+                DecryptFile.Decrypt(inputFile, outputFilePath, wrappedFileKeys, fileKeys.Slice(i, ChaCha20.KeySize));
+                Globals.SuccessfulCount++;
+                break;
+            }
+            catch (ArgumentException)
+            {
+                inputFile.Position -= Constants.EncryptedHeaderLength;
+                if (i == wrappedFileKeys.Length - ChaCha20.KeySize) {
+                    throw;
+                }
+            }
+        }
+        CryptographicOperations.ZeroMemory(fileKeys);
     }
 }

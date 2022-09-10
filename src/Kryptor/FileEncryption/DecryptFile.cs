@@ -29,17 +29,15 @@ namespace Kryptor;
 
 public static class DecryptFile
 {
-    public static void Decrypt(FileStream inputFile, string outputFilePath, Span<byte> headerKey)
+    public static void Decrypt(FileStream inputFile, string outputFilePath, Span<byte> wrappedFileKeys, Span<byte> fileKey)
     {
-        Span<byte> fileKey = stackalloc byte[ChaCha20Poly1305.KeySize];
         try
         {
             Span<byte> nonce = stackalloc byte[ChaCha20Poly1305.NonceSize]; nonce.Clear();
-            Span<byte> header = DecryptHeader(inputFile, nonce, headerKey);
-            header[..fileKey.Length].CopyTo(fileKey);
-            long plaintextLength = BinaryPrimitives.ReadInt64LittleEndian(header.Slice(fileKey.Length, Constants.Int64BytesLength));
+            Span<byte> header = DecryptHeader(inputFile, nonce, fileKey, wrappedFileKeys);
+            long plaintextLength = BinaryPrimitives.ReadInt64LittleEndian(header[..Constants.Int64BytesLength]);
             Span<byte> fileName = stackalloc byte[Constants.FileNameHeaderLength];
-            header.Slice(fileKey.Length + Constants.Int64BytesLength, Constants.FileNameHeaderLength).CopyTo(fileName);
+            header[Constants.Int64BytesLength..Constants.FileNameHeaderLength].CopyTo(fileName);
             int fileNameLength = Padding.GetUnpaddedLength(fileName, fileName.Length);
             bool isDirectory = BitConverter.ToBoolean(header[^Constants.BoolBytesLength..]);
             CryptographicOperations.ZeroMemory(header);
@@ -64,7 +62,6 @@ public static class DecryptFile
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
         {
-            CryptographicOperations.ZeroMemory(headerKey);
             CryptographicOperations.ZeroMemory(fileKey);
             if (ex is not ArgumentException) {
                 FileHandling.DeleteFile(outputFilePath);
@@ -73,7 +70,7 @@ public static class DecryptFile
         }
     }
 
-    private static Span<byte> DecryptHeader(FileStream inputFile, Span<byte> nonce, Span<byte> headerKey)
+    private static Span<byte> DecryptHeader(FileStream inputFile, Span<byte> nonce, Span<byte> fileKey, Span<byte> associatedData)
     {
         try
         {
@@ -81,8 +78,7 @@ public static class DecryptFile
             inputFile.Read(ciphertextHeader);
 
             Span<byte> plaintextHeader = GC.AllocateArray<byte>(ciphertextHeader.Length - ChaCha20Poly1305.TagSize - kcChaCha20Poly1305.CommitmentSize, pinned: true);
-            kcChaCha20Poly1305.Decrypt(plaintextHeader, ciphertextHeader, nonce, headerKey);
-            CryptographicOperations.ZeroMemory(headerKey);
+            kcChaCha20Poly1305.Decrypt(plaintextHeader, ciphertextHeader, nonce, fileKey, associatedData);
             return plaintextHeader;
         }
         catch (CryptographicException ex)

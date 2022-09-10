@@ -30,10 +30,8 @@ namespace Kryptor;
 
 public static class EncryptFile
 {
-    public static void Encrypt(string inputFilePath, string outputFilePath, bool isDirectory, Span<byte> unencryptedHeaders, Span<byte> headerKey)
+    public static void Encrypt(string inputFilePath, string outputFilePath, bool isDirectory, Span<byte> unencryptedHeader, Span<byte> wrappedFileKeys, Span<byte> fileKey)
     {
-        Span<byte> fileKey = stackalloc byte[ChaCha20Poly1305.KeySize];
-        SecureRandom.Fill(fileKey);
         try
         {
             using (var inputFile = new FileStream(inputFilePath, FileHandling.GetFileStreamReadOptions(inputFilePath)))
@@ -48,8 +46,9 @@ public static class EncryptFile
                 
                 using var outputFile = new FileStream(outputFilePath, FileHandling.GetFileStreamWriteOptions(payloadLength + Constants.FileHeadersLength));
                 Span<byte> nonce = stackalloc byte[ChaCha20Poly1305.NonceSize]; nonce.Clear();
-                Span<byte> encryptedHeader = EncryptFileHeader(fileKey, inputFile.Length, Path.GetFileName(inputFilePath), isDirectory, nonce, headerKey);
-                outputFile.Write(unencryptedHeaders);
+                Span<byte> encryptedHeader = EncryptFileHeader(inputFile.Length, Path.GetFileName(inputFilePath), isDirectory, nonce, fileKey, wrappedFileKeys);
+                outputFile.Write(unencryptedHeader);
+                outputFile.Write(wrappedFileKeys);
                 outputFile.Write(encryptedHeader);
                 
                 ConstantTime.Increment(nonce[..^1]);
@@ -65,14 +64,13 @@ public static class EncryptFile
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
         {
-            CryptographicOperations.ZeroMemory(headerKey);
             CryptographicOperations.ZeroMemory(fileKey);
             FileHandling.DeleteFile(outputFilePath);
             throw;
         }
     }
     
-    private static Span<byte> EncryptFileHeader(Span<byte> fileKey, long fileLength, string fileName, bool isDirectory, Span<byte> nonce, Span<byte> headerKey)
+    private static Span<byte> EncryptFileHeader(long fileLength, string fileName, bool isDirectory, Span<byte> nonce, Span<byte> fileKey, Span<byte> associatedData)
     {
         Span<byte> plaintextLength = stackalloc byte[Constants.Int64BytesLength];
         BinaryPrimitives.WriteInt64LittleEndian(plaintextLength, fileLength);
@@ -80,12 +78,11 @@ public static class EncryptFile
         Span<byte> spare = stackalloc byte[Constants.Int64BytesLength * 4]; spare.Clear();
         Span<byte> directory = BitConverter.GetBytes(isDirectory);
         Span<byte> plaintextHeader = stackalloc byte[Constants.EncryptedHeaderLength - ChaCha20Poly1305.TagSize - kcChaCha20Poly1305.CommitmentSize];
-        Spans.Concat(plaintextHeader, fileKey, plaintextLength, paddedFileName, spare, directory);
+        Spans.Concat(plaintextHeader, plaintextLength, paddedFileName, spare, directory);
         
         Span<byte> ciphertextHeader = new byte[Constants.EncryptedHeaderLength];
-        kcChaCha20Poly1305.Encrypt(ciphertextHeader, plaintextHeader, nonce, headerKey);
+        kcChaCha20Poly1305.Encrypt(ciphertextHeader, plaintextHeader, nonce, fileKey, associatedData);
         CryptographicOperations.ZeroMemory(plaintextHeader);
-        CryptographicOperations.ZeroMemory(headerKey);
         return ciphertextHeader;
     }
 

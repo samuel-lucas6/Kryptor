@@ -18,6 +18,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using Geralt;
@@ -34,13 +35,20 @@ public static class AsymmetricKeyValidation
             foreach (string publicKeyPath in publicKeyPaths) {
                 byte[] publicKey = GetPublicKeyFromFile(publicKeyPath);
                 ValidateEncryptionKeyAlgorithm(publicKey);
-                publicKeys.Add(publicKey[Constants.Curve25519KeyHeader.Length..]);
+                publicKey = publicKey[Constants.Curve25519KeyHeader.Length..];
+                CheckIfDuplicate(publicKeys, publicKey);
+                publicKeys.Add(publicKey);
             }
             return publicKeys;
         }
         catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
-            DisplayMessage.Exception(ex.GetType().Name, publicKeyPaths == null || publicKeyPaths.Length == 1 ? "Please specify a valid encryption public key." : "Please specify valid encryption public keys.");
+            if (ex is ArgumentException) {
+                DisplayMessage.Error(ex.Message);
+            }
+            else {
+                DisplayMessage.Exception(ex.GetType().Name, publicKeyPaths == null || publicKeyPaths.Length == 1 ? "Please specify a valid encryption public key." : "Please specify valid encryption public keys.");
+            }
             throw new UserInputException(ex.Message, ex);
         }
     }
@@ -85,13 +93,20 @@ public static class AsymmetricKeyValidation
             foreach (string encodedPublicKey in encodedPublicKeys) {
                 byte[] publicKey = Encodings.FromBase64(encodedPublicKey);
                 ValidateEncryptionKeyAlgorithm(publicKey);
-                publicKeys.Add(publicKey[Constants.Curve25519KeyHeader.Length..]);
+                publicKey = publicKey[Constants.Curve25519KeyHeader.Length..];
+                CheckIfDuplicate(publicKeys, publicKey);
+                publicKeys.Add(publicKey);
             }
             return publicKeys;
         }
         catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
-            DisplayMessage.Exception(ex.GetType().Name, encodedPublicKeys == null || encodedPublicKeys.Length == 1 ? "Please enter a valid encryption public key." : "Please enter valid encryption public keys.");
+            if (ex is ArgumentException) {
+                DisplayMessage.Error(ex.Message);
+            }
+            else {
+                DisplayMessage.Exception(ex.GetType().Name, encodedPublicKeys == null || encodedPublicKeys.Length == 1 ? "Please enter a valid encryption public key." : "Please enter valid encryption public keys.");
+            }
             throw new UserInputException(ex.Message, ex);
         }
     }
@@ -116,6 +131,13 @@ public static class AsymmetricKeyValidation
         Span<byte> keyAlgorithm = asymmetricKey[..Constants.Curve25519KeyHeader.Length];
         if (!ConstantTime.Equals(keyAlgorithm, Constants.Curve25519KeyHeader) && !ConstantTime.Equals(keyAlgorithm, Constants.OldCurve25519KeyHeader)) {
             throw new NotSupportedException("This key algorithm isn't supported for encryption.");
+        }
+    }
+
+    private static void CheckIfDuplicate(List<byte[]> publicKeys, byte[] publicKey)
+    {
+        if (publicKeys.Any(key => key.SequenceEqual(publicKey))) {
+            throw new ArgumentException("The same public key has been specified more than once.");
         }
     }
 

@@ -46,9 +46,12 @@ public static class Constants
     public const int BoolBytesLength = 1;
     public const int Int64BytesLength = 8;
     public const int FileNameHeaderLength = 255;
-    public const int EncryptedHeaderLength = kcChaCha20Poly1305.CommitmentSize + ChaCha20.KeySize + Int64BytesLength + FileNameHeaderLength + Int64BytesLength * 4 + BoolBytesLength + Poly1305.TagSize;
-    public static readonly int FileHeadersLength = X25519.PublicKeySize + Argon2id.SaltSize + EncryptedHeaderLength;
-    public static readonly int UnencryptedHeadersLength = FileHeadersLength - EncryptedHeaderLength;
+    public const int MaxRecipients = 20;
+    public const uint ChaCha20Counter = 1;
+    public static readonly int UnencryptedHeaderLength = X25519.PublicKeySize + Argon2id.SaltSize;
+    public const int KeyWrapHeaderLength = ChaCha20.KeySize * MaxRecipients;
+    public const int EncryptedHeaderLength = kcChaCha20Poly1305.CommitmentSize + Int64BytesLength + FileNameHeaderLength + Int64BytesLength * 4 + BoolBytesLength + Poly1305.TagSize;
+    public static readonly int FileHeadersLength = UnencryptedHeaderLength + KeyWrapHeaderLength + EncryptedHeaderLength;
     public const int FileChunkSize = 16384;
     public const int CiphertextChunkSize = FileChunkSize + Poly1305.TagSize;
 

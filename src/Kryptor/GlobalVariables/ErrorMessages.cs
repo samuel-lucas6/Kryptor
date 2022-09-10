@@ -33,7 +33,7 @@ public static class ErrorMessages
     public const string EncryptionMethod = "Please specify a password and/or symmetric key, private key, or private key and public key.";
     public const string InvalidSymmetricKey = "Please specify a valid symmetric key string.";
     public const string UnableToEncryptFile = "Unable to encrypt the file/directory.";
-    public const string UnableToDecryptFile = "Unable to decrypt the file/directory.";
+    public const string UnableToDecryptFile = "Unable to decrypt the file.";
 
     public static string GetFilePathError(string filePath, string errorMessage) => $"\"{Path.GetFileName(FileHandling.TrimTrailingSeparatorChars(filePath))}\" - {errorMessage}";
     

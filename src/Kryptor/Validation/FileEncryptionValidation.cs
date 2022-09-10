@@ -26,6 +26,7 @@ public static class FileEncryptionValidation
 {
     private const string FileOrDirectoryError = "Please specify a file/directory.";
     private const string PasswordOrSymmetricKeyError = "Please specify whether to use a password and/or symmetric key.";
+    private static readonly string TooManyRecipients = $"Please specify no more than {Constants.MaxRecipients} public keys.";
 
     public static void FileEncryptionWithPassword(bool usePassword, string symmetricKey, string[] filePaths)
     {
@@ -78,6 +79,9 @@ public static class FileEncryptionValidation
         if (publicKeyPaths == null) {
             yield return ErrorMessages.NoPublicKey;
         }
+        else if (publicKeyPaths.Length > Constants.MaxRecipients) {
+            yield return TooManyRecipients;
+        }
         else {
             foreach (string publicKeyPath in publicKeyPaths) {
                 if (!publicKeyPath.EndsWith(Constants.PublicKeyExtension)) {
@@ -103,6 +107,9 @@ public static class FileEncryptionValidation
         }
         if (encodedPublicKeys == null) {
             yield return ErrorMessages.NoPublicKey;
+        }
+        else if (encodedPublicKeys.Length > Constants.MaxRecipients) {
+            yield return TooManyRecipients;
         }
         else {
             foreach (string encodedPublicKey in encodedPublicKeys) {
