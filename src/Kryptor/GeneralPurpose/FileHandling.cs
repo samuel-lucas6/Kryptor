@@ -76,26 +76,7 @@ public static class FileHandling
             PreallocationSize = preAllocationSize
         };
     }
-
-    public static bool? IsValidSignatureFile(string filePath, out bool? validVersion)
-    {
-        try
-        {
-            using var fileStream = new FileStream(filePath, GetFileStreamReadOptions(filePath, onlyReadingHeaders: true));
-            Span<byte> magicBytes = stackalloc byte[Constants.SignatureMagicBytes.Length];
-            fileStream.Read(magicBytes);
-            Span<byte> version = stackalloc byte[Constants.SignatureVersion.Length];
-            fileStream.Read(version);
-            validVersion = version.SequenceEqual(Constants.SignatureVersion);
-            return magicBytes.SequenceEqual(Constants.SignatureMagicBytes);
-        }
-        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
-        {
-            validVersion = null;
-            return null;
-        }
-    }
-
+    
     public static void OverwriteFile(string fileToDelete, string fileToCopy)
     {
         try

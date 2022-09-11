@@ -161,9 +161,10 @@ public static class AsymmetricKeyValidation
         {
             if (ex is CryptographicException) {
                 DisplayMessage.Error(ex.Message);
-                throw new UserInputException(ex.Message, ex);
             }
-            DisplayMessage.FilePathException(privateKeyPath, ex.GetType().Name, ex.Message);
+            else {
+                DisplayMessage.FilePathException(privateKeyPath, ex.GetType().Name, ex.Message);
+            }
             throw new UserInputException(ex.Message, ex);
         }
     }
@@ -180,9 +181,10 @@ public static class AsymmetricKeyValidation
         {
             if (ex is CryptographicException) {
                 DisplayMessage.Error(ex.Message);
-                throw new UserInputException(ex.Message, ex);
             }
-            DisplayMessage.FilePathException(privateKeyPath, ex.GetType().Name, ex.Message);
+            else {
+                DisplayMessage.FilePathException(privateKeyPath, ex.GetType().Name, ex.Message);
+            }
             throw new UserInputException(ex.Message, ex);
         }
     }

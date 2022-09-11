@@ -25,7 +25,7 @@ namespace Kryptor;
 
 public static class DigitalSignatures
 {
-    public static void SignFile(string filePath, string signatureFilePath, string comment, bool prehash, Span<byte> privateKey)
+    public static void SignFile(string filePath, string signaturePath, string comment, bool prehash, Span<byte> privateKey)
     {
         if (!prehash) {
             prehash = new FileInfo(filePath).Length >= 1073741824;
@@ -42,7 +42,7 @@ public static class DigitalSignatures
         Span<byte> globalSignature = stackalloc byte[Ed25519.SignatureSize];
         Ed25519.Sign(globalSignature, signatureFileBytes, privateKey);
         
-        CreateSignatureFile(filePath, signatureFilePath, signatureFileBytes, globalSignature);
+        CreateSignatureFile(filePath, signaturePath, signatureFileBytes, globalSignature);
     }
 
     private static Span<byte> GetFileBytes(string filePath, bool prehash)
@@ -55,23 +55,23 @@ public static class DigitalSignatures
         return blake2b.ComputeHash(fileStream);
     }
 
-    private static void CreateSignatureFile(string filePath, string signatureFilePath, Span<byte> signatureFileBytes, Span<byte> globalSignature)
+    private static void CreateSignatureFile(string filePath, string signaturePath, Span<byte> signatureFileBytes, Span<byte> globalSignature)
     {
-        if (string.IsNullOrEmpty(signatureFilePath)) {
-            signatureFilePath = filePath + Constants.SignatureExtension;
+        if (string.IsNullOrEmpty(signaturePath)) {
+            signaturePath = filePath + Constants.SignatureExtension;
         }
-        if (File.Exists(signatureFilePath)) {
-            File.SetAttributes(signatureFilePath, FileAttributes.Normal);
+        if (File.Exists(signaturePath)) {
+            File.SetAttributes(signaturePath, FileAttributes.Normal);
         }
-        using var signatureFile = new FileStream(signatureFilePath, FileHandling.GetFileStreamWriteOptions(signatureFileBytes.Length + globalSignature.Length));
+        using var signatureFile = new FileStream(signaturePath, FileHandling.GetFileStreamWriteOptions(signatureFileBytes.Length + globalSignature.Length));
         signatureFile.Write(signatureFileBytes);
         signatureFile.Write(globalSignature);
-        File.SetAttributes(signatureFilePath, FileAttributes.ReadOnly);
+        File.SetAttributes(signaturePath, FileAttributes.ReadOnly);
     }
 
-    public static bool VerifySignature(string signatureFilePath, string filePath, Span<byte> publicKey, out string comment)
+    public static bool VerifySignature(string signaturePath, string filePath, Span<byte> publicKey, out string comment)
     {
-        Span<byte> signatureFileBytes = File.ReadAllBytes(signatureFilePath);
+        Span<byte> signatureFileBytes = File.ReadAllBytes(signaturePath);
         
         Span<byte> globalSignature = signatureFileBytes[^Ed25519.SignatureSize..];
         if (!Ed25519.Verify(globalSignature, signatureFileBytes[..^globalSignature.Length], publicKey)) {

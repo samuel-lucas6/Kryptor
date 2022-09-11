@@ -221,25 +221,25 @@ public static class CommandLine
         }
     }
 
-    public static void Sign(string privateKeyPath, Span<byte> password, string comment, bool prehash, string[] signatureFilePaths, string[] filePaths)
+    public static void Sign(string privateKeyPath, Span<byte> password, string comment, bool prehash, string[] signaturePaths, string[] filePaths)
     {
-        SigningValidation.Sign(privateKeyPath, comment, signatureFilePaths, filePaths);
+        SigningValidation.Sign(privateKeyPath, comment, signaturePaths, filePaths);
         Span<byte> privateKey = AsymmetricKeyValidation.SigningPrivateKeyFile(privateKeyPath, password);
-        FileSigning.SignEachFile(filePaths, signatureFilePaths, comment, prehash, privateKey);
+        FileSigning.SignEachFile(filePaths, signaturePaths, comment, prehash, privateKey);
     }
 
-    public static void Verify(string[] publicKeys, string[] signatureFilePaths, string[] filePaths)
+    public static void Verify(string[] publicKeys, string[] signaturePaths, string[] filePaths)
     {
         Span<byte> publicKey;
         if (publicKeys == null || publicKeys[0].EndsWith(Constants.PublicKeyExtension)) {
-            SigningValidation.VerifyWithPublicKeyFile(publicKeys, signatureFilePaths, filePaths);
+            SigningValidation.VerifyPublicKeyFile(publicKeys, signaturePaths, filePaths);
             publicKey = AsymmetricKeyValidation.SigningPublicKeyFile(publicKeys[0]);
         }
         else {
-            SigningValidation.VerifyWithPublicKeyString(publicKeys, signatureFilePaths, filePaths);
+            SigningValidation.VerifyPublicKeyString(publicKeys, signaturePaths, filePaths);
             publicKey = AsymmetricKeyValidation.SigningPublicKeyString(publicKeys[0]);
         }
-        FileSigning.VerifyEachFile(signatureFilePaths, filePaths, publicKey);
+        FileSigning.VerifyEachFile(signaturePaths, filePaths, publicKey);
     }
     
     public static void CheckForUpdates()

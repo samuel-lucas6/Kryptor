@@ -30,23 +30,19 @@ public static class FilePathValidation
         (char) 21, (char) 22, (char) 23, (char) 24, (char) 25, (char) 26, (char) 27, (char) 28, (char) 29, (char) 30,
         (char) 31, ':', '*', '?', '\\', '/'
     };
-    private const string FileOrDirectoryDoesNotExist = "This file/directory doesn't exist.";
-    private const string FileInaccessible = "Unable to access the file.";
-    private const string DirectoryEmpty = "This directory is empty.";
-    private const string InvalidSignatureFile = "Please specify a signature file with a valid format.";
-    private const string SignatureFileInaccessible = "Unable to access the signature file.";
+
 
     public static string GetFileEncryptionError(string inputFilePath)
     {
         if (Path.GetFileName(Path.TrimEndingDirectorySeparator(inputFilePath)).IndexOfAny(IllegalFileNameChars) != -1) { return "This file/directory name contains illegal characters for Windows, Linux, and/or macOS.";}
-        if (Directory.Exists(inputFilePath)) { return FileHandling.IsDirectoryEmpty(inputFilePath) ? DirectoryEmpty : null; }
-        return !File.Exists(inputFilePath) ? FileOrDirectoryDoesNotExist : null;
+        if (Directory.Exists(inputFilePath)) { return FileHandling.IsDirectoryEmpty(inputFilePath) ? ErrorMessages.DirectoryEmpty : null; }
+        return !File.Exists(inputFilePath) ? ErrorMessages.FileOrDirectoryDoesNotExist : null;
     }
 
     public static string GetFileDecryptionError(string inputFilePath)
     {
-        if (Directory.Exists(inputFilePath)) { return FileHandling.IsDirectoryEmpty(inputFilePath) ? DirectoryEmpty : null; }
-        return !File.Exists(inputFilePath) ? FileOrDirectoryDoesNotExist : null;
+        if (Directory.Exists(inputFilePath)) { return FileHandling.IsDirectoryEmpty(inputFilePath) ? ErrorMessages.DirectoryEmpty : null; }
+        return !File.Exists(inputFilePath) ? ErrorMessages.FileOrDirectoryDoesNotExist : null;
     }
 
     public static void GenerateKeyPair(string directoryPath, int keyPairType, bool encryption, bool signing)
@@ -108,45 +104,5 @@ public static class FilePathValidation
         else if (!File.Exists(privateKeyPath)) {
             yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.NonExistentPrivateKeyFile);
         }
-    }
-
-    public static IEnumerable<string> GetFileSigningError(string filePath, string[] signatureFilePaths)
-    {
-        if (Directory.Exists(filePath)) {
-            if (FileHandling.IsDirectoryEmpty(filePath)) {
-                yield return DirectoryEmpty;
-            }
-            if (signatureFilePaths != null) {
-                yield return "You cannot specify signature files when signing a directory.";
-            }
-        }
-        else if (!File.Exists(filePath)) {
-            yield return FileOrDirectoryDoesNotExist;
-        }
-    }
-
-    public static string GetSignatureVerifyError(string filePath, string signatureFilePath)
-    {
-        if (filePath.EndsWith(Constants.SignatureExtension)) { return "Please specify the file to verify, not the signature file."; }
-        if (Directory.Exists(filePath)) { return "Please only specify files, not directories."; }
-        if (!File.Exists(filePath)) { return "This file doesn't exist."; }
-        if (string.IsNullOrEmpty(signatureFilePath)) { return null; }
-        if (!File.Exists(signatureFilePath)) { return "Unable to find the signature file. Please specify it manually using -t|--signature."; }
-        bool? validMagicBytes = FileHandling.IsValidSignatureFile(signatureFilePath, out bool? validVersion);
-        if (validMagicBytes == null) { return SignatureFileInaccessible; }
-        if (validMagicBytes == false) { return "The signature file that was found doesn't have a valid format."; }
-        if (validVersion == false) { return "The signature file that was found doesn't have a valid version."; }
-        return validVersion == null ? SignatureFileInaccessible : null;
-    }
-
-    public static string GetSignatureFileError(string signatureFilePath)
-    {
-        if (!signatureFilePath.EndsWith(Constants.SignatureExtension)) { return InvalidSignatureFile; }
-        if (!File.Exists(signatureFilePath)) { return "Please specify a signature file that exists."; }
-        bool? validMagicBytes = FileHandling.IsValidSignatureFile(signatureFilePath, out bool? validVersion);
-        if (validMagicBytes == null) { return SignatureFileInaccessible; }
-        if (validMagicBytes == false) { return InvalidSignatureFile; }
-        if (validVersion == false) { return "This signature file doesn't have a valid version."; }
-        return validVersion == null ? SignatureFileInaccessible : null;
     }
 }

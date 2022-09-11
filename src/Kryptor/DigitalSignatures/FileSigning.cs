@@ -26,7 +26,7 @@ public static class FileSigning
 {
     private const string DefaultComment = "This file has not been tampered with.";
 
-    public static void SignEachFile(string[] filePaths, string[] signatureFilePaths, string comment, bool prehash, Span<byte> privateKey)
+    public static void SignEachFile(string[] filePaths, string[] signaturePaths, string comment, bool prehash, Span<byte> privateKey)
     {
         if (filePaths == null || privateKey == default) {
             throw new UserInputException();
@@ -43,7 +43,7 @@ public static class FileSigning
                     continue;
                 }
                 DisplayMessage.SigningFile(filePaths[i]);
-                DigitalSignatures.SignFile(filePaths[i], signatureFilePaths == null ? string.Empty : signatureFilePaths[i], comment, prehash, privateKey);
+                DigitalSignatures.SignFile(filePaths[i], signaturePaths?[i] ?? string.Empty, comment, prehash, privateKey);
                 Globals.SuccessfulCount++;
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -64,7 +64,7 @@ public static class FileSigning
             try
             {
                 DisplayMessage.SigningFile(filePath);
-                DigitalSignatures.SignFile(filePath, signatureFilePath: string.Empty, comment, prehash, privateKey);
+                DigitalSignatures.SignFile(filePath, signaturePath: string.Empty, comment, prehash, privateKey);
                 Globals.SuccessfulCount++;
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -74,20 +74,20 @@ public static class FileSigning
         }
     }
     
-    public static void VerifyEachFile(string[] signatureFilePaths, string[] filePaths, Span<byte> publicKey)
+    public static void VerifyEachFile(string[] signaturePaths, string[] filePaths, Span<byte> publicKey)
     {
         if (filePaths == null || publicKey == default) {
             throw new UserInputException();
         }
-        signatureFilePaths ??= new string[filePaths.Length];
+        signaturePaths ??= new string[filePaths.Length];
         for (int i = 0; i < filePaths.Length; i++) {
             try
             {
-                if (string.IsNullOrEmpty(signatureFilePaths[i])) {
-                    signatureFilePaths[i] = filePaths[i] + Constants.SignatureExtension;
+                if (string.IsNullOrEmpty(signaturePaths[i])) {
+                    signaturePaths[i] = filePaths[i] + Constants.SignatureExtension;
                 }
-                Console.WriteLine($"Verifying \"{Path.GetFileName(signatureFilePaths[i])}\"...");
-                bool validSignature = DigitalSignatures.VerifySignature(signatureFilePaths[i], filePaths[i], publicKey, out string comment);
+                Console.WriteLine($"Verifying \"{Path.GetFileName(signaturePaths[i])}\"...");
+                bool validSignature = DigitalSignatures.VerifySignature(signaturePaths[i], filePaths[i], publicKey, out string comment);
                 if (!validSignature) {
                     DisplayMessage.WriteLine("Bad signature.", ConsoleColor.DarkRed);
                 }
@@ -103,7 +103,7 @@ public static class FileSigning
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
-                DisplayMessage.FilePathException(signatureFilePaths[i], ex.GetType().Name, "Unable to verify the signature.");
+                DisplayMessage.FilePathException(signaturePaths[i], ex.GetType().Name, "Unable to verify the signature.");
             }
         }
     }

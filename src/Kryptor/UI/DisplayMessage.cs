@@ -64,14 +64,12 @@ public static class DisplayMessage
 
     public static void SuccessfullyEncrypted(bool insertSpace = true)
     {
-        if (Globals.TotalCount <= 0) { return; }
         if (insertSpace) { Console.WriteLine(); }
         WriteLine($"Successfully encrypted: {Globals.SuccessfulCount}/{Globals.TotalCount}", Globals.SuccessfulCount == Globals.TotalCount ? ConsoleColor.Green : ConsoleColor.DarkRed);
     }
 
     public static void SuccessfullyDecrypted(bool insertSpace = true)
     {
-        if (Globals.TotalCount <= 0) { return; }
         if (insertSpace) { Console.WriteLine(); }
         WriteLine($"Successfully decrypted: {Globals.SuccessfulCount}/{Globals.TotalCount}", Globals.SuccessfulCount == Globals.TotalCount ? ConsoleColor.Green : ConsoleColor.DarkRed);
     }
@@ -116,7 +114,6 @@ public static class DisplayMessage
         
     public static void SuccessfullySigned()
     {
-        if (Globals.TotalCount <= 0) { return; }
         Console.WriteLine();
         WriteLine($"Successfully signed: {Globals.SuccessfulCount}/{Globals.TotalCount}", Globals.SuccessfulCount == Globals.TotalCount ? ConsoleColor.Green : ConsoleColor.DarkRed);
     }
