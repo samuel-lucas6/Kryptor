@@ -86,7 +86,7 @@ public static class DisplayMessage
     {
         Console.WriteLine($"Randomly generated keyfile: \"{keyfilePath}\"");
         Console.WriteLine();
-        WriteLine("IMPORTANT: Please back up this keyfile to external storage (e.g. memory sticks).", ConsoleColor.Blue);
+        WriteLine("IMPORTANT: Please back up this keyfile to external storage (e.g. memory sticks).", ConsoleColor.DarkYellow);
         Console.WriteLine();
     }
     
@@ -97,7 +97,7 @@ public static class DisplayMessage
         Console.Write($"Private key file: \"{privateKeyPath}\" - ");
         WriteLine("Keep this secret!", ConsoleColor.DarkYellow);
         Console.WriteLine();
-        WriteLine("IMPORTANT: Please back up these files to external storage (e.g. memory sticks).", ConsoleColor.Blue);
+        WriteLine("IMPORTANT: Please back up these files to external storage (e.g. memory sticks).", ConsoleColor.DarkYellow);
     }
     
     public static void PublicKey(string publicKey, string publicKeyPath)

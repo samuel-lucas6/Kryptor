@@ -156,26 +156,26 @@ public static class CommandLine
         FileDecryption.DecryptEachFileWithPrivateKey(privateKey, preSharedKey, filePaths);
     }
 
-    public static void GenerateNewKeyPair(Span<byte> password, string exportDirectoryPath, bool encryption, bool signing)
+    public static void GenerateNewKeyPair(string directoryPath, Span<byte> password, bool encryption, bool signing)
     {
         try
         {
             int keyPairType = GetKeyPairType(encryption, signing);
-            FilePathValidation.GenerateKeyPair(exportDirectoryPath, keyPairType, encryption, signing);
+            FilePathValidation.GenerateKeyPair(directoryPath, keyPairType, encryption, signing);
             string publicKey, privateKey, publicKeyPath, privateKeyPath;
             if (keyPairType == 1) {
                 (publicKey, privateKey) = AsymmetricKeys.GenerateEncryptionKeyPair(password);
-                (publicKeyPath, privateKeyPath) = AsymmetricKeys.ExportKeyPair(exportDirectoryPath, Constants.DefaultEncryptionKeyFileName, publicKey, privateKey);
+                (publicKeyPath, privateKeyPath) = AsymmetricKeys.ExportKeyPair(directoryPath, Constants.DefaultEncryptionKeyFileName, publicKey, privateKey);
             }
             else {
                 (publicKey, privateKey) = AsymmetricKeys.GenerateSigningKeyPair(password);
-                (publicKeyPath, privateKeyPath) = AsymmetricKeys.ExportKeyPair(exportDirectoryPath, Constants.DefaultSigningKeyFileName, publicKey, privateKey);
+                (publicKeyPath, privateKeyPath) = AsymmetricKeys.ExportKeyPair(directoryPath, Constants.DefaultSigningKeyFileName, publicKey, privateKey);
             }
             DisplayMessage.KeyPair(publicKey, publicKeyPath, privateKeyPath);
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
-            DisplayMessage.FilePathException(exportDirectoryPath, ex.GetType().Name, "Unable to create the key pair files.");
+            DisplayMessage.FilePathException(directoryPath, ex.GetType().Name, "Unable to create the key pair files.");
         }
     }
 

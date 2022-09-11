@@ -57,14 +57,14 @@ public static class FilePathValidation
 
     private static IEnumerable<string> GetGenerateKeyPairErrors(string directoryPath, int keyPairType, bool encryption, bool signing)
     {
-        if (keyPairType is < 1 or > 2) {
+        if (keyPairType != 1 && keyPairType != 2) {
             yield return "Please enter a valid number.";
         }
         bool defaultKeyDirectory = string.Equals(directoryPath, Constants.DefaultKeyDirectory);
         if (!defaultKeyDirectory && !Directory.Exists(directoryPath)) {
             yield return ErrorMessages.GetFilePathError(directoryPath, "This directory doesn't exist.");
         }
-        if (encryption & signing) {
+        if (encryption && signing) {
             yield return "Please specify only one type of key pair to generate.";
         }
         else if (defaultKeyDirectory && !Globals.Overwrite) {

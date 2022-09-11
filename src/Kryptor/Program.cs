@@ -108,7 +108,7 @@ public class Program
         try
         {
             if (GenerateKeys) {
-                CommandLine.GenerateNewKeyPair(GetPassword(Password.value), FilePaths == null ? Constants.DefaultKeyDirectory : FilePaths[0], Encrypt, Sign);
+                CommandLine.GenerateNewKeyPair(FilePaths?[0] ?? Constants.DefaultKeyDirectory, GetPassword(Password.value), Encrypt, Sign);
             }
             else if (Encrypt) {
                 CommandLine.Encrypt(Password.optionSpecified, GetPassword(Password.value), SymmetricKey, PrivateKey.optionSpecified, GetEncryptionPrivateKey(PrivateKey.value), PublicKeys, FilePaths);
