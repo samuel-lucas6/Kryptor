@@ -88,12 +88,12 @@ public class Program
     private string[] Signatures { get; }
 
     [Option("-u|--update", "check for updates", CommandOptionType.NoValue)]
-    private bool CheckForUpdates { get; }
+    private bool Update { get; }
 
     [Option("-a|--about", "view the program version and license", CommandOptionType.NoValue)]
     private bool About { get; }
 
-    [Argument(0, Name = "file", Description = "specify a file/directory path")]
+    [Argument(order: 0, Name = "file", Description = "specify a file/directory path")]
     private string[] FilePaths { get; }
 
     public static int Main(string[] args) => CommandLineApplication.Execute<Program>(args);
@@ -125,7 +125,7 @@ public class Program
             else if (Verify) {
                 CommandLine.Verify(PublicKeys, Signatures, FilePaths);
             }
-            else if (CheckForUpdates) {
+            else if (Update) {
                 CommandLine.CheckForUpdates();
             }
             else if (About) {
@@ -169,5 +169,5 @@ public class Program
 
     private static string GetSigningPrivateKey(string privateKeyPath) => string.IsNullOrEmpty(privateKeyPath) ? Constants.DefaultSigningPrivateKeyPath : privateKeyPath;
 
-    public static string GetVersion() => Assembly.GetExecutingAssembly().GetName().Version?.ToString()[..^2];
+    public static string GetVersion() => Assembly.GetExecutingAssembly().GetName().Version?.ToString(fieldCount: 3);
 }
