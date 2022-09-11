@@ -90,22 +90,22 @@ public static class DisplayMessage
         Console.WriteLine();
     }
     
-    public static void KeyPair(string publicKey, string publicKeyFilePath, string privateKeyFilePath)
+    public static void KeyPair(string publicKey, string publicKeyPath, string privateKeyPath)
     {
-        PublicKey(publicKey, publicKeyFilePath);
+        PublicKey(publicKey, publicKeyPath);
         Console.WriteLine();
-        Console.Write($"Private key file: \"{privateKeyFilePath}\" - ");
+        Console.Write($"Private key file: \"{privateKeyPath}\" - ");
         WriteLine("Keep this secret!", ConsoleColor.DarkYellow);
         Console.WriteLine();
         WriteLine("IMPORTANT: Please back up these files to external storage (e.g. memory sticks).", ConsoleColor.Blue);
     }
     
-    public static void PublicKey(string publicKey, string publicKeyFilePath)
+    public static void PublicKey(string publicKey, string publicKeyPath)
     {
         Console.WriteLine();
         Console.WriteLine($"Public key: {publicKey}");
-        if (!string.IsNullOrEmpty(publicKeyFilePath)) {
-            Console.WriteLine($"Public key file: \"{publicKeyFilePath}\"");
+        if (!string.IsNullOrEmpty(publicKeyPath)) {
+            Console.WriteLine($"Public key file: \"{publicKeyPath}\"");
         }
     }
     

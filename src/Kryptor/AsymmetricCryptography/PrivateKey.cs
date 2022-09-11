@@ -26,7 +26,7 @@ namespace Kryptor;
 
 public static class PrivateKey
 {
-    public static Span<byte> Encrypt(Span<byte> password, Span<byte> keyAlgorithm, Span<byte> privateKey)
+    public static Span<byte> Encrypt(Span<byte> privateKey, Span<byte> password, Span<byte> keyAlgorithm)
     {
         DisplayMessage.DerivingKeyFromPassword();
         Span<byte> salt = stackalloc byte[Argon2id.SaltSize];
@@ -50,7 +50,7 @@ public static class PrivateKey
         return fullPrivateKey;
     }
 
-    public static Span<byte> DecryptV2(Span<byte> password, Span<byte> privateKey)
+    public static Span<byte> DecryptV2(Span<byte> privateKey, Span<byte> password)
     {
         try
         {
@@ -74,7 +74,7 @@ public static class PrivateKey
         }
     }
 
-    public static Span<byte> DecryptV1(Span<byte> password, Span<byte> privateKey)
+    public static Span<byte> DecryptV1(Span<byte> privateKey, Span<byte> password)
     {
         try
         {

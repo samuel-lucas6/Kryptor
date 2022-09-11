@@ -51,11 +51,11 @@ public static class FilePathValidation
 
     public static void GenerateKeyPair(string directoryPath, int keyPairType, bool encryption, bool signing)
     {
-        IEnumerable<string> errorMessages = GetGenerateKeyPairError(directoryPath, keyPairType, encryption, signing);
+        IEnumerable<string> errorMessages = GetGenerateKeyPairErrors(directoryPath, keyPairType, encryption, signing);
         DisplayMessage.AllErrors(errorMessages);
     }
 
-    private static IEnumerable<string> GetGenerateKeyPairError(string directoryPath, int keyPairType, bool encryption, bool signing)
+    private static IEnumerable<string> GetGenerateKeyPairErrors(string directoryPath, int keyPairType, bool encryption, bool signing)
     {
         if (keyPairType is < 1 or > 2) {
             yield return "Please enter a valid number.";
@@ -93,19 +93,19 @@ public static class FilePathValidation
 
     public static void RecoverPublicKey(string privateKeyPath)
     {
-        IEnumerable<string> errorMessages = GetRecoverPublicKeyError(privateKeyPath);
+        IEnumerable<string> errorMessages = GetRecoverPublicKeyErrors(privateKeyPath);
         DisplayMessage.AllErrors(errorMessages);
     }
 
-    private static IEnumerable<string> GetRecoverPublicKeyError(string privateKeyPath)
+    private static IEnumerable<string> GetRecoverPublicKeyErrors(string privateKeyPath)
     {
         if (string.IsNullOrEmpty(privateKeyPath)) {
             yield return "Please specify a private key file using -x:file.";
         }
-        else if (!string.IsNullOrEmpty(privateKeyPath) && !privateKeyPath.EndsWith(Constants.PrivateKeyExtension)) {
+        else if (!privateKeyPath.EndsWith(Constants.PrivateKeyExtension)) {
             yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.InvalidPrivateKeyFile);
         }
-        else if (!string.IsNullOrEmpty(privateKeyPath) && !File.Exists(privateKeyPath)) {
+        else if (!File.Exists(privateKeyPath)) {
             yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.NonExistentPrivateKeyFile);
         }
     }

@@ -155,7 +155,7 @@ public static class AsymmetricKeyValidation
         {
             Span<byte> privateKey = GetPrivateKeyFromFile(privateKeyPath);
             ValidateEncryptionKeyAlgorithm(privateKey);
-            return DecryptPrivateKey(privateKeyPath, password, privateKey);
+            return DecryptPrivateKey(privateKey, password, privateKeyPath);
         }
         catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
@@ -174,7 +174,7 @@ public static class AsymmetricKeyValidation
         {
             Span<byte> privateKey = GetPrivateKeyFromFile(privateKeyPath);
             ValidateSigningKeyAlgorithm(privateKey);
-            return DecryptPrivateKey(privateKeyPath, password, privateKey);
+            return DecryptPrivateKey(privateKey, password, privateKeyPath);
         }
         catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
@@ -203,7 +203,7 @@ public static class AsymmetricKeyValidation
         }
     }
 
-    public static Span<byte> DecryptPrivateKey(string privateKeyPath, Span<byte> password, Span<byte> privateKey)
+    public static Span<byte> DecryptPrivateKey(Span<byte> privateKey, Span<byte> password, string privateKeyPath)
     {
         Span<byte> keyVersion = privateKey.Slice(Constants.KeyAlgorithmLength, Constants.PrivateKeyVersion2.Length);
         bool version2 = ConstantTime.Equals(keyVersion, Constants.PrivateKeyVersion2);
@@ -211,46 +211,47 @@ public static class AsymmetricKeyValidation
         if (!version2 && !version1) {
             throw new NotSupportedException("This private key version isn't supported.");
         }
-        
+
         if (password.Length == 0) {
             password = PasswordPrompt.EnterYourPassword(isPrivateKey: true);
         }
         Console.WriteLine("Decrypting private key...");
         
         if (version2) {
-            return PrivateKey.DecryptV2(password, privateKey);
+            return PrivateKey.DecryptV2(privateKey, password);
         }
 
         Span<byte> prehashedPassword = stackalloc byte[BLAKE2b.MaxHashSize];
         BLAKE2b.ComputeHash(prehashedPassword, password);
-        Span<byte> decryptedPrivateKey = PrivateKey.DecryptV1(prehashedPassword, privateKey);
+        Span<byte> decryptedPrivateKey = PrivateKey.DecryptV1(privateKey, prehashedPassword);
         CryptographicOperations.ZeroMemory(prehashedPassword);
         
-        Span<byte> unencryptedPrivateKey = GC.AllocateArray<byte>(decryptedPrivateKey.Length, pinned: true);
-        decryptedPrivateKey.CopyTo(unencryptedPrivateKey);
-        Span<byte> keyAlgorithm = privateKey[..Constants.KeyAlgorithmLength];
+        Span<byte> plaintextPrivateKey = GC.AllocateArray<byte>(decryptedPrivateKey.Length, pinned: true);
+        decryptedPrivateKey.CopyTo(plaintextPrivateKey);
         try
         {
             Console.WriteLine("Updating private key format...");
-            Span<byte> v2PrivateKey = PrivateKey.Encrypt(password, keyAlgorithm, decryptedPrivateKey);
+            Span<byte> keyAlgorithm = privateKey[..Constants.KeyAlgorithmLength];
+            Span<byte> v2PrivateKey = PrivateKey.Encrypt(decryptedPrivateKey, password, keyAlgorithm);
             AsymmetricKeys.CreateKeyFile(privateKeyPath, Encodings.ToBase64(v2PrivateKey));
             Console.WriteLine("Private key format successfully updated.");
             Console.WriteLine();
+            
             Console.WriteLine("Updating public key format...");
-            Span<byte> publicKey = unencryptedPrivateKey.Length switch
+            Span<byte> publicKey = plaintextPrivateKey.Length switch
             {
-                X25519.PrivateKeySize => AsymmetricKeys.GetCurve25519PublicKey(unencryptedPrivateKey),
-                _ => AsymmetricKeys.GetEd25519PublicKey(unencryptedPrivateKey)
+                X25519.PrivateKeySize => AsymmetricKeys.GetCurve25519PublicKey(plaintextPrivateKey),
+                _ => AsymmetricKeys.GetEd25519PublicKey(plaintextPrivateKey)
             };
             string publicKeyString = Encodings.ToBase64(publicKey);
-            string publicKeyFilePath = Path.ChangeExtension(privateKeyPath, Constants.PublicKeyExtension);
-            AsymmetricKeys.CreateKeyFile(publicKeyFilePath, publicKeyString);
-            DisplayMessage.PublicKey(publicKeyString, publicKeyFilePath);
+            string publicKeyPath = Path.ChangeExtension(privateKeyPath, Constants.PublicKeyExtension);
+            AsymmetricKeys.CreateKeyFile(publicKeyPath, publicKeyString);
+            DisplayMessage.PublicKey(publicKeyString, publicKeyPath);
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
         {
             DisplayMessage.FilePathException(privateKeyPath, ex.GetType().Name, "Unable to update private and/or public key to latest format.");
         }
-        return unencryptedPrivateKey;
+        return plaintextPrivateKey;
     }
 }

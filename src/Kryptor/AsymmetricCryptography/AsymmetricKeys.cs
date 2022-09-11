@@ -34,7 +34,7 @@ public static class AsymmetricKeys
         
         Span<byte> fullPublicKey = stackalloc byte[Constants.Curve25519KeyHeader.Length + publicKey.Length];
         Spans.Concat(fullPublicKey, Constants.Curve25519KeyHeader, publicKey);
-        Span<byte> encryptedPrivateKey = PrivateKey.Encrypt(password, Constants.Curve25519KeyHeader, privateKey);
+        Span<byte> encryptedPrivateKey = PrivateKey.Encrypt(privateKey, password, Constants.Curve25519KeyHeader);
         return (Encodings.ToBase64(fullPublicKey), Encodings.ToBase64(encryptedPrivateKey));
     }
 
@@ -48,7 +48,7 @@ public static class AsymmetricKeys
         
         Span<byte> fullPublicKey = stackalloc byte[Constants.Ed25519KeyHeader.Length + publicKey.Length];
         Spans.Concat(fullPublicKey, Constants.Ed25519KeyHeader, publicKey);
-        Span<byte> encryptedPrivateKey = PrivateKey.Encrypt(password, Constants.Ed25519KeyHeader, privateKey);
+        Span<byte> encryptedPrivateKey = PrivateKey.Encrypt(privateKey, password, Constants.Ed25519KeyHeader);
         return (Encodings.ToBase64(fullPublicKey), Encodings.ToBase64(encryptedPrivateKey));
     }
 
@@ -62,20 +62,20 @@ public static class AsymmetricKeys
         return (publicKeyPath, privateKeyPath);
     }
 
-    public static string ExportPublicKey(string privateKeyFilePath, string publicKey)
+    public static string ExportPublicKey(string privateKeyPath, string publicKey)
     {
-        string publicKeyFilePath = Path.ChangeExtension(privateKeyFilePath, Constants.PublicKeyExtension);
+        string publicKeyPath = Path.ChangeExtension(privateKeyPath, Constants.PublicKeyExtension);
         try
         {
-            if (File.Exists(publicKeyFilePath)) {
+            if (File.Exists(publicKeyPath)) {
                 return null;
             }
-            CreateKeyFile(publicKeyFilePath, publicKey);
-            return publicKeyFilePath;
+            CreateKeyFile(publicKeyPath, publicKey);
+            return publicKeyPath;
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
-            DisplayMessage.FilePathException(publicKeyFilePath, ex.GetType().Name, "Unable to create a public key file.");
+            DisplayMessage.FilePathException(publicKeyPath, ex.GetType().Name, "Unable to create a public key file.");
             return null;
         }
     }

@@ -162,16 +162,16 @@ public static class CommandLine
         {
             int keyPairType = GetKeyPairType(encryption, signing);
             FilePathValidation.GenerateKeyPair(exportDirectoryPath, keyPairType, encryption, signing);
-            string publicKey, privateKey, publicKeyFilePath, privateKeyFilePath;
+            string publicKey, privateKey, publicKeyPath, privateKeyPath;
             if (keyPairType == 1) {
                 (publicKey, privateKey) = AsymmetricKeys.GenerateEncryptionKeyPair(password);
-                (publicKeyFilePath, privateKeyFilePath) = AsymmetricKeys.ExportKeyPair(exportDirectoryPath, Constants.DefaultEncryptionKeyFileName, publicKey, privateKey);
+                (publicKeyPath, privateKeyPath) = AsymmetricKeys.ExportKeyPair(exportDirectoryPath, Constants.DefaultEncryptionKeyFileName, publicKey, privateKey);
             }
             else {
                 (publicKey, privateKey) = AsymmetricKeys.GenerateSigningKeyPair(password);
-                (publicKeyFilePath, privateKeyFilePath) = AsymmetricKeys.ExportKeyPair(exportDirectoryPath, Constants.DefaultSigningKeyFileName, publicKey, privateKey);
+                (publicKeyPath, privateKeyPath) = AsymmetricKeys.ExportKeyPair(exportDirectoryPath, Constants.DefaultSigningKeyFileName, publicKey, privateKey);
             }
-            DisplayMessage.KeyPair(publicKey, publicKeyFilePath, privateKeyFilePath);
+            DisplayMessage.KeyPair(publicKey, publicKeyPath, privateKeyPath);
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
@@ -198,16 +198,18 @@ public static class CommandLine
         {
             FilePathValidation.RecoverPublicKey(privateKeyPath);
             Span<byte> privateKey = AsymmetricKeyValidation.GetPrivateKeyFromFile(privateKeyPath);
-            privateKey = AsymmetricKeyValidation.DecryptPrivateKey(privateKeyPath, password, privateKey);
+            privateKey = AsymmetricKeyValidation.DecryptPrivateKey(privateKey, password, privateKeyPath);
+            
             Span<byte> publicKey = privateKey.Length switch
             {
                 X25519.PrivateKeySize => AsymmetricKeys.GetCurve25519PublicKey(privateKey),
                 _ => AsymmetricKeys.GetEd25519PublicKey(privateKey)
             };
             CryptographicOperations.ZeroMemory(privateKey);
+            
             string publicKeyString = Encodings.ToBase64(publicKey);
-            string publicKeyFilePath = AsymmetricKeys.ExportPublicKey(privateKeyPath, publicKeyString);
-            DisplayMessage.PublicKey(publicKeyString, publicKeyFilePath);
+            string publicKeyPath = AsymmetricKeys.ExportPublicKey(privateKeyPath, publicKeyString);
+            DisplayMessage.PublicKey(publicKeyString, publicKeyPath);
         }
         catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
