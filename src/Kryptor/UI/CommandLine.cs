@@ -246,12 +246,12 @@ public static class CommandLine
         {
             bool updateAvailable = Updates.CheckForUpdates(out string latestVersion);
             if (!updateAvailable) {
-                DisplayMessage.WriteLine("Kryptor is up-to-date.", ConsoleColor.Green);
+                DisplayMessage.WriteLine("Kryptor is up to date.", ConsoleColor.Green);
                 return;
             }
             Console.WriteLine($"An update is available for Kryptor. The latest version is v{latestVersion}.");
             Console.WriteLine();
-            DisplayMessage.WriteLine($"IMPORTANT: Please check the latest changelog at <https://www.kryptor.co.uk/changelog#v{latestVersion}> to see if there are any breaking changes BEFORE updating.", ConsoleColor.Blue);
+            DisplayMessage.WriteLine($"IMPORTANT: Please check the latest changelog at <https://www.kryptor.co.uk/changelog#v{latestVersion}> to see if there are any breaking changes BEFORE updating.", ConsoleColor.DarkYellow);
             Console.WriteLine();
             Console.WriteLine("Would you like Kryptor to automatically install this update now? (type y or n)");
             string userInput = Console.ReadLine()?.ToLower();

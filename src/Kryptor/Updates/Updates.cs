@@ -67,7 +67,7 @@ public static class Updates
         }
         Console.WriteLine("Downloading update...");
         byte[] downloadedExecutable = GetLatestExecutable(latestVersion);
-        Console.WriteLine("Applying update...");
+        Console.WriteLine("Installing update...");
         ReplaceExecutable(downloadedExecutable);
     }
 
@@ -97,10 +97,10 @@ public static class Updates
     private static string GetReleaseDownloadLink(string latestVersion)
     {
         string downloadLink = $"https://github.com/samuel-lucas6/Kryptor/releases/download/v{latestVersion}/";
-        if (OperatingSystem.IsWindows()) { return downloadLink + "kryptor-windows-amd64.zip"; }
-        if (OperatingSystem.IsLinux() && RuntimeInformation.OSArchitecture == Architecture.X64) { return downloadLink + "kryptor-linux-amd64.zip"; }
+        if (OperatingSystem.IsWindows()) { return downloadLink + "kryptor-windows-x64.zip"; }
+        if (OperatingSystem.IsLinux() && RuntimeInformation.OSArchitecture == Architecture.X64) { return downloadLink + "kryptor-linux-x64.zip"; }
         if (OperatingSystem.IsLinux() && RuntimeInformation.OSArchitecture == Architecture.Arm64) { return downloadLink + "kryptor-linux-arm64.zip"; }
-        if (OperatingSystem.IsMacOS() && RuntimeInformation.OSArchitecture == Architecture.X64) { return downloadLink + "kryptor-macos-amd64.zip"; }
+        if (OperatingSystem.IsMacOS() && RuntimeInformation.OSArchitecture == Architecture.X64) { return downloadLink + "kryptor-macos-x64.zip"; }
         if (OperatingSystem.IsMacOS() && RuntimeInformation.OSArchitecture == Architecture.Arm64) { return downloadLink + "kryptor-macos-arm64.zip"; }
         return null;
     }
@@ -119,7 +119,7 @@ public static class Updates
 
     private static void ReplaceExecutable(byte[] downloadedExecutable)
     {
-        string executableFilePath = Environment.ProcessPath ?? throw new ArgumentNullException(nameof(executableFilePath));
+        string executableFilePath = Environment.ProcessPath ?? throw new FileNotFoundException("Unable to retrieve the process path.");
         if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS()) {
             File.WriteAllBytes(executableFilePath, downloadedExecutable);
         }
