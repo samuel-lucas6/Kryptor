@@ -29,11 +29,11 @@ public static class FileHandling
     
     public static string TrimTrailingSeparatorChars(string filePath) => filePath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar, Path.VolumeSeparatorChar);
     
-    public static string ReplaceFileName(string originalFilePath, string newFileName)
+    public static string ReplaceFileName(string filePath, string newFileName)
     {
-        string directoryPath = Path.GetDirectoryName(Path.GetFullPath(originalFilePath));
+        string directoryPath = Path.GetDirectoryName(Path.GetFullPath(filePath));
         string newPath = Path.GetFullPath(Path.Combine(directoryPath, newFileName));
-        if (!newPath.StartsWith(Path.GetFullPath(directoryPath))) {
+        if (!newPath.StartsWith(Path.GetFullPath(directoryPath + Path.DirectorySeparatorChar))) {
             throw new ArgumentException("Invalid new path.");
         }
         return newPath;
@@ -48,7 +48,7 @@ public static class FileHandling
             Access = FileAccess.Read,
             Share = FileShare.Read,
             BufferSize = GetFileStreamBufferSize(fileLength, onlyReadingHeaders),
-            Options = fileLength < 10737418240 || !onlyReadingHeaders ? FileOptions.None : FileOptions.SequentialScan
+            Options = onlyReadingHeaders || fileLength < 10737418240 ? FileOptions.None : FileOptions.SequentialScan
         };
     }
     
@@ -115,10 +115,9 @@ public static class FileHandling
         string fileNameNoExtension = Path.GetFileNameWithoutExtension(filePath);
         int fileNumber = 2;
         string fileExtension = Path.GetExtension(filePath);
-        string directoryPath = Path.GetDirectoryName(filePath);
         do {
             string newFileName = $"{fileNameNoExtension} ({fileNumber}){fileExtension}";
-            filePath = Path.Combine(directoryPath, newFileName);
+            filePath = ReplaceFileName(filePath, newFileName);
             fileNumber++;
         } while (File.Exists(filePath));
         return filePath;
@@ -184,7 +183,7 @@ public static class FileHandling
     {
         try
         {
-            string directoryPath = GetUniqueDirectoryPath(zipFilePath[..^Path.GetExtension(zipFilePath).Length]);
+            string directoryPath = GetUniqueDirectoryPath(Path.ChangeExtension(zipFilePath, extension: null));
             DisplayMessage.InputToOutput("Extracting", zipFilePath, directoryPath);
             ZipFile.ExtractToDirectory(zipFilePath, directoryPath);
             DeleteFile(zipFilePath);
@@ -200,11 +199,11 @@ public static class FileHandling
         if (!Directory.Exists(directoryPath)) {
             return directoryPath;
         }
-        string parentDirectory = Directory.GetParent(directoryPath)?.FullName;
+        directoryPath = TrimTrailingSeparatorChars(directoryPath);
         string directoryName = Path.GetFileName(directoryPath);
         int directoryNumber = 2;
         do {
-            directoryPath = Path.Combine(parentDirectory ?? string.Empty, $"{directoryName} ({directoryNumber})");
+            directoryPath = ReplaceFileName(directoryPath, $"{directoryName} ({directoryNumber})");
             directoryNumber++;
         } while (Directory.Exists(directoryPath));
         return directoryPath;
