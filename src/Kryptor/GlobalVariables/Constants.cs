@@ -30,31 +30,34 @@ public static class Constants
     public const int ErrorCode = -1;
     
     // Key derivation
-    public const int MemorySize = 268435456;
     public const int Iterations = 3;
+    public const int MemorySize = 268435456;
     public static readonly byte[] Personalisation = Encoding.UTF8.GetBytes("Kryptor.Personal");
     
     // File encryption
     public const string EncryptedExtension = ".bin";
-    public const string KeyfileExtension = ".key";
     public const string ZipFileExtension = ".zip";
     public const int RandomFileNameLength = 16;
-    public const int SymmetricKeyLength = 48;
-    public static readonly byte[] SymmetricKeyHeader = { 61, 34, 184 };
-    public const char Base64Padding = '=';
-    public const int KeyfileLength = ChaCha20.KeySize;
-    public const int BoolBytesLength = 1;
+    
+    public const int UnencryptedHeaderLength = X25519.PublicKeySize + Argon2id.SaltSize;
+    public const int MaxRecipients = 20;
+    public const int KeyWrapHeaderLength = ChaCha20.KeySize * MaxRecipients;
+    public const uint ChaCha20Counter = 1;
     public const int Int64BytesLength = 8;
     public const int FileNameHeaderLength = 255;
-    public const int MaxRecipients = 20;
-    public const uint ChaCha20Counter = 1;
-    public static readonly int UnencryptedHeaderLength = X25519.PublicKeySize + Argon2id.SaltSize;
-    public const int KeyWrapHeaderLength = ChaCha20.KeySize * MaxRecipients;
+    public const int BoolBytesLength = 1;
     public const int EncryptedHeaderLength = kcChaCha20Poly1305.CommitmentSize + Int64BytesLength + FileNameHeaderLength + Int64BytesLength * 4 + BoolBytesLength + Poly1305.TagSize;
-    public static readonly int FileHeadersLength = UnencryptedHeaderLength + KeyWrapHeaderLength + EncryptedHeaderLength;
+    public const int FileHeadersLength = UnencryptedHeaderLength + KeyWrapHeaderLength + EncryptedHeaderLength;
     public const int FileChunkSize = 16384;
     public const int CiphertextChunkSize = FileChunkSize + Poly1305.TagSize;
-
+    
+    // Symmetric keys
+    public const string KeyfileExtension = ".key";
+    public const int KeyfileLength = ChaCha20.KeySize;
+    public const char Base64Padding = '=';
+    public const int SymmetricKeyLength = 48;
+    public static readonly byte[] SymmetricKeyHeader = { 61, 34, 184 };
+    
     // Asymmetric keys
     public static readonly string DefaultKeyDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".kryptor");
     public const string DefaultEncryptionKeyFileName = "encryption";
@@ -65,6 +68,7 @@ public static class Constants
     public static readonly string DefaultEncryptionPrivateKeyPath = Path.Combine(DefaultKeyDirectory, DefaultEncryptionKeyFileName + PrivateKeyExtension);
     public static readonly string DefaultSigningPublicKeyPath = Path.Combine(DefaultKeyDirectory, DefaultSigningKeyFileName + PublicKeyExtension);
     public static readonly string DefaultSigningPrivateKeyPath = Path.Combine(DefaultKeyDirectory, DefaultSigningKeyFileName + PrivateKeyExtension);
+    
     public const int PublicKeyLength = 48;
     public const int V2EncryptionPrivateKeyLength = 136;
     public const int V1EncryptionPrivateKeyLength = 144;
@@ -75,11 +79,11 @@ public static class Constants
     public static readonly byte[] Ed25519KeyHeader = { 17, 222 };
     public static readonly byte[] OldCurve25519KeyHeader = Encoding.UTF8.GetBytes("Cu");
     public static readonly byte[] OldEd25519KeyHeader = Encoding.UTF8.GetBytes("Ed");
-    public static readonly byte[] PrivateKeyVersion1 = { 0x01, 0x00 };
-    public static readonly byte[] PrivateKeyVersion2 = { 0x02, 0x00 };
+    public static readonly byte[] PrivateKeyVersion2 = { 2, 0 };
+    public static readonly byte[] PrivateKeyVersion1 = { 1, 0 };
     
     // File signing
     public const string SignatureExtension = ".signature";
     public static readonly byte[] SignatureMagicBytes = Encoding.UTF8.GetBytes("SIGNATURE");
-    public static readonly byte[] SignatureVersion = { 0x01, 0x00 };
+    public static readonly byte[] SignatureVersion = { 1, 0 };
 }
