@@ -161,7 +161,7 @@ public static class CommandLine
         try
         {
             int keyPairType = GetKeyPairType(encryption, signing);
-            FilePathValidation.GenerateKeyPair(directoryPath, keyPairType, encryption, signing);
+            AsymmetricKeyValidation.GenerateKeyPair(directoryPath, keyPairType, encryption, signing);
             string publicKey, privateKey, publicKeyPath, privateKeyPath;
             if (keyPairType == 1) {
                 (publicKey, privateKey) = AsymmetricKeys.GenerateEncryptionKeyPair(password);
@@ -196,7 +196,7 @@ public static class CommandLine
     {
         try
         {
-            FilePathValidation.RecoverPublicKey(privateKeyPath);
+            AsymmetricKeyValidation.RecoverPublicKey(privateKeyPath);
             Span<byte> privateKey = AsymmetricKeyValidation.GetPrivateKeyFromFile(privateKeyPath);
             privateKey = AsymmetricKeyValidation.DecryptPrivateKey(privateKey, password, privateKeyPath);
             

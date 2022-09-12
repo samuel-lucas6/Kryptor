@@ -42,7 +42,7 @@ public static class DigitalSignatures
         Span<byte> globalSignature = stackalloc byte[Ed25519.SignatureSize];
         Ed25519.Sign(globalSignature, signatureFileBytes, privateKey);
         
-        CreateSignatureFile(filePath, signaturePath, signatureFileBytes, globalSignature);
+        CreateSignatureFile(signaturePath, signatureFileBytes, globalSignature);
     }
 
     private static Span<byte> GetFileBytes(string filePath, bool prehash)
@@ -55,11 +55,8 @@ public static class DigitalSignatures
         return blake2b.ComputeHash(fileStream);
     }
 
-    private static void CreateSignatureFile(string filePath, string signaturePath, Span<byte> signatureFileBytes, Span<byte> globalSignature)
+    private static void CreateSignatureFile(string signaturePath, Span<byte> signatureFileBytes, Span<byte> globalSignature)
     {
-        if (string.IsNullOrEmpty(signaturePath)) {
-            signaturePath = filePath + Constants.SignatureExtension;
-        }
         if (File.Exists(signaturePath)) {
             File.SetAttributes(signaturePath, FileAttributes.Normal);
         }

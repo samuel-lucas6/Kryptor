@@ -31,6 +31,7 @@ public static class FileSigning
         if (filePaths == null || privateKey == default) {
             throw new UserInputException();
         }
+        signaturePaths ??= new string[filePaths.Length];
         if (string.IsNullOrEmpty(comment)) {
             comment = DefaultComment;
         }
@@ -42,8 +43,11 @@ public static class FileSigning
                     SignDirectoryFiles(filePaths[i], comment, prehash, privateKey);
                     continue;
                 }
-                DisplayMessage.SigningFile(filePaths[i]);
-                DigitalSignatures.SignFile(filePaths[i], signaturePaths?[i] ?? string.Empty, comment, prehash, privateKey);
+                if (string.IsNullOrEmpty(signaturePaths[i])) {
+                    signaturePaths[i] = filePaths[i] + Constants.SignatureExtension;
+                }
+                DisplayMessage.InputToOutput("Signing", filePaths[i], signaturePaths[i]);
+                DigitalSignatures.SignFile(filePaths[i], signaturePaths[i], comment, prehash, privateKey);
                 Globals.SuccessfulCount++;
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -59,17 +63,19 @@ public static class FileSigning
     {
         Console.WriteLine($"Signing each file in \"{Path.GetFileName(directoryPath)}\" directory...");
         string[] filePaths = Directory.GetFiles(directoryPath, searchPattern: "*", SearchOption.AllDirectories);
+        string[] signaturePaths = new string[filePaths.Length];
         Globals.TotalCount += filePaths.Length - 1;
-        foreach (string filePath in filePaths) {
+        for (int i = 0; i < filePaths.Length; i++) {
             try
             {
-                DisplayMessage.SigningFile(filePath);
-                DigitalSignatures.SignFile(filePath, signaturePath: string.Empty, comment, prehash, privateKey);
+                signaturePaths[i] = filePaths[i] + Constants.SignatureExtension;
+                DisplayMessage.InputToOutput("Signing", filePaths[i], signaturePaths[i]);
+                DigitalSignatures.SignFile(filePaths[i], signaturePaths[i], comment, prehash, privateKey);
                 Globals.SuccessfulCount++;
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
             {
-                DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to sign the file.");
+                DisplayMessage.FilePathException(filePaths[i], ex.GetType().Name, "Unable to sign the file.");
             }
         }
     }

@@ -73,6 +73,12 @@ public static class DisplayMessage
         if (insertSpace) { Console.WriteLine(); }
         WriteLine($"Successfully decrypted: {Globals.SuccessfulCount}/{Globals.TotalCount}", Globals.SuccessfulCount == Globals.TotalCount ? ConsoleColor.Green : ConsoleColor.DarkRed);
     }
+    
+    public static void SuccessfullySigned()
+    {
+        Console.WriteLine();
+        WriteLine($"Successfully signed: {Globals.SuccessfulCount}/{Globals.TotalCount}", Globals.SuccessfulCount == Globals.TotalCount ? ConsoleColor.Green : ConsoleColor.DarkRed);
+    }
 
     public static void SymmetricKey(string symmetricKey)
     {
@@ -106,18 +112,7 @@ public static class DisplayMessage
             Console.WriteLine($"Public key file: \"{publicKeyPath}\"");
         }
     }
-    
-    public static void SigningFile(string filePath)
-    {
-        Console.WriteLine($"Signing \"{Path.GetFileName(filePath)}\"...");
-    }
-        
-    public static void SuccessfullySigned()
-    {
-        Console.WriteLine();
-        WriteLine($"Successfully signed: {Globals.SuccessfulCount}/{Globals.TotalCount}", Globals.SuccessfulCount == Globals.TotalCount ? ConsoleColor.Green : ConsoleColor.DarkRed);
-    }
-    
+
     public static void About()
     {
         Console.WriteLine($"Kryptor v{Program.GetVersion()}");

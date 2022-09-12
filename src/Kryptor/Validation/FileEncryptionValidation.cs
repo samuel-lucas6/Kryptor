@@ -27,6 +27,13 @@ public static class FileEncryptionValidation
     private const string FileOrDirectoryError = "Please specify a file/directory.";
     private const string PasswordOrSymmetricKeyError = "Please specify whether to use a password and/or symmetric key.";
     private static readonly string TooManyRecipients = $"Please specify no more than {Constants.MaxRecipients} public keys.";
+    private static readonly char[] IllegalFileNameChars = {
+        '\"', '<', '>', '|', '\0',
+        (char) 1, (char) 2, (char) 3, (char) 4, (char) 5, (char) 6, (char) 7, (char) 8, (char) 9, (char) 10,
+        (char) 11, (char) 12, (char) 13, (char) 14, (char) 15, (char) 16, (char) 17, (char) 18, (char) 19, (char) 20,
+        (char) 21, (char) 22, (char) 23, (char) 24, (char) 25, (char) 26, (char) 27, (char) 28, (char) 29, (char) 30,
+        (char) 31, ':', '*', '?', '\\', '/'
+    };
 
     public static void FileEncryptionWithPassword(bool usePassword, string symmetricKey, string[] filePaths)
     {
@@ -57,12 +64,19 @@ public static class FileEncryptionValidation
         }
         else {
             foreach (string inputFilePath in filePaths) {
-                string errorMessage = FilePathValidation.GetFileEncryptionError(inputFilePath);
+                string errorMessage = GetFileEncryptionError(inputFilePath);
                 if (!string.IsNullOrEmpty(errorMessage)) {
                     yield return ErrorMessages.GetFilePathError(inputFilePath, errorMessage);
                 }
             }
         }
+    }
+    
+    private static string GetFileEncryptionError(string inputFilePath)
+    {
+        if (Path.GetFileName(Path.TrimEndingDirectorySeparator(inputFilePath)).IndexOfAny(IllegalFileNameChars) != -1) { return "This file/directory name contains illegal characters for Windows, Linux, and/or macOS.";}
+        if (Directory.Exists(inputFilePath)) { return FileHandling.IsDirectoryEmpty(inputFilePath) ? ErrorMessages.DirectoryEmpty : null; }
+        return !File.Exists(inputFilePath) ? ErrorMessages.FileOrDirectoryDoesNotExist : null;
     }
 
     public static void FileEncryptionWithPublicKeyFile(string privateKeyPath, string[] publicKeyPaths, string symmetricKey, string[] filePaths)
@@ -168,12 +182,18 @@ public static class FileEncryptionValidation
         }
         else {
             foreach (string inputFilePath in filePaths) {
-                string errorMessage = FilePathValidation.GetFileDecryptionError(inputFilePath);
+                string errorMessage = GetFileDecryptionError(inputFilePath);
                 if (!string.IsNullOrEmpty(errorMessage)) {
                     yield return ErrorMessages.GetFilePathError(inputFilePath, errorMessage);
                 }
             }
         }
+    }
+    
+    private static string GetFileDecryptionError(string inputFilePath)
+    {
+        if (Directory.Exists(inputFilePath)) { return FileHandling.IsDirectoryEmpty(inputFilePath) ? ErrorMessages.DirectoryEmpty : null; }
+        return !File.Exists(inputFilePath) ? ErrorMessages.FileOrDirectoryDoesNotExist : null;
     }
 
     public static void FileDecryptionWithPublicKeyFile(string privateKeyPath, string[] publicKeyPaths, string symmetricKey, string[] filePaths)
