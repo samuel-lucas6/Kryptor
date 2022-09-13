@@ -27,13 +27,7 @@ public static class SigningValidation
     private const string InvalidSignatureFile = "Please specify a signature file with a valid format.";
     private const string SignatureFileInaccessible = "Unable to access the signature file.";
     
-    public static void Sign(string privateKeyPath, string comment, string[] signaturePaths, string[] filePaths)
-    {
-        IEnumerable<string> errorMessages = GetSignErrors(privateKeyPath, comment, signaturePaths, filePaths);
-        DisplayMessage.AllErrors(errorMessages);
-    }
-
-    private static IEnumerable<string> GetSignErrors(string privateKeyPath, string comment, string[] signaturePaths, string[] filePaths)
+    public static IEnumerable<string> GetSignErrors(string privateKeyPath, string comment, string[] signaturePaths, string[] filePaths)
     {
         if (string.Equals(privateKeyPath, Constants.DefaultSigningPrivateKeyPath) && !File.Exists(Constants.DefaultSigningPrivateKeyPath)) {
             yield return ErrorMessages.NonExistentDefaultPrivateKeyFile;
@@ -83,63 +77,32 @@ public static class SigningValidation
         }
     }
 
-    public static void VerifyPublicKeyFile(string[] publicKeyPaths, string[] signaturePaths, string[] filePaths)
+    public static IEnumerable<string> GetVerifyErrors(string[] publicKeys, string[] signaturePaths, string[] filePaths)
     {
-        IEnumerable<string> errorMessages = GetVerifyPublicKeyFileErrors(publicKeyPaths, signaturePaths, filePaths);
-        DisplayMessage.AllErrors(errorMessages);
-    }
-
-    private static IEnumerable<string> GetVerifyPublicKeyFileErrors(string[] publicKeyPaths, string[] signaturePaths, string[] filePaths)
-    {
-        if (publicKeyPaths == null) {
+        if (publicKeys == null) {
             yield return ErrorMessages.NoPublicKey;
         }
-        else if (publicKeyPaths.Length > 1) {
+        else if (publicKeys.Length > 1) {
             yield return ErrorMessages.MultiplePublicKeys;
         }
-        else if (!publicKeyPaths[0].EndsWith(Constants.PublicKeyExtension)) {
-            yield return ErrorMessages.GetFilePathError(publicKeyPaths[0], ErrorMessages.InvalidPublicKeyFile);
+        else if (!publicKeys[0].EndsWith(Constants.PublicKeyExtension)) {
+            if (File.Exists(publicKeys[0]) || !string.IsNullOrEmpty(Path.GetExtension(publicKeys[0]))) {
+                yield return ErrorMessages.GetFilePathError(publicKeys[0], ErrorMessages.InvalidPublicKeyFile);
+            }
+            else if (string.IsNullOrEmpty(Path.GetExtension(publicKeys[0])) && publicKeys[0].Length != Constants.PublicKeyLength) {
+                yield return ErrorMessages.GetKeyStringError(publicKeys[0], ErrorMessages.InvalidPublicKey);
+            }
         }
-        else if (!File.Exists(publicKeyPaths[0])) {
-            yield return ErrorMessages.GetFilePathError(publicKeyPaths[0], ErrorMessages.NonExistentPublicKeyFile);
+        else if (!File.Exists(publicKeys[0])) {
+            yield return ErrorMessages.GetFilePathError(publicKeys[0], ErrorMessages.NonExistentPublicKeyFile);
         }
-        
-        foreach (string errorMessage in GetVerifyFilePathsErrors(filePaths, signaturePaths)) {
-            yield return errorMessage;
-        }
-    }
 
-    public static void VerifyPublicKeyString(string[] encodedPublicKeys, string[] signaturePaths, string[] filePaths)
-    {
-        IEnumerable<string> errorMessages = GetVerifyPublicKeyStringErrors(encodedPublicKeys, signaturePaths, filePaths);
-        DisplayMessage.AllErrors(errorMessages);
-    }
-
-    private static IEnumerable<string> GetVerifyPublicKeyStringErrors(string[] encodedPublicKeys, string[] signaturePaths, string[] filePaths)
-    {
-        if (encodedPublicKeys == null) {
-            yield return ErrorMessages.NoPublicKey;
-        }
-        else if (encodedPublicKeys.Length > 1) {
-            yield return ErrorMessages.MultiplePublicKeys;
-        }
-        else if (encodedPublicKeys[0].Length != Constants.PublicKeyLength) {
-            yield return ErrorMessages.GetKeyStringError(encodedPublicKeys[0], ErrorMessages.InvalidPublicKey);
-        }
-        
-        foreach (string errorMessage in GetVerifyFilePathsErrors(filePaths, signaturePaths)) {
-            yield return errorMessage;
-        }
-    }
-    
-    private static IEnumerable<string> GetVerifyFilePathsErrors(string[] filePaths, string[] signaturePaths)
-    {
         if (filePaths == null) {
             yield return "Please specify a file to verify.";
         }
         else {
             foreach (string filePath in filePaths) {
-                string errorMessage = GetSignatureVerifyError(filePath, signaturePaths == null ? filePath + Constants.SignatureExtension : string.Empty);
+                string errorMessage = GetVerifyFileError(filePath, signaturePaths == null ? filePath + Constants.SignatureExtension : string.Empty);
                 if (!string.IsNullOrEmpty(errorMessage)) {
                     yield return ErrorMessages.GetFilePathError(filePath, errorMessage);
                 }
@@ -149,18 +112,18 @@ public static class SigningValidation
         if (signaturePaths == null) {
             yield break;
         }
-        if (filePaths != null && signaturePaths.Length != filePaths.Length) {
-            yield return "Please specify the same number of signature files and files to verify.";
-        }
         foreach (string signaturePath in signaturePaths) {
             string errorMessage = GetSignatureFileError(signaturePath);
             if (!string.IsNullOrEmpty(errorMessage)) {
                 yield return ErrorMessages.GetFilePathError(signaturePath, errorMessage);
             }
         }
+        if (filePaths != null && signaturePaths.Length != filePaths.Length) {
+            yield return "Please specify the same number of signature files and files to verify.";
+        }
     }
-    
-    private static string GetSignatureVerifyError(string filePath, string signatureFilePath)
+
+    private static string GetVerifyFileError(string filePath, string signatureFilePath)
     {
         if (filePath.EndsWith(Constants.SignatureExtension)) { return "Please specify the file to verify, not the signature file."; }
         if (Directory.Exists(filePath)) { return "Please only specify files, not directories."; }
@@ -187,7 +150,7 @@ public static class SigningValidation
     {
         try
         {
-            using var fileStream = new FileStream(filePath, FileHandling.GetFileStreamReadOptions(filePath, onlyReadingHeaders: true));
+            using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 0);
             Span<byte> magicBytes = stackalloc byte[Constants.SignatureMagicBytes.Length];
             fileStream.Read(magicBytes);
             Span<byte> version = stackalloc byte[Constants.SignatureVersion.Length];

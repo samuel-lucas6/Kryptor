@@ -39,7 +39,7 @@ public static class FileHandling
         return newPath;
     }
     
-    public static FileStreamOptions GetFileStreamReadOptions(string filePath, bool onlyReadingHeaders = false)
+    public static FileStreamOptions GetFileStreamReadOptions(string filePath)
     {
         long fileLength = new FileInfo(filePath).Length;
         return new FileStreamOptions
@@ -47,14 +47,13 @@ public static class FileHandling
             Mode = FileMode.Open,
             Access = FileAccess.Read,
             Share = FileShare.Read,
-            BufferSize = GetFileStreamBufferSize(fileLength, onlyReadingHeaders),
-            Options = onlyReadingHeaders || fileLength < 10737418240 ? FileOptions.None : FileOptions.SequentialScan
+            BufferSize = GetFileStreamBufferSize(fileLength),
+            Options = fileLength < 10737418240 ? FileOptions.None : FileOptions.SequentialScan
         };
     }
     
-    private static int GetFileStreamBufferSize(long fileLength, bool onlyReadingHeaders = false)
+    private static int GetFileStreamBufferSize(long fileLength)
     {
-        if (onlyReadingHeaders) { return 0; }
         return fileLength switch
         {
             <= 262144 => 0,

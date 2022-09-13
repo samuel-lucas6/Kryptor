@@ -25,8 +25,6 @@ namespace Kryptor;
 public static class FileEncryptionValidation
 {
     private const string FileOrDirectoryError = "Please specify a file/directory.";
-    private const string PasswordOrSymmetricKeyError = "Please specify whether to use a password and/or symmetric key.";
-    private static readonly string TooManyRecipients = $"Please specify no more than {Constants.MaxRecipients} public keys.";
     private static readonly char[] IllegalFileNameChars = {
         '\"', '<', '>', '|', '\0',
         (char) 1, (char) 2, (char) 3, (char) 4, (char) 5, (char) 6, (char) 7, (char) 8, (char) 9, (char) 10,
@@ -34,116 +32,68 @@ public static class FileEncryptionValidation
         (char) 21, (char) 22, (char) 23, (char) 24, (char) 25, (char) 26, (char) 27, (char) 28, (char) 29, (char) 30,
         (char) 31, ':', '*', '?', '\\', '/'
     };
-
-    public static void FileEncryptionWithPassword(bool usePassword, string symmetricKey, string[] filePaths)
+    
+    public static IEnumerable<string> GetEncryptionErrors(string symmetricKey)
     {
-        IEnumerable<string> errorMessages = GetFileEncryptionErrors(usePassword, symmetricKey).Concat(GetEncryptionFilePathErrors(filePaths));
-        DisplayMessage.AllErrors(errorMessages);
-    }
-
-    private static IEnumerable<string> GetFileEncryptionErrors(bool usePassword, string symmetricKey)
-    {
-        if (!usePassword && string.IsNullOrEmpty(symmetricKey)) {
-            yield return PasswordOrSymmetricKeyError;
-        }
         if (Path.EndsInDirectorySeparator(symmetricKey) && !Directory.Exists(symmetricKey)) {
             yield return ErrorMessages.GetFilePathError(symmetricKey, "Please specify a valid directory for the keyfile.");
         }
         else if (File.Exists(symmetricKey) && new FileInfo(symmetricKey).Length < Constants.KeyfileLength) {
-            yield return ErrorMessages.GetFilePathError(symmetricKey, "Please specify a keyfile that's at least 64 bytes in size.");
+            yield return ErrorMessages.GetFilePathError(symmetricKey, $"Please specify a keyfile that's at least {Constants.KeyfileLength} bytes in size.");
         }
         else if (!string.IsNullOrEmpty(symmetricKey) && symmetricKey.EndsWith(Constants.Base64Padding) && symmetricKey.Length != Constants.SymmetricKeyLength) {
             yield return ErrorMessages.GetKeyStringError(symmetricKey, ErrorMessages.InvalidSymmetricKey);
         }
     }
 
-    private static IEnumerable<string> GetEncryptionFilePathErrors(string[] filePaths)
+    public static IEnumerable<string> GetEncryptionErrors(string privateKeyPath, string[] publicKeys, string symmetricKey)
     {
-        if (filePaths == null) {
-            yield return FileOrDirectoryError;
+        foreach (string errorMessage in GetPrivateKeyErrors(privateKeyPath)) {
+            yield return errorMessage;
+        }
+        
+        if (publicKeys == null) {
+            yield return ErrorMessages.NoPublicKey;
+        }
+        else if (publicKeys.Length > Constants.MaxRecipients) {
+            yield return $"Please specify no more than {Constants.MaxRecipients} public keys.";
         }
         else {
-            foreach (string inputFilePath in filePaths) {
-                string errorMessage = GetFileEncryptionError(inputFilePath);
-                if (!string.IsNullOrEmpty(errorMessage)) {
-                    yield return ErrorMessages.GetFilePathError(inputFilePath, errorMessage);
+            foreach (string publicKey in publicKeys) {
+                if (!publicKey.EndsWith(Constants.PublicKeyExtension)) {
+                    if (File.Exists(publicKey) || !string.IsNullOrEmpty(Path.GetExtension(publicKey))) {
+                        yield return ErrorMessages.GetFilePathError(publicKey, ErrorMessages.InvalidPublicKeyFile);
+                    }
+                    else if (string.IsNullOrEmpty(Path.GetExtension(publicKey)) && publicKey.Length != Constants.PublicKeyLength) {
+                        yield return ErrorMessages.GetKeyStringError(publicKey, ErrorMessages.InvalidPublicKey);
+                    }
+                }
+                else if (!File.Exists(publicKey)) {
+                    yield return ErrorMessages.GetFilePathError(publicKey, ErrorMessages.NonExistentPublicKeyFile);
                 }
             }
+            if (publicKeys.Any(key => !string.IsNullOrEmpty(Path.GetExtension(key))) && publicKeys.Any(key => string.IsNullOrEmpty(Path.GetExtension(key)))) {
+                yield return "Please specify only public key strings or only public key files.";
+            }
+        }
+        
+        foreach (string errorMessage in GetEncryptionErrors(symmetricKey)) {
+            yield return errorMessage;
+        }
+    }
+
+    public static IEnumerable<string> GetEncryptionErrors(string privateKeyPath, string symmetricKey)
+    {
+        foreach (string errorMessage in GetPrivateKeyErrors(privateKeyPath)) {
+            yield return errorMessage;
+        }
+        
+        foreach (string errorMessage in GetEncryptionErrors(symmetricKey)) {
+            yield return errorMessage;
         }
     }
     
-    private static string GetFileEncryptionError(string inputFilePath)
-    {
-        if (Path.GetFileName(Path.TrimEndingDirectorySeparator(inputFilePath)).IndexOfAny(IllegalFileNameChars) != -1) { return "This file/directory name contains illegal characters for Windows, Linux, and/or macOS.";}
-        if (Directory.Exists(inputFilePath)) { return FileHandling.IsDirectoryEmpty(inputFilePath) ? ErrorMessages.DirectoryEmpty : null; }
-        return !File.Exists(inputFilePath) ? ErrorMessages.FileOrDirectoryDoesNotExist : null;
-    }
-
-    public static void FileEncryptionWithPublicKeyFile(string privateKeyPath, string[] publicKeyPaths, string symmetricKey, string[] filePaths)
-    {
-        IEnumerable<string> errorMessages = GetFileEncryptionWithPublicKeyFileErrors(privateKeyPath, publicKeyPaths).Concat(GetFileEncryptionErrors(usePassword: true, symmetricKey)).Concat(GetEncryptionFilePathErrors(filePaths));
-        DisplayMessage.AllErrors(errorMessages);
-    }
-
-    private static IEnumerable<string> GetFileEncryptionWithPublicKeyFileErrors(string privateKeyPath, string[] publicKeyPaths)
-    {
-        foreach (string errorMessage in GetFileEncryptionErrors(privateKeyPath)) {
-            yield return errorMessage;
-        }
-        if (publicKeyPaths == null) {
-            yield return ErrorMessages.NoPublicKey;
-        }
-        else if (publicKeyPaths.Length > Constants.MaxRecipients) {
-            yield return TooManyRecipients;
-        }
-        else {
-            foreach (string publicKeyPath in publicKeyPaths) {
-                if (!publicKeyPath.EndsWith(Constants.PublicKeyExtension)) {
-                    yield return ErrorMessages.GetFilePathError(publicKeyPath, ErrorMessages.InvalidPublicKeyFile);
-                }
-                else if (!File.Exists(publicKeyPath)) {
-                    yield return ErrorMessages.GetFilePathError(publicKeyPath, ErrorMessages.NonExistentPublicKeyFile);
-                }
-            }
-        }
-    }
-
-    public static void FileEncryptionWithPublicKeyString(string privateKeyPath, string[] encodedPublicKeys, string symmetricKey, string[] filePaths)
-    {
-        IEnumerable<string> errorMessages = GetFileEncryptionWithPublicKeyStringErrors(privateKeyPath, encodedPublicKeys).Concat(GetFileEncryptionErrors(usePassword: true, symmetricKey)).Concat(GetEncryptionFilePathErrors(filePaths));
-        DisplayMessage.AllErrors(errorMessages);
-    }
-
-    private static IEnumerable<string> GetFileEncryptionWithPublicKeyStringErrors(string privateKeyPath, string[] encodedPublicKeys)
-    {
-        foreach (string errorMessage in GetFileEncryptionErrors(privateKeyPath)) {
-            yield return errorMessage;
-        }
-        if (encodedPublicKeys == null) {
-            yield return ErrorMessages.NoPublicKey;
-        }
-        else if (encodedPublicKeys.Length > Constants.MaxRecipients) {
-            yield return TooManyRecipients;
-        }
-        else {
-            foreach (string encodedPublicKey in encodedPublicKeys) {
-                if (encodedPublicKey.EndsWith(Constants.PublicKeyExtension)) {
-                    yield return ErrorMessages.GetFilePathError(encodedPublicKey, "Please specify only public key strings or only public key files.");
-                }
-                else if (encodedPublicKey.Length != Constants.PublicKeyLength) {
-                    yield return ErrorMessages.GetKeyStringError(encodedPublicKey, ErrorMessages.InvalidPublicKey);
-                }
-            }
-        }
-    }
-
-    public static void FileEncryptionWithPrivateKey(string privateKeyPath, string symmetricKey, string[] filePaths)
-    {
-        IEnumerable<string> errorMessages = GetFileEncryptionErrors(privateKeyPath).Concat(GetFileEncryptionErrors(usePassword: true, symmetricKey)).Concat(GetEncryptionFilePathErrors(filePaths));
-        DisplayMessage.AllErrors(errorMessages);
-    }
-
-    private static IEnumerable<string> GetFileEncryptionErrors(string privateKeyPath)
+    private static IEnumerable<string> GetPrivateKeyErrors(string privateKeyPath)
     {
         if (string.Equals(privateKeyPath, Constants.DefaultEncryptionPrivateKeyPath) && !File.Exists(Constants.DefaultEncryptionPrivateKeyPath)) {
             yield return ErrorMessages.NonExistentDefaultPrivateKeyFile;
@@ -155,18 +105,29 @@ public static class FileEncryptionValidation
             yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.NonExistentPrivateKeyFile);
         }
     }
-
-    public static void FileDecryptionWithPassword(bool usePassword, string symmetricKey, string[] filePaths)
+    
+    public static IEnumerable<string> GetEncryptionFilePathErrors(string[] filePaths)
     {
-        IEnumerable<string> errorMessages = GetFileDecryptionErrors(usePassword, symmetricKey).Concat(GetDecryptionFilePathErrors(filePaths));
-        DisplayMessage.AllErrors(errorMessages);
+        if (filePaths == null) {
+            yield return FileOrDirectoryError;
+        }
+        else {
+            foreach (string inputFilePath in filePaths) {
+                if (Path.GetFileName(Path.TrimEndingDirectorySeparator(inputFilePath)).IndexOfAny(IllegalFileNameChars) != -1) {
+                    yield return ErrorMessages.GetFilePathError(inputFilePath, "This file/directory name contains illegal characters for cross-platform decryption.");
+                }
+                else if (Directory.Exists(inputFilePath) && FileHandling.IsDirectoryEmpty(inputFilePath)) {
+                    yield return ErrorMessages.GetFilePathError(inputFilePath, ErrorMessages.DirectoryEmpty);
+                }
+                else if (!File.Exists(inputFilePath)) {
+                    yield return ErrorMessages.GetFilePathError(inputFilePath, ErrorMessages.FileOrDirectoryDoesNotExist);
+                }
+            }
+        }
     }
 
-    private static IEnumerable<string> GetFileDecryptionErrors(bool usePassword, string symmetricKey)
+    public static IEnumerable<string> GetDecryptionErrors(string symmetricKey)
     {
-        if (!usePassword && string.IsNullOrEmpty(symmetricKey)) {
-            yield return PasswordOrSymmetricKeyError;
-        }
         if (!string.IsNullOrEmpty(symmetricKey) && symmetricKey.EndsWith(Constants.Base64Padding) && symmetricKey.Length != Constants.SymmetricKeyLength) {
             yield return ErrorMessages.GetKeyStringError(symmetricKey, ErrorMessages.InvalidSymmetricKey);
         }
@@ -174,78 +135,61 @@ public static class FileEncryptionValidation
             yield return ErrorMessages.GetFilePathError(symmetricKey, "Please specify a valid symmetric key string or a keyfile that exists.");
         }
     }
+    
+    public static IEnumerable<string> GetDecryptionErrors(string privateKeyPath, string[] publicKeys, string symmetricKey)
+    {
+        foreach (string errorMessage in GetPrivateKeyErrors(privateKeyPath)) {
+            yield return errorMessage;
+        }
+        
+        if (publicKeys == null) {
+            yield return ErrorMessages.NoPublicKey;
+        }
+        else if (publicKeys.Length > 1) {
+            yield return ErrorMessages.MultiplePublicKeys;
+        }
+        else if (!publicKeys[0].EndsWith(Constants.PublicKeyExtension)) {
+            if (File.Exists(publicKeys[0]) || !string.IsNullOrEmpty(Path.GetExtension(publicKeys[0]))) {
+                yield return ErrorMessages.GetFilePathError(publicKeys[0], ErrorMessages.InvalidPublicKeyFile);
+            }
+            else if (string.IsNullOrEmpty(Path.GetExtension(publicKeys[0])) && publicKeys[0].Length != Constants.PublicKeyLength) {
+                yield return ErrorMessages.GetKeyStringError(publicKeys[0], ErrorMessages.InvalidPublicKey);
+            }
+        }
+        else if (!File.Exists(publicKeys[0])) {
+            yield return ErrorMessages.GetFilePathError(publicKeys[0], ErrorMessages.NonExistentPublicKeyFile);
+        }
 
-    private static IEnumerable<string> GetDecryptionFilePathErrors(string[] filePaths)
+        foreach (string errorMessage in GetDecryptionErrors(symmetricKey)) {
+            yield return errorMessage;
+        }
+    }
+    
+    public static IEnumerable<string> GetDecryptionErrors(string privateKeyPath, string symmetricKey)
+    {
+        foreach (string errorMessage in GetPrivateKeyErrors(privateKeyPath)) {
+            yield return errorMessage;
+        }
+        
+        foreach (string errorMessage in GetDecryptionErrors(symmetricKey)) {
+            yield return errorMessage;
+        }
+    }
+    
+    public static IEnumerable<string> GetDecryptionFilePathErrors(string[] filePaths)
     {
         if (filePaths == null) {
             yield return FileOrDirectoryError;
         }
         else {
             foreach (string inputFilePath in filePaths) {
-                string errorMessage = GetFileDecryptionError(inputFilePath);
-                if (!string.IsNullOrEmpty(errorMessage)) {
-                    yield return ErrorMessages.GetFilePathError(inputFilePath, errorMessage);
+                if (Directory.Exists(inputFilePath) && FileHandling.IsDirectoryEmpty(inputFilePath)) {
+                    yield return ErrorMessages.GetFilePathError(inputFilePath, ErrorMessages.DirectoryEmpty);
+                }
+                else if (!File.Exists(inputFilePath)) {
+                    yield return ErrorMessages.GetFilePathError(inputFilePath, ErrorMessages.FileOrDirectoryDoesNotExist);
                 }
             }
         }
-    }
-    
-    private static string GetFileDecryptionError(string inputFilePath)
-    {
-        if (Directory.Exists(inputFilePath)) { return FileHandling.IsDirectoryEmpty(inputFilePath) ? ErrorMessages.DirectoryEmpty : null; }
-        return !File.Exists(inputFilePath) ? ErrorMessages.FileOrDirectoryDoesNotExist : null;
-    }
-
-    public static void FileDecryptionWithPublicKeyFile(string privateKeyPath, string[] publicKeyPaths, string symmetricKey, string[] filePaths)
-    {
-        IEnumerable<string> errorMessages = GetFileDecryptionWithPublicKeyFileErrors(privateKeyPath, publicKeyPaths).Concat(GetFileDecryptionErrors(usePassword: true, symmetricKey)).Concat(GetDecryptionFilePathErrors(filePaths));
-        DisplayMessage.AllErrors(errorMessages);
-    }
-    
-    private static IEnumerable<string> GetFileDecryptionWithPublicKeyFileErrors(string privateKeyPath, string[] publicKeyPaths)
-    {
-        foreach (string errorMessage in GetFileEncryptionErrors(privateKeyPath)) {
-            yield return errorMessage;
-        }
-        if (publicKeyPaths == null) {
-            yield return ErrorMessages.NoPublicKey;
-        }
-        else if (publicKeyPaths.Length > 1) {
-            yield return ErrorMessages.MultiplePublicKeys;
-        }
-        else if (!publicKeyPaths[0].EndsWith(Constants.PublicKeyExtension)) {
-            yield return ErrorMessages.GetFilePathError(publicKeyPaths[0], ErrorMessages.InvalidPublicKeyFile);
-        }
-        else if (!File.Exists(publicKeyPaths[0])) {
-            yield return ErrorMessages.GetFilePathError(publicKeyPaths[0], ErrorMessages.NonExistentPublicKeyFile);
-        }
-    }
-
-    public static void FileDecryptionWithPublicKeyString(string privateKeyPath, string[] encodedPublicKeys, string symmetricKey, string[] filePaths)
-    {
-        IEnumerable<string> errorMessages = GetFileDecryptionWithPublicKeyStringErrors(privateKeyPath, encodedPublicKeys).Concat(GetFileDecryptionErrors(usePassword: true, symmetricKey)).Concat(GetDecryptionFilePathErrors(filePaths));
-        DisplayMessage.AllErrors(errorMessages);
-    }
-    
-    private static IEnumerable<string> GetFileDecryptionWithPublicKeyStringErrors(string privateKeyPath, string[] encodedPublicKeys)
-    {
-        foreach (string errorMessage in GetFileEncryptionErrors(privateKeyPath)) {
-            yield return errorMessage;
-        }
-        if (encodedPublicKeys == null) {
-            yield return ErrorMessages.NoPublicKey;
-        }
-        else if (encodedPublicKeys.Length > 1) {
-            yield return ErrorMessages.MultiplePublicKeys;
-        }
-        else if (encodedPublicKeys[0].Length != Constants.PublicKeyLength) {
-            yield return ErrorMessages.GetKeyStringError(encodedPublicKeys[0], ErrorMessages.InvalidPublicKey);
-        }
-    }
-
-    public static void FileDecryptionWithPrivateKey(string privateKeyPath, string symmetricKey, string[] filePaths)
-    {
-        IEnumerable<string> errorMessages = GetFileEncryptionErrors(privateKeyPath).Concat(GetFileDecryptionErrors(usePassword: true, symmetricKey)).Concat(GetDecryptionFilePathErrors(filePaths));
-        DisplayMessage.AllErrors(errorMessages);
     }
 }
