@@ -29,7 +29,7 @@ public static class SymmetricKeyValidation
     public static Span<byte> GetEncryptionSymmetricKey(string symmetricKey)
     {
         if (string.IsNullOrEmpty(symmetricKey)) {
-            return default;
+            return Span<byte>.Empty;
         }
         Span<byte> symmetricKeyBytes = GC.AllocateArray<byte>(Encoding.UTF8.GetMaxByteCount(symmetricKey.Length), pinned: true);
         int bytesEncoded = Encoding.UTF8.GetBytes(symmetricKey, symmetricKeyBytes);
@@ -56,7 +56,7 @@ public static class SymmetricKeyValidation
     public static Span<byte> GetDecryptionSymmetricKey(string symmetricKey)
     {
         if (string.IsNullOrEmpty(symmetricKey)) {
-            return default;
+            return Span<byte>.Empty;
         }
         return symmetricKey.EndsWith(Constants.Base64Padding) ? KeyString(symmetricKey) : ReadKeyfile(symmetricKey);
     }
@@ -68,6 +68,7 @@ public static class SymmetricKeyValidation
         Span<byte> keyString = stackalloc byte[Constants.SymmetricKeyHeader.Length + key.Length];
         Spans.Concat(keyString, Constants.SymmetricKeyHeader, key);
         DisplayMessage.SymmetricKey(Encodings.ToBase64(keyString));
+        CryptographicOperations.ZeroMemory(keyString);
         return key;
     }
 

@@ -29,14 +29,14 @@ public static class FileEncryption
 {
     public static void EncryptEachFileWithPassword(string[] filePaths, Span<byte> password, Span<byte> pepper)
     {
-        if (filePaths == null || password == default) {
+        if (filePaths == null || password.Length == 0) {
             throw new UserInputException();
         }
         Span<byte> salt = stackalloc byte[Argon2id.SaltSize];
         Span<byte> ephemeralPublicKey = stackalloc byte[X25519.PublicKeySize];
         Span<byte> inputKeyingMaterial = stackalloc byte[BLAKE2b.MaxKeySize], hashedPassword = inputKeyingMaterial[..ChaCha20.KeySize];
-        if (pepper != default) {
-            pepper.CopyTo(inputKeyingMaterial[^pepper.Length..]);
+        if (pepper.Length != 0) {
+            pepper.CopyTo(inputKeyingMaterial[hashedPassword.Length..]);
             CryptographicOperations.ZeroMemory(pepper);
         }
         Span<byte> emptySalt = stackalloc byte[BLAKE2b.SaltSize]; emptySalt.Clear();
@@ -53,7 +53,8 @@ public static class FileEncryption
                 
                 DisplayMessage.DerivingKeyFromPassword();
                 Argon2id.DeriveKey(hashedPassword, password, salt, Constants.Iterations, Constants.MemorySize);
-                BLAKE2b.DeriveKey(headerKey, pepper == default ? hashedPassword : inputKeyingMaterial, Constants.Personalisation, emptySalt, info: ephemeralPublicKey);
+                BLAKE2b.DeriveKey(headerKey, pepper.Length == 0 ? hashedPassword : inputKeyingMaterial, Constants.Personalisation, emptySalt, info: ephemeralPublicKey);
+                CryptographicOperations.ZeroMemory(hashedPassword);
                 
                 SecureRandom.Fill(fileKey);
                 ChaCha20.Encrypt(wrappedFileKeys[..fileKey.Length], fileKey, nonce, headerKey, Constants.ChaCha20Counter);
@@ -70,12 +71,12 @@ public static class FileEncryption
         }
         CryptographicOperations.ZeroMemory(password);
         CryptographicOperations.ZeroMemory(inputKeyingMaterial);
-        DisplayMessage.SuccessfullyEncrypted(insertSpace: false);
+        DisplayMessage.SuccessfullyEncrypted();
     }
     
     public static void EncryptEachFileWithSymmetricKey(string[] filePaths, Span<byte> symmetricKey)
     {
-        if (filePaths == null || symmetricKey == default) {
+        if (filePaths == null || symmetricKey.Length == 0) {
             throw new UserInputException();
         }
         Span<byte> salt = stackalloc byte[BLAKE2b.SaltSize];
@@ -106,15 +107,15 @@ public static class FileEncryption
             Console.WriteLine();
         }
         CryptographicOperations.ZeroMemory(symmetricKey);
-        DisplayMessage.SuccessfullyEncrypted(insertSpace: false);
+        DisplayMessage.SuccessfullyEncrypted();
     }
 
-    public static void EncryptEachFileWithPublicKey(Span<byte> senderPrivateKey, List<byte[]> recipientPublicKeys, Span<byte> preSharedKey, string[] filePaths)
+    public static void EncryptEachFileWithPublicKey(string[] filePaths, Span<byte> senderPrivateKey, List<byte[]> recipientPublicKeys, Span<byte> preSharedKey)
     {
-        if (filePaths == null || senderPrivateKey == default || recipientPublicKeys == null) {
+        if (filePaths == null || senderPrivateKey.Length == 0 || recipientPublicKeys == null) {
             throw new UserInputException();
         }
-        Span<byte> sharedSecret = stackalloc byte[X25519.SharedSecretSize], ephemeralSharedSecret = stackalloc byte[X25519.SharedSecretSize];
+        Span<byte> ephemeralSharedSecret = stackalloc byte[X25519.SharedSecretSize], sharedSecret = stackalloc byte[X25519.SharedSecretSize];
         Span<byte> seed = stackalloc byte[X25519.SeedSize], xCoordinate = stackalloc byte[X25519.SharedSecretSize];
         Span<byte> ephemeralPublicKey = stackalloc byte[X25519.PublicKeySize], ephemeralPrivateKey = stackalloc byte[X25519.PrivateKeySize];
         Span<byte> unhiddenEphemeralPublicKey = stackalloc byte[X25519.PublicKeySize];
@@ -125,7 +126,6 @@ public static class FileEncryption
         Span<byte> nonce = stackalloc byte[ChaCha20.NonceSize]; nonce.Clear();
 
         foreach (string inputFilePath in filePaths) {
-            Console.WriteLine();
             try
             {
                 bool isDirectory = IsDirectory(inputFilePath, out string zipFilePath);
@@ -138,7 +138,6 @@ public static class FileEncryption
                 int wrappedKeyIndex = 0;
                 SecureRandom.Fill(fileKey);
                 foreach (Span<byte> recipientPublicKey in recipientPublicKeys) {
-                    X25519.DeriveSenderSharedSecret(sharedSecret, senderPrivateKey, recipientPublicKey, preSharedKey);
                     X25519.ComputeXCoordinate(xCoordinate, ephemeralPrivateKey, recipientPublicKey);
                     using var blake2b = new IncrementalBLAKE2b(ephemeralSharedSecret.Length, preSharedKey);
                     blake2b.Update(xCoordinate);
@@ -147,8 +146,9 @@ public static class FileEncryption
                     blake2b.Finalize(ephemeralSharedSecret);
                     CryptographicOperations.ZeroMemory(xCoordinate);
 
+                    X25519.DeriveSenderSharedSecret(sharedSecret, senderPrivateKey, recipientPublicKey, preSharedKey);
                     Spans.Concat(inputKeyingMaterial, ephemeralSharedSecret, sharedSecret);
-                    BLAKE2b.DeriveKey(headerKey, inputKeyingMaterial, Constants.Personalisation, salt);
+                    BLAKE2b.DeriveKey(headerKey, inputKeyingMaterial, Constants.Personalisation, salt, info: ephemeralPublicKey);
                     CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
                     CryptographicOperations.ZeroMemory(sharedSecret);
                     CryptographicOperations.ZeroMemory(inputKeyingMaterial);
@@ -168,15 +168,16 @@ public static class FileEncryption
             {
                 DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToEncryptFile);
             }
+            Console.WriteLine();
         }
         CryptographicOperations.ZeroMemory(senderPrivateKey);
         CryptographicOperations.ZeroMemory(preSharedKey);
         DisplayMessage.SuccessfullyEncrypted();
     }
 
-    public static void EncryptEachFileWithPrivateKey(Span<byte> privateKey, Span<byte> preSharedKey, string[] filePaths)
+    public static void EncryptEachFileWithPrivateKey(string[] filePaths, Span<byte> privateKey, Span<byte> preSharedKey)
     {
-        if (filePaths == null || privateKey == default) {
+        if (filePaths == null || privateKey.Length == 0) {
             throw new UserInputException();
         }
         Span<byte> seed = stackalloc byte[X25519.SeedSize];
@@ -189,7 +190,6 @@ public static class FileEncryption
         Span<byte> nonce = stackalloc byte[ChaCha20.NonceSize]; nonce.Clear();
         
         foreach (string inputFilePath in filePaths) {
-            Console.WriteLine();
             try
             {
                 bool isDirectory = IsDirectory(inputFilePath, out string zipFilePath);
@@ -201,7 +201,7 @@ public static class FileEncryption
                 
                 SecureRandom.Fill(salt);
                 X25519.DeriveSenderSharedSecret(ephemeralSharedSecret, privateKey, unhiddenEphemeralPublicKey, preSharedKey);
-                BLAKE2b.DeriveKey(headerKey, ephemeralSharedSecret, Constants.Personalisation, salt);
+                BLAKE2b.DeriveKey(headerKey, ephemeralSharedSecret, Constants.Personalisation, salt, info: ephemeralPublicKey);
                 CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
                 
                 SecureRandom.Fill(fileKey);
@@ -215,6 +215,7 @@ public static class FileEncryption
             {
                 DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToEncryptFile);
             }
+            Console.WriteLine();
         }
         CryptographicOperations.ZeroMemory(privateKey);
         CryptographicOperations.ZeroMemory(preSharedKey);

@@ -62,21 +62,18 @@ public static class DisplayMessage
         Console.WriteLine($"{activity} \"{Path.GetFileName(inputFilePath)}\" => \"{Path.GetFileName(outputFilePath)}\"...");
     }
 
-    public static void SuccessfullyEncrypted(bool insertSpace = true)
+    public static void SuccessfullyEncrypted()
     {
-        if (insertSpace) { Console.WriteLine(); }
         WriteLine($"Successfully encrypted: {Globals.SuccessfulCount}/{Globals.TotalCount}", Globals.SuccessfulCount == Globals.TotalCount ? ConsoleColor.Green : ConsoleColor.DarkRed);
     }
 
-    public static void SuccessfullyDecrypted(bool insertSpace = true)
+    public static void SuccessfullyDecrypted()
     {
-        if (insertSpace) { Console.WriteLine(); }
         WriteLine($"Successfully decrypted: {Globals.SuccessfulCount}/{Globals.TotalCount}", Globals.SuccessfulCount == Globals.TotalCount ? ConsoleColor.Green : ConsoleColor.DarkRed);
     }
     
     public static void SuccessfullySigned()
     {
-        Console.WriteLine();
         WriteLine($"Successfully signed: {Globals.SuccessfulCount}/{Globals.TotalCount}", Globals.SuccessfulCount == Globals.TotalCount ? ConsoleColor.Green : ConsoleColor.DarkRed);
     }
 
@@ -96,6 +93,7 @@ public static class DisplayMessage
     
     public static void KeyPair(string publicKey, string publicKeyPath, string privateKeyPath)
     {
+        Console.WriteLine();
         PublicKey(publicKey, publicKeyPath);
         Console.WriteLine();
         Console.Write($"Private key file: \"{privateKeyPath}\" - ");
@@ -106,7 +104,6 @@ public static class DisplayMessage
     
     public static void PublicKey(string publicKey, string publicKeyPath)
     {
-        Console.WriteLine();
         Console.WriteLine($"Public key: {publicKey}");
         if (!string.IsNullOrEmpty(publicKeyPath)) {
             Console.WriteLine($"Public key file: \"{publicKeyPath}\"");

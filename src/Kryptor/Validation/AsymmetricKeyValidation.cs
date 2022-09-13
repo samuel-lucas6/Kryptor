@@ -108,7 +108,7 @@ public static class AsymmetricKeyValidation
                 DisplayMessage.Error(ex.Message);
             }
             else {
-                DisplayMessage.Exception(ex.GetType().Name, publicKeyPaths == null || publicKeyPaths.Length == 1 ? "Please specify a valid encryption public key." : "Please specify valid encryption public keys.");
+                DisplayMessage.Exception(ex.GetType().Name, publicKeyPaths?.Length > 1 ? "Please specify valid encryption public keys." : "Please specify a valid encryption public key.");
             }
             throw new UserInputException(ex.Message, ex);
         }
@@ -166,7 +166,7 @@ public static class AsymmetricKeyValidation
                 DisplayMessage.Error(ex.Message);
             }
             else {
-                DisplayMessage.Exception(ex.GetType().Name, encodedPublicKeys == null || encodedPublicKeys.Length == 1 ? "Please enter a valid encryption public key." : "Please enter valid encryption public keys.");
+                DisplayMessage.Exception(ex.GetType().Name, encodedPublicKeys?.Length > 1 ? "Please enter valid encryption public keys." : "Please enter a valid encryption public key.");
             }
             throw new UserInputException(ex.Message, ex);
         }
@@ -195,7 +195,7 @@ public static class AsymmetricKeyValidation
         }
     }
 
-    private static void CheckIfDuplicate(List<byte[]> publicKeys, byte[] publicKey)
+    private static void CheckIfDuplicate(IEnumerable<byte[]> publicKeys, byte[] publicKey)
     {
         if (publicKeys.Any(key => key.SequenceEqual(publicKey))) {
             throw new ArgumentException("The same public key has been specified more than once.");
@@ -279,7 +279,7 @@ public static class AsymmetricKeyValidation
             password = PasswordPrompt.EnterYourPassword(isPrivateKey: true);
         }
         Console.WriteLine("Decrypting private key...");
-        
+        Console.WriteLine();
         if (version2) {
             return PrivateKey.DecryptV2(privateKey, password);
         }
@@ -287,7 +287,6 @@ public static class AsymmetricKeyValidation
         Span<byte> prehashedPassword = stackalloc byte[BLAKE2b.MaxHashSize];
         BLAKE2b.ComputeHash(prehashedPassword, password);
         Span<byte> decryptedPrivateKey = PrivateKey.DecryptV1(privateKey, prehashedPassword);
-        CryptographicOperations.ZeroMemory(prehashedPassword);
         
         Span<byte> plaintextPrivateKey = GC.AllocateArray<byte>(decryptedPrivateKey.Length, pinned: true);
         decryptedPrivateKey.CopyTo(plaintextPrivateKey);
@@ -310,6 +309,7 @@ public static class AsymmetricKeyValidation
             string publicKeyPath = Path.ChangeExtension(privateKeyPath, Constants.PublicKeyExtension);
             AsymmetricKeys.CreateKeyFile(publicKeyPath, publicKeyString);
             DisplayMessage.PublicKey(publicKeyString, publicKeyPath);
+            Console.WriteLine();
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
         {

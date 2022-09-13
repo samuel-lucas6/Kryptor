@@ -163,7 +163,7 @@ public class Program
         }
     }
 
-    private static Span<byte> GetPassword(string password) => string.IsNullOrEmpty(password) ? default : Encoding.UTF8.GetBytes(password);
+    private static Span<byte> GetPassword(string password) => string.IsNullOrEmpty(password) ? Span<byte>.Empty : Encoding.UTF8.GetBytes(password);
 
     private static string GetEncryptionPrivateKey(string privateKeyPath) => string.IsNullOrEmpty(privateKeyPath) ? Constants.DefaultEncryptionPrivateKeyPath : privateKeyPath;
 

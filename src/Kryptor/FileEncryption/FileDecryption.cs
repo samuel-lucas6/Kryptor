@@ -28,13 +28,13 @@ public static class FileDecryption
 {
     public static void DecryptEachFileWithPassword(string[] filePaths, Span<byte> password, Span<byte> pepper)
     {
-        if (filePaths == null || password == default) {
+        if (filePaths == null || password.Length == 0) {
             throw new UserInputException();
         }
         Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeaderLength], wrappedFileKeys = new byte[Constants.KeyWrapHeaderLength];
         Span<byte> inputKeyingMaterial = stackalloc byte[BLAKE2b.MaxKeySize], hashedPassword = inputKeyingMaterial[..ChaCha20.KeySize];
-        if (pepper != default) {
-            pepper.CopyTo(inputKeyingMaterial[^pepper.Length..]);
+        if (pepper.Length != 0) {
+            pepper.CopyTo(inputKeyingMaterial[hashedPassword.Length..]);
             CryptographicOperations.ZeroMemory(pepper);
         }
         Span<byte> emptySalt = stackalloc byte[BLAKE2b.SaltSize]; emptySalt.Clear();
@@ -52,7 +52,8 @@ public static class FileDecryption
                 
                 DisplayMessage.DerivingKeyFromPassword();
                 Argon2id.DeriveKey(hashedPassword, password, salt, Constants.Iterations, Constants.MemorySize);
-                BLAKE2b.DeriveKey(headerKey, pepper == default ? hashedPassword : inputKeyingMaterial, Constants.Personalisation, emptySalt, info: ephemeralPublicKey);
+                BLAKE2b.DeriveKey(headerKey, pepper.Length == 0 ? hashedPassword : inputKeyingMaterial, Constants.Personalisation, emptySalt, info: ephemeralPublicKey);
+                CryptographicOperations.ZeroMemory(hashedPassword);
                 DecryptInputFile(inputFile, wrappedFileKeys, headerKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -68,12 +69,12 @@ public static class FileDecryption
         }
         CryptographicOperations.ZeroMemory(password);
         CryptographicOperations.ZeroMemory(inputKeyingMaterial);
-        DisplayMessage.SuccessfullyDecrypted(insertSpace: false);
+        DisplayMessage.SuccessfullyDecrypted();
     }
     
     public static void DecryptEachFileWithSymmetricKey(string[] filePaths, Span<byte> symmetricKey)
     {
-        if (filePaths == null || symmetricKey == default) {
+        if (filePaths == null || symmetricKey.Length == 0) {
             throw new UserInputException();
         }
         Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeaderLength], wrappedFileKeys = new byte[Constants.KeyWrapHeaderLength];
@@ -104,12 +105,12 @@ public static class FileDecryption
             Console.WriteLine();
         }
         CryptographicOperations.ZeroMemory(symmetricKey);
-        DisplayMessage.SuccessfullyDecrypted(insertSpace: false);
+        DisplayMessage.SuccessfullyDecrypted();
     }
 
-    public static void DecryptEachFileWithPublicKey(Span<byte> recipientPrivateKey, Span<byte> senderPublicKey, Span<byte> preSharedKey, string[] filePaths)
+    public static void DecryptEachFileWithPublicKey(string[] filePaths, Span<byte> recipientPrivateKey, Span<byte> senderPublicKey, Span<byte> preSharedKey)
     {
-        if (filePaths == null || recipientPrivateKey == default || senderPublicKey == default) {
+        if (filePaths == null || recipientPrivateKey.Length == 0 || senderPublicKey.Length == 0) {
             throw new UserInputException();
         }
         Span<byte> sharedSecret = stackalloc byte[X25519.SharedSecretSize], ephemeralSharedSecret = stackalloc byte[X25519.SharedSecretSize];
@@ -121,7 +122,6 @@ public static class FileDecryption
         Span<byte> headerKey = stackalloc byte[ChaCha20.KeySize];
 
         foreach (string inputFilePath in filePaths) {
-            Console.WriteLine();
             try
             {
                 using var inputFile = new FileStream(inputFilePath, FileHandling.GetFileStreamReadOptions(inputFilePath));
@@ -134,7 +134,7 @@ public static class FileDecryption
                 crypto_hidden_to_curve(unhiddenEphemeralPublicKey, ephemeralPublicKey);
                 X25519.DeriveRecipientSharedSecret(ephemeralSharedSecret, recipientPrivateKey, unhiddenEphemeralPublicKey, preSharedKey);
                 Spans.Concat(inputKeyingMaterial, ephemeralSharedSecret, sharedSecret);
-                BLAKE2b.DeriveKey(headerKey, inputKeyingMaterial, Constants.Personalisation, salt);
+                BLAKE2b.DeriveKey(headerKey, inputKeyingMaterial, Constants.Personalisation, salt, info: ephemeralPublicKey);
                 CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
                 CryptographicOperations.ZeroMemory(inputKeyingMaterial);
                 
@@ -149,6 +149,7 @@ public static class FileDecryption
                     DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToDecryptFile);
                 }
             }
+            Console.WriteLine();
         }
         CryptographicOperations.ZeroMemory(recipientPrivateKey);
         CryptographicOperations.ZeroMemory(sharedSecret);
@@ -156,9 +157,9 @@ public static class FileDecryption
         DisplayMessage.SuccessfullyDecrypted();
     }
     
-    public static void DecryptEachFileWithPrivateKey(Span<byte> privateKey, Span<byte> preSharedKey, string[] filePaths)
+    public static void DecryptEachFileWithPrivateKey(string[] filePaths, Span<byte> privateKey, Span<byte> preSharedKey)
     {
-        if (filePaths == null || privateKey == default) {
+        if (filePaths == null || privateKey.Length == 0) {
             throw new UserInputException();
         }
         Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeaderLength], wrappedFileKeys = new byte[Constants.KeyWrapHeaderLength];
@@ -167,7 +168,6 @@ public static class FileDecryption
         Span<byte> headerKey = stackalloc byte[ChaCha20.KeySize];
 
         foreach (string inputFilePath in filePaths) {
-            Console.WriteLine();
             try
             {
                 using var inputFile = new FileStream(inputFilePath, FileHandling.GetFileStreamReadOptions(inputFilePath));
@@ -179,7 +179,7 @@ public static class FileDecryption
                 
                 crypto_hidden_to_curve(unhiddenEphemeralPublicKey, ephemeralPublicKey);
                 X25519.DeriveSenderSharedSecret(ephemeralSharedSecret, privateKey, unhiddenEphemeralPublicKey, preSharedKey);
-                BLAKE2b.DeriveKey(headerKey, ephemeralSharedSecret, Constants.Personalisation, salt);
+                BLAKE2b.DeriveKey(headerKey, ephemeralSharedSecret, Constants.Personalisation, salt, info: ephemeralPublicKey);
                 CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
                 
                 DecryptInputFile(inputFile, wrappedFileKeys, headerKey);
@@ -193,6 +193,7 @@ public static class FileDecryption
                     DisplayMessage.FilePathException(inputFilePath, ex.GetType().Name, ErrorMessages.UnableToDecryptFile);
                 }
             }
+            Console.WriteLine();
         }
         CryptographicOperations.ZeroMemory(privateKey);
         CryptographicOperations.ZeroMemory(preSharedKey);
@@ -212,21 +213,21 @@ public static class FileDecryption
         }
         CryptographicOperations.ZeroMemory(headerKey);
         
-        for (int i = 0; i < wrappedFileKeys.Length; i += ChaCha20.KeySize) {
+        for (int i = 0; i < fileKeys.Length; i += ChaCha20.KeySize) {
             try
             {
                 DecryptFile.Decrypt(inputFile, outputFilePath, wrappedFileKeys, fileKeys.Slice(i, ChaCha20.KeySize));
+                CryptographicOperations.ZeroMemory(fileKeys);
                 Globals.SuccessfulCount++;
                 break;
             }
             catch (ArgumentException)
             {
                 inputFile.Position -= Constants.EncryptedHeaderLength;
-                if (i == wrappedFileKeys.Length - ChaCha20.KeySize) {
+                if (i == fileKeys.Length - ChaCha20.KeySize) {
                     throw;
                 }
             }
         }
-        CryptographicOperations.ZeroMemory(fileKeys);
     }
 }

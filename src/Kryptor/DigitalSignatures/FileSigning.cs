@@ -28,7 +28,7 @@ public static class FileSigning
 
     public static void SignEachFile(string[] filePaths, string[] signaturePaths, string comment, bool prehash, Span<byte> privateKey)
     {
-        if (filePaths == null || privateKey == default) {
+        if (filePaths == null || privateKey.Length == 0) {
             throw new UserInputException();
         }
         signaturePaths ??= new string[filePaths.Length];
@@ -38,7 +38,6 @@ public static class FileSigning
         for (int i = 0; i < filePaths.Length; i++) {
             try
             {
-                Console.WriteLine();
                 if (File.GetAttributes(filePaths[i]).HasFlag(FileAttributes.Directory)) {
                     SignDirectoryFiles(filePaths[i], comment, prehash, privateKey);
                     continue;
@@ -54,6 +53,7 @@ public static class FileSigning
             {
                 DisplayMessage.FilePathException(filePaths[i], ex.GetType().Name, !Directory.Exists(filePaths[i]) ? "Unable to sign the file." : "Unable to sign the files in the directory.");
             }
+            Console.WriteLine();
         }
         CryptographicOperations.ZeroMemory(privateKey);
         DisplayMessage.SuccessfullySigned();
@@ -82,7 +82,7 @@ public static class FileSigning
     
     public static void VerifyEachFile(string[] signaturePaths, string[] filePaths, Span<byte> publicKey)
     {
-        if (filePaths == null || publicKey == default) {
+        if (filePaths == null || publicKey.Length == 0) {
             throw new UserInputException();
         }
         signaturePaths ??= new string[filePaths.Length];

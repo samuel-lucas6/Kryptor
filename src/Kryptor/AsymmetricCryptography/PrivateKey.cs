@@ -85,6 +85,7 @@ public static class PrivateKey
 
             Span<byte> key = stackalloc byte[ChaCha20.KeySize];
             Argon2id.DeriveKey(key, password, salt, iterations: 12, Constants.MemorySize);
+            CryptographicOperations.ZeroMemory(password);
 
             Span<byte> decryptedPrivateKey = XChaCha20BLAKE2b.Decrypt(encryptedPrivateKey.ToArray(), nonce.ToArray(), key.ToArray(), associatedData.ToArray());
             CryptographicOperations.ZeroMemory(key);
