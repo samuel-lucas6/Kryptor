@@ -78,6 +78,7 @@ public static class FileSigning
                 DisplayMessage.FilePathException(filePaths[i], ex.GetType().Name, "Unable to sign the file.");
             }
         }
+        Console.WriteLine();
     }
     
     public static void VerifyEachFile(string[] signaturePaths, string[] filePaths, Span<byte> publicKey)
