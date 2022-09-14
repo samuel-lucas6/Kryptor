@@ -209,7 +209,7 @@ public static class FileDecryption
         Span<byte> nonce = stackalloc byte[ChaCha20.NonceSize]; nonce.Clear();
 
         for (int i = 0; i < wrappedFileKeys.Length; i += ChaCha20.KeySize) {
-            ChaCha20.Decrypt(fileKeys.Slice(i, ChaCha20.KeySize), wrappedFileKeys.Slice(i, ChaCha20.KeySize), nonce, headerKey, Constants.ChaCha20Counter);
+            ChaCha20.Decrypt(fileKeys.Slice(i, ChaCha20.KeySize), wrappedFileKeys.Slice(i, ChaCha20.KeySize), nonce, headerKey);
         }
         CryptographicOperations.ZeroMemory(headerKey);
         

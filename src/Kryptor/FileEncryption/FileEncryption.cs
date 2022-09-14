@@ -57,7 +57,7 @@ public static class FileEncryption
                 CryptographicOperations.ZeroMemory(hashedPassword);
                 
                 SecureRandom.Fill(fileKey);
-                ChaCha20.Encrypt(wrappedFileKeys[..fileKey.Length], fileKey, nonce, headerKey, Constants.ChaCha20Counter);
+                ChaCha20.Encrypt(wrappedFileKeys[..fileKey.Length], fileKey, nonce, headerKey);
                 CryptographicOperations.ZeroMemory(headerKey);
                 SecureRandom.Fill(wrappedFileKeys[fileKey.Length..]);
                 
@@ -94,7 +94,7 @@ public static class FileEncryption
                 BLAKE2b.DeriveKey(headerKey, symmetricKey, Constants.Personalisation, salt, info: ephemeralPublicKey);
                 
                 SecureRandom.Fill(fileKey);
-                ChaCha20.Encrypt(wrappedFileKeys[..fileKey.Length], fileKey, nonce, headerKey, Constants.ChaCha20Counter);
+                ChaCha20.Encrypt(wrappedFileKeys[..fileKey.Length], fileKey, nonce, headerKey);
                 CryptographicOperations.ZeroMemory(headerKey);
                 SecureRandom.Fill(wrappedFileKeys[fileKey.Length..]);
                 
@@ -153,7 +153,7 @@ public static class FileEncryption
                     CryptographicOperations.ZeroMemory(sharedSecret);
                     CryptographicOperations.ZeroMemory(inputKeyingMaterial);
                     
-                    ChaCha20.Encrypt(wrappedFileKeys.Slice(wrappedKeyIndex, fileKey.Length), fileKey, nonce, headerKey, Constants.ChaCha20Counter);
+                    ChaCha20.Encrypt(wrappedFileKeys.Slice(wrappedKeyIndex, fileKey.Length), fileKey, nonce, headerKey);
                     CryptographicOperations.ZeroMemory(headerKey);
                     wrappedKeyIndex += fileKey.Length;
                 }
@@ -205,7 +205,7 @@ public static class FileEncryption
                 CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
                 
                 SecureRandom.Fill(fileKey);
-                ChaCha20.Encrypt(wrappedFileKeys[..fileKey.Length], fileKey, nonce, headerKey, Constants.ChaCha20Counter);
+                ChaCha20.Encrypt(wrappedFileKeys[..fileKey.Length], fileKey, nonce, headerKey);
                 CryptographicOperations.ZeroMemory(headerKey);
                 SecureRandom.Fill(wrappedFileKeys[fileKey.Length..]);
                 

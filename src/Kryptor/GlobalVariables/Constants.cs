@@ -42,7 +42,6 @@ public static class Constants
     public const int UnencryptedHeaderLength = X25519.PublicKeySize + Argon2id.SaltSize;
     public const int MaxRecipients = 20;
     public const int KeyWrapHeaderLength = ChaCha20.KeySize * MaxRecipients;
-    public const uint ChaCha20Counter = 1;
     public const int Int64BytesLength = 8;
     public const int FileNameHeaderLength = 255;
     public const int BoolBytesLength = 1;
