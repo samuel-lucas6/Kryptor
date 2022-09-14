@@ -45,11 +45,11 @@ public static class SigningValidation
         
         if (signaturePaths != null) {
             foreach (string signaturePath in signaturePaths) {
-                if (!signaturePath.EndsWith(Constants.SignatureExtension)) {
-                    yield return ErrorMessages.GetFilePathError(signaturePath, "Please specify a .signature file.");
-                }
                 if (Directory.Exists(signaturePath)) {
                     yield return ErrorMessages.GetFilePathError(signaturePath, "Please specify a file, not a directory.");
+                }
+                else if (!signaturePath.EndsWith(Constants.SignatureExtension)) {
+                    yield return ErrorMessages.GetFilePathError(signaturePath, "Please specify a .signature file.");
                 }
             }
         }
