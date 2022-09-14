@@ -199,7 +199,9 @@ public static class CommandLine
         Console.WriteLine("1) Encryption");
         Console.WriteLine("2) Signing");
         string userInput = Console.ReadLine();
-        Console.WriteLine();
+        if (!string.IsNullOrEmpty(userInput)) {
+            Console.WriteLine();
+        }
         _ = int.TryParse(userInput, out int keyPairType);
         return keyPairType;
     }
