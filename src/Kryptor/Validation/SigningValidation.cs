@@ -24,7 +24,7 @@ namespace Kryptor;
 
 public static class SigningValidation
 {
-    private const string InvalidSignatureFile = "Please specify a signature file with a valid format.";
+    private const string WrongSignatureExtension = "Please specify a .signature file.";
     private const string SignatureFileInaccessible = "Unable to access the signature file.";
     
     public static IEnumerable<string> GetSignErrors(string privateKeyPath, string comment, string[] signaturePaths, string[] filePaths)
@@ -49,7 +49,7 @@ public static class SigningValidation
                     yield return ErrorMessages.GetFilePathError(signaturePath, "Please specify a file, not a directory.");
                 }
                 else if (!signaturePath.EndsWith(Constants.SignatureExtension)) {
-                    yield return ErrorMessages.GetFilePathError(signaturePath, "Please specify a .signature file.");
+                    yield return ErrorMessages.GetFilePathError(signaturePath, WrongSignatureExtension);
                 }
             }
         }
@@ -138,11 +138,11 @@ public static class SigningValidation
 
     private static string GetSignatureFileError(string signatureFilePath)
     {
-        if (!signatureFilePath.EndsWith(Constants.SignatureExtension)) { return InvalidSignatureFile; }
+        if (!signatureFilePath.EndsWith(Constants.SignatureExtension)) { return WrongSignatureExtension; }
         if (!File.Exists(signatureFilePath)) { return "Please specify a signature file that exists."; }
         bool? validMagicBytes = IsValidSignatureFile(signatureFilePath, out bool? validVersion);
         if (validMagicBytes == null) { return SignatureFileInaccessible; }
-        if (validMagicBytes == false) { return InvalidSignatureFile; }
+        if (validMagicBytes == false) { return "Please specify a signature file with a valid format."; }
         return validVersion == false ? "This signature file doesn't have a valid version." : null;
     }
     
