@@ -51,7 +51,7 @@ public static class PasswordPrompt
     {
         Console.WriteLine("Retype password:");
         Span<byte> retypedPassword = GetPassword();
-        if (!ConstantTime.Equals(password, retypedPassword)) {
+        if (retypedPassword.Length == 0 || !ConstantTime.Equals(password, retypedPassword)) {
             DisplayMessage.Error("The passwords don't match.");
             Environment.Exit(Constants.ErrorCode);
         }
