@@ -225,7 +225,7 @@ public static class FileEncryption
     private static bool IsDirectory(string inputFilePath, out string zipFilePath)
     {
         bool isDirectory = File.GetAttributes(inputFilePath).HasFlag(FileAttributes.Directory);
-        zipFilePath = inputFilePath + Constants.ZipFileExtension;
+        zipFilePath = FileHandling.TrimTrailingSeparatorChars(inputFilePath) + Constants.ZipFileExtension;
         if (isDirectory) {
             FileHandling.CreateZipFile(inputFilePath, zipFilePath);
         }
