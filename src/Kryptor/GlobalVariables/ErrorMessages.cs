@@ -24,6 +24,7 @@ public static class ErrorMessages
 {
     public const string FileOrDirectoryDoesNotExist = "This file/directory doesn't exist.";
     public const string DirectoryEmpty = "This directory is empty.";
+    public const string UnableToAccessDirectory = "Unable to access this directory.";
     public const string InvalidPrivateKeyFile = "Please specify a .private key file.";
     public const string NonExistentDefaultPrivateKeyFile = "You don't have a default key pair. You can generate one using -g|--generate.";
     public const string NonExistentPrivateKeyFile = "Please specify a private key file that exists.";

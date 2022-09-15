@@ -83,9 +83,6 @@ public static class AsymmetricKeyValidation
             var publicKeys = new List<byte[]>();
             foreach (string publicKeyPath in publicKeyPaths) {
                 byte[] publicKey = GetPublicKeyFromFile(publicKeyPath);
-                if (publicKey == null) {
-                    return null;
-                }
                 ValidateEncryptionKeyAlgorithm(publicKey);
                 publicKey = publicKey[Constants.Curve25519KeyHeader.Length..];
                 CheckIfDuplicate(publicKeys, publicKey);
@@ -109,15 +106,12 @@ public static class AsymmetricKeyValidation
         try
         {
             Span<byte> publicKey = GetPublicKeyFromFile(publicKeyPath);
-            if (publicKey.Length == 0) {
-                return Span<byte>.Empty;
-            }
             ValidateSigningKeyAlgorithm(publicKey);
             return publicKey[Constants.Ed25519KeyHeader.Length..];
         }
         catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
-            DisplayMessage.FilePathException(publicKeyPath, ex.GetType().Name, "Please specify a valid signing public key.");
+            DisplayMessage.FilePathException(publicKeyPath, ex.GetType().Name, ex.Message);
             return Span<byte>.Empty;
         }
     }
@@ -134,8 +128,9 @@ public static class AsymmetricKeyValidation
         }
         catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
-            DisplayMessage.FilePathException(publicKeyPath, ex.GetType().Name, ex is ArgumentException or FormatException ? ex.Message : "Unable to read the public key file.");
-            return null;
+            if (ex is ArgumentException) { throw new ArgumentException(ex.Message, ex); }
+            if (ex is FormatException) { throw new FormatException(ex.Message, ex); }
+            throw new IOException("Unable to read the public key file.", ex);
         }
     }
 
@@ -155,11 +150,7 @@ public static class AsymmetricKeyValidation
         }
         catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
-            if (ex is ArgumentException) {
-                DisplayMessage.Error(ex.Message);
-                return null;
-            }
-            DisplayMessage.Exception(ex.GetType().Name, encodedPublicKeys?.Length > 1 ? "Please enter valid encryption public keys." : "Please enter a valid encryption public key.");
+            DisplayMessage.Exception(ex.GetType().Name, ex.Message);
             return null;
         }
     }
@@ -190,7 +181,7 @@ public static class AsymmetricKeyValidation
     private static void CheckIfDuplicate(IEnumerable<byte[]> publicKeys, byte[] publicKey)
     {
         if (publicKeys.Any(key => key.SequenceEqual(publicKey))) {
-            throw new ArgumentException("The same public key has been specified more than once.");
+            throw new NotSupportedException("The same public key has been specified more than once.");
         }
     }
 
@@ -250,9 +241,11 @@ public static class AsymmetricKeyValidation
             }
             return Encodings.FromBase64(encodedPrivateKey);
         }
-        catch (Exception ex) when (ExceptionFilters.FileAccess(ex) || ex is FormatException)
+        catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
-            throw new ArgumentException(ex is ArgumentException or FormatException ? ex.Message : "Unable to read the private key file.", ex);
+            if (ex is ArgumentException) { throw new ArgumentException(ex.Message, ex); }
+            if (ex is FormatException) { throw new FormatException(ex.Message, ex); }
+            throw new IOException("Unable to read the private key file.", ex);
         }
     }
 
@@ -299,6 +292,8 @@ public static class AsymmetricKeyValidation
             string publicKeyPath = Path.ChangeExtension(privateKeyPath, Constants.PublicKeyExtension);
             AsymmetricKeys.CreateKeyFile(publicKeyPath, publicKeyString);
             DisplayMessage.PublicKey(publicKeyString, publicKeyPath);
+            Console.WriteLine();
+            DisplayMessage.WriteLine("IMPORTANT: Please back up these updated files to external storage (e.g. memory sticks).", ConsoleColor.DarkYellow);
             Console.WriteLine();
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))

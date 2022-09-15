@@ -29,5 +29,5 @@ public static class ExceptionFilters
 
     public static bool Cryptography(Exception ex) => ex is CryptographicException || FileAccess(ex);
 
-    public static bool StringKey(Exception ex) => ex is ArgumentException or NotSupportedException or FormatException or CryptographicException;
+    public static bool StringKey(Exception ex) => ex is FormatException || Cryptography(ex);
 }
