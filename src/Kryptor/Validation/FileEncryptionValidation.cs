@@ -119,7 +119,7 @@ public static class FileEncryptionValidation
                 else if (Directory.Exists(inputFilePath) && FileHandling.IsDirectoryEmpty(inputFilePath)) {
                     yield return ErrorMessages.GetFilePathError(inputFilePath, ErrorMessages.DirectoryEmpty);
                 }
-                else if (!File.Exists(inputFilePath)) {
+                else if (!File.Exists(inputFilePath) && !Directory.Exists(inputFilePath)) {
                     yield return ErrorMessages.GetFilePathError(inputFilePath, ErrorMessages.FileOrDirectoryDoesNotExist);
                 }
             }
@@ -186,7 +186,7 @@ public static class FileEncryptionValidation
                 if (Directory.Exists(inputFilePath) && FileHandling.IsDirectoryEmpty(inputFilePath)) {
                     yield return ErrorMessages.GetFilePathError(inputFilePath, ErrorMessages.DirectoryEmpty);
                 }
-                else if (!File.Exists(inputFilePath)) {
+                else if (!File.Exists(inputFilePath) && !Directory.Exists(inputFilePath)) {
                     yield return ErrorMessages.GetFilePathError(inputFilePath, ErrorMessages.FileOrDirectoryDoesNotExist);
                 }
             }
