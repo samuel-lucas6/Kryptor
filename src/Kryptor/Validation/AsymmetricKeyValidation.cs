@@ -280,7 +280,11 @@ public static class AsymmetricKeyValidation
         try
         {
             Console.WriteLine("Updating private key format...");
-            Span<byte> keyAlgorithm = privateKey[..Constants.KeyAlgorithmLength];
+            Span<byte> keyAlgorithm = decryptedPrivateKey.Length switch
+            {
+                X25519.PrivateKeySize => Constants.Curve25519KeyHeader,
+                _ => Constants.Ed25519KeyHeader
+            };
             Span<byte> v2PrivateKey = PrivateKey.Encrypt(decryptedPrivateKey, password, keyAlgorithm);
             AsymmetricKeys.CreateKeyFile(privateKeyPath, Encodings.ToBase64(v2PrivateKey));
             Console.WriteLine("Private key format successfully updated.");
