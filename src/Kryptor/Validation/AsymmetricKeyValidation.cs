@@ -92,7 +92,7 @@ public static class AsymmetricKeyValidation
         }
         catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
-            if (ex is ArgumentException) {
+            if (ex is ArgumentException or FormatException or IOException) {
                 DisplayMessage.Error(ex.Message);
                 return null;
             }
@@ -150,7 +150,11 @@ public static class AsymmetricKeyValidation
         }
         catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
-            DisplayMessage.Exception(ex.GetType().Name, ex.Message);
+            if (ex is ArgumentException or FormatException) {
+                DisplayMessage.Error(ex.Message);
+                return null;
+            }
+            DisplayMessage.Exception(ex.GetType().Name, encodedPublicKeys?.Length > 1 ? "Please enter valid encryption public keys." : "Please enter a valid encryption public key.");
             return null;
         }
     }
@@ -181,7 +185,7 @@ public static class AsymmetricKeyValidation
     private static void CheckIfDuplicate(IEnumerable<byte[]> publicKeys, byte[] publicKey)
     {
         if (publicKeys.Any(key => key.SequenceEqual(publicKey))) {
-            throw new NotSupportedException("The same public key has been specified more than once.");
+            throw new ArgumentException("The same public key has been specified more than once.");
         }
     }
 
