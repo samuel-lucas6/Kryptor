@@ -201,6 +201,9 @@ public static class FileEncryptionValidation
                 else if (!File.Exists(inputFilePath)) {
                     yield return ErrorMessages.GetFilePathError(inputFilePath, ErrorMessages.FileOrDirectoryDoesNotExist);
                 }
+                else if (new FileInfo(inputFilePath).Length < Constants.FileHeadersLength) {
+                    yield return ErrorMessages.GetFilePathError(inputFilePath, "This file is too small to be encrypted.");
+                }
             }
         }
     }
