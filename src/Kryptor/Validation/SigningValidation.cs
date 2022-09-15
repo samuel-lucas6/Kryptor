@@ -60,8 +60,12 @@ public static class SigningValidation
         else {
             foreach (string filePath in filePaths) {
                 if (Directory.Exists(filePath)) {
-                    if (FileHandling.IsDirectoryEmpty(filePath)) {
+                    bool? isEmpty = FileHandling.IsDirectoryEmpty(filePath);
+                    if (isEmpty == true) {
                         yield return ErrorMessages.GetFilePathError(filePath, ErrorMessages.DirectoryEmpty);
+                    }
+                    else if (isEmpty == null) {
+                        yield return ErrorMessages.GetFilePathError(filePath, ErrorMessages.UnableToAccessDirectory);
                     }
                     if (signaturePaths != null) {
                         yield return ErrorMessages.GetFilePathError(filePath, "You cannot specify signature files when signing a directory.");

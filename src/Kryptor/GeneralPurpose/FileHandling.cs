@@ -25,7 +25,17 @@ namespace Kryptor;
 
 public static class FileHandling
 {
-    public static bool IsDirectoryEmpty(string directoryPath) => !Directory.EnumerateFiles(directoryPath, searchPattern: "*", SearchOption.AllDirectories).Any();
+    public static bool? IsDirectoryEmpty(string directoryPath)
+    {
+        try
+        {
+            return !Directory.EnumerateFiles(directoryPath, searchPattern: "*", SearchOption.AllDirectories).Any();
+        }
+        catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
+        {
+            return null;
+        }
+    }
     
     public static string TrimTrailingSeparatorChars(string filePath) => filePath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar, Path.VolumeSeparatorChar);
     

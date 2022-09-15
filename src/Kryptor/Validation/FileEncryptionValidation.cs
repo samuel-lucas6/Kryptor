@@ -116,10 +116,16 @@ public static class FileEncryptionValidation
                 if (Path.GetFileName(Path.TrimEndingDirectorySeparator(inputFilePath)).IndexOfAny(IllegalFileNameChars) != -1) {
                     yield return ErrorMessages.GetFilePathError(inputFilePath, "This file/directory name contains illegal characters for cross-platform decryption.");
                 }
-                else if (Directory.Exists(inputFilePath) && FileHandling.IsDirectoryEmpty(inputFilePath)) {
-                    yield return ErrorMessages.GetFilePathError(inputFilePath, ErrorMessages.DirectoryEmpty);
+                else if (Directory.Exists(inputFilePath)) {
+                    bool? isEmpty = FileHandling.IsDirectoryEmpty(inputFilePath);
+                    if (isEmpty == true) {
+                        yield return ErrorMessages.GetFilePathError(inputFilePath, ErrorMessages.DirectoryEmpty);
+                    }
+                    else if (isEmpty == null) {
+                        yield return ErrorMessages.GetFilePathError(inputFilePath, ErrorMessages.UnableToAccessDirectory);
+                    }
                 }
-                else if (!File.Exists(inputFilePath) && !Directory.Exists(inputFilePath)) {
+                else if (!File.Exists(inputFilePath)) {
                     yield return ErrorMessages.GetFilePathError(inputFilePath, ErrorMessages.FileOrDirectoryDoesNotExist);
                 }
             }
@@ -183,10 +189,16 @@ public static class FileEncryptionValidation
         }
         else {
             foreach (string inputFilePath in filePaths) {
-                if (Directory.Exists(inputFilePath) && FileHandling.IsDirectoryEmpty(inputFilePath)) {
-                    yield return ErrorMessages.GetFilePathError(inputFilePath, ErrorMessages.DirectoryEmpty);
+                if (Directory.Exists(inputFilePath)) {
+                    bool? isEmpty = FileHandling.IsDirectoryEmpty(inputFilePath);
+                    if (isEmpty == true) {
+                        yield return ErrorMessages.GetFilePathError(inputFilePath, ErrorMessages.DirectoryEmpty);
+                    }
+                    else if (isEmpty == null) {
+                        yield return ErrorMessages.GetFilePathError(inputFilePath, ErrorMessages.UnableToAccessDirectory);
+                    }
                 }
-                else if (!File.Exists(inputFilePath) && !Directory.Exists(inputFilePath)) {
+                else if (!File.Exists(inputFilePath)) {
                     yield return ErrorMessages.GetFilePathError(inputFilePath, ErrorMessages.FileOrDirectoryDoesNotExist);
                 }
             }
