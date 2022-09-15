@@ -25,6 +25,7 @@ namespace Kryptor;
 public static class FileEncryptionValidation
 {
     private const string FileOrDirectoryError = "Please specify a file/directory.";
+    private static readonly string KeyfileTooSmall = $"Please specify a keyfile that's at least {Constants.KeyfileLength} bytes in size.";
     private static readonly char[] IllegalFileNameChars = {
         '\"', '<', '>', '|', '\0',
         (char) 1, (char) 2, (char) 3, (char) 4, (char) 5, (char) 6, (char) 7, (char) 8, (char) 9, (char) 10,
@@ -35,14 +36,17 @@ public static class FileEncryptionValidation
     
     public static IEnumerable<string> GetEncryptionErrors(string symmetricKey)
     {
+        if (string.IsNullOrEmpty(symmetricKey)) {
+            yield break;
+        }
         if (Path.EndsInDirectorySeparator(symmetricKey) && !Directory.Exists(symmetricKey)) {
             yield return ErrorMessages.GetFilePathError(symmetricKey, "Please specify a valid directory for the keyfile.");
         }
-        else if (File.Exists(symmetricKey) && new FileInfo(symmetricKey).Length < Constants.KeyfileLength) {
-            yield return ErrorMessages.GetFilePathError(symmetricKey, $"Please specify a keyfile that's at least {Constants.KeyfileLength} bytes in size.");
-        }
-        else if (!string.IsNullOrEmpty(symmetricKey) && symmetricKey.EndsWith(Constants.Base64Padding) && symmetricKey.Length != Constants.SymmetricKeyLength) {
+        else if (symmetricKey.EndsWith(Constants.Base64Padding) && symmetricKey.Length != Constants.SymmetricKeyLength) {
             yield return ErrorMessages.GetKeyStringError(symmetricKey, ErrorMessages.InvalidSymmetricKey);
+        }
+        else if (File.Exists(symmetricKey) && new FileInfo(symmetricKey).Length < Constants.KeyfileLength) {
+            yield return ErrorMessages.GetFilePathError(symmetricKey, KeyfileTooSmall);
         }
     }
 
@@ -134,11 +138,19 @@ public static class FileEncryptionValidation
 
     public static IEnumerable<string> GetDecryptionErrors(string symmetricKey)
     {
-        if (!string.IsNullOrEmpty(symmetricKey) && symmetricKey.EndsWith(Constants.Base64Padding) && symmetricKey.Length != Constants.SymmetricKeyLength) {
+        if (string.IsNullOrEmpty(symmetricKey)) {
+            yield break;
+        }
+        if (symmetricKey.EndsWith(Constants.Base64Padding) && symmetricKey.Length != Constants.SymmetricKeyLength) {
             yield return ErrorMessages.GetKeyStringError(symmetricKey, ErrorMessages.InvalidSymmetricKey);
         }
-        else if (!string.IsNullOrEmpty(symmetricKey) && !symmetricKey.EndsWith(Constants.Base64Padding) && !File.Exists(symmetricKey)) {
-            yield return ErrorMessages.GetFilePathError(symmetricKey, "Please specify a valid symmetric key string or a keyfile that exists.");
+        else if (!symmetricKey.EndsWith(Constants.Base64Padding)) {
+            if (File.Exists(symmetricKey) && new FileInfo(symmetricKey).Length < Constants.KeyfileLength) {
+                yield return ErrorMessages.GetFilePathError(symmetricKey, KeyfileTooSmall);
+            }
+            else if (!File.Exists(symmetricKey)) {
+                yield return ErrorMessages.GetFilePathError(symmetricKey, "Please specify a valid symmetric key string or a keyfile that exists.");
+            }
         }
     }
     
