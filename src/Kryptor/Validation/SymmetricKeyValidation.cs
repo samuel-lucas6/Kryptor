@@ -107,7 +107,7 @@ public static class SymmetricKeyValidation
         }
         catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
-            DisplayMessage.KeyStringException(encodedSymmetricKey, ex.GetType().Name, ErrorMessages.InvalidSymmetricKey);
+            DisplayMessage.Exception(ex.GetType().Name, ErrorMessages.InvalidSymmetricKey);
             throw new UserInputException(ex.Message, ex);
         }
     }

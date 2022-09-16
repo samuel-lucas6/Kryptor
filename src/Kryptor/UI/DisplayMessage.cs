@@ -48,13 +48,7 @@ public static class DisplayMessage
         Environment.ExitCode = Constants.ErrorCode;
         WriteLine($"{exceptionName}: \"{Path.GetFileName(FileHandling.TrimTrailingSeparatorChars(filePath))}\" - {message}", ConsoleColor.DarkRed);
     }
-    
-    public static void KeyStringException(string keyString, string exceptionName, string message)
-    {
-        Environment.ExitCode = Constants.ErrorCode;
-        WriteLine($"{exceptionName}: \"{keyString}\" - {message}", ConsoleColor.DarkRed);
-    }
-    
+
     public static void DerivingKeyFromPassword() => Console.WriteLine("Deriving encryption key from password...");
 
     public static void InputToOutput(string activity, string inputFilePath, string outputFilePath)
