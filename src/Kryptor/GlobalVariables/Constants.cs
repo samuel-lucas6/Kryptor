@@ -55,7 +55,7 @@ public static class Constants
     public const int KeyfileLength = ChaCha20.KeySize;
     public const char Base64Padding = '=';
     public const int SymmetricKeyLength = 48;
-    public static readonly byte[] SymmetricKeyHeader = { 61, 34, 184 };
+    public static readonly byte[] SymmetricKeyHeader = { 61, 34, 191 }; // "PSK/" in Base64
     
     // Asymmetric keys
     public static readonly string DefaultKeyDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".kryptor");
@@ -71,11 +71,10 @@ public static class Constants
     public const int PublicKeyLength = 48;
     public const int V2EncryptionPrivateKeyLength = 136;
     public const int V1EncryptionPrivateKeyLength = 144;
-    public const int V2SigningPrivateKeyLength = 176;
+    public const int V2SigningPrivateKeyLength = 180;
     public const int V1SigningPrivateKeyLength = 188;
-    public const int KeyAlgorithmLength = 2;
-    public static readonly byte[] Curve25519KeyHeader = { 10, 234 };
-    public static readonly byte[] Ed25519KeyHeader = { 17, 222 };
+    public static readonly byte[] Curve25519KeyHeader = { 10, 239, 255 }; // "Cu//" in Base64
+    public static readonly byte[] Ed25519KeyHeader = { 17, 223, 255 }; // "Ed//" in Base64
     public static readonly byte[] OldCurve25519KeyHeader = Encoding.UTF8.GetBytes("Cu");
     public static readonly byte[] OldEd25519KeyHeader = Encoding.UTF8.GetBytes("Ed");
     public static readonly byte[] PrivateKeyVersion2 = { 2, 0 };

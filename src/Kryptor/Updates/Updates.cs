@@ -107,7 +107,7 @@ public static class Updates
 
     private static void VerifyDownloadSignature(string signatureFilePath, string downloadFilePath, string latestVersion)
     {
-        Span<byte> publicKey = AsymmetricKeyValidation.SigningPublicKeyString("Ed5udj7GpRdUxpojSmgHBOoNGUoD37H0WOUMAcT0yZcobg==");
+        Span<byte> publicKey = AsymmetricKeyValidation.SigningPublicKeyString("Ed//bnY+xqUXVMaaI0poBwTqDRlKA9+x9FjlDAHE9MmXKG4=");
         bool validSignature = DigitalSignatures.VerifySignature(signatureFilePath, downloadFilePath, publicKey, out string comment);
         File.Delete(signatureFilePath);
         if (validSignature && comment.Equals($"Kryptor v{latestVersion}")) {

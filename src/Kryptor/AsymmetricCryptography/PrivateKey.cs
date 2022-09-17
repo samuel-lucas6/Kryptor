@@ -54,7 +54,7 @@ public static class PrivateKey
     {
         try
         {
-            Span<byte> associatedData = privateKey[..(Constants.KeyAlgorithmLength + Constants.PrivateKeyVersion2.Length)];
+            Span<byte> associatedData = privateKey[..(Constants.Curve25519KeyHeader.Length + Constants.PrivateKeyVersion2.Length)];
             Span<byte> salt = privateKey.Slice(associatedData.Length, Argon2id.SaltSize);
             Span<byte> encryptedPrivateKey = privateKey[(associatedData.Length + salt.Length)..];
             
@@ -78,7 +78,7 @@ public static class PrivateKey
     {
         try
         {
-            Span<byte> associatedData = privateKey[..(Constants.KeyAlgorithmLength + Constants.PrivateKeyVersion1.Length)];
+            Span<byte> associatedData = privateKey[..(Constants.OldCurve25519KeyHeader.Length + Constants.PrivateKeyVersion1.Length)];
             Span<byte> salt = privateKey.Slice(associatedData.Length, Argon2id.SaltSize);
             Span<byte> nonce = privateKey.Slice(associatedData.Length + salt.Length, XChaCha20.NonceSize);
             Span<byte> encryptedPrivateKey = privateKey[(associatedData.Length + salt.Length + nonce.Length)..];

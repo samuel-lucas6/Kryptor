@@ -83,8 +83,8 @@ public static class AsymmetricKeyValidation
             var publicKeys = new List<byte[]>();
             foreach (string publicKeyPath in publicKeyPaths) {
                 byte[] publicKey = GetPublicKeyFromFile(publicKeyPath);
-                ValidateEncryptionKeyAlgorithm(publicKey);
-                publicKey = publicKey[Constants.Curve25519KeyHeader.Length..];
+                bool version2 = ValidateEncryptionKeyAlgorithm(publicKey);
+                publicKey = version2 ? publicKey[Constants.Curve25519KeyHeader.Length..] : publicKey[Constants.OldCurve25519KeyHeader.Length..];
                 CheckIfDuplicate(publicKeys, publicKey);
                 publicKeys.Add(publicKey);
             }
@@ -106,8 +106,8 @@ public static class AsymmetricKeyValidation
         try
         {
             Span<byte> publicKey = GetPublicKeyFromFile(publicKeyPath);
-            ValidateSigningKeyAlgorithm(publicKey);
-            return publicKey[Constants.Ed25519KeyHeader.Length..];
+            bool version2 = ValidateSigningKeyAlgorithm(publicKey);
+            return version2 ? publicKey[Constants.Ed25519KeyHeader.Length..] : publicKey[Constants.OldEd25519KeyHeader.Length..];
         }
         catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
@@ -141,8 +141,8 @@ public static class AsymmetricKeyValidation
             var publicKeys = new List<byte[]>();
             foreach (string encodedPublicKey in encodedPublicKeys) {
                 byte[] publicKey = Encodings.FromBase64(encodedPublicKey);
-                ValidateEncryptionKeyAlgorithm(publicKey);
-                publicKey = publicKey[Constants.Curve25519KeyHeader.Length..];
+                bool version2 = ValidateEncryptionKeyAlgorithm(publicKey);
+                publicKey = version2 ? publicKey[Constants.Curve25519KeyHeader.Length..] : publicKey[Constants.OldCurve25519KeyHeader.Length..];
                 CheckIfDuplicate(publicKeys, publicKey);
                 publicKeys.Add(publicKey);
             }
@@ -164,8 +164,8 @@ public static class AsymmetricKeyValidation
         try
         {
             Span<byte> publicKey = Encodings.FromBase64(encodedPublicKey);
-            ValidateSigningKeyAlgorithm(publicKey);
-            return publicKey[Constants.Ed25519KeyHeader.Length..];
+            bool version2 = ValidateSigningKeyAlgorithm(publicKey);
+            return version2 ? publicKey[Constants.Ed25519KeyHeader.Length..] : publicKey[Constants.OldEd25519KeyHeader.Length..];
         }
         catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
@@ -174,12 +174,14 @@ public static class AsymmetricKeyValidation
         }
     }
 
-    private static void ValidateEncryptionKeyAlgorithm(Span<byte> asymmetricKey)
+    private static bool ValidateEncryptionKeyAlgorithm(Span<byte> asymmetricKey)
     {
-        Span<byte> keyAlgorithm = asymmetricKey[..Constants.Curve25519KeyHeader.Length];
-        if (!ConstantTime.Equals(keyAlgorithm, Constants.Curve25519KeyHeader) && !ConstantTime.Equals(keyAlgorithm, Constants.OldCurve25519KeyHeader)) {
+        bool version2 = ConstantTime.Equals(asymmetricKey[..Constants.Curve25519KeyHeader.Length], Constants.Curve25519KeyHeader);
+        bool version1 = ConstantTime.Equals(asymmetricKey[..Constants.OldCurve25519KeyHeader.Length], Constants.OldCurve25519KeyHeader);
+        if (!version2 && !version1) {
             throw new NotSupportedException("This key algorithm isn't supported for encryption.");
         }
+        return version2;
     }
 
     private static void CheckIfDuplicate(IEnumerable<byte[]> publicKeys, byte[] publicKey)
@@ -189,12 +191,14 @@ public static class AsymmetricKeyValidation
         }
     }
 
-    private static void ValidateSigningKeyAlgorithm(Span<byte> asymmetricKey)
+    private static bool ValidateSigningKeyAlgorithm(Span<byte> asymmetricKey)
     {
-        Span<byte> keyAlgorithm = asymmetricKey[..Constants.Ed25519KeyHeader.Length];
-        if (!ConstantTime.Equals(keyAlgorithm, Constants.Ed25519KeyHeader) && !ConstantTime.Equals(keyAlgorithm, Constants.OldEd25519KeyHeader)) {
+        bool version2 = ConstantTime.Equals(asymmetricKey[..Constants.Ed25519KeyHeader.Length], Constants.Ed25519KeyHeader);
+        bool version1 = ConstantTime.Equals(asymmetricKey[..Constants.OldEd25519KeyHeader.Length], Constants.OldEd25519KeyHeader);
+        if (!version2 && !version1) {
             throw new NotSupportedException("This key algorithm isn't supported for signing.");
         }
+        return version2;
     }
 
     public static Span<byte> EncryptionPrivateKeyFile(string privateKeyPath, Span<byte> password)
@@ -255,8 +259,9 @@ public static class AsymmetricKeyValidation
 
     public static Span<byte> DecryptPrivateKey(Span<byte> privateKey, Span<byte> password, string privateKeyPath)
     {
-        Span<byte> keyVersion = privateKey.Slice(Constants.KeyAlgorithmLength, Constants.PrivateKeyVersion2.Length);
+        Span<byte> keyVersion = privateKey.Slice(Constants.Curve25519KeyHeader.Length, Constants.PrivateKeyVersion2.Length);
         bool version2 = ConstantTime.Equals(keyVersion, Constants.PrivateKeyVersion2);
+        keyVersion = privateKey.Slice(Constants.OldCurve25519KeyHeader.Length, Constants.PrivateKeyVersion1.Length);
         bool version1 = ConstantTime.Equals(keyVersion, Constants.PrivateKeyVersion1);
         if (!version2 && !version1) {
             throw new NotSupportedException("This private key version isn't supported.");
