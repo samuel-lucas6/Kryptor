@@ -75,7 +75,7 @@ public static class EncryptFile
         Span<byte> plaintextLength = stackalloc byte[Constants.Int64BytesLength];
         BinaryPrimitives.WriteInt64LittleEndian(plaintextLength, fileLength);
         Span<byte> paddedFileName = GetPaddedFileName(fileName);
-        Span<byte> spare = stackalloc byte[Constants.Int64BytesLength * 4]; spare.Clear();
+        Span<byte> spare = stackalloc byte[Constants.SpareHeaderLength]; spare.Clear();
         Span<byte> directory = BitConverter.GetBytes(isDirectory);
         Span<byte> plaintextHeader = stackalloc byte[Constants.EncryptedHeaderLength - Poly1305.TagSize - kcChaCha20Poly1305.CommitmentSize];
         Spans.Concat(plaintextHeader, plaintextLength, paddedFileName, spare, directory);
@@ -96,7 +96,7 @@ public static class EncryptFile
         
         Span<byte> fileNameBytes = new byte[Encoding.UTF8.GetMaxByteCount(fileName.Length)];
         int bytesEncoded = Encoding.UTF8.GetBytes(fileName, fileNameBytes);
-        if (bytesEncoded > paddedFileName.Length) {
+        if (bytesEncoded > paddedFileName.Length - 1) {
             throw new ArgumentException("The encoded file name is too long to be stored. Please rename the file.");
         }
         Padding.Pad(paddedFileName, fileNameBytes[..bytesEncoded], paddedFileName.Length);
