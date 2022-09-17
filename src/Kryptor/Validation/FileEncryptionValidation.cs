@@ -39,14 +39,16 @@ public static class FileEncryptionValidation
         if (string.IsNullOrEmpty(symmetricKey)) {
             yield break;
         }
-        if (Path.EndsInDirectorySeparator(symmetricKey) && !Directory.Exists(symmetricKey)) {
-            yield return ErrorMessages.GetFilePathError(symmetricKey, "Please specify a valid directory for the keyfile.");
-        }
-        else if (symmetricKey.EndsWith(Constants.Base64Padding) && symmetricKey.Length != Constants.SymmetricKeyLength) {
+        if (symmetricKey.EndsWith(Constants.Base64Padding) && symmetricKey.Length != Constants.SymmetricKeyLength) {
             yield return ErrorMessages.GetKeyStringError(symmetricKey, ErrorMessages.InvalidSymmetricKey);
         }
-        else if (File.Exists(symmetricKey) && new FileInfo(symmetricKey).Length < Constants.KeyfileLength) {
-            yield return ErrorMessages.GetFilePathError(symmetricKey, KeyfileTooSmall);
+        else if (!symmetricKey.EndsWith(Constants.Base64Padding)) {
+            if (File.Exists(symmetricKey) && new FileInfo(symmetricKey).Length < Constants.KeyfileLength) {
+                yield return ErrorMessages.GetFilePathError(symmetricKey, KeyfileTooSmall);
+            }
+            else if (!File.Exists(symmetricKey) && (symmetricKey.Contains(Path.DirectorySeparatorChar) || symmetricKey.Contains(Path.AltDirectorySeparatorChar)) && !Directory.Exists(Path.GetDirectoryName(symmetricKey))) {
+                yield return ErrorMessages.GetFilePathError(symmetricKey, "Please specify a valid directory for the keyfile.");
+            }
         }
     }
 
@@ -145,11 +147,11 @@ public static class FileEncryptionValidation
             yield return ErrorMessages.GetKeyStringError(symmetricKey, ErrorMessages.InvalidSymmetricKey);
         }
         else if (!symmetricKey.EndsWith(Constants.Base64Padding)) {
-            if (File.Exists(symmetricKey) && new FileInfo(symmetricKey).Length < Constants.KeyfileLength) {
-                yield return ErrorMessages.GetFilePathError(symmetricKey, KeyfileTooSmall);
-            }
-            else if (!File.Exists(symmetricKey)) {
+            if (!File.Exists(symmetricKey)) {
                 yield return ErrorMessages.GetFilePathError(symmetricKey, "Please specify a valid symmetric key string or a keyfile that exists.");
+            }
+            else if (new FileInfo(symmetricKey).Length < Constants.KeyfileLength) {
+                yield return ErrorMessages.GetFilePathError(symmetricKey, KeyfileTooSmall);
             }
         }
     }
