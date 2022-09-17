@@ -292,7 +292,7 @@ public static class AsymmetricKeyValidation
             };
             Span<byte> v2PrivateKey = PrivateKey.Encrypt(decryptedPrivateKey, password, keyAlgorithm);
             AsymmetricKeys.CreateKeyFile(privateKeyPath, Encodings.ToBase64(v2PrivateKey));
-            Console.WriteLine("Private key format successfully updated.");
+            DisplayMessage.WriteLine("Private key format successfully updated.", ConsoleColor.Green);
             Console.WriteLine();
             
             Console.WriteLine("Updating public key format...");
@@ -304,15 +304,14 @@ public static class AsymmetricKeyValidation
             string publicKeyString = Encodings.ToBase64(publicKey);
             string publicKeyPath = Path.ChangeExtension(privateKeyPath, Constants.PublicKeyExtension);
             AsymmetricKeys.CreateKeyFile(publicKeyPath, publicKeyString);
-            DisplayMessage.PublicKey(publicKeyString, publicKeyPath);
-            Console.WriteLine();
-            DisplayMessage.WriteLine("IMPORTANT: Please back up these updated files to external storage (e.g. memory sticks).", ConsoleColor.DarkYellow);
-            Console.WriteLine();
+            DisplayMessage.WriteLine("Public key format successfully updated.", ConsoleColor.Green);
+            DisplayMessage.KeyPair(publicKeyString, publicKeyPath, privateKeyPath);
         }
         catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
         {
-            DisplayMessage.FilePathException(privateKeyPath, ex.GetType().Name, "Unable to update private and/or public key to latest format.");
+            DisplayMessage.Exception(ex.GetType().Name, "Unable to update private and/or public key to latest format. Use -r|--recover to get your new public key if the private key updated successfully.");
         }
+        Console.WriteLine();
         return plaintextPrivateKey;
     }
 }
