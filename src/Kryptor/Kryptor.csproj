@@ -2,34 +2,28 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <PublishReadyToRunShowWarnings>true</PublishReadyToRunShowWarnings>
     <TargetFramework>net6.0</TargetFramework>
-	<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
-	<PublishReadyToRunShowWarnings>true</PublishReadyToRunShowWarnings>
-	<StartupObject>Kryptor.Program</StartupObject>
+    <StartupObject>Kryptor.Program</StartupObject>
+    <AssemblyName>kryptor</AssemblyName>
     <ApplicationIcon>Kryptor.ico</ApplicationIcon>
-    <Platforms>x64</Platforms>
-    <PackageId>Kryptor</PackageId>
+    <PlatformTarget>x64</PlatformTarget>
     <Version>4.0.0</Version>
     <Authors>Samuel Lucas</Authors>
-    <Company />
     <Product>Kryptor</Product>
+    <AssemblyTitle>A simple, modern, and secure encryption and signing tool.</AssemblyTitle>
     <Copyright>Copyright © 2020-2022 Samuel Lucas</Copyright>
-    <Description>A simple, modern, and secure encryption and signing tool.</Description>
-    <PackageLicenseFile></PackageLicenseFile>
-    <PackageLicenseExpression>GPLv3</PackageLicenseExpression>
     <PackageProjectUrl>https://www.kryptor.co.uk</PackageProjectUrl>
+    <PackageIcon>Kryptor.png</PackageIcon>
     <RepositoryUrl>https://github.com/samuel-lucas6/Kryptor</RepositoryUrl>
-    <PackageIcon>Kryptor Logo.png</PackageIcon>
-    <NeutralLanguage>en-GB</NeutralLanguage>
-    <AssemblyName>kryptor</AssemblyName>
+    <RepositoryType>git</RepositoryType>
+    <AssemblyVersion>4.0.0.0</AssemblyVersion>
+    <PackageLicenseExpression>GPLv3</PackageLicenseExpression>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <AnalysisLevel>latest</AnalysisLevel>
-    <AssemblyVersion>4.0.0.0</AssemblyVersion>
-    <FileVersion>4.0.0.0</FileVersion>
     <ErrorReport>none</ErrorReport>
-    <RepositoryType>git</RepositoryType>
-    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -64,7 +58,7 @@
     <PackageReference Include="Monocypher" Version="0.3.0" />
     <PackageReference Include="PADME" Version="1.0.2" />
     <PackageReference Include="Sodium.Core" Version="1.3.1" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0-preview.7.22375.6" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0-rc.1.22426.10" />
   </ItemGroup>
 
   <ItemGroup>
