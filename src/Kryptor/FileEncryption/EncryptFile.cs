@@ -24,7 +24,6 @@ using System.Security.Cryptography;
 using ChaCha20Poly1305 = Geralt.ChaCha20Poly1305;
 using Geralt;
 using kcAEAD;
-using Padme;
 
 namespace Kryptor;
 
@@ -36,7 +35,7 @@ public static class EncryptFile
         {
             using (var inputFile = new FileStream(inputFilePath, FileHandling.GetFileStreamReadOptions(inputFilePath)))
             {
-                long paddedLength = inputFile.Length < 9 ? 10 : (long)PADME.GetPaddedLength((ulong)inputFile.Length);
+                long paddedLength = inputFile.Length + GetRandomPaddingLength(inputFile.Length);
                 long chunkCount = (paddedLength + Constants.FileChunkSize - 1) / Constants.FileChunkSize;
                 long lastChunkPadding = paddedLength % Constants.FileChunkSize;
                 if (lastChunkPadding == 0) {
@@ -44,7 +43,7 @@ public static class EncryptFile
                 }
                 long payloadLength = chunkCount * Constants.CiphertextChunkSize - (Constants.FileChunkSize - lastChunkPadding);
                 
-                using var outputFile = new FileStream(outputFilePath, FileHandling.GetFileStreamWriteOptions(payloadLength + Constants.FileHeadersLength));
+                using var outputFile = new FileStream(outputFilePath, FileHandling.GetFileStreamWriteOptions(Constants.FileHeadersLength + payloadLength));
                 Span<byte> nonce = stackalloc byte[ChaCha20.NonceSize]; nonce.Clear();
                 Span<byte> encryptedHeader = EncryptFileHeader(inputFile.Length, Path.GetFileName(inputFilePath), isDirectory, nonce, fileKey, wrappedFileKeys);
                 outputFile.Write(unencryptedHeader);
@@ -68,6 +67,19 @@ public static class EncryptFile
             FileHandling.DeleteFile(outputFilePath);
             throw;
         }
+    }
+
+    private static long GetRandomPaddingLength(long unpaddedLength, double proportion = 0.10)
+    {
+        // The randomised padding scheme from Covert Encryption: https://github.com/samuel-lucas6/CovertPadding
+        long fixedPadding = Math.Max(0, (int)(proportion * 500) - unpaddedLength);
+        double effectiveSize = 200 + 1e8 * Math.Log(1 + 1e-8 * (unpaddedLength + fixedPadding));
+        Span<byte> randomBytes = stackalloc byte[Constants.Int64BytesLength];
+        SecureRandom.Fill(randomBytes);
+        uint random1 = BinaryPrimitives.ReadUInt32LittleEndian(randomBytes[..4]);
+        uint random2 = BinaryPrimitives.ReadUInt32LittleEndian(randomBytes[4..]);
+        double coefficient = Math.Log(Math.Pow(2, 32)) - Math.Log(random1 + random2 * Math.Pow(2, -32) + Math.Pow(2, -33));
+        return fixedPadding + (long)Math.Round(coefficient * proportion * effectiveSize);
     }
     
     private static Span<byte> EncryptFileHeader(long fileLength, string fileName, bool isDirectory, Span<byte> nonce, Span<byte> fileKey, Span<byte> associatedData)
