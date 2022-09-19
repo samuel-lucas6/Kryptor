@@ -18,6 +18,7 @@
     <PackageIcon>Kryptor.png</PackageIcon>
     <RepositoryUrl>https://github.com/samuel-lucas6/Kryptor</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <NeutralLanguage>en-GB</NeutralLanguage>
     <AssemblyVersion>4.0.0.0</AssemblyVersion>
     <PackageLicenseExpression>GPLv3</PackageLicenseExpression>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
