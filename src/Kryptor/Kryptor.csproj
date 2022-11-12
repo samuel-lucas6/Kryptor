@@ -11,7 +11,7 @@
     <Version>4.0.0</Version>
     <Authors>Samuel Lucas</Authors>
     <Product>Kryptor</Product>
-    <AssemblyTitle>A simple, modern, and secure encryption and signing tool.</AssemblyTitle>
+    <Description>A simple, modern, and secure encryption and signing tool.</Description>
     <Copyright>Copyright © 2020-2022 Samuel Lucas</Copyright>
     <PackageProjectUrl>https://www.kryptor.co.uk</PackageProjectUrl>
     <PackageIcon>Kryptor.png</PackageIcon>
@@ -45,10 +45,6 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\vcruntime140x64.dll" />
     <EmbeddedResource Include="Resources\vcruntime140x86.dll" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
 
   <ItemGroup>
