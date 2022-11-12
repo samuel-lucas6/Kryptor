@@ -1,4 +1,5 @@
 # Reporting a vulnerability
- Please email me at `samuel[at]samuellucas[dot]com` using an informative subject line or use [HackerOne](https://hackerone.com/kryptor/). I will respond as soon as possible.
 
-If you identify a valid security issue, then your name and/or HackerOne account will be credited in the GitHub release that resolves the vulnerability you reported and in the Acknowledgements section of the [website](https://www.kryptor.co.uk/#acknowledgements).
+Please email me at `samuel at samuellucas dot com` using an informative subject line or use [GitHub's Advisories page](https://github.com/samuel-lucas6/Kryptor/security/advisories). I will respond as soon as possible.
+
+Assuming consent, your name and a profile of your choice (e.g. GitHub) will be acknowledged in the GitHub release that patches the vulnerability and on the [website](https://www.kryptor.co.uk/#acknowledgements). However, I cannot currently afford to give cash rewards.
