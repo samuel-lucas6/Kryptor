@@ -213,7 +213,7 @@ public static class CommandLine
             IEnumerable<string> errorMessages = AsymmetricKeyValidation.GetRecoverPublicKeyErrors(privateKeyPath);
             DisplayMessage.AllErrors(errorMessages);
             Span<byte> privateKey = AsymmetricKeyValidation.GetPrivateKeyFromFile(privateKeyPath);
-            privateKey = AsymmetricKeyValidation.DecryptPrivateKey(privateKey, password, privateKeyPath);
+            privateKey = AsymmetricKeyValidation.DecryptPrivateKey(privateKey, password);
             
             Span<byte> publicKey = privateKey.Length switch
             {

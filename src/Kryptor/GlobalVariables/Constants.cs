@@ -70,16 +70,11 @@ public static class Constants
     public static readonly string DefaultSigningPrivateKeyPath = Path.Combine(DefaultKeyDirectory, DefaultSigningKeyFileName + PrivateKeyExtension);
     
     public const int PublicKeyLength = 48;
-    public const int V2EncryptionPrivateKeyLength = 136;
-    public const int V1EncryptionPrivateKeyLength = 144;
-    public const int V2SigningPrivateKeyLength = 180;
-    public const int V1SigningPrivateKeyLength = 188;
+    public const int EncryptionPrivateKeyLength = 136;
+    public const int SigningPrivateKeyLength = 180;
     public static readonly byte[] Curve25519KeyHeader = { 10, 239, 255 }; // "Cu//" in Base64
     public static readonly byte[] Ed25519KeyHeader = { 17, 223, 255 }; // "Ed//" in Base64
-    public static readonly byte[] OldCurve25519KeyHeader = Encoding.UTF8.GetBytes("Cu");
-    public static readonly byte[] OldEd25519KeyHeader = Encoding.UTF8.GetBytes("Ed");
-    public static readonly byte[] PrivateKeyVersion2 = { 2, 0 };
-    public static readonly byte[] PrivateKeyVersion1 = { 1, 0 };
+    public static readonly byte[] PrivateKeyVersion = { 2, 0 };
     
     // File signing
     public const string SignatureExtension = ".signature";

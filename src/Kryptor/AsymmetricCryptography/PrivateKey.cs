@@ -20,7 +20,6 @@ using System;
 using System.Security.Cryptography;
 using Geralt;
 using kcAEAD;
-using ChaCha20BLAKE2;
 
 namespace Kryptor;
 
@@ -37,8 +36,8 @@ public static class PrivateKey
         Argon2id.DeriveKey(key, password, salt, Constants.Iterations, Constants.MemorySize);
         CryptographicOperations.ZeroMemory(password);
 
-        Span<byte> associatedData = stackalloc byte[keyAlgorithm.Length + Constants.PrivateKeyVersion2.Length];
-        Spans.Concat(associatedData, keyAlgorithm, Constants.PrivateKeyVersion2);
+        Span<byte> associatedData = stackalloc byte[keyAlgorithm.Length + Constants.PrivateKeyVersion.Length];
+        Spans.Concat(associatedData, keyAlgorithm, Constants.PrivateKeyVersion);
 
         Span<byte> encryptedPrivateKey = stackalloc byte[kcChaCha20Poly1305.CommitmentSize + privateKey.Length + Poly1305.TagSize];
         kcChaCha20Poly1305.Encrypt(encryptedPrivateKey, privateKey, nonce, key, associatedData);
@@ -50,11 +49,11 @@ public static class PrivateKey
         return fullPrivateKey;
     }
 
-    public static Span<byte> DecryptV2(Span<byte> privateKey, Span<byte> password)
+    public static Span<byte> Decrypt(Span<byte> privateKey, Span<byte> password)
     {
         try
         {
-            Span<byte> associatedData = privateKey[..(Constants.Curve25519KeyHeader.Length + Constants.PrivateKeyVersion2.Length)];
+            Span<byte> associatedData = privateKey[..(Constants.Curve25519KeyHeader.Length + Constants.PrivateKeyVersion.Length)];
             Span<byte> salt = privateKey.Slice(associatedData.Length, Argon2id.SaltSize);
             Span<byte> encryptedPrivateKey = privateKey[(associatedData.Length + salt.Length)..];
             
@@ -65,29 +64,6 @@ public static class PrivateKey
 
             Span<byte> decryptedPrivateKey = GC.AllocateArray<byte>(encryptedPrivateKey.Length - Poly1305.TagSize - kcChaCha20Poly1305.CommitmentSize, pinned: true);
             kcChaCha20Poly1305.Decrypt(decryptedPrivateKey, encryptedPrivateKey, nonce, key, associatedData);
-            CryptographicOperations.ZeroMemory(key);
-            return decryptedPrivateKey;
-        }
-        catch (CryptographicException ex)
-        {
-            throw new CryptographicException("Incorrect password, or the private key has been tampered with.", ex);
-        }
-    }
-
-    public static Span<byte> DecryptV1(Span<byte> privateKey, Span<byte> password)
-    {
-        try
-        {
-            Span<byte> associatedData = privateKey[..(Constants.OldCurve25519KeyHeader.Length + Constants.PrivateKeyVersion1.Length)];
-            Span<byte> salt = privateKey.Slice(associatedData.Length, Argon2id.SaltSize);
-            Span<byte> nonce = privateKey.Slice(associatedData.Length + salt.Length, XChaCha20.NonceSize);
-            Span<byte> encryptedPrivateKey = privateKey[(associatedData.Length + salt.Length + nonce.Length)..];
-
-            Span<byte> key = stackalloc byte[ChaCha20.KeySize];
-            Argon2id.DeriveKey(key, password, salt, iterations: 12, Constants.MemorySize);
-            CryptographicOperations.ZeroMemory(password);
-
-            Span<byte> decryptedPrivateKey = XChaCha20BLAKE2b.Decrypt(encryptedPrivateKey.ToArray(), nonce.ToArray(), key.ToArray(), associatedData.ToArray());
             CryptographicOperations.ZeroMemory(key);
             return decryptedPrivateKey;
         }
