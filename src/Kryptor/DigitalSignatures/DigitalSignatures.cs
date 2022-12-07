@@ -51,8 +51,9 @@ public static class DigitalSignatures
             return File.ReadAllBytes(filePath);
         }
         using var fileStream = new FileStream(filePath, FileHandling.GetFileStreamReadOptions(filePath));
-        using var blake2b = new BLAKE2bHashAlgorithm(BLAKE2b.MaxHashSize);
-        return blake2b.ComputeHash(fileStream);
+        Span<byte> hash = new byte[BLAKE2b.MaxHashSize];
+        BLAKE2b.ComputeHash(hash, fileStream);
+        return hash;
     }
 
     private static void CreateSignatureFile(string signaturePath, Span<byte> signatureFileBytes, Span<byte> globalSignature)

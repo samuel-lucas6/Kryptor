@@ -138,7 +138,7 @@ public static class FileEncryption
                 int wrappedKeyIndex = 0;
                 SecureRandom.Fill(fileKey);
                 foreach (Span<byte> recipientPublicKey in recipientPublicKeys) {
-                    X25519.ComputeXCoordinate(xCoordinate, ephemeralPrivateKey, recipientPublicKey);
+                    X25519.ComputeSharedSecret(xCoordinate, ephemeralPrivateKey, recipientPublicKey);
                     using var blake2b = new IncrementalBLAKE2b(ephemeralSharedSecret.Length, preSharedKey);
                     blake2b.Update(xCoordinate);
                     blake2b.Update(unhiddenEphemeralPublicKey);
@@ -146,7 +146,7 @@ public static class FileEncryption
                     blake2b.Finalize(ephemeralSharedSecret);
                     CryptographicOperations.ZeroMemory(xCoordinate);
 
-                    X25519.DeriveSenderSharedSecret(sharedSecret, senderPrivateKey, recipientPublicKey, preSharedKey);
+                    X25519.DeriveSenderSharedKey(sharedSecret, senderPrivateKey, recipientPublicKey, preSharedKey);
                     Spans.Concat(inputKeyingMaterial, ephemeralSharedSecret, sharedSecret);
                     BLAKE2b.DeriveKey(headerKey, inputKeyingMaterial, Constants.Personalisation, salt, info: ephemeralPublicKey);
                     CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
@@ -200,7 +200,7 @@ public static class FileEncryption
                 crypto_hidden_to_curve(unhiddenEphemeralPublicKey, ephemeralPublicKey);
                 
                 SecureRandom.Fill(salt);
-                X25519.DeriveSenderSharedSecret(ephemeralSharedSecret, privateKey, unhiddenEphemeralPublicKey, preSharedKey);
+                X25519.DeriveSenderSharedKey(ephemeralSharedSecret, privateKey, unhiddenEphemeralPublicKey, preSharedKey);
                 BLAKE2b.DeriveKey(headerKey, ephemeralSharedSecret, Constants.Personalisation, salt, info: ephemeralPublicKey);
                 CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
                 

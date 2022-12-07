@@ -114,7 +114,7 @@ public static class FileDecryption
             throw new UserInputException();
         }
         Span<byte> sharedSecret = stackalloc byte[X25519.SharedSecretSize], ephemeralSharedSecret = stackalloc byte[X25519.SharedSecretSize];
-        X25519.DeriveRecipientSharedSecret(sharedSecret, recipientPrivateKey, senderPublicKey, preSharedKey);
+        X25519.DeriveRecipientSharedKey(sharedSecret, recipientPrivateKey, senderPublicKey, preSharedKey);
         
         Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeaderLength], wrappedFileKeys = new byte[Constants.KeyWrapHeaderLength];
         Span<byte> unhiddenEphemeralPublicKey = stackalloc byte[X25519.PublicKeySize];
@@ -132,7 +132,7 @@ public static class FileDecryption
                 Span<byte> ephemeralPublicKey = unencryptedHeaders[^X25519.PublicKeySize..];
                 
                 crypto_hidden_to_curve(unhiddenEphemeralPublicKey, ephemeralPublicKey);
-                X25519.DeriveRecipientSharedSecret(ephemeralSharedSecret, recipientPrivateKey, unhiddenEphemeralPublicKey, preSharedKey);
+                X25519.DeriveRecipientSharedKey(ephemeralSharedSecret, recipientPrivateKey, unhiddenEphemeralPublicKey, preSharedKey);
                 Spans.Concat(inputKeyingMaterial, ephemeralSharedSecret, sharedSecret);
                 BLAKE2b.DeriveKey(headerKey, inputKeyingMaterial, Constants.Personalisation, salt, info: ephemeralPublicKey);
                 CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
@@ -178,7 +178,7 @@ public static class FileDecryption
                 Span<byte> ephemeralPublicKey = unencryptedHeaders[^X25519.PublicKeySize..];
                 
                 crypto_hidden_to_curve(unhiddenEphemeralPublicKey, ephemeralPublicKey);
-                X25519.DeriveSenderSharedSecret(ephemeralSharedSecret, privateKey, unhiddenEphemeralPublicKey, preSharedKey);
+                X25519.DeriveSenderSharedKey(ephemeralSharedSecret, privateKey, unhiddenEphemeralPublicKey, preSharedKey);
                 BLAKE2b.DeriveKey(headerKey, ephemeralSharedSecret, Constants.Personalisation, salt, info: ephemeralPublicKey);
                 CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
                 
