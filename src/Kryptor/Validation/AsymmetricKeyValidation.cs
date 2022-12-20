@@ -74,6 +74,9 @@ public static class AsymmetricKeyValidation
         else if (!File.Exists(privateKeyPath)) {
             yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.NonExistentPrivateKeyFile);
         }
+        else if (new FileInfo(privateKeyPath).Length is not (Constants.EncryptionPrivateKeyLength or Constants.SigningPrivateKeyLength)) {
+            yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.InvalidPrivateKeyFileLength);
+        }
     }
     
     public static List<byte[]> EncryptionPublicKeyFile(string[] publicKeyPaths)
@@ -121,16 +124,12 @@ public static class AsymmetricKeyValidation
         try
         {
             string encodedPublicKey = File.ReadAllText(publicKeyPath);
-            if (encodedPublicKey.Length != Constants.PublicKeyLength) {
-                throw new ArgumentException("Please specify a valid public key file.");
-            }
             return Encodings.FromBase64(encodedPublicKey);
         }
         catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
             throw ex switch
             {
-                ArgumentException => new ArgumentException(ex.Message, ex),
                 FormatException => new FormatException(ex.Message, ex),
                 _ => new IOException("Unable to read the public key file.", ex)
             };
@@ -241,16 +240,12 @@ public static class AsymmetricKeyValidation
         try
         {
             string encodedPrivateKey = File.ReadAllText(privateKeyPath);
-            if (encodedPrivateKey.Length != Constants.EncryptionPrivateKeyLength && encodedPrivateKey.Length != Constants.SigningPrivateKeyLength) {
-                throw new ArgumentException("Please specify a valid private key file.");
-            }
             return Encodings.FromBase64(encodedPrivateKey);
         }
         catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
             throw ex switch
             {
-                ArgumentException => new ArgumentException(ex.Message, ex),
                 FormatException => new FormatException(ex.Message, ex),
                 _ => new IOException("Unable to read the private key file.", ex)
             };

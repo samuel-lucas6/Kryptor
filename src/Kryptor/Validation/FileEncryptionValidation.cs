@@ -77,6 +77,9 @@ public static class FileEncryptionValidation
                 else if (!File.Exists(publicKey)) {
                     yield return ErrorMessages.GetFilePathError(publicKey, ErrorMessages.NonExistentPublicKeyFile);
                 }
+                else if (new FileInfo(publicKey).Length != Constants.PublicKeyLength) {
+                    yield return ErrorMessages.GetFilePathError(publicKey, ErrorMessages.InvalidPublicKeyFileLength);
+                }
             }
             if (publicKeys.Any(key => !string.IsNullOrEmpty(Path.GetExtension(key))) && publicKeys.Any(key => string.IsNullOrEmpty(Path.GetExtension(key)))) {
                 yield return "Please specify only public key strings or only public key files.";
@@ -104,11 +107,16 @@ public static class FileEncryptionValidation
         if (string.Equals(privateKeyPath, Constants.DefaultEncryptionPrivateKeyPath) && !File.Exists(Constants.DefaultEncryptionPrivateKeyPath)) {
             yield return ErrorMessages.NonExistentDefaultPrivateKeyFile;
         }
-        else if (!string.IsNullOrEmpty(privateKeyPath) && !privateKeyPath.EndsWith(Constants.PrivateKeyExtension)) {
-            yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.InvalidPrivateKeyFile);
-        }
-        else if (!string.IsNullOrEmpty(privateKeyPath) && !File.Exists(privateKeyPath)) {
-            yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.NonExistentPrivateKeyFile);
+        else switch (string.IsNullOrEmpty(privateKeyPath)) {
+            case false when !privateKeyPath.EndsWith(Constants.PrivateKeyExtension):
+                yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.InvalidPrivateKeyFile);
+                break;
+            case false when !File.Exists(privateKeyPath):
+                yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.NonExistentPrivateKeyFile);
+                break;
+            case false when new FileInfo(privateKeyPath).Length != Constants.EncryptionPrivateKeyLength:
+                yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.InvalidPrivateKeyFileLength);
+                break;
         }
     }
     
@@ -178,6 +186,9 @@ public static class FileEncryptionValidation
         }
         else if (!File.Exists(publicKeys[0])) {
             yield return ErrorMessages.GetFilePathError(publicKeys[0], ErrorMessages.NonExistentPublicKeyFile);
+        }
+        else if (new FileInfo(publicKeys[0]).Length != Constants.PublicKeyLength) {
+            yield return ErrorMessages.GetFilePathError(publicKeys[0], ErrorMessages.InvalidPublicKeyFileLength);
         }
 
         foreach (string errorMessage in GetDecryptionErrors(symmetricKey)) {

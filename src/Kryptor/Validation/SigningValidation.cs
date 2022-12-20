@@ -32,11 +32,16 @@ public static class SigningValidation
         if (string.Equals(privateKeyPath, Constants.DefaultSigningPrivateKeyPath) && !File.Exists(Constants.DefaultSigningPrivateKeyPath)) {
             yield return ErrorMessages.NonExistentDefaultPrivateKeyFile;
         }
-        else if (!string.IsNullOrEmpty(privateKeyPath) && !privateKeyPath.EndsWith(Constants.PrivateKeyExtension)) {
-            yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.InvalidPrivateKeyFile);
-        }
-        else if (!string.IsNullOrEmpty(privateKeyPath) && !File.Exists(privateKeyPath)) {
-            yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.NonExistentPrivateKeyFile);
+        else switch (string.IsNullOrEmpty(privateKeyPath)) {
+            case false when !privateKeyPath.EndsWith(Constants.PrivateKeyExtension):
+                yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.InvalidPrivateKeyFile);
+                break;
+            case false when !File.Exists(privateKeyPath):
+                yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.NonExistentPrivateKeyFile);
+                break;
+            case false when new FileInfo(privateKeyPath).Length != Constants.SigningPrivateKeyLength:
+                yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.InvalidPrivateKeyFileLength);
+                break;
         }
         
         if (!string.IsNullOrEmpty(comment) && comment.Length > 500) {
@@ -99,6 +104,9 @@ public static class SigningValidation
         }
         else if (!File.Exists(publicKeys[0])) {
             yield return ErrorMessages.GetFilePathError(publicKeys[0], ErrorMessages.NonExistentPublicKeyFile);
+        }
+        else if (new FileInfo(publicKeys[0]).Length != Constants.PublicKeyLength) {
+            yield return ErrorMessages.GetFilePathError(publicKeys[0], ErrorMessages.InvalidPublicKeyFileLength);
         }
 
         if (filePaths == null) {
