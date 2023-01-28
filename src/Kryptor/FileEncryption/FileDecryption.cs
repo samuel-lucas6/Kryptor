@@ -26,15 +26,15 @@ namespace Kryptor;
 
 public static class FileDecryption
 {
-    public static void DecryptEachFileWithPassword(string[] filePaths, Span<byte> password, Span<byte> pepper)
+    public static void DecryptEachFileWithPassphrase(string[] filePaths, Span<byte> passphrase, Span<byte> pepper)
     {
-        if (filePaths == null || password.Length == 0) {
+        if (filePaths == null || passphrase.Length == 0) {
             throw new UserInputException();
         }
         Span<byte> unencryptedHeaders = stackalloc byte[Constants.UnencryptedHeaderLength], wrappedFileKeys = new byte[Constants.KeyWrapHeaderLength];
-        Span<byte> inputKeyingMaterial = stackalloc byte[BLAKE2b.MaxKeySize], hashedPassword = inputKeyingMaterial[..ChaCha20.KeySize];
+        Span<byte> inputKeyingMaterial = stackalloc byte[BLAKE2b.MaxKeySize], hashedPassphrase = inputKeyingMaterial[..ChaCha20.KeySize];
         if (pepper.Length != 0) {
-            pepper.CopyTo(inputKeyingMaterial[hashedPassword.Length..]);
+            pepper.CopyTo(inputKeyingMaterial[hashedPassphrase.Length..]);
             CryptographicOperations.ZeroMemory(pepper);
         }
         Span<byte> emptySalt = stackalloc byte[BLAKE2b.SaltSize]; emptySalt.Clear();
@@ -50,10 +50,10 @@ public static class FileDecryption
                 Span<byte> salt = unencryptedHeaders[..Argon2id.SaltSize];
                 Span<byte> ephemeralPublicKey = unencryptedHeaders[^X25519.PublicKeySize..];
                 
-                DisplayMessage.DerivingKeyFromPassword();
-                Argon2id.DeriveKey(hashedPassword, password, salt, Constants.Iterations, Constants.MemorySize);
-                BLAKE2b.DeriveKey(headerKey, pepper.Length == 0 ? hashedPassword : inputKeyingMaterial, Constants.Personalisation, emptySalt, info: ephemeralPublicKey);
-                CryptographicOperations.ZeroMemory(hashedPassword);
+                DisplayMessage.DerivingKeyFromPassphrase();
+                Argon2id.DeriveKey(hashedPassphrase, passphrase, salt, Constants.Iterations, Constants.MemorySize);
+                BLAKE2b.DeriveKey(headerKey, pepper.Length == 0 ? hashedPassphrase : inputKeyingMaterial, Constants.Personalisation, emptySalt, info: ephemeralPublicKey);
+                CryptographicOperations.ZeroMemory(hashedPassphrase);
                 DecryptInputFile(inputFile, wrappedFileKeys, headerKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -67,7 +67,7 @@ public static class FileDecryption
             }
             Console.WriteLine();
         }
-        CryptographicOperations.ZeroMemory(password);
+        CryptographicOperations.ZeroMemory(passphrase);
         CryptographicOperations.ZeroMemory(inputKeyingMaterial);
         DisplayMessage.SuccessfullyDecrypted();
     }

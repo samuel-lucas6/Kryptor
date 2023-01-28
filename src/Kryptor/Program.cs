@@ -48,8 +48,8 @@ public class Program
     [Option("-d|--decrypt", "decrypt files/directories", CommandOptionType.NoValue)]
     private bool Decrypt { get; }
 
-    [Option("-p|--password", "specify a password (empty for interactive entry)", CommandOptionType.SingleOrNoValue)]
-    private (bool optionSpecified, string value) Password { get; }
+    [Option("-p|--passphrase", "specify a passphrase (empty for interactive entry)", CommandOptionType.SingleOrNoValue)]
+    private (bool optionSpecified, string value) Passphrase { get; }
 
     [Option("-k|--key", "specify or randomly generate a symmetric key or keyfile", CommandOptionType.SingleValue)]
     private string SymmetricKey { get; }
@@ -108,19 +108,19 @@ public class Program
         try
         {
             if (GenerateKeys) {
-                CommandLine.GenerateNewKeyPair(FilePaths?[0] ?? Constants.DefaultKeyDirectory, GetPassword(Password.value), Encrypt, Sign);
+                CommandLine.GenerateNewKeyPair(FilePaths?[0] ?? Constants.DefaultKeyDirectory, GetPassphrase(Passphrase.value), Encrypt, Sign);
             }
             else if (Encrypt) {
-                CommandLine.Encrypt(Password.optionSpecified, GetPassword(Password.value), SymmetricKey, PrivateKey.optionSpecified, GetEncryptionPrivateKey(PrivateKey.value), PublicKeys, FilePaths);
+                CommandLine.Encrypt(Passphrase.optionSpecified, GetPassphrase(Passphrase.value), SymmetricKey, PrivateKey.optionSpecified, GetEncryptionPrivateKey(PrivateKey.value), PublicKeys, FilePaths);
             }
             else if (Decrypt) {
-                CommandLine.Decrypt(Password.optionSpecified, GetPassword(Password.value), SymmetricKey, PrivateKey.optionSpecified, GetEncryptionPrivateKey(PrivateKey.value), PublicKeys, FilePaths);
+                CommandLine.Decrypt(Passphrase.optionSpecified, GetPassphrase(Passphrase.value), SymmetricKey, PrivateKey.optionSpecified, GetEncryptionPrivateKey(PrivateKey.value), PublicKeys, FilePaths);
             }
             else if (RecoverPublicKey) {
-                CommandLine.RecoverPublicKey(PrivateKey.value, GetPassword(Password.value));
+                CommandLine.RecoverPublicKey(PrivateKey.value, GetPassphrase(Passphrase.value));
             }
             else if (Sign) {
-                CommandLine.Sign(GetSigningPrivateKey(PrivateKey.value), GetPassword(Password.value), Comment, Prehash, Signatures, FilePaths);
+                CommandLine.Sign(GetSigningPrivateKey(PrivateKey.value), GetPassphrase(Passphrase.value), Comment, Prehash, Signatures, FilePaths);
             }
             else if (Verify) {
                 CommandLine.Verify(PublicKeys, Signatures, FilePaths);
@@ -166,7 +166,7 @@ public class Program
         }
     }
 
-    private static Span<byte> GetPassword(string password) => string.IsNullOrEmpty(password) ? Span<byte>.Empty : Encoding.UTF8.GetBytes(password);
+    private static Span<byte> GetPassphrase(string passphrase) => string.IsNullOrEmpty(passphrase) ? Span<byte>.Empty : Encoding.UTF8.GetBytes(passphrase);
 
     private static string GetEncryptionPrivateKey(string privateKeyPath) => string.IsNullOrEmpty(privateKeyPath) ? Constants.DefaultEncryptionPrivateKeyPath : privateKeyPath;
 

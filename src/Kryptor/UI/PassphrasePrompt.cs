@@ -24,38 +24,38 @@ using Geralt;
 
 namespace Kryptor;
 
-public static class PasswordPrompt
+public static class PassphrasePrompt
 {
-    public static Span<byte> GetNewPassword(Span<byte> password)
+    public static Span<byte> GetNewPassphrase(Span<byte> passphrase)
     {
-        return password.Length switch
+        return passphrase.Length switch
         {
-            0 => EnterNewPassword(),
-            1 when ConstantTime.Equals(password, Encoding.UTF8.GetBytes(" ")) => UseRandomPassphrase(),
-            _ => password
+            0 => EnterNewPassphrase(),
+            1 when ConstantTime.Equals(passphrase, Encoding.UTF8.GetBytes(" ")) => UseRandomPassphrase(),
+            _ => passphrase
         };
     }
     
-    private static Span<byte> EnterNewPassword()
+    private static Span<byte> EnterNewPassphrase()
     {
-        Console.WriteLine("Enter a password (leave empty for a random passphrase):");
-        Span<byte> password = GetPassword();
-        if (password.Length == 0) {
+        Console.WriteLine("Enter a passphrase (leave empty for a random one):");
+        Span<byte> passphrase = GetPassphrase();
+        if (passphrase.Length == 0) {
             return UseRandomPassphrase();
         }
-        RetypeNewPassword(password);
-        return password;
+        RetypeNewPassphrase(passphrase);
+        return passphrase;
     }
 
-    private static void RetypeNewPassword(Span<byte> password)
+    private static void RetypeNewPassphrase(Span<byte> passphrase)
     {
-        Console.WriteLine("Retype password:");
-        Span<byte> retypedPassword = GetPassword();
-        if (retypedPassword.Length == 0 || !ConstantTime.Equals(password, retypedPassword)) {
-            DisplayMessage.Error("The passwords don't match.");
+        Console.WriteLine("Retype passphrase:");
+        Span<byte> retypedPassphrase = GetPassphrase();
+        if (retypedPassphrase.Length == 0 || !ConstantTime.Equals(passphrase, retypedPassphrase)) {
+            DisplayMessage.Error("The passphrases don't match.");
             Environment.Exit(Constants.ErrorCode);
         }
-        CryptographicOperations.ZeroMemory(retypedPassword);
+        CryptographicOperations.ZeroMemory(retypedPassphrase);
     }
     
     private static Span<byte> UseRandomPassphrase()
@@ -67,30 +67,30 @@ public static class PasswordPrompt
         return Encoding.UTF8.GetBytes(passphrase);
     }
 
-    public static Span<byte> EnterYourPassword(bool isPrivateKey = false)
+    public static Span<byte> EnterYourPassphrase(bool isPrivateKey = false)
     {
-        Console.WriteLine(isPrivateKey == false ? "Enter your password:" : "Enter your private key password:");
-        Span<byte> password = GetPassword();
-        if (password.Length == 0) {
-            DisplayMessage.Error("You didn't enter a password.");
+        Console.WriteLine(isPrivateKey == false ? "Enter your passphrase:" : "Enter your private key passphrase:");
+        Span<byte> passphrase = GetPassphrase();
+        if (passphrase.Length == 0) {
+            DisplayMessage.Error("You didn't enter a passphrase.");
             Environment.Exit(Constants.ErrorCode);
         }
-        return password;
+        return passphrase;
     }
 
-    private static Span<byte> GetPassword()
+    private static Span<byte> GetPassphrase()
     {
-        var password = new List<char>();
+        var passphrase = new List<char>();
         ConsoleKeyInfo consoleKeyInfo;
         while ((consoleKeyInfo = Console.ReadKey(intercept: true)).Key != ConsoleKey.Enter) {
             if (!char.IsControl(consoleKeyInfo.KeyChar)) {
-                password.Add(consoleKeyInfo.KeyChar);
+                passphrase.Add(consoleKeyInfo.KeyChar);
             }
-            else if (consoleKeyInfo.Key == ConsoleKey.Backspace && password.Count > 0) {
-                password.RemoveAt(password.Count - 1);
+            else if (consoleKeyInfo.Key == ConsoleKey.Backspace && passphrase.Count > 0) {
+                passphrase.RemoveAt(passphrase.Count - 1);
             }
         }
         Console.WriteLine();
-        return Encoding.UTF8.GetBytes(password.ToArray());
+        return Encoding.UTF8.GetBytes(passphrase.ToArray());
     }
 }

@@ -35,7 +35,7 @@ public static class ErrorMessages
     public const string NonExistentPublicKeyFile = "Please specify a public key file that exists.";
     public const string InvalidPublicKeyFileLength = "Please specify a public key file that only contains the public key.";
     public const string InvalidPrivateKeyFileLength = "Please specify a private key file that only contains the private key.";
-    public const string EncryptionMethod = "Please specify a password and/or symmetric key, private key, or private key and public key.";
+    public const string EncryptionMethod = "Please specify a passphrase and/or symmetric key, private key, or private key and public key.";
     public const string InvalidSymmetricKey = "Please specify a valid symmetric key string.";
     public const string UnableToEncryptFile = "Unable to encrypt the file/directory.";
     public const string UnableToDecryptFile = "Unable to decrypt the file.";

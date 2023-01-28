@@ -83,7 +83,7 @@ public static class DecryptFile
         }
         catch (CryptographicException ex)
         {
-            throw new ArgumentException("Incorrect password/key, or this file has been tampered with.", ex);
+            throw new ArgumentException("Incorrect passphrase/key, or this file has been tampered with.", ex);
         }
     }
 

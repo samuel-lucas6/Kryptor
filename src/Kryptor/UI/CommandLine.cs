@@ -27,36 +27,36 @@ namespace Kryptor;
 
 public static class CommandLine
 {
-    public static void Encrypt(bool usePassword, Span<byte> password, string symmetricKey, bool usePrivateKey, string privateKeyPath, string[] publicKeys, string[] filePaths)
+    public static void Encrypt(bool usePassphrase, Span<byte> passphrase, string symmetricKey, bool usePrivateKey, string privateKeyPath, string[] publicKeys, string[] filePaths)
     {
-        if (!usePrivateKey && publicKeys == null && usePassword) {
-            FileEncryptionWithPassword(password, symmetricKey, filePaths);
+        if (!usePrivateKey && publicKeys == null && usePassphrase) {
+            FileEncryptionWithPassphrase(passphrase, symmetricKey, filePaths);
         }
         else if (!usePrivateKey && publicKeys == null && !string.IsNullOrEmpty(symmetricKey)) {
             FileEncryptionWithSymmetricKey(symmetricKey, filePaths);
         }
         else if (publicKeys != null && !string.IsNullOrEmpty(privateKeyPath)) {
             if (publicKeys[0].EndsWith(Constants.PublicKeyExtension)) {
-                FileEncryptionWithPublicKeyFile(privateKeyPath, password, publicKeys, symmetricKey, filePaths);
+                FileEncryptionWithPublicKeyFile(privateKeyPath, passphrase, publicKeys, symmetricKey, filePaths);
                 return;
             }
-            FileEncryptionWithPublicKeyString(privateKeyPath, password, publicKeys, symmetricKey, filePaths);
+            FileEncryptionWithPublicKeyString(privateKeyPath, passphrase, publicKeys, symmetricKey, filePaths);
         }
         else if (!string.IsNullOrEmpty(privateKeyPath)) {
-            FileEncryptionWithPrivateKey(privateKeyPath, password, symmetricKey, filePaths);
+            FileEncryptionWithPrivateKey(privateKeyPath, passphrase, symmetricKey, filePaths);
         }
         else {
             DisplayMessage.Error(ErrorMessages.EncryptionMethod);
         }
     }
 
-    private static void FileEncryptionWithPassword(Span<byte> password, string symmetricKey, string[] filePaths)
+    private static void FileEncryptionWithPassphrase(Span<byte> passphrase, string symmetricKey, string[] filePaths)
     {
         IEnumerable<string> errorMessages = FileEncryptionValidation.GetEncryptionErrors(symmetricKey).Concat(FileEncryptionValidation.GetEncryptionFilePathErrors(filePaths));
         DisplayMessage.AllErrors(errorMessages);
-        password = PasswordPrompt.GetNewPassword(password);
+        passphrase = PassphrasePrompt.GetNewPassphrase(passphrase);
         Span<byte> pepper = SymmetricKeyValidation.GetEncryptionSymmetricKey(symmetricKey);
-        FileEncryption.EncryptEachFileWithPassword(filePaths, password, pepper);
+        FileEncryption.EncryptEachFileWithPassphrase(filePaths, passphrase, pepper);
     }
     
     private static void FileEncryptionWithSymmetricKey(string symmetricKey, string[] filePaths)
@@ -67,67 +67,67 @@ public static class CommandLine
         FileEncryption.EncryptEachFileWithSymmetricKey(filePaths, symmetricKeyBytes);
     }
 
-    private static void FileEncryptionWithPublicKeyFile(string senderPrivateKeyPath, Span<byte> password, string[] recipientPublicKeyPaths, string symmetricKey, string[] filePaths)
+    private static void FileEncryptionWithPublicKeyFile(string senderPrivateKeyPath, Span<byte> passphrase, string[] recipientPublicKeyPaths, string symmetricKey, string[] filePaths)
     {
         IEnumerable<string> errorMessages = FileEncryptionValidation.GetEncryptionErrors(senderPrivateKeyPath, recipientPublicKeyPaths, symmetricKey).Concat(FileEncryptionValidation.GetEncryptionFilePathErrors(filePaths));
         DisplayMessage.AllErrors(errorMessages);
-        Span<byte> senderPrivateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(senderPrivateKeyPath, password);
+        Span<byte> senderPrivateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(senderPrivateKeyPath, passphrase);
         List<byte[]> recipientPublicKeys = AsymmetricKeyValidation.EncryptionPublicKeyFile(recipientPublicKeyPaths);
         Span<byte> preSharedKey = SymmetricKeyValidation.GetEncryptionSymmetricKey(symmetricKey);
         FileEncryption.EncryptEachFileWithPublicKey(filePaths, senderPrivateKey, recipientPublicKeys, preSharedKey);
     }
 
-    private static void FileEncryptionWithPublicKeyString(string senderPrivateKeyPath, Span<byte> password, string[] recipientPublicKeyStrings, string symmetricKey, string[] filePaths)
+    private static void FileEncryptionWithPublicKeyString(string senderPrivateKeyPath, Span<byte> passphrase, string[] recipientPublicKeyStrings, string symmetricKey, string[] filePaths)
     {
         IEnumerable<string> errorMessages = FileEncryptionValidation.GetEncryptionErrors(senderPrivateKeyPath, recipientPublicKeyStrings, symmetricKey).Concat(FileEncryptionValidation.GetEncryptionFilePathErrors(filePaths));
         DisplayMessage.AllErrors(errorMessages);
-        Span<byte> senderPrivateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(senderPrivateKeyPath, password);
+        Span<byte> senderPrivateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(senderPrivateKeyPath, passphrase);
         List<byte[]> recipientPublicKeys = AsymmetricKeyValidation.EncryptionPublicKeyString(recipientPublicKeyStrings);
         Span<byte> preSharedKey = SymmetricKeyValidation.GetEncryptionSymmetricKey(symmetricKey);
         FileEncryption.EncryptEachFileWithPublicKey(filePaths, senderPrivateKey, recipientPublicKeys, preSharedKey);
     }
 
-    private static void FileEncryptionWithPrivateKey(string privateKeyPath, Span<byte> password, string symmetricKey, string[] filePaths)
+    private static void FileEncryptionWithPrivateKey(string privateKeyPath, Span<byte> passphrase, string symmetricKey, string[] filePaths)
     {
         IEnumerable<string> errorMessages = FileEncryptionValidation.GetEncryptionErrors(privateKeyPath, symmetricKey).Concat(FileEncryptionValidation.GetEncryptionFilePathErrors(filePaths));
         DisplayMessage.AllErrors(errorMessages);
-        Span<byte> privateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(privateKeyPath, password);
+        Span<byte> privateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(privateKeyPath, passphrase);
         Span<byte> preSharedKey = SymmetricKeyValidation.GetEncryptionSymmetricKey(symmetricKey);
         FileEncryption.EncryptEachFileWithPrivateKey(filePaths, privateKey, preSharedKey);
     }
 
-    public static void Decrypt(bool usePassword, Span<byte> password, string symmetricKey, bool usePrivateKey, string privateKeyPath, string[] publicKeys, string[] filePaths)
+    public static void Decrypt(bool usePassphrase, Span<byte> passphrase, string symmetricKey, bool usePrivateKey, string privateKeyPath, string[] publicKeys, string[] filePaths)
     {
-        if (!usePrivateKey && publicKeys == null && usePassword) {
-            FileDecryptionWithPassword(password, symmetricKey, filePaths);
+        if (!usePrivateKey && publicKeys == null && usePassphrase) {
+            FileDecryptionWithPassphrase(passphrase, symmetricKey, filePaths);
         }
         else if (!usePrivateKey && publicKeys == null && !string.IsNullOrEmpty(symmetricKey)) {
             FileDecryptionWithSymmetricKey(symmetricKey, filePaths);
         }
         else if (publicKeys != null && !string.IsNullOrEmpty(privateKeyPath)) {
             if (publicKeys[0].EndsWith(Constants.PublicKeyExtension)) {
-                FileDecryptionWithPublicKeyFile(privateKeyPath, password, publicKeys, symmetricKey, filePaths);
+                FileDecryptionWithPublicKeyFile(privateKeyPath, passphrase, publicKeys, symmetricKey, filePaths);
                 return;
             }
-            FileDecryptionWithPublicKeyString(privateKeyPath, password, publicKeys, symmetricKey, filePaths);
+            FileDecryptionWithPublicKeyString(privateKeyPath, passphrase, publicKeys, symmetricKey, filePaths);
         }
         else if (!string.IsNullOrEmpty(privateKeyPath)) {
-            FileDecryptionWithPrivateKey(privateKeyPath, password, symmetricKey, filePaths);
+            FileDecryptionWithPrivateKey(privateKeyPath, passphrase, symmetricKey, filePaths);
         }
         else {
             DisplayMessage.Error(ErrorMessages.EncryptionMethod);
         }
     }
 
-    private static void FileDecryptionWithPassword(Span<byte> password, string symmetricKey, string[] filePaths)
+    private static void FileDecryptionWithPassphrase(Span<byte> passphrase, string symmetricKey, string[] filePaths)
     {
         IEnumerable<string> errorMessages = FileEncryptionValidation.GetDecryptionErrors(symmetricKey).Concat(FileEncryptionValidation.GetDecryptionFilePathErrors(filePaths));
         DisplayMessage.AllErrors(errorMessages);
-        if (password.Length == 0) {
-            password = PasswordPrompt.EnterYourPassword();
+        if (passphrase.Length == 0) {
+            passphrase = PassphrasePrompt.EnterYourPassphrase();
         }
         Span<byte> pepper = SymmetricKeyValidation.GetDecryptionSymmetricKey(symmetricKey);
-        FileDecryption.DecryptEachFileWithPassword(filePaths, password, pepper);
+        FileDecryption.DecryptEachFileWithPassphrase(filePaths, passphrase, pepper);
     }
     
     private static void FileDecryptionWithSymmetricKey(string symmetricKey, string[] filePaths)
@@ -138,36 +138,36 @@ public static class CommandLine
         FileDecryption.DecryptEachFileWithSymmetricKey(filePaths, symmetricKeyBytes);
     }
 
-    private static void FileDecryptionWithPublicKeyFile(string recipientPrivateKeyPath, Span<byte> password, string[] senderPublicKeyPaths, string symmetricKey, string[] filePaths)
+    private static void FileDecryptionWithPublicKeyFile(string recipientPrivateKeyPath, Span<byte> passphrase, string[] senderPublicKeyPaths, string symmetricKey, string[] filePaths)
     {
         IEnumerable<string> errorMessages = FileEncryptionValidation.GetDecryptionErrors(recipientPrivateKeyPath, senderPublicKeyPaths, symmetricKey).Concat(FileEncryptionValidation.GetDecryptionFilePathErrors(filePaths));
         DisplayMessage.AllErrors(errorMessages);
-        Span<byte> recipientPrivateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(recipientPrivateKeyPath, password);
+        Span<byte> recipientPrivateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(recipientPrivateKeyPath, passphrase);
         List<byte[]> senderPublicKey = AsymmetricKeyValidation.EncryptionPublicKeyFile(senderPublicKeyPaths);
         Span<byte> preSharedKey = SymmetricKeyValidation.GetDecryptionSymmetricKey(symmetricKey);
         FileDecryption.DecryptEachFileWithPublicKey(filePaths, recipientPrivateKey, senderPublicKey?[0] ?? Span<byte>.Empty, preSharedKey);
     }
 
-    private static void FileDecryptionWithPublicKeyString(string recipientPrivateKeyPath, Span<byte> password, string[] senderPublicKeyStrings, string symmetricKey, string[] filePaths)
+    private static void FileDecryptionWithPublicKeyString(string recipientPrivateKeyPath, Span<byte> passphrase, string[] senderPublicKeyStrings, string symmetricKey, string[] filePaths)
     {
         IEnumerable<string> errorMessages = FileEncryptionValidation.GetDecryptionErrors(recipientPrivateKeyPath, senderPublicKeyStrings, symmetricKey).Concat(FileEncryptionValidation.GetDecryptionFilePathErrors(filePaths));
         DisplayMessage.AllErrors(errorMessages);
-        Span<byte> recipientPrivateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(recipientPrivateKeyPath, password);
+        Span<byte> recipientPrivateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(recipientPrivateKeyPath, passphrase);
         List<byte[]> senderPublicKey = AsymmetricKeyValidation.EncryptionPublicKeyString(senderPublicKeyStrings);
         Span<byte> preSharedKey = SymmetricKeyValidation.GetDecryptionSymmetricKey(symmetricKey);
         FileDecryption.DecryptEachFileWithPublicKey(filePaths, recipientPrivateKey, senderPublicKey?[0] ?? Span<byte>.Empty, preSharedKey);
     }
 
-    private static void FileDecryptionWithPrivateKey(string privateKeyPath, Span<byte> password, string symmetricKey, string[] filePaths)
+    private static void FileDecryptionWithPrivateKey(string privateKeyPath, Span<byte> passphrase, string symmetricKey, string[] filePaths)
     {
         IEnumerable<string> errorMessages = FileEncryptionValidation.GetDecryptionErrors(privateKeyPath, symmetricKey).Concat(FileEncryptionValidation.GetDecryptionFilePathErrors(filePaths));
         DisplayMessage.AllErrors(errorMessages);
-        Span<byte> privateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(privateKeyPath, password);
+        Span<byte> privateKey = AsymmetricKeyValidation.EncryptionPrivateKeyFile(privateKeyPath, passphrase);
         Span<byte> preSharedKey = SymmetricKeyValidation.GetDecryptionSymmetricKey(symmetricKey);
         FileDecryption.DecryptEachFileWithPrivateKey(filePaths, privateKey, preSharedKey);
     }
 
-    public static void GenerateNewKeyPair(string directoryPath, Span<byte> password, bool encryption, bool signing)
+    public static void GenerateNewKeyPair(string directoryPath, Span<byte> passphrase, bool encryption, bool signing)
     {
         try
         {
@@ -176,11 +176,11 @@ public static class CommandLine
             DisplayMessage.AllErrors(errorMessages);
             string publicKey, privateKey, publicKeyPath, privateKeyPath;
             if (keyPairType == 1) {
-                (publicKey, privateKey) = AsymmetricKeys.GenerateEncryptionKeyPair(password);
+                (publicKey, privateKey) = AsymmetricKeys.GenerateEncryptionKeyPair(passphrase);
                 (publicKeyPath, privateKeyPath) = AsymmetricKeys.ExportKeyPair(directoryPath, Constants.DefaultEncryptionKeyFileName, publicKey, privateKey);
             }
             else {
-                (publicKey, privateKey) = AsymmetricKeys.GenerateSigningKeyPair(password);
+                (publicKey, privateKey) = AsymmetricKeys.GenerateSigningKeyPair(passphrase);
                 (publicKeyPath, privateKeyPath) = AsymmetricKeys.ExportKeyPair(directoryPath, Constants.DefaultSigningKeyFileName, publicKey, privateKey);
             }
             DisplayMessage.KeyPair(publicKey, publicKeyPath, privateKeyPath);
@@ -206,14 +206,14 @@ public static class CommandLine
         return keyPairType;
     }
 
-    public static void RecoverPublicKey(string privateKeyPath, Span<byte> password)
+    public static void RecoverPublicKey(string privateKeyPath, Span<byte> passphrase)
     {
         try
         {
             IEnumerable<string> errorMessages = AsymmetricKeyValidation.GetRecoverPublicKeyErrors(privateKeyPath);
             DisplayMessage.AllErrors(errorMessages);
             Span<byte> privateKey = AsymmetricKeyValidation.GetPrivateKeyFromFile(privateKeyPath);
-            privateKey = AsymmetricKeyValidation.DecryptPrivateKey(privateKey, password);
+            privateKey = AsymmetricKeyValidation.DecryptPrivateKey(privateKey, passphrase);
             
             Span<byte> publicKey = privateKey.Length switch
             {
@@ -236,11 +236,11 @@ public static class CommandLine
         }
     }
 
-    public static void Sign(string privateKeyPath, Span<byte> password, string comment, bool prehash, string[] signaturePaths, string[] filePaths)
+    public static void Sign(string privateKeyPath, Span<byte> passphrase, string comment, bool prehash, string[] signaturePaths, string[] filePaths)
     {
         IEnumerable<string> errorMessages = SigningValidation.GetSignErrors(privateKeyPath, comment, signaturePaths, filePaths);
         DisplayMessage.AllErrors(errorMessages);
-        Span<byte> privateKey = AsymmetricKeyValidation.SigningPrivateKeyFile(privateKeyPath, password);
+        Span<byte> privateKey = AsymmetricKeyValidation.SigningPrivateKeyFile(privateKeyPath, passphrase);
         FileSigning.SignEachFile(filePaths, signaturePaths, comment, prehash, privateKey);
     }
 

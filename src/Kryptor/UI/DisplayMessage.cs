@@ -49,7 +49,7 @@ public static class DisplayMessage
         WriteLine($"{exceptionName}: \"{Path.GetFileName(FileHandling.TrimTrailingSeparatorChars(filePath))}\" - {message}", ConsoleColor.DarkRed);
     }
 
-    public static void DerivingKeyFromPassword() => Console.WriteLine("Deriving encryption key from password...");
+    public static void DerivingKeyFromPassphrase() => Console.WriteLine("Deriving encryption key from passphrase...");
 
     public static void InputToOutput(string activity, string inputFilePath, string outputFilePath)
     {

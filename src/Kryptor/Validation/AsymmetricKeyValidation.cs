@@ -197,13 +197,13 @@ public static class AsymmetricKeyValidation
         }
     }
 
-    public static Span<byte> EncryptionPrivateKeyFile(string privateKeyPath, Span<byte> password)
+    public static Span<byte> EncryptionPrivateKeyFile(string privateKeyPath, Span<byte> passphrase)
     {
         try
         {
             Span<byte> privateKey = GetPrivateKeyFromFile(privateKeyPath);
             ValidateEncryptionKeyAlgorithm(privateKey);
-            return DecryptPrivateKey(privateKey, password);
+            return DecryptPrivateKey(privateKey, passphrase);
         }
         catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
@@ -216,13 +216,13 @@ public static class AsymmetricKeyValidation
         }
     }
 
-    public static Span<byte> SigningPrivateKeyFile(string privateKeyPath, Span<byte> password)
+    public static Span<byte> SigningPrivateKeyFile(string privateKeyPath, Span<byte> passphrase)
     {
         try
         {
             Span<byte> privateKey = GetPrivateKeyFromFile(privateKeyPath);
             ValidateSigningKeyAlgorithm(privateKey);
-            return DecryptPrivateKey(privateKey, password);
+            return DecryptPrivateKey(privateKey, passphrase);
         }
         catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
@@ -252,17 +252,17 @@ public static class AsymmetricKeyValidation
         }
     }
 
-    public static Span<byte> DecryptPrivateKey(Span<byte> privateKey, Span<byte> password)
+    public static Span<byte> DecryptPrivateKey(Span<byte> privateKey, Span<byte> passphrase)
     {
         Span<byte> keyVersion = privateKey.Slice(Constants.Curve25519KeyHeader.Length, Constants.PrivateKeyVersion.Length);
         if (!ConstantTime.Equals(keyVersion, Constants.PrivateKeyVersion)) {
             throw new NotSupportedException("This private key version isn't supported.");
         }
-        if (password.Length == 0) {
-            password = PasswordPrompt.EnterYourPassword(isPrivateKey: true);
+        if (passphrase.Length == 0) {
+            passphrase = PassphrasePrompt.EnterYourPassphrase(isPrivateKey: true);
         }
         Console.WriteLine("Decrypting private key...");
         Console.WriteLine();
-        return PrivateKey.Decrypt(privateKey, password);
+        return PrivateKey.Decrypt(privateKey, passphrase);
     }
 }

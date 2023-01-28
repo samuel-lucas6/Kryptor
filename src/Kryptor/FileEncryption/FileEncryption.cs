@@ -27,16 +27,16 @@ namespace Kryptor;
 
 public static class FileEncryption
 {
-    public static void EncryptEachFileWithPassword(string[] filePaths, Span<byte> password, Span<byte> pepper)
+    public static void EncryptEachFileWithPassphrase(string[] filePaths, Span<byte> passphrase, Span<byte> pepper)
     {
-        if (filePaths == null || password.Length == 0) {
+        if (filePaths == null || passphrase.Length == 0) {
             throw new UserInputException();
         }
         Span<byte> salt = stackalloc byte[Argon2id.SaltSize];
         Span<byte> ephemeralPublicKey = stackalloc byte[X25519.PublicKeySize];
-        Span<byte> inputKeyingMaterial = stackalloc byte[BLAKE2b.MaxKeySize], hashedPassword = inputKeyingMaterial[..ChaCha20.KeySize];
+        Span<byte> inputKeyingMaterial = stackalloc byte[BLAKE2b.MaxKeySize], hashedPassphrase = inputKeyingMaterial[..ChaCha20.KeySize];
         if (pepper.Length != 0) {
-            pepper.CopyTo(inputKeyingMaterial[hashedPassword.Length..]);
+            pepper.CopyTo(inputKeyingMaterial[hashedPassphrase.Length..]);
             CryptographicOperations.ZeroMemory(pepper);
         }
         Span<byte> emptySalt = stackalloc byte[BLAKE2b.SaltSize]; emptySalt.Clear();
@@ -51,10 +51,10 @@ public static class FileEncryption
                 SecureRandom.Fill(salt);
                 SecureRandom.Fill(ephemeralPublicKey);
                 
-                DisplayMessage.DerivingKeyFromPassword();
-                Argon2id.DeriveKey(hashedPassword, password, salt, Constants.Iterations, Constants.MemorySize);
-                BLAKE2b.DeriveKey(headerKey, pepper.Length == 0 ? hashedPassword : inputKeyingMaterial, Constants.Personalisation, emptySalt, info: ephemeralPublicKey);
-                CryptographicOperations.ZeroMemory(hashedPassword);
+                DisplayMessage.DerivingKeyFromPassphrase();
+                Argon2id.DeriveKey(hashedPassphrase, passphrase, salt, Constants.Iterations, Constants.MemorySize);
+                BLAKE2b.DeriveKey(headerKey, pepper.Length == 0 ? hashedPassphrase : inputKeyingMaterial, Constants.Personalisation, emptySalt, info: ephemeralPublicKey);
+                CryptographicOperations.ZeroMemory(hashedPassphrase);
                 
                 SecureRandom.Fill(fileKey);
                 ChaCha20.Encrypt(wrappedFileKeys[..fileKey.Length], fileKey, nonce, headerKey);
@@ -69,7 +69,7 @@ public static class FileEncryption
             }
             Console.WriteLine();
         }
-        CryptographicOperations.ZeroMemory(password);
+        CryptographicOperations.ZeroMemory(passphrase);
         CryptographicOperations.ZeroMemory(inputKeyingMaterial);
         DisplayMessage.SuccessfullyEncrypted();
     }

@@ -25,16 +25,16 @@ namespace Kryptor;
 
 public static class PrivateKey
 {
-    public static Span<byte> Encrypt(Span<byte> privateKey, Span<byte> password, Span<byte> keyAlgorithm)
+    public static Span<byte> Encrypt(Span<byte> privateKey, Span<byte> passphrase, Span<byte> keyAlgorithm)
     {
-        DisplayMessage.DerivingKeyFromPassword();
+        DisplayMessage.DerivingKeyFromPassphrase();
         Span<byte> salt = stackalloc byte[Argon2id.SaltSize];
         SecureRandom.Fill(salt);
 
         Span<byte> nonce = stackalloc byte[ChaCha20.NonceSize]; nonce.Clear();
         Span<byte> key = stackalloc byte[ChaCha20.KeySize];
-        Argon2id.DeriveKey(key, password, salt, Constants.Iterations, Constants.MemorySize);
-        CryptographicOperations.ZeroMemory(password);
+        Argon2id.DeriveKey(key, passphrase, salt, Constants.Iterations, Constants.MemorySize);
+        CryptographicOperations.ZeroMemory(passphrase);
 
         Span<byte> associatedData = stackalloc byte[keyAlgorithm.Length + Constants.PrivateKeyVersion.Length];
         Spans.Concat(associatedData, keyAlgorithm, Constants.PrivateKeyVersion);
@@ -49,7 +49,7 @@ public static class PrivateKey
         return fullPrivateKey;
     }
 
-    public static Span<byte> Decrypt(Span<byte> privateKey, Span<byte> password)
+    public static Span<byte> Decrypt(Span<byte> privateKey, Span<byte> passphrase)
     {
         try
         {
@@ -59,8 +59,8 @@ public static class PrivateKey
             
             Span<byte> nonce = stackalloc byte[ChaCha20.NonceSize]; nonce.Clear();
             Span<byte> key = stackalloc byte[ChaCha20.KeySize];
-            Argon2id.DeriveKey(key, password, salt, Constants.Iterations, Constants.MemorySize);
-            CryptographicOperations.ZeroMemory(password);
+            Argon2id.DeriveKey(key, passphrase, salt, Constants.Iterations, Constants.MemorySize);
+            CryptographicOperations.ZeroMemory(passphrase);
 
             Span<byte> decryptedPrivateKey = GC.AllocateArray<byte>(encryptedPrivateKey.Length - Poly1305.TagSize - kcChaCha20Poly1305.CommitmentSize, pinned: true);
             kcChaCha20Poly1305.Decrypt(decryptedPrivateKey, encryptedPrivateKey, nonce, key, associatedData);
@@ -69,7 +69,7 @@ public static class PrivateKey
         }
         catch (CryptographicException ex)
         {
-            throw new CryptographicException("Incorrect password, or the private key has been tampered with.", ex);
+            throw new CryptographicException("Incorrect passphrase, or the private key has been tampered with.", ex);
         }
     }
 }
