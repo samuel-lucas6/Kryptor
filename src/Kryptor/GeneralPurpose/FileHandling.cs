@@ -156,7 +156,7 @@ public static class FileHandling
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
-            DisplayMessage.FilePathException(filePath, ex.GetType().Name, $"Unable to restore the file name to \"{newFileName}\".");
+            DisplayMessage.FilePathException(filePath, ex.GetType().Name, $"Unable to restore the file name. You should manually rename it to \"{newFileName}\".");
             return filePath;
         }
     }

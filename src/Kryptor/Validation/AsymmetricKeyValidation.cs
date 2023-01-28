@@ -30,35 +30,35 @@ public static class AsymmetricKeyValidation
     public static IEnumerable<string> GetGenerateKeyPairErrors(string directoryPath, int keyPairType, bool encryption, bool signing)
     {
         if (keyPairType != 1 && keyPairType != 2) {
-            yield return "Please enter a valid number.";
+            yield return "Invalid number.";
         }
         bool defaultKeyDirectory = string.Equals(directoryPath, Constants.DefaultKeyDirectory);
         if (!defaultKeyDirectory && !Directory.Exists(directoryPath)) {
-            yield return ErrorMessages.GetFilePathError(directoryPath, "This directory doesn't exist.");
+            yield return ErrorMessages.GetFilePathError(directoryPath, ErrorMessages.DirectoryDoesNotExist);
         }
         if (encryption && signing) {
-            yield return "Please specify only one type of key pair to generate.";
+            yield return "Only specify one type of key pair to generate.";
         }
         else if (defaultKeyDirectory && !Globals.Overwrite) {
             if (keyPairType == 1 && (File.Exists(Constants.DefaultEncryptionPublicKeyPath) || File.Exists(Constants.DefaultEncryptionPrivateKeyPath))) {
-                yield return "An encryption key pair already exists in the default directory. Please specify -o|--overwrite if you want to overwrite your key pair.";
+                yield return "An encryption key pair already exists in the default directory. Specify -o|--overwrite if you want to overwrite your key pair.";
             }
             else if (keyPairType == 2 && (File.Exists(Constants.DefaultSigningPublicKeyPath) || File.Exists(Constants.DefaultSigningPrivateKeyPath))) {   
-                yield return "A signing key pair already exists in the default directory. Please specify -o|--overwrite if you want to overwrite your key pair.";
+                yield return "A signing key pair already exists in the default directory. Specify -o|--overwrite if you want to overwrite your key pair.";
             }
         }
         else if (!defaultKeyDirectory && !Globals.Overwrite && keyPairType == 1) {
             string publicKeyPath = Path.Combine(directoryPath, Constants.DefaultEncryptionKeyFileName + Constants.PublicKeyExtension);
             string privateKeyPath = Path.Combine(directoryPath, Constants.DefaultEncryptionKeyFileName + Constants.PrivateKeyExtension);
             if (File.Exists(publicKeyPath) || File.Exists(privateKeyPath)) {
-                yield return ErrorMessages.GetFilePathError(directoryPath, "An encryption key pair already exists in this directory. Please specify -o|--overwrite if you want to overwrite your key pair.");
+                yield return ErrorMessages.GetFilePathError(directoryPath, "An encryption key pair already exists in this directory. Specify -o|--overwrite if you want to overwrite your key pair.");
             }
         }
         else if (!defaultKeyDirectory && !Globals.Overwrite && keyPairType == 2) {
             string publicKeyPath = Path.Combine(directoryPath, Constants.DefaultSigningKeyFileName + Constants.PublicKeyExtension);
             string privateKeyPath = Path.Combine(directoryPath, Constants.DefaultSigningKeyFileName + Constants.PrivateKeyExtension);
             if (File.Exists(publicKeyPath) || File.Exists(privateKeyPath)) {
-                yield return ErrorMessages.GetFilePathError(directoryPath, "A signing key pair already exists in this directory. Please specify -o|--overwrite if you want to overwrite your key pair.");
+                yield return ErrorMessages.GetFilePathError(directoryPath, "A signing key pair already exists in this directory. Specify -o|--overwrite if you want to overwrite your key pair.");
             }
         }
     }
@@ -66,7 +66,7 @@ public static class AsymmetricKeyValidation
     public static IEnumerable<string> GetRecoverPublicKeyErrors(string privateKeyPath)
     {
         if (string.IsNullOrEmpty(privateKeyPath)) {
-            yield return "Please specify a private key file using -x:file.";
+            yield return "Specify a private key file using -x:file.";
         }
         else if (!privateKeyPath.EndsWith(Constants.PrivateKeyExtension)) {
             yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.InvalidPrivateKeyFile);
@@ -99,7 +99,7 @@ public static class AsymmetricKeyValidation
                 DisplayMessage.Exception(ex.GetType().Name, ex.Message);
                 return null;
             }
-            DisplayMessage.Exception(ex.GetType().Name, publicKeyPaths?.Length > 1 ? "Please specify valid encryption public keys." : "Please specify a valid encryption public key.");
+            DisplayMessage.Exception(ex.GetType().Name, publicKeyPaths?.Length > 1 ? "One or more invalid encryption public keys." : "Invalid encryption public key.");
             return null;
         }
     }
@@ -156,7 +156,7 @@ public static class AsymmetricKeyValidation
                 DisplayMessage.Exception(ex.GetType().Name, ex.Message);
                 return null;
             }
-            DisplayMessage.Exception(ex.GetType().Name, encodedPublicKeys?.Length > 1 ? "Please enter valid encryption public keys." : "Please enter a valid encryption public key.");
+            DisplayMessage.Exception(ex.GetType().Name, encodedPublicKeys?.Length > 1 ? "One or more invalid encryption public keys." : "Invalid encryption public key.");
             return null;
         }
     }
@@ -171,7 +171,7 @@ public static class AsymmetricKeyValidation
         }
         catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
-            DisplayMessage.Exception(ex.GetType().Name, "Please enter a valid signing public key.");
+            DisplayMessage.Exception(ex.GetType().Name, "Invalid signing public key.");
             return Span<byte>.Empty;
         }
     }
@@ -179,7 +179,7 @@ public static class AsymmetricKeyValidation
     private static void ValidateEncryptionKeyAlgorithm(Span<byte> asymmetricKey)
     {
         if (!ConstantTime.Equals(asymmetricKey[..Constants.Curve25519KeyHeader.Length], Constants.Curve25519KeyHeader)) {
-            throw new NotSupportedException("This key algorithm isn't supported for encryption.");
+            throw new NotSupportedException("Invalid key algorithm for encryption.");
         }
     }
 
@@ -193,7 +193,7 @@ public static class AsymmetricKeyValidation
     private static void ValidateSigningKeyAlgorithm(Span<byte> asymmetricKey)
     {
         if (!ConstantTime.Equals(asymmetricKey[..Constants.Ed25519KeyHeader.Length], Constants.Ed25519KeyHeader)) {
-            throw new NotSupportedException("This key algorithm isn't supported for signing.");
+            throw new NotSupportedException("Invalid key algorithm for signing.");
         }
     }
 

@@ -24,8 +24,8 @@ namespace Kryptor;
 
 public static class FileEncryptionValidation
 {
-    private const string FileOrDirectoryError = "Please specify a file/directory.";
-    private static readonly string KeyfileTooSmall = $"Please specify a keyfile that's at least {Constants.KeyfileLength} bytes in size.";
+    private const string FileOrDirectoryError = "Specify a file/directory.";
+    private static readonly string KeyfileTooSmall = $"Keyfiles must be at least {Constants.KeyfileLength} bytes long.";
     private static readonly char[] IllegalFileNameChars = {
         '\"', '<', '>', '|', '\0',
         (char) 1, (char) 2, (char) 3, (char) 4, (char) 5, (char) 6, (char) 7, (char) 8, (char) 9, (char) 10,
@@ -47,7 +47,7 @@ public static class FileEncryptionValidation
                 yield return ErrorMessages.GetFilePathError(symmetricKey, KeyfileTooSmall);
             }
             else if (!File.Exists(symmetricKey) && (symmetricKey.Contains(Path.DirectorySeparatorChar) || symmetricKey.Contains(Path.AltDirectorySeparatorChar)) && !Directory.Exists(Path.GetDirectoryName(symmetricKey))) {
-                yield return ErrorMessages.GetFilePathError(symmetricKey, "Please specify a valid directory for the keyfile.");
+                yield return ErrorMessages.GetFilePathError(symmetricKey, ErrorMessages.DirectoryDoesNotExist);
             }
         }
     }
@@ -62,7 +62,7 @@ public static class FileEncryptionValidation
             yield return ErrorMessages.NoPublicKey;
         }
         else if (publicKeys.Length > Constants.MaxRecipients) {
-            yield return $"Please specify no more than {Constants.MaxRecipients} public keys.";
+            yield return $"The max number of public keys is {Constants.MaxRecipients}.";
         }
         else {
             foreach (string publicKey in publicKeys) {
@@ -82,7 +82,7 @@ public static class FileEncryptionValidation
                 }
             }
             if (publicKeys.Any(key => !string.IsNullOrEmpty(Path.GetExtension(key))) && publicKeys.Any(key => string.IsNullOrEmpty(Path.GetExtension(key)))) {
-                yield return "Please specify only public key strings or only public key files.";
+                yield return "Only specify public key strings or public key files.";
             }
         }
         
@@ -156,7 +156,7 @@ public static class FileEncryptionValidation
         }
         else if (!symmetricKey.EndsWith(Constants.Base64Padding)) {
             if (!File.Exists(symmetricKey)) {
-                yield return ErrorMessages.GetFilePathError(symmetricKey, "Please specify a valid symmetric key string or a keyfile that exists.");
+                yield return ErrorMessages.GetFilePathError(symmetricKey, "Specify a valid symmetric key string or a keyfile that exists.");
             }
             else if (new FileInfo(symmetricKey).Length < Constants.KeyfileLength) {
                 yield return ErrorMessages.GetFilePathError(symmetricKey, KeyfileTooSmall);
@@ -227,7 +227,7 @@ public static class FileEncryptionValidation
                     yield return ErrorMessages.GetFilePathError(inputFilePath, ErrorMessages.FileOrDirectoryDoesNotExist);
                 }
                 else if (new FileInfo(inputFilePath).Length < Constants.FileHeadersLength) {
-                    yield return ErrorMessages.GetFilePathError(inputFilePath, "This file is too small to be encrypted.");
+                    yield return ErrorMessages.GetFilePathError(inputFilePath, "This file hasn't been encrypted.");
                 }
             }
         }

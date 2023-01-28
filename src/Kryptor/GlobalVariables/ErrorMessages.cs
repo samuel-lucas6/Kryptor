@@ -23,20 +23,21 @@ namespace Kryptor;
 public static class ErrorMessages
 {
     public const string FileOrDirectoryDoesNotExist = "This file/directory doesn't exist.";
+    public const string DirectoryDoesNotExist = "This directory doesn't exist.";
     public const string DirectoryEmpty = "This directory is empty.";
     public const string UnableToAccessDirectory = "Unable to access this directory.";
-    public const string InvalidPrivateKeyFile = "Please specify a .private key file.";
+    public const string InvalidPrivateKeyFile = "This isn't a .private file.";
     public const string NonExistentDefaultPrivateKeyFile = "You don't have a default key pair. You can generate one using -g|--generate.";
-    public const string NonExistentPrivateKeyFile = "Please specify a private key file that exists.";
-    public const string NoPublicKey = "Please specify a public key.";
-    public const string MultiplePublicKeys = "Please specify a single public key.";
-    public const string InvalidPublicKey = "Please specify a valid public key.";
-    public const string InvalidPublicKeyFile = "Please specify a .public key file.";
-    public const string NonExistentPublicKeyFile = "Please specify a public key file that exists.";
-    public const string InvalidPublicKeyFileLength = "Please specify a public key file that only contains the public key.";
-    public const string InvalidPrivateKeyFileLength = "Please specify a private key file that only contains the private key.";
-    public const string EncryptionMethod = "Please specify a passphrase and/or symmetric key, private key, or private key and public key.";
-    public const string InvalidSymmetricKey = "Please specify a valid symmetric key string.";
+    public const string NonExistentPrivateKeyFile = "This private key file doesn't exist.";
+    public const string NoPublicKey = "No public key specified.";
+    public const string MultiplePublicKeys = "Specify a single public key.";
+    public const string InvalidPublicKey = "Invalid public key.";
+    public const string InvalidPublicKeyFile = "This isn't a .public file.";
+    public const string NonExistentPublicKeyFile = "This public key file doesn't exist.";
+    public const string InvalidPublicKeyFileLength = "Invalid public key file length.";
+    public const string InvalidPrivateKeyFileLength = "Invalid private key file length.";
+    public const string EncryptionMethod = "Specify a passphrase and/or symmetric key, private key, or private key and public key.";
+    public const string InvalidSymmetricKey = "Invalid symmetric key string.";
     public const string UnableToEncryptFile = "Unable to encrypt the file/directory.";
     public const string UnableToDecryptFile = "Unable to decrypt the file.";
 

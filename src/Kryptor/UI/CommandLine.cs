@@ -280,7 +280,7 @@ public static class CommandLine
                     Console.WriteLine("Alternatively, you can manually download the latest release at <https://www.kryptor.co.uk/#download-kryptor>.");
                     return;
                 default:
-                    DisplayMessage.Error("Please type either y or n next time.");
+                    DisplayMessage.Error("You didn't type y or n.");
                     return;
             }
         }

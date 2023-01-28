@@ -24,7 +24,7 @@ namespace Kryptor;
 
 public static class SigningValidation
 {
-    private const string WrongSignatureExtension = "Please specify a .signature file.";
+    private const string WrongSignatureExtension = "This isn't a .signature file.";
     private const string SignatureFileInaccessible = "Unable to access the signature file.";
     
     public static IEnumerable<string> GetSignErrors(string privateKeyPath, string comment, string[] signaturePaths, string[] filePaths)
@@ -45,13 +45,13 @@ public static class SigningValidation
         }
         
         if (!string.IsNullOrEmpty(comment) && comment.Length > 500) {
-            yield return "Please enter a shorter comment. The maximum length is 500 characters.";
+            yield return "The max comment length is 500 characters.";
         }
         
         if (signaturePaths != null) {
             foreach (string signaturePath in signaturePaths) {
                 if (Directory.Exists(signaturePath)) {
-                    yield return ErrorMessages.GetFilePathError(signaturePath, "Please specify a file, not a directory.");
+                    yield return ErrorMessages.GetFilePathError(signaturePath, "This is a directory, not a signature file.");
                 }
                 else if (!signaturePath.EndsWith(Constants.SignatureExtension)) {
                     yield return ErrorMessages.GetFilePathError(signaturePath, WrongSignatureExtension);
@@ -60,7 +60,7 @@ public static class SigningValidation
         }
         
         if (filePaths == null) {
-            yield return "Please specify a file to sign.";
+            yield return "Specify a file to sign.";
         }
         else {
             foreach (string filePath in filePaths) {
@@ -73,7 +73,7 @@ public static class SigningValidation
                         yield return ErrorMessages.GetFilePathError(filePath, ErrorMessages.UnableToAccessDirectory);
                     }
                     if (signaturePaths != null) {
-                        yield return ErrorMessages.GetFilePathError(filePath, "You cannot specify signature files when signing a directory.");
+                        yield return ErrorMessages.GetFilePathError(filePath, "Signature files cannot be specified when signing a directory.");
                     }
                 }
                 else if (!File.Exists(filePath)) {
@@ -82,7 +82,7 @@ public static class SigningValidation
             }
         }
         if (signaturePaths != null && filePaths != null && signaturePaths.Length != filePaths.Length) {
-            yield return "Please specify the same number of signature files and files to sign.";
+            yield return "Specify the same number of signature files and files to sign.";
         }
     }
 
@@ -110,7 +110,7 @@ public static class SigningValidation
         }
 
         if (filePaths == null) {
-            yield return "Please specify a file to verify.";
+            yield return "Specify a file to verify.";
         }
         else {
             foreach (string filePath in filePaths) {
@@ -131,17 +131,17 @@ public static class SigningValidation
             }
         }
         if (filePaths != null && signaturePaths.Length != filePaths.Length) {
-            yield return "Please specify the same number of signature files and files to verify.";
+            yield return "Specify the same number of signature files and files to verify.";
         }
     }
 
     private static string GetVerifyFileError(string filePath, string signatureFilePath)
     {
-        if (filePath.EndsWith(Constants.SignatureExtension)) { return "Please specify the file to verify, not the signature file."; }
-        if (Directory.Exists(filePath)) { return "Please only specify files, not directories."; }
+        if (filePath.EndsWith(Constants.SignatureExtension)) { return "Specify the file to verify, not the signature file."; }
+        if (Directory.Exists(filePath)) { return "Only specify files when verifying, not directories."; }
         if (!File.Exists(filePath)) { return "This file doesn't exist."; }
         if (string.IsNullOrEmpty(signatureFilePath)) { return null; }
-        if (!File.Exists(signatureFilePath)) { return "Unable to find the signature file. Please specify it manually using -t|--signature."; }
+        if (!File.Exists(signatureFilePath)) { return "Unable to find the signature file. Specify it manually using -t|--signature."; }
         bool? validMagicBytes = IsValidSignatureFile(signatureFilePath, out bool? validVersion);
         if (validMagicBytes == null) { return SignatureFileInaccessible; }
         if (validMagicBytes == false) { return "The signature file that was found doesn't have a valid format."; }
@@ -151,11 +151,11 @@ public static class SigningValidation
     private static string GetSignatureFileError(string signatureFilePath)
     {
         if (!signatureFilePath.EndsWith(Constants.SignatureExtension)) { return WrongSignatureExtension; }
-        if (!File.Exists(signatureFilePath)) { return "Please specify a signature file that exists."; }
+        if (!File.Exists(signatureFilePath)) { return "This signature file doesn't exist."; }
         bool? validMagicBytes = IsValidSignatureFile(signatureFilePath, out bool? validVersion);
         if (validMagicBytes == null) { return SignatureFileInaccessible; }
-        if (validMagicBytes == false) { return "Please specify a signature file with a valid format."; }
-        return validVersion == false ? "This signature file doesn't have a valid version." : null;
+        if (validMagicBytes == false) { return "Invalid signature file format."; }
+        return validVersion == false ? "Invalid signature file version." : null;
     }
     
     private static bool? IsValidSignatureFile(string filePath, out bool? validVersion)
