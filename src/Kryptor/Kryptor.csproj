@@ -12,7 +12,7 @@
     <Authors>Samuel Lucas</Authors>
     <Product>Kryptor</Product>
     <Description>A simple, modern, and secure encryption and signing tool.</Description>
-    <Copyright>Copyright © 2020-2022 Samuel Lucas</Copyright>
+    <Copyright>Copyright © 2020-2023 Samuel Lucas</Copyright>
     <PackageProjectUrl>https://www.kryptor.co.uk</PackageProjectUrl>
     <PackageIcon>Kryptor.png</PackageIcon>
     <RepositoryUrl>https://github.com/samuel-lucas6/Kryptor</RepositoryUrl>
