@@ -13,12 +13,12 @@ It aims to be a better version of [age](https://github.com/FiloSottile/age) and 
 ## Features
 
 - The latest and greatest cryptographic primitives, with no config options.
-- Encrypt multiple files/directories with a password, symmetric key, or asymmetric keys.
+- Encrypt multiple files/directories with a passphrase, symmetric key, or asymmetric keys.
 - Encrypt to multiple recipients for sender authenticated, one-way file sharing.
 - Encrypted files are indistinguishable from random. File names can also be encrypted.
 - Create and verify digital signatures, with support for an authenticated comment and prehashing.
 - Small public keys. Private keys are encrypted for protection at rest.
-- UNIX style password entry and random passphrase generation.
+- UNIX style passphrase entry and random passphrase generation.
 - Pre-shared keys can be used for post-quantum secure key exchange.
 
 For more information, please go to [kryptor.co.uk](https://www.kryptor.co.uk/).
@@ -31,27 +31,27 @@ If you're just getting started, check out the [tutorial](https://www.kryptor.co.
 Usage: kryptor [options] <file>
 
 Arguments:
-  file            specify a file/directory path
+  file             specify a file/directory path
 
 Options:
-  -e|--encrypt    encrypt files/directories
-  -d|--decrypt    decrypt files/directories
-  -p|--password   specify a password (empty for interactive entry)
-  -k|--key        specify or randomly generate a symmetric key or keyfile
-  -x|--private    specify your private key (unused or empty for default key)
-  -y|--public     specify a public key
-  -n|--names      encrypt file/directory names
-  -o|--overwrite  overwrite files
-  -g|--generate   generate a new key pair
-  -r|--recover    recover your public key from your private key
-  -s|--sign       create a signature
-  -c|--comment    add a comment to a signature
-  -l|--prehash    sign large files by prehashing
-  -v|--verify     verify a signature
-  -t|--signature  specify a signature file (unused for default name)
-  -u|--update     check for updates
-  -a|--about      view the program version and license
-  -h|--help       show help information
+  -e|--encrypt     encrypt files/directories
+  -d|--decrypt     decrypt files/directories
+  -p|--passphrase  specify a passphrase (empty for interactive entry)
+  -k|--key         specify or randomly generate a symmetric key or keyfile
+  -x|--private     specify your private key (unused or empty for default key)
+  -y|--public      specify a public key
+  -n|--names       encrypt file/directory names
+  -o|--overwrite   overwrite files
+  -g|--generate    generate a new key pair
+  -r|--recover     recover your public key from your private key
+  -s|--sign        create a signature
+  -c|--comment     add a comment to a signature
+  -l|--prehash     sign large files by prehashing
+  -v|--verify      verify a signature
+  -t|--signature   specify a signature file (unused for default name)
+  -u|--update      check for updates
+  -a|--about       view the program version and license
+  -h|--help        show help information
 
 Examples:
   --encrypt [file]
