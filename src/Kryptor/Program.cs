@@ -25,8 +25,7 @@ using McMaster.Extensions.CommandLineUtils;
 namespace Kryptor;
 
 [HelpOption("-h|--help", ShowInHelpText = false)]
-[Command(ExtendedHelpText = @"  -h|--help       show help information
-
+[Command(ExtendedHelpText = @"
 Examples:
   --encrypt [file]
   --encrypt -p [file]
