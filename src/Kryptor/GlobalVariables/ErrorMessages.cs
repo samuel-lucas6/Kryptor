@@ -26,13 +26,13 @@ public static class ErrorMessages
     public const string DirectoryDoesNotExist = "This directory doesn't exist.";
     public const string DirectoryEmpty = "This directory is empty.";
     public const string UnableToAccessDirectory = "Unable to access this directory.";
-    public const string InvalidPrivateKeyFile = "This isn't a .private file.";
+    public const string InvalidPrivateKeyFile = "This isn't a .private key file.";
     public const string NonExistentDefaultPrivateKeyFile = "You don't have a default key pair. You can generate one using -g|--generate.";
     public const string NonExistentPrivateKeyFile = "This private key file doesn't exist.";
     public const string NoPublicKey = "No public key specified.";
     public const string MultiplePublicKeys = "Specify a single public key.";
     public const string InvalidPublicKey = "Invalid public key.";
-    public const string InvalidPublicKeyFile = "This isn't a .public file.";
+    public const string InvalidPublicKeyFile = "This isn't a .public key file.";
     public const string NonExistentPublicKeyFile = "This public key file doesn't exist.";
     public const string InvalidPublicKeyFileLength = "Invalid public key file length.";
     public const string InvalidPrivateKeyFileLength = "Invalid private key file length.";

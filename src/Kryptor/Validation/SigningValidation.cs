@@ -60,7 +60,7 @@ public static class SigningValidation
         }
         
         if (filePaths == null) {
-            yield return "Specify a file to sign.";
+            yield return "Specify a file/directory to sign.";
         }
         else {
             foreach (string filePath in filePaths) {
