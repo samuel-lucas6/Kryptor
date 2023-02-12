@@ -27,7 +27,7 @@ namespace Kryptor;
 
 public static class AsymmetricKeyValidation
 {
-    public static IEnumerable<string> GetGenerateKeyPairErrors(string directoryPath, int keyPairType, bool encryption, bool signing)
+    public static IEnumerable<string> GetGenerateKeyPairErrors(string directoryPath, int keyPairType, string comment, bool encryption, bool signing)
     {
         if (keyPairType != 1 && keyPairType != 2) {
             yield return "Invalid number.";
@@ -35,6 +35,9 @@ public static class AsymmetricKeyValidation
         bool defaultKeyDirectory = string.Equals(directoryPath, Constants.DefaultKeyDirectory);
         if (!defaultKeyDirectory && !Directory.Exists(directoryPath)) {
             yield return ErrorMessages.GetFilePathError(directoryPath, ErrorMessages.DirectoryDoesNotExist);
+        }
+        if (!string.IsNullOrEmpty(comment) && comment.Length > Constants.MaxCommentLength) {
+            yield return ErrorMessages.InvalidCommentLength;
         }
         if (encryption && signing) {
             yield return "Only specify one type of key pair to generate.";
@@ -74,7 +77,7 @@ public static class AsymmetricKeyValidation
         else if (!File.Exists(privateKeyPath)) {
             yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.NonExistentPrivateKeyFile);
         }
-        else if (new FileInfo(privateKeyPath).Length is not (Constants.EncryptionPrivateKeyLength or Constants.SigningPrivateKeyLength)) {
+        else if (new FileInfo(privateKeyPath).Length is < Constants.EncryptionPrivateKeyLength or Constants.SigningPrivateKeyLength) {
             yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.InvalidPrivateKeyFileLength);
         }
     }
@@ -123,8 +126,9 @@ public static class AsymmetricKeyValidation
     {
         try
         {
-            string encodedPublicKey = File.ReadAllText(publicKeyPath);
-            return Encodings.FromBase64(encodedPublicKey);
+            using var streamReader = new StreamReader(publicKeyPath);
+            string[] encodedPublicKey = streamReader.ReadLine()?.TrimStart().Split(" ");
+            return Encodings.FromBase64(encodedPublicKey?[0]);
         }
         catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {
@@ -239,8 +243,9 @@ public static class AsymmetricKeyValidation
     {
         try
         {
-            string encodedPrivateKey = File.ReadAllText(privateKeyPath);
-            return Encodings.FromBase64(encodedPrivateKey);
+            using var streamReader = new StreamReader(privateKeyPath);
+            string[] encodedPrivateKey = streamReader.ReadLine()?.TrimStart().Split(" ");
+            return Encodings.FromBase64(encodedPrivateKey?[0]);
         }
         catch (Exception ex) when (ExceptionFilters.StringKey(ex))
         {

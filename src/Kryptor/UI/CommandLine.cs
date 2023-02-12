@@ -167,21 +167,21 @@ public static class CommandLine
         FileDecryption.DecryptEachFileWithPrivateKey(filePaths, privateKey, preSharedKey);
     }
 
-    public static void GenerateNewKeyPair(string directoryPath, Span<byte> passphrase, bool encryption, bool signing)
+    public static void GenerateNewKeyPair(string directoryPath, Span<byte> passphrase, string comment, bool encryption, bool signing)
     {
         try
         {
             int keyPairType = GetKeyPairType(encryption, signing);
-            IEnumerable<string> errorMessages = AsymmetricKeyValidation.GetGenerateKeyPairErrors(directoryPath, keyPairType, encryption, signing);
+            IEnumerable<string> errorMessages = AsymmetricKeyValidation.GetGenerateKeyPairErrors(directoryPath, keyPairType, comment, encryption, signing);
             DisplayMessage.AllErrors(errorMessages);
             string publicKey, privateKey, publicKeyPath, privateKeyPath;
             if (keyPairType == 1) {
                 (publicKey, privateKey) = AsymmetricKeys.GenerateEncryptionKeyPair(passphrase);
-                (publicKeyPath, privateKeyPath) = AsymmetricKeys.ExportKeyPair(directoryPath, Constants.DefaultEncryptionKeyFileName, publicKey, privateKey);
+                (publicKeyPath, privateKeyPath) = AsymmetricKeys.ExportKeyPair(directoryPath, Constants.DefaultEncryptionKeyFileName, publicKey, privateKey, comment);
             }
             else {
                 (publicKey, privateKey) = AsymmetricKeys.GenerateSigningKeyPair(passphrase);
-                (publicKeyPath, privateKeyPath) = AsymmetricKeys.ExportKeyPair(directoryPath, Constants.DefaultSigningKeyFileName, publicKey, privateKey);
+                (publicKeyPath, privateKeyPath) = AsymmetricKeys.ExportKeyPair(directoryPath, Constants.DefaultSigningKeyFileName, publicKey, privateKey, comment);
             }
             DisplayMessage.KeyPair(publicKey, publicKeyPath, privateKeyPath);
         }

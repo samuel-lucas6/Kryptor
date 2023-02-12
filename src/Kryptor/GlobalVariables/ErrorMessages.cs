@@ -36,6 +36,7 @@ public static class ErrorMessages
     public const string NonExistentPublicKeyFile = "This public key file doesn't exist.";
     public const string InvalidPublicKeyFileLength = "Invalid public key file length.";
     public const string InvalidPrivateKeyFileLength = "Invalid private key file length.";
+    public static readonly string InvalidCommentLength = $"The max comment length is {Constants.MaxCommentLength} characters.";
     public const string EncryptionMethod = "Specify a passphrase and/or symmetric key, private key, or private key and public key.";
     public const string InvalidSymmetricKey = "Invalid symmetric key string.";
     public const string UnableToEncryptFile = "Unable to encrypt the file/directory.";

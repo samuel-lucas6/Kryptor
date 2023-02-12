@@ -52,13 +52,13 @@ public static class AsymmetricKeys
         return (Encodings.ToBase64(fullPublicKey), Encodings.ToBase64(encryptedPrivateKey));
     }
 
-    public static (string publicKeyPath, string privateKeyPath) ExportKeyPair(string directoryPath, string fileName, string publicKey, string privateKey)
+    public static (string publicKeyPath, string privateKeyPath) ExportKeyPair(string directoryPath, string fileName, string publicKey, string privateKey, string comment)
     {
         Directory.CreateDirectory(directoryPath);
         string publicKeyPath = Path.Combine(directoryPath, fileName + Constants.PublicKeyExtension);
-        CreateKeyFile(publicKeyPath, publicKey);
+        CreateKeyFile(publicKeyPath, publicKey, comment);
         string privateKeyPath = Path.Combine(directoryPath, fileName + Constants.PrivateKeyExtension);
-        CreateKeyFile(privateKeyPath, privateKey);
+        CreateKeyFile(privateKeyPath, privateKey, comment);
         return (publicKeyPath, privateKeyPath);
     }
 
@@ -70,7 +70,7 @@ public static class AsymmetricKeys
             if (File.Exists(publicKeyPath)) {
                 return null;
             }
-            CreateKeyFile(publicKeyPath, publicKey);
+            CreateKeyFile(publicKeyPath, publicKey, comment: string.Empty);
             return publicKeyPath;
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
@@ -80,12 +80,12 @@ public static class AsymmetricKeys
         }
     }
 
-    public static void CreateKeyFile(string filePath, string asymmetricKey)
+    public static void CreateKeyFile(string filePath, string asymmetricKey, string comment)
     {
         if (File.Exists(filePath)) {
             File.SetAttributes(filePath, FileAttributes.Normal);
         }
-        File.WriteAllText(filePath, asymmetricKey);
+        File.WriteAllText(filePath, string.IsNullOrWhiteSpace(comment) ? asymmetricKey : asymmetricKey + $" {comment}");
         File.SetAttributes(filePath, FileAttributes.ReadOnly);
     }
 

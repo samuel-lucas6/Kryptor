@@ -80,4 +80,5 @@ public static class Constants
     public const string SignatureExtension = ".signature";
     public static readonly byte[] SignatureMagicBytes = Encoding.UTF8.GetBytes("SIGNATURE");
     public static readonly byte[] SignatureVersion = { 1, 0 };
+    public const int MaxCommentLength = 500;
 }

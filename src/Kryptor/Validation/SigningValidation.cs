@@ -39,13 +39,13 @@ public static class SigningValidation
             case false when !File.Exists(privateKeyPath):
                 yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.NonExistentPrivateKeyFile);
                 break;
-            case false when new FileInfo(privateKeyPath).Length != Constants.SigningPrivateKeyLength:
+            case false when new FileInfo(privateKeyPath).Length < Constants.SigningPrivateKeyLength:
                 yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.InvalidPrivateKeyFileLength);
                 break;
         }
         
-        if (!string.IsNullOrEmpty(comment) && comment.Length > 500) {
-            yield return "The max comment length is 500 characters.";
+        if (!string.IsNullOrEmpty(comment) && comment.Length > Constants.MaxCommentLength) {
+            yield return ErrorMessages.InvalidCommentLength;
         }
         
         if (signaturePaths != null) {
@@ -105,7 +105,7 @@ public static class SigningValidation
         else if (!File.Exists(publicKeys[0])) {
             yield return ErrorMessages.GetFilePathError(publicKeys[0], ErrorMessages.NonExistentPublicKeyFile);
         }
-        else if (new FileInfo(publicKeys[0]).Length != Constants.PublicKeyLength) {
+        else if (new FileInfo(publicKeys[0]).Length < Constants.PublicKeyLength) {
             yield return ErrorMessages.GetFilePathError(publicKeys[0], ErrorMessages.InvalidPublicKeyFileLength);
         }
 
