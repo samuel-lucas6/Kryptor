@@ -22,6 +22,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using Geralt;
+using System.IO;
 
 namespace Kryptor;
 
@@ -254,6 +255,11 @@ public static class CommandLine
     
     public static void CheckForUpdates()
     {
+        if (isAURPackage())
+        {
+            DisplayMessage.WriteLine("Kryptor is installed through AUR so it can't be updated manually.", ConsoleColor.Red);
+            Environment.Exit(-1);
+        }
         try
         {
             bool updateAvailable = Updates.CheckForUpdates(out string latestVersion);
@@ -294,5 +300,14 @@ public static class CommandLine
             Console.WriteLine();
             Console.WriteLine("You can manually download the latest release at <https://www.kryptor.co.uk/#download-kryptor>.");
         }
+    }
+
+    /// Check if this kryptor binary is installed through AUR, if true we cannot update the binary manually 
+    private static bool isAURPackage()
+    {
+        string executableFilePath = Environment.ProcessPath ?? throw new FileNotFoundException("Unable to retrieve the process path.");
+        var isArchBased = File.Exists("/usr/bin/pacman");
+        var isKryptorInstalledUsingAUR = String.Equals("/usr/bin/kryptor", executableFilePath);
+        return isArchBased && isKryptorInstalledUsingAUR;
     }
 }
