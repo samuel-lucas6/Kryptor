@@ -86,9 +86,6 @@ public class Program
     [Option("-t|--signature", "specify a signature file (unused for default name)", CommandOptionType.MultipleValue)]
     private string[] Signatures { get; }
 
-    [Option("-u|--update", "check for updates", CommandOptionType.NoValue)]
-    private bool Update { get; }
-
     [Option("-a|--about", "view the program version and license", CommandOptionType.NoValue)]
     private bool About { get; }
 
@@ -123,9 +120,6 @@ public class Program
             }
             else if (Verify) {
                 CommandLine.Verify(PublicKeys, Signatures, FilePaths);
-            }
-            else if (Update) {
-                CommandLine.CheckForUpdates();
             }
             else if (About) {
                 DisplayMessage.About();

@@ -17,7 +17,6 @@
 */
 
 using System;
-using System.Net;
 using System.Linq;
 using System.Collections.Generic;
 using System.Security.Cryptography;
@@ -250,49 +249,5 @@ public static class CommandLine
         DisplayMessage.AllErrors(errorMessages);
         Span<byte> publicKey = publicKeys[0].EndsWith(Constants.PublicKeyExtension) ? AsymmetricKeyValidation.SigningPublicKeyFile(publicKeys[0]) : AsymmetricKeyValidation.SigningPublicKeyString(publicKeys[0]);
         FileSigning.VerifyEachFile(signaturePaths, filePaths, publicKey);
-    }
-    
-    public static void CheckForUpdates()
-    {
-        try
-        {
-            bool updateAvailable = Updates.CheckForUpdates(out string latestVersion);
-            if (!updateAvailable) {
-                DisplayMessage.WriteLine("Kryptor is up to date.", ConsoleColor.Green);
-                return;
-            }
-            Console.WriteLine($"An update is available for Kryptor. The latest version is v{latestVersion}.");
-            Console.WriteLine();
-            DisplayMessage.WriteLine($"IMPORTANT: Please check the latest changelog at <https://www.kryptor.co.uk/changelog#v{latestVersion}> to see if there are any breaking changes BEFORE updating.", ConsoleColor.DarkYellow);
-            Console.WriteLine();
-            Console.WriteLine("Would you like Kryptor to automatically install this update now? (type y or n)");
-            string userInput = Console.ReadLine()?.ToLower();
-            if (!string.IsNullOrEmpty(userInput)) {
-                Console.WriteLine();
-            }
-            switch (userInput) {
-                case "y":
-                    Updates.Update(latestVersion);
-                    break;
-                case "n":
-                    Console.WriteLine("Please specify -u|--update again when you're ready to update.");
-                    Console.WriteLine();
-                    Console.WriteLine("Alternatively, you can manually download the latest release at <https://www.kryptor.co.uk/#download-kryptor>.");
-                    return;
-                default:
-                    DisplayMessage.Error("You didn't type y or n.");
-                    return;
-            }
-        }
-        catch (Exception ex) when (ex is WebException or PlatformNotSupportedException or FormatException or OverflowException or InvalidOperationException || ExceptionFilters.Cryptography(ex))
-        {
-            if (ex is PlatformNotSupportedException or CryptographicException) {
-                DisplayMessage.Exception(ex.GetType().Name, ex.Message);
-                return;
-            }
-            DisplayMessage.Exception(ex.GetType().Name, "Unable to check for updates, or the download failed.");
-            Console.WriteLine();
-            Console.WriteLine("You can manually download the latest release at <https://www.kryptor.co.uk/#download-kryptor>.");
-        }
     }
 }
