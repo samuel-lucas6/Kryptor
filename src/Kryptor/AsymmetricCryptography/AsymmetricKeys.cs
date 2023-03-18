@@ -89,6 +89,12 @@ public static class AsymmetricKeys
         File.SetAttributes(filePath, FileAttributes.ReadOnly);
     }
 
+    public static string ReadKeyFileComment(string filePath, int stringKeyLength)
+    {
+        string comment = File.ReadAllText(filePath).TrimStart();
+        return comment.Remove(startIndex: 0, stringKeyLength).TrimStart();
+    }
+    
     public static Span<byte> GetCurve25519PublicKey(Span<byte> privateKey)
     {
         Span<byte> publicKey = stackalloc byte[X25519.PublicKeySize];

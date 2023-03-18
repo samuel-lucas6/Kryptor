@@ -70,6 +70,9 @@ public class Program
 
     [Option("-r|--recover", "recover your public key from your private key", CommandOptionType.NoValue)]
     private bool RecoverPublicKey { get; }
+    
+    [Option("-m|--modify", "change your private key passphrase", CommandOptionType.NoValue)]
+    private bool ChangePrivateKeyPassphrase { get; }
 
     [Option("-s|--sign", "create a signature", CommandOptionType.NoValue)]
     private bool Sign { get; }
@@ -114,6 +117,9 @@ public class Program
             }
             else if (RecoverPublicKey) {
                 CommandLine.RecoverPublicKey(PrivateKey.value, GetPassphrase(Passphrase.value));
+            }
+            else if (ChangePrivateKeyPassphrase) {
+                CommandLine.ChangePrivateKeyPassphrase(PrivateKey.value, GetPassphrase(Passphrase.value));
             }
             else if (Sign) {
                 CommandLine.Sign(GetSigningPrivateKey(PrivateKey.value), GetPassphrase(Passphrase.value), Comment, Prehash, Signatures, FilePaths);

@@ -77,7 +77,7 @@ public static class AsymmetricKeyValidation
         else if (!File.Exists(privateKeyPath)) {
             yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.NonExistentPrivateKeyFile);
         }
-        else if (new FileInfo(privateKeyPath).Length is < Constants.EncryptionPrivateKeyLength or Constants.SigningPrivateKeyLength) {
+        else if (new FileInfo(privateKeyPath).Length < Constants.EncryptionPrivateKeyLength) {
             yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.InvalidPrivateKeyFileLength);
         }
     }

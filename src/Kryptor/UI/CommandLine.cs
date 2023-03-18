@@ -234,6 +234,36 @@ public static class CommandLine
             DisplayMessage.FilePathException(privateKeyPath, ex.GetType().Name, ex.Message);
         }
     }
+    
+    public static void ChangePrivateKeyPassphrase(string privateKeyPath, Span<byte> passphrase)
+    {
+        try
+        {
+            IEnumerable<string> errorMessages = AsymmetricKeyValidation.GetRecoverPublicKeyErrors(privateKeyPath);
+            DisplayMessage.AllErrors(errorMessages);
+            
+            Span<byte> privateKey = AsymmetricKeyValidation.GetPrivateKeyFromFile(privateKeyPath);
+            Span<byte> keyAlgorithm = privateKey[..Constants.Curve25519KeyHeader.Length];
+            privateKey = AsymmetricKeyValidation.DecryptPrivateKey(privateKey, passphrase);
+            
+            passphrase = PassphrasePrompt.GetNewPassphrase(passphrase: Span<byte>.Empty);
+            Span<byte> encryptedPrivateKey = PrivateKey.Encrypt(privateKey, passphrase, keyAlgorithm);
+            string privateKeyString = Encodings.ToBase64(encryptedPrivateKey);
+            
+            bool isEncryptionKey = keyAlgorithm.SequenceEqual(Constants.Curve25519KeyHeader);
+            string comment = AsymmetricKeys.ReadKeyFileComment(privateKeyPath, isEncryptionKey ? Constants.EncryptionPrivateKeyLength : Constants.SigningPrivateKeyLength);
+            AsymmetricKeys.CreateKeyFile(privateKeyPath, privateKeyString, comment);
+            DisplayMessage.WriteLine("Passphrase changed successfully.", ConsoleColor.Green);
+        }
+        catch (Exception ex) when (ExceptionFilters.StringKey(ex))
+        {
+            if (ex is CryptographicException) {
+                DisplayMessage.Error(ex.Message);
+                return;
+            }
+            DisplayMessage.FilePathException(privateKeyPath, ex.GetType().Name, ex.Message);
+        }
+    }
 
     public static void Sign(string privateKeyPath, Span<byte> passphrase, string comment, bool prehash, string[] signaturePaths, string[] filePaths)
     {
