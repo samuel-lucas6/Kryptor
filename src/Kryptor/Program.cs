@@ -89,8 +89,8 @@ public class Program
     [Option("-t|--signature", "specify a signature file (unused for default name)", CommandOptionType.MultipleValue)]
     private string[] Signatures { get; }
 
-    [Option("-a|--about", "view the program version and license", CommandOptionType.NoValue)]
-    private bool About { get; }
+    [Option("--version", "view the program version", CommandOptionType.NoValue)]
+    private bool Version { get; }
 
     [Argument(order: 0, Name = "file", Description = "specify a file/directory path")]
     private string[] FilePaths { get; }
@@ -127,8 +127,8 @@ public class Program
             else if (Verify) {
                 CommandLine.Verify(PublicKeys, Signatures, FilePaths);
             }
-            else if (About) {
-                DisplayMessage.About();
+            else if (Version) {
+                Console.WriteLine($"Kryptor v{GetVersion()}");
             }
             else {
                 DisplayMessage.Error("Unknown command. Specify -h|--help for a list of options and examples.");

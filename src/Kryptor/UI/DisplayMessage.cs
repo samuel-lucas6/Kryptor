@@ -103,16 +103,7 @@ public static class DisplayMessage
             Console.WriteLine($"Public key file: \"{publicKeyPath}\"");
         }
     }
-
-    public static void About()
-    {
-        Console.WriteLine($"Kryptor v{Program.GetVersion()}");
-        Console.WriteLine("Copyright (C) 2020-2023 Samuel Lucas");
-        Console.WriteLine("License GPLv3+: GNU GPL version 3 or later <https://www.gnu.org/licenses/gpl-3.0.html>.");
-        Console.WriteLine("This is free software: you are free to change and redistribute it.");
-        Console.WriteLine("There is NO WARRANTY, to the extent permitted by law.");
-    }
-
+    
     public static void WriteLine(string message, ConsoleColor colour)
     {
         Console.ForegroundColor = colour;
