@@ -39,7 +39,6 @@ public static class FileEncryption
             pepper.CopyTo(inputKeyingMaterial[hashedPassphrase.Length..]);
             CryptographicOperations.ZeroMemory(pepper);
         }
-        Span<byte> emptySalt = stackalloc byte[BLAKE2b.SaltSize]; emptySalt.Clear();
         Span<byte> headerKey = stackalloc byte[ChaCha20.KeySize];
         Span<byte> fileKey = stackalloc byte[ChaCha20.KeySize], wrappedFileKeys = new byte[Constants.KeyWrapHeaderLength];
         Span<byte> nonce = stackalloc byte[ChaCha20.NonceSize]; nonce.Clear();
@@ -53,7 +52,7 @@ public static class FileEncryption
                 
                 DisplayMessage.DerivingKeyFromPassphrase();
                 Argon2id.DeriveKey(hashedPassphrase, passphrase, salt, Constants.Iterations, Constants.MemorySize);
-                BLAKE2b.DeriveKey(headerKey, pepper.Length == 0 ? hashedPassphrase : inputKeyingMaterial, Constants.Personalisation, emptySalt, info: ephemeralPublicKey);
+                BLAKE2b.DeriveKey(headerKey, pepper.Length == 0 ? hashedPassphrase : inputKeyingMaterial, Constants.Personalisation, salt: ReadOnlySpan<byte>.Empty, info: ephemeralPublicKey);
                 CryptographicOperations.ZeroMemory(hashedPassphrase);
                 
                 SecureRandom.Fill(fileKey);
