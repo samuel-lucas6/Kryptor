@@ -60,7 +60,7 @@ public static class PassphrasePrompt
     
     private static Span<byte> UseRandomPassphrase()
     {
-        char[] passphrase = SecureRandom.GetPassphrase(wordCount: 8, separatorChar: '-', capitalise: false, includeNumber: false);
+        char[] passphrase = SecureRandom.GetPassphrase(wordCount: 8, separatorChar: '-', capitalize: false, includeNumber: false);
         Console.Write("Randomly generated passphrase: ");
         Console.WriteLine(passphrase);
         Console.WriteLine();
