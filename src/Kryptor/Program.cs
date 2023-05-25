@@ -103,7 +103,6 @@ public class Program
         Globals.Overwrite = Overwrite;
         Globals.EncryptFileNames = EncryptFileNames;
         Globals.TotalCount = FilePaths?.Length ?? 0;
-        Console.WriteLine();
         try
         {
             if (GenerateKeys) {
