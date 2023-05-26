@@ -28,7 +28,7 @@ public static class DisplayMessage
     public static void Error(string message)
     {
         Environment.ExitCode = Constants.ErrorCode;
-        WriteLine($"Error: {message}", ConsoleColor.DarkRed);
+        ErrorWriteLine($"Error: {message}", ConsoleColor.DarkRed);
     }
 
     public static void FilePathError(string filePath, string message)
@@ -40,13 +40,13 @@ public static class DisplayMessage
     public static void Exception(string exceptionName, string message)
     {
         Environment.ExitCode = Constants.ErrorCode;
-        WriteLine($"{exceptionName}: {message}", ConsoleColor.DarkRed);
+        ErrorWriteLine($"{exceptionName}: {message}", ConsoleColor.DarkRed);
     }
 
     public static void FilePathException(string filePath, string exceptionName, string message)
     {
         Environment.ExitCode = Constants.ErrorCode;
-        WriteLine($"{exceptionName}: \"{Path.GetFileName(FileHandling.TrimTrailingSeparatorChars(filePath))}\" - {message}", ConsoleColor.DarkRed);
+        ErrorWriteLine($"{exceptionName}: \"{Path.GetFileName(FileHandling.TrimTrailingSeparatorChars(filePath))}\" - {message}", ConsoleColor.DarkRed);
     }
 
     public static void DerivingKeyFromPassphrase() => Console.WriteLine("Deriving encryption key from passphrase...");
@@ -110,14 +110,21 @@ public static class DisplayMessage
         Console.WriteLine(message);
         Console.ResetColor();
     }
-    
+
+    private static void ErrorWriteLine(string message, ConsoleColor colour)
+    {
+        Console.ForegroundColor = colour;
+        Console.Error.WriteLine(message);
+        Console.ResetColor();
+    }
+
     public static void AllErrors(IEnumerable<string> errorMessages)
     {
         var errors = errorMessages.ToList();
         foreach (string errorMessage in errors) {
             Error(errorMessage);
         }
-        if (errors.Any()) {
+        if (errors.Count != 0) {
             throw new UserInputException($"{errors.Count} errors detected during initial validation.");
         }
     }
