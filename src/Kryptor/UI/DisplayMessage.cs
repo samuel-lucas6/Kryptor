@@ -33,7 +33,6 @@ public static class DisplayMessage
 
     public static void FilePathError(string filePath, string message)
     {
-        Environment.ExitCode = Constants.ErrorCode;
         Error($"\"{Path.GetFileName(FileHandling.TrimTrailingSeparatorChars(filePath))}\" - {message}");
     }
 
