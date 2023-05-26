@@ -96,6 +96,7 @@ public static class FileSigning
                 Console.WriteLine($"Verifying \"{Path.GetFileName(signaturePaths[i])}\"...");
                 bool validSignature = DigitalSignatures.VerifySignature(signaturePaths[i], filePaths[i], publicKey, out string comment);
                 if (!validSignature) {
+                    Environment.ExitCode = Constants.ErrorCode;
                     DisplayMessage.WriteLine("Bad signature.", ConsoleColor.DarkRed);
                 }
                 else {
