@@ -44,13 +44,13 @@ Options:
   -o|--overwrite   overwrite files
   -g|--generate    generate a new key pair
   -r|--recover     recover your public key from your private key
+  -m|--modify      change your private key passphrase
   -s|--sign        create a signature
-  -c|--comment     add a comment to a signature
+  -c|--comment     add a comment to a signature or new key pair
   -l|--prehash     sign large files by prehashing
   -v|--verify      verify a signature
   -t|--signature   specify a signature file (unused for default name)
-  -u|--update      check for updates
-  -a|--about       view the program version and license
+  --version        view the program version
   -h|--help        show help information
 
 Examples:
@@ -105,7 +105,7 @@ This is the recommended approach, but it means your private keys must be kept in
 - Linux: `/home/.kryptor`
 - macOS: `/Users/USERNAME/.kryptor`
 
-To specify a private key for `-r|--recover` or a private key not stored in the default folder, you must use the `-x|--private` option followed by `:[file]` like so:
+To specify a private key for `-r|--recover`, `-m|--modify`, or a private key not stored in the default folder, you must use the `-x|--private` option followed by `:[file]` like so:
 
 ```
 $ kryptor -r -x:"C:\Users\samuel-lucas6\Documents\encryption.private"
