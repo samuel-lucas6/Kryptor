@@ -77,7 +77,7 @@ public class Program
     [Option("-s|--sign", "create a signature", CommandOptionType.NoValue)]
     private bool Sign { get; }
 
-    [Option("-c|--comment", "add a comment to a signature", CommandOptionType.SingleValue)]
+    [Option("-c|--comment", "add a comment to a signature or new key pair", CommandOptionType.SingleValue)]
     private string Comment { get; }
 
     [Option("-l|--prehash", "sign large files by prehashing", CommandOptionType.NoValue)]
