@@ -8,7 +8,7 @@ Kryptor is a simple, modern, and secure file encryption and signing tool for Win
 
 It aims to be a better version of [age](https://github.com/FiloSottile/age) and [Minisign](https://jedisct1.github.io/minisign/) to provide a leaner, user friendly alternative to [GPG](https://gnupg.org/).
 
-![kryptor](https://user-images.githubusercontent.com/63159663/198125694-1826b817-8dd7-492a-9390-5b4215bc1d6a.gif)
+![kryptor](https://github.com/samuel-lucas6/Kryptor/assets/63159663/51f49cb7-f06e-4928-9eb6-cb7176ce4706)
 
 ## Features
 
