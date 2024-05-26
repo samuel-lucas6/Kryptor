@@ -99,11 +99,7 @@ $ kryptor -d file.txt.bin
 $ kryptor -s file.txt
 ```
 
-This is the recommended approach, but it means your private keys must be kept in the default folder, which varies depending on your operating system:
-
-- Windows: `%USERPROFILE%/.kryptor`
-- Linux: `/home/.kryptor`
-- macOS: `/Users/USERNAME/.kryptor`
+This is the recommended approach, but it means your private keys must be kept in the default folder, which is `~/.kryptor`.
 
 To specify a private key for `-r|--recover`, `-m|--modify`, or a private key not stored in the default folder, you must use the `-x|--private` option followed by `:[file]` like so:
 
