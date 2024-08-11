@@ -56,9 +56,9 @@
 
   <ItemGroup>
     <PackageReference Include="Geralt" Version="3.0.1" />
-    <PackageReference Include="libsodium" Version="1.0.19" />
-    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.1.0" />
-    <PackageReference Include="Monocypher" Version="0.3.0" />
+    <PackageReference Include="libsodium" Version="1.0.20" />
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.1.1" />
+    <PackageReference Include="Monocypher" Version="0.4.1" />
   </ItemGroup>
 
   <ItemGroup>
