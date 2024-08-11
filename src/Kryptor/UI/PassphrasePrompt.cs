@@ -86,7 +86,7 @@ public static class PassphrasePrompt
             if (!char.IsControl(consoleKeyInfo.KeyChar)) {
                 passphrase.Add(consoleKeyInfo.KeyChar);
             }
-            else if (consoleKeyInfo.Key == ConsoleKey.Backspace && passphrase.Count > 0) {
+            else if (consoleKeyInfo.Key is ConsoleKey.Backspace or ConsoleKey.Delete && passphrase.Count > 0) {
                 passphrase.RemoveAt(passphrase.Count - 1);
             }
         }
