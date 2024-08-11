@@ -41,7 +41,7 @@ public static class DecryptFile
             int fileNameLength = Padding.GetUnpaddedLength(fileName, fileName.Length);
             bool isDirectory = BitConverter.ToBoolean(header[^Constants.BoolBytesLength..]);
             CryptographicOperations.ZeroMemory(header);
-            
+
             using (var outputFile = new FileStream(outputFilePath, FileHandling.GetFileStreamWriteOptions(inputFile.Length - Constants.FileHeadersLength)))
             {
                 ConstantTime.Increment(nonce[..^1]);
@@ -49,7 +49,7 @@ public static class DecryptFile
                 CryptographicOperations.ZeroMemory(fileKey);
             }
             inputFile.Dispose();
-            
+
             if (fileNameLength > 0) {
                 outputFilePath = FileHandling.RenameFile(outputFilePath, Encoding.UTF8.GetString(fileName[..fileNameLength]));
             }

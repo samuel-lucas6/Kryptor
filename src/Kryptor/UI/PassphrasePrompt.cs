@@ -35,7 +35,7 @@ public static class PassphrasePrompt
             _ => passphrase
         };
     }
-    
+
     private static Span<byte> EnterNewPassphrase()
     {
         Console.WriteLine("Enter a passphrase (leave empty for a random one):");
@@ -57,7 +57,7 @@ public static class PassphrasePrompt
         }
         CryptographicOperations.ZeroMemory(retypedPassphrase);
     }
-    
+
     private static Span<byte> UseRandomPassphrase()
     {
         char[] passphrase = SecureRandom.GetPassphrase(wordCount: 8, separatorChar: '-', capitalize: false, includeNumber: false);

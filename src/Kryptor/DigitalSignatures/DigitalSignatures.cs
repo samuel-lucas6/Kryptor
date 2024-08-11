@@ -34,14 +34,14 @@ public static class DigitalSignatures
         Span<byte> fileBytes = GetFileBytes(filePath, prehash);
         Span<byte> fileSignature = stackalloc byte[Ed25519.SignatureSize];
         Ed25519.Sign(fileSignature, fileBytes, privateKey);
-        
+
         Span<byte> commentBytes = Encoding.UTF8.GetBytes(comment);
         Span<byte> signatureFileBytes = new byte[Constants.SignatureMagicBytes.Length + Constants.SignatureVersion.Length + prehashed.Length + fileSignature.Length + commentBytes.Length];
         Spans.Concat(signatureFileBytes, Constants.SignatureMagicBytes, Constants.SignatureVersion, prehashed, fileSignature, commentBytes);
-        
+
         Span<byte> globalSignature = stackalloc byte[Ed25519.SignatureSize];
         Ed25519.Sign(globalSignature, signatureFileBytes, privateKey);
-        
+
         CreateSignatureFile(signaturePath, signatureFileBytes, globalSignature);
     }
 
@@ -70,13 +70,13 @@ public static class DigitalSignatures
     public static bool VerifySignature(string signaturePath, string filePath, Span<byte> publicKey, out string comment)
     {
         Span<byte> signatureFileBytes = File.ReadAllBytes(signaturePath);
-        
+
         Span<byte> globalSignature = signatureFileBytes[^Ed25519.SignatureSize..];
         if (!Ed25519.Verify(globalSignature, signatureFileBytes[..^globalSignature.Length], publicKey)) {
             comment = string.Empty;
             return false;
         }
-        
+
         Span<byte> prehashed = signatureFileBytes.Slice(Constants.SignatureMagicBytes.Length + Constants.SignatureVersion.Length, Constants.BoolBytesLength);
         bool prehash = BitConverter.ToBoolean(prehashed);
         Span<byte> fileBytes = GetFileBytes(filePath, prehash);

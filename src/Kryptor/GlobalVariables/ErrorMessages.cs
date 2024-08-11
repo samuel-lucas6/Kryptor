@@ -43,6 +43,6 @@ public static class ErrorMessages
     public const string UnableToDecryptFile = "Unable to decrypt the file.";
 
     public static string GetFilePathError(string filePath, string errorMessage) => $"\"{Path.GetFileName(FileHandling.TrimTrailingSeparatorChars(filePath))}\" - {errorMessage}";
-    
+
     public static string GetKeyStringError(string keyString, string errorMessage) => $"\"{keyString}\" - {errorMessage}";
 }

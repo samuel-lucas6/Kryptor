@@ -46,7 +46,7 @@ public static class AsymmetricKeyValidation
             if (keyPairType == 1 && (File.Exists(Constants.DefaultEncryptionPublicKeyPath) || File.Exists(Constants.DefaultEncryptionPrivateKeyPath))) {
                 yield return "An encryption key pair already exists in the default directory. Specify -o|--overwrite if you want to overwrite your key pair.";
             }
-            else if (keyPairType == 2 && (File.Exists(Constants.DefaultSigningPublicKeyPath) || File.Exists(Constants.DefaultSigningPrivateKeyPath))) {   
+            else if (keyPairType == 2 && (File.Exists(Constants.DefaultSigningPublicKeyPath) || File.Exists(Constants.DefaultSigningPrivateKeyPath))) {
                 yield return "A signing key pair already exists in the default directory. Specify -o|--overwrite if you want to overwrite your key pair.";
             }
         }
@@ -81,7 +81,7 @@ public static class AsymmetricKeyValidation
             yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.InvalidPrivateKeyFileLength);
         }
     }
-    
+
     public static List<byte[]> EncryptionPublicKeyFile(string[] publicKeyPaths)
     {
         try
@@ -121,7 +121,7 @@ public static class AsymmetricKeyValidation
             return Span<byte>.Empty;
         }
     }
-    
+
     private static byte[] GetPublicKeyFromFile(string publicKeyPath)
     {
         try

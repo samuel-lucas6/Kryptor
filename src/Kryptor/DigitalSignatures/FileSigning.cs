@@ -80,7 +80,7 @@ public static class FileSigning
         }
         Console.WriteLine();
     }
-    
+
     public static void VerifyEachFile(string[] signaturePaths, string[] filePaths, Span<byte> publicKey)
     {
         if (filePaths == null || publicKey.Length == 0) {

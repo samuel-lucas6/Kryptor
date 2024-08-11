@@ -26,7 +26,7 @@ public static class SigningValidation
 {
     private const string WrongSignatureExtension = "This isn't a .signature file.";
     private const string SignatureFileInaccessible = "Unable to access the signature file.";
-    
+
     public static IEnumerable<string> GetSignErrors(string privateKeyPath, string comment, string[] signaturePaths, string[] filePaths)
     {
         if (string.Equals(privateKeyPath, Constants.DefaultSigningPrivateKeyPath) && !File.Exists(Constants.DefaultSigningPrivateKeyPath)) {
@@ -43,11 +43,11 @@ public static class SigningValidation
                 yield return ErrorMessages.GetFilePathError(privateKeyPath, ErrorMessages.InvalidPrivateKeyFileLength);
                 break;
         }
-        
+
         if (!string.IsNullOrEmpty(comment) && comment.Length > Constants.MaxCommentLength) {
             yield return ErrorMessages.InvalidCommentLength;
         }
-        
+
         if (signaturePaths != null) {
             foreach (string signaturePath in signaturePaths) {
                 if (Directory.Exists(signaturePath)) {
@@ -58,7 +58,7 @@ public static class SigningValidation
                 }
             }
         }
-        
+
         if (filePaths == null) {
             yield return "Specify a file/directory to sign.";
         }
@@ -157,7 +157,7 @@ public static class SigningValidation
         if (validMagicBytes == false) { return "Invalid signature file format."; }
         return validVersion == false ? "Invalid signature file version." : null;
     }
-    
+
     private static bool? IsValidSignatureFile(string filePath, out bool? validVersion)
     {
         try

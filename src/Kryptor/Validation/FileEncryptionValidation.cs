@@ -33,7 +33,7 @@ public static class FileEncryptionValidation
         (char) 21, (char) 22, (char) 23, (char) 24, (char) 25, (char) 26, (char) 27, (char) 28, (char) 29, (char) 30,
         (char) 31, ':', '*', '?', '\\', '/'
     };
-    
+
     public static IEnumerable<string> GetEncryptionErrors(string symmetricKey)
     {
         if (string.IsNullOrEmpty(symmetricKey)) {
@@ -57,7 +57,7 @@ public static class FileEncryptionValidation
         foreach (string errorMessage in GetPrivateKeyErrors(privateKeyPath)) {
             yield return errorMessage;
         }
-        
+
         if (publicKeys == null) {
             yield return ErrorMessages.NoPublicKey;
         }
@@ -85,7 +85,7 @@ public static class FileEncryptionValidation
                 yield return "Only specify public key strings or public key files.";
             }
         }
-        
+
         foreach (string errorMessage in GetEncryptionErrors(symmetricKey)) {
             yield return errorMessage;
         }
@@ -96,12 +96,12 @@ public static class FileEncryptionValidation
         foreach (string errorMessage in GetPrivateKeyErrors(privateKeyPath)) {
             yield return errorMessage;
         }
-        
+
         foreach (string errorMessage in GetEncryptionErrors(symmetricKey)) {
             yield return errorMessage;
         }
     }
-    
+
     private static IEnumerable<string> GetPrivateKeyErrors(string privateKeyPath)
     {
         if (string.Equals(privateKeyPath, Constants.DefaultEncryptionPrivateKeyPath) && !File.Exists(Constants.DefaultEncryptionPrivateKeyPath)) {
@@ -119,7 +119,7 @@ public static class FileEncryptionValidation
                 break;
         }
     }
-    
+
     public static IEnumerable<string> GetEncryptionFilePathErrors(string[] filePaths)
     {
         if (filePaths == null) {
@@ -163,13 +163,13 @@ public static class FileEncryptionValidation
             }
         }
     }
-    
+
     public static IEnumerable<string> GetDecryptionErrors(string privateKeyPath, string[] publicKeys, string symmetricKey)
     {
         foreach (string errorMessage in GetPrivateKeyErrors(privateKeyPath)) {
             yield return errorMessage;
         }
-        
+
         if (publicKeys == null) {
             yield return ErrorMessages.NoPublicKey;
         }
@@ -195,18 +195,18 @@ public static class FileEncryptionValidation
             yield return errorMessage;
         }
     }
-    
+
     public static IEnumerable<string> GetDecryptionErrors(string privateKeyPath, string symmetricKey)
     {
         foreach (string errorMessage in GetPrivateKeyErrors(privateKeyPath)) {
             yield return errorMessage;
         }
-        
+
         foreach (string errorMessage in GetDecryptionErrors(symmetricKey)) {
             yield return errorMessage;
         }
     }
-    
+
     public static IEnumerable<string> GetDecryptionFilePathErrors(string[] filePaths)
     {
         if (filePaths == null) {

@@ -42,14 +42,14 @@ public static class EncryptFile
                     lastChunkPadding = Constants.FileChunkSize;
                 }
                 long payloadLength = chunkCount * Constants.CiphertextChunkSize - (Constants.FileChunkSize - lastChunkPadding);
-                
+
                 using var outputFile = new FileStream(outputFilePath, FileHandling.GetFileStreamWriteOptions(Constants.FileHeadersLength + payloadLength));
                 Span<byte> nonce = stackalloc byte[ChaCha20.NonceSize]; nonce.Clear();
                 Span<byte> encryptedHeader = EncryptFileHeader(inputFile.Length, Path.GetFileName(inputFilePath), isDirectory, nonce, fileKey, wrappedFileKeys);
                 outputFile.Write(unencryptedHeader);
                 outputFile.Write(wrappedFileKeys);
                 outputFile.Write(encryptedHeader);
-                
+
                 ConstantTime.Increment(nonce[..^1]);
                 EncryptChunks(inputFile, outputFile, (int)chunkCount, (int)lastChunkPadding, nonce, fileKey);
                 CryptographicOperations.ZeroMemory(fileKey);
@@ -81,7 +81,7 @@ public static class EncryptFile
         double coefficient = Math.Log(Math.Pow(2, 32)) - Math.Log(random1 + random2 * Math.Pow(2, -32) + Math.Pow(2, -33));
         return fixedPadding + (long)Math.Round(coefficient * proportion * effectiveSize);
     }
-    
+
     private static Span<byte> EncryptFileHeader(long fileLength, string fileName, bool isDirectory, Span<byte> nonce, Span<byte> fileKey, Span<byte> associatedData)
     {
         Span<byte> plaintextLength = stackalloc byte[Constants.Int64BytesLength];
@@ -91,7 +91,7 @@ public static class EncryptFile
         Span<byte> directory = BitConverter.GetBytes(isDirectory);
         Span<byte> plaintextHeader = stackalloc byte[Constants.EncryptedHeaderLength - Poly1305.TagSize - kcChaCha20Poly1305.CommitmentSize];
         Spans.Concat(plaintextHeader, plaintextLength, paddedFileName, spare, directory);
-        
+
         Span<byte> ciphertextHeader = new byte[Constants.EncryptedHeaderLength];
         kcChaCha20Poly1305.Encrypt(ciphertextHeader, plaintextHeader, nonce, fileKey, associatedData);
         CryptographicOperations.ZeroMemory(plaintextHeader);
@@ -105,7 +105,7 @@ public static class EncryptFile
             Padding.Fill(paddedFileName);
             return paddedFileName;
         }
-        
+
         Span<byte> fileNameBytes = new byte[Encoding.UTF8.GetMaxByteCount(fileName.Length)];
         int bytesEncoded = Encoding.UTF8.GetBytes(fileName, fileNameBytes);
         if (bytesEncoded > paddedFileName.Length - 1) {

@@ -28,17 +28,17 @@ public static class Constants
 {
     // Error handling
     public const int ErrorCode = -1;
-    
+
     // Key derivation
     public const int Iterations = 3;
     public const int MemorySize = 268435456;
     public static readonly byte[] Personalisation = Encoding.UTF8.GetBytes("Kryptor.Personal");
-    
+
     // File encryption
     public const string EncryptedExtension = ".bin";
     public const string ZipFileExtension = ".zip";
     public const int RandomFileNameLength = 16;
-    
+
     public const int UnencryptedHeaderLength = X25519.PublicKeySize + Argon2id.SaltSize;
     public const int MaxRecipients = 20;
     public const int KeyWrapHeaderLength = ChaCha20.KeySize * MaxRecipients;
@@ -50,14 +50,14 @@ public static class Constants
     public const int FileHeadersLength = UnencryptedHeaderLength + KeyWrapHeaderLength + EncryptedHeaderLength;
     public const int FileChunkSize = 16384;
     public const int CiphertextChunkSize = FileChunkSize + Poly1305.TagSize;
-    
+
     // Symmetric keys
     public const string KeyfileExtension = ".key";
     public const int KeyfileLength = ChaCha20.KeySize;
     public const char Base64Padding = '=';
     public const int SymmetricKeyLength = 48;
     public static readonly byte[] SymmetricKeyHeader = { 61, 34, 191 }; // "PSK/" in Base64
-    
+
     // Asymmetric keys
     public static readonly string DefaultKeyDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".kryptor");
     public const string DefaultEncryptionKeyFileName = "encryption";
@@ -68,14 +68,14 @@ public static class Constants
     public static readonly string DefaultEncryptionPrivateKeyPath = Path.Combine(DefaultKeyDirectory, DefaultEncryptionKeyFileName + PrivateKeyExtension);
     public static readonly string DefaultSigningPublicKeyPath = Path.Combine(DefaultKeyDirectory, DefaultSigningKeyFileName + PublicKeyExtension);
     public static readonly string DefaultSigningPrivateKeyPath = Path.Combine(DefaultKeyDirectory, DefaultSigningKeyFileName + PrivateKeyExtension);
-    
+
     public const int PublicKeyLength = 48;
     public const int EncryptionPrivateKeyLength = 136;
     public const int SigningPrivateKeyLength = 180;
     public static readonly byte[] Curve25519KeyHeader = { 10, 239, 255 }; // "Cu//" in Base64
     public static readonly byte[] Ed25519KeyHeader = { 17, 223, 255 }; // "Ed//" in Base64
     public static readonly byte[] PrivateKeyVersion = { 2, 0 };
-    
+
     // File signing
     public const string SignatureExtension = ".signature";
     public static readonly byte[] SignatureMagicBytes = Encoding.UTF8.GetBytes("SIGNATURE");

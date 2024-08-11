@@ -27,11 +27,11 @@ public static class AsymmetricKeys
     public static (string publicKey, string privateKey) GenerateEncryptionKeyPair(Span<byte> passphrase)
     {
         passphrase = PassphrasePrompt.GetNewPassphrase(passphrase);
-        
+
         Span<byte> publicKey = stackalloc byte[X25519.PublicKeySize];
         Span<byte> privateKey = stackalloc byte[X25519.PrivateKeySize];
         X25519.GenerateKeyPair(publicKey, privateKey);
-        
+
         Span<byte> fullPublicKey = stackalloc byte[Constants.Curve25519KeyHeader.Length + publicKey.Length];
         Spans.Concat(fullPublicKey, Constants.Curve25519KeyHeader, publicKey);
         Span<byte> encryptedPrivateKey = PrivateKey.Encrypt(privateKey, passphrase, Constants.Curve25519KeyHeader);
@@ -41,11 +41,11 @@ public static class AsymmetricKeys
     public static (string publicKey, string privateKey) GenerateSigningKeyPair(Span<byte> passphrase)
     {
         passphrase = PassphrasePrompt.GetNewPassphrase(passphrase);
-        
+
         Span<byte> publicKey = stackalloc byte[Ed25519.PublicKeySize];
         Span<byte> privateKey = stackalloc byte[Ed25519.PrivateKeySize];
         Ed25519.GenerateKeyPair(publicKey, privateKey);
-        
+
         Span<byte> fullPublicKey = stackalloc byte[Constants.Ed25519KeyHeader.Length + publicKey.Length];
         Spans.Concat(fullPublicKey, Constants.Ed25519KeyHeader, publicKey);
         Span<byte> encryptedPrivateKey = PrivateKey.Encrypt(privateKey, passphrase, Constants.Ed25519KeyHeader);
@@ -94,12 +94,12 @@ public static class AsymmetricKeys
         string comment = File.ReadAllText(filePath).TrimStart();
         return comment.Remove(startIndex: 0, stringKeyLength).TrimStart();
     }
-    
+
     public static Span<byte> GetCurve25519PublicKey(Span<byte> privateKey)
     {
         Span<byte> publicKey = stackalloc byte[X25519.PublicKeySize];
         X25519.ComputePublicKey(publicKey, privateKey);
-        
+
         Span<byte> fullPublicKey = new byte[Constants.Curve25519KeyHeader.Length + publicKey.Length];
         Spans.Concat(fullPublicKey, Constants.Curve25519KeyHeader, publicKey);
         return fullPublicKey;
@@ -109,7 +109,7 @@ public static class AsymmetricKeys
     {
         Span<byte> publicKey = stackalloc byte[Ed25519.PublicKeySize];
         Ed25519.ComputePublicKey(publicKey, privateKey);
-        
+
         Span<byte> fullPublicKey = new byte[Constants.Ed25519KeyHeader.Length + publicKey.Length];
         Spans.Concat(fullPublicKey, Constants.Ed25519KeyHeader, publicKey);
         return fullPublicKey;

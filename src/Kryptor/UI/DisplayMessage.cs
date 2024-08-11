@@ -64,7 +64,7 @@ public static class DisplayMessage
     {
         WriteLine($"Successfully decrypted: {Globals.SuccessfulCount}/{Globals.TotalCount}", Globals.SuccessfulCount == Globals.TotalCount ? ConsoleColor.Green : ConsoleColor.DarkRed);
     }
-    
+
     public static void SuccessfullySigned()
     {
         WriteLine($"Successfully signed: {Globals.SuccessfulCount}/{Globals.TotalCount}", Globals.SuccessfulCount == Globals.TotalCount ? ConsoleColor.Green : ConsoleColor.DarkRed);
@@ -83,7 +83,7 @@ public static class DisplayMessage
         WriteLine("IMPORTANT: Please back up this keyfile to external storage (e.g. memory sticks).", ConsoleColor.DarkYellow);
         Console.WriteLine();
     }
-    
+
     public static void KeyPair(string publicKey, string publicKeyPath, string privateKeyPath)
     {
         Console.WriteLine();
@@ -94,7 +94,7 @@ public static class DisplayMessage
         Console.WriteLine();
         WriteLine("IMPORTANT: Please back up these files to external storage (e.g. memory sticks).", ConsoleColor.DarkYellow);
     }
-    
+
     public static void PublicKey(string publicKey, string publicKeyPath)
     {
         Console.WriteLine($"Public key: {publicKey}");
@@ -102,7 +102,7 @@ public static class DisplayMessage
             Console.WriteLine($"Public key file: \"{publicKeyPath}\"");
         }
     }
-    
+
     public static void WriteLine(string message, ConsoleColor colour)
     {
         Console.ForegroundColor = colour;

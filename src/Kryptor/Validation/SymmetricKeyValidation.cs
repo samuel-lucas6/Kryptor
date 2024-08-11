@@ -52,7 +52,7 @@ public static class SymmetricKeyValidation
         }
         return File.Exists(symmetricKey) ? ReadKeyfile(symmetricKey) : GenerateKeyfile(symmetricKey);
     }
-    
+
     public static Span<byte> GetDecryptionSymmetricKey(string symmetricKey)
     {
         if (string.IsNullOrEmpty(symmetricKey)) {

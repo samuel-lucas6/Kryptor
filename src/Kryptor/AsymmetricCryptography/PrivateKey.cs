@@ -56,7 +56,7 @@ public static class PrivateKey
             Span<byte> associatedData = privateKey[..(Constants.Curve25519KeyHeader.Length + Constants.PrivateKeyVersion.Length)];
             Span<byte> salt = privateKey.Slice(associatedData.Length, Argon2id.SaltSize);
             Span<byte> encryptedPrivateKey = privateKey[(associatedData.Length + salt.Length)..];
-            
+
             Span<byte> nonce = stackalloc byte[ChaCha20.NonceSize]; nonce.Clear();
             Span<byte> key = stackalloc byte[ChaCha20.KeySize];
             Argon2id.DeriveKey(key, passphrase, salt, Constants.Iterations, Constants.MemorySize);

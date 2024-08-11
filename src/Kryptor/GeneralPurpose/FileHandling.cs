@@ -36,9 +36,9 @@ public static class FileHandling
             return null;
         }
     }
-    
+
     public static string TrimTrailingSeparatorChars(string filePath) => filePath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar, Path.VolumeSeparatorChar);
-    
+
     public static string ReplaceFileName(string filePath, string newFileName)
     {
         string directoryPath = Path.GetDirectoryName(Path.GetFullPath(filePath));
@@ -48,7 +48,7 @@ public static class FileHandling
         }
         return newPath;
     }
-    
+
     public static FileStreamOptions GetFileStreamReadOptions(string filePath)
     {
         long fileLength = new FileInfo(filePath).Length;
@@ -61,7 +61,7 @@ public static class FileHandling
             Options = fileLength < 10737418240 ? FileOptions.None : FileOptions.SequentialScan
         };
     }
-    
+
     private static int GetFileStreamBufferSize(long fileLength)
     {
         return fileLength switch
@@ -72,7 +72,7 @@ public static class FileHandling
             >= 104857600 => 1048576
         };
     }
-    
+
     public static FileStreamOptions GetFileStreamWriteOptions(long preAllocationSize)
     {
         return new FileStreamOptions
@@ -85,7 +85,7 @@ public static class FileHandling
             PreallocationSize = preAllocationSize
         };
     }
-    
+
     public static void OverwriteFile(string fileToDelete, string fileToCopy)
     {
         try
@@ -99,7 +99,7 @@ public static class FileHandling
             DisplayMessage.FilePathException(fileToDelete, ex.GetType().Name, "Unable to overwrite the file.");
         }
     }
-    
+
     public static void DeleteFile(string filePath)
     {
         try
@@ -115,7 +115,7 @@ public static class FileHandling
             DisplayMessage.FilePathException(filePath, ex.GetType().Name, "Unable to delete the file.");
         }
     }
-    
+
     public static string GetUniqueFilePath(string filePath)
     {
         if (!File.Exists(filePath)) {
@@ -140,7 +140,7 @@ public static class FileHandling
         int index = filePath.LastIndexOf(" (", StringComparison.Ordinal);
         return filePath[..index];
     }
-    
+
     public static string RenameFile(string filePath, string newFileName)
     {
         try
@@ -160,7 +160,7 @@ public static class FileHandling
             return filePath;
         }
     }
-    
+
     public static void CreateZipFile(string directoryPath, string zipFilePath)
     {
         DisplayMessage.InputToOutput("Zipping", directoryPath, zipFilePath);
@@ -169,7 +169,7 @@ public static class FileHandling
             DeleteDirectory(directoryPath);
         }
     }
-    
+
     private static void DeleteDirectory(string directoryPath)
     {
         try
@@ -202,7 +202,7 @@ public static class FileHandling
             DisplayMessage.FilePathException(zipFilePath, ex.GetType().Name, "Unable to extract the file.");
         }
     }
-    
+
     private static string GetUniqueDirectoryPath(string directoryPath)
     {
         if (!Directory.Exists(directoryPath)) {
