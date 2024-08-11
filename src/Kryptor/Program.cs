@@ -70,7 +70,7 @@ public class Program
 
     [Option("-r|--recover", "recover your public key from your private key", CommandOptionType.NoValue)]
     private bool RecoverPublicKey { get; }
-    
+
     [Option("-m|--modify", "change your private key passphrase", CommandOptionType.NoValue)]
     private bool ChangePrivateKeyPassphrase { get; }
 
@@ -99,7 +99,9 @@ public class Program
 
     private int OnExecute()
     {
-        ExtractVisualCRuntime();
+        if (OperatingSystem.IsWindows()) {
+            ExtractVisualCRuntime();
+        }
         Globals.Overwrite = Overwrite;
         Globals.EncryptFileNames = EncryptFileNames;
         Globals.TotalCount = FilePaths?.Length ?? 0;
@@ -144,20 +146,30 @@ public class Program
         }
         return Environment.ExitCode;
     }
-    
+
     private static void ExtractVisualCRuntime()
     {
-        try
-        {
-            string vcruntimeFilePath = Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), "vcruntime140.dll");
-            if (!OperatingSystem.IsWindows() || File.Exists(vcruntimeFilePath)) {
-                return;
+        try {
+            const string environmentVariable = "DOTNET_BUNDLE_EXTRACT_BASE_DIR";
+            string executableFileName = Path.GetFileNameWithoutExtension(Environment.ProcessPath);
+            // The environment variables take priority in this order
+            string environmentDirectory = Environment.GetEnvironmentVariable(environmentVariable, EnvironmentVariableTarget.Process) ?? Environment.GetEnvironmentVariable(environmentVariable, EnvironmentVariableTarget.User) ?? Environment.GetEnvironmentVariable(environmentVariable, EnvironmentVariableTarget.Machine);
+            if (!string.IsNullOrWhiteSpace(environmentDirectory)) {
+                environmentDirectory = Path.Combine(environmentDirectory, executableFileName);
             }
-            if (Environment.Is64BitOperatingSystem) {
-                File.WriteAllBytes(vcruntimeFilePath, Properties.Resources.vcruntime140x64);
-                return;
+            string defaultDirectory = Path.Combine(Path.GetTempPath(), ".net", executableFileName);
+            string[] subdirectories = Directory.GetDirectories(!Directory.Exists(environmentDirectory) ? defaultDirectory : environmentDirectory);
+            foreach (var directory in subdirectories) {
+                string vcruntimeFilePath = Path.Combine(directory, "vcruntime140.dll");
+                if (File.Exists(vcruntimeFilePath)) {
+                    continue;
+                }
+                if (Environment.Is64BitOperatingSystem) {
+                    File.WriteAllBytes(vcruntimeFilePath, Properties.Resources.vcruntime140x64);
+                    continue;
+                }
+                File.WriteAllBytes(vcruntimeFilePath, Properties.Resources.vcruntime140x86);
             }
-            File.WriteAllBytes(vcruntimeFilePath, Properties.Resources.vcruntime140x86);
         }
         catch (Exception ex) when (ExceptionFilters.FileAccess(ex))
         {
