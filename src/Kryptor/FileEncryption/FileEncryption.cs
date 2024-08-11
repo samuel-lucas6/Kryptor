@@ -42,24 +42,24 @@ public static class FileEncryption
         Span<byte> headerKey = stackalloc byte[ChaCha20.KeySize];
         Span<byte> fileKey = stackalloc byte[ChaCha20.KeySize], wrappedFileKeys = new byte[Constants.KeyWrapHeaderLength];
         Span<byte> nonce = stackalloc byte[ChaCha20.NonceSize]; nonce.Clear();
-        
+
         foreach (string inputFilePath in filePaths) {
             try
             {
                 bool isDirectory = IsDirectory(inputFilePath, out string zipFilePath);
                 SecureRandom.Fill(salt);
                 SecureRandom.Fill(ephemeralPublicKey);
-                
+
                 DisplayMessage.DerivingKeyFromPassphrase();
                 Argon2id.DeriveKey(hashedPassphrase, passphrase, salt, Constants.Iterations, Constants.MemorySize);
                 BLAKE2b.DeriveKey(headerKey, pepper.Length == 0 ? hashedPassphrase : inputKeyingMaterial, Constants.Personalisation, salt: ReadOnlySpan<byte>.Empty, info: ephemeralPublicKey);
                 CryptographicOperations.ZeroMemory(hashedPassphrase);
-                
+
                 SecureRandom.Fill(fileKey);
                 ChaCha20.Encrypt(wrappedFileKeys[..fileKey.Length], fileKey, nonce, headerKey);
                 CryptographicOperations.ZeroMemory(headerKey);
                 SecureRandom.Fill(wrappedFileKeys[fileKey.Length..]);
-                
+
                 EncryptInputFile(isDirectory ? zipFilePath : inputFilePath, isDirectory, salt, ephemeralPublicKey, wrappedFileKeys, fileKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -72,7 +72,7 @@ public static class FileEncryption
         CryptographicOperations.ZeroMemory(inputKeyingMaterial);
         DisplayMessage.SuccessfullyEncrypted();
     }
-    
+
     public static void EncryptEachFileWithSymmetricKey(string[] filePaths, Span<byte> symmetricKey)
     {
         if (filePaths == null || symmetricKey.Length == 0) {
@@ -83,7 +83,7 @@ public static class FileEncryption
         Span<byte> headerKey = stackalloc byte[ChaCha20.KeySize];
         Span<byte> fileKey = stackalloc byte[ChaCha20.KeySize], wrappedFileKeys = new byte[Constants.KeyWrapHeaderLength];
         Span<byte> nonce = stackalloc byte[ChaCha20.NonceSize]; nonce.Clear();
-        
+
         foreach (string inputFilePath in filePaths) {
             try
             {
@@ -91,12 +91,12 @@ public static class FileEncryption
                 SecureRandom.Fill(salt);
                 SecureRandom.Fill(ephemeralPublicKey);
                 BLAKE2b.DeriveKey(headerKey, symmetricKey, Constants.Personalisation, salt, info: ephemeralPublicKey);
-                
+
                 SecureRandom.Fill(fileKey);
                 ChaCha20.Encrypt(wrappedFileKeys[..fileKey.Length], fileKey, nonce, headerKey);
                 CryptographicOperations.ZeroMemory(headerKey);
                 SecureRandom.Fill(wrappedFileKeys[fileKey.Length..]);
-                
+
                 EncryptInputFile(isDirectory ? zipFilePath : inputFilePath, isDirectory, salt, ephemeralPublicKey, wrappedFileKeys, fileKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -131,8 +131,8 @@ public static class FileEncryption
 
                 SecureRandom.Fill(salt);
                 SecureRandom.Fill(seed);
-                crypto_hidden_key_pair(ephemeralPublicKey, ephemeralPrivateKey, seed);
-                crypto_hidden_to_curve(unhiddenEphemeralPublicKey, ephemeralPublicKey);
+                crypto_elligator_key_pair(ephemeralPublicKey, ephemeralPrivateKey, seed);
+                crypto_elligator_map(unhiddenEphemeralPublicKey, ephemeralPublicKey);
 
                 int wrappedKeyIndex = 0;
                 SecureRandom.Fill(fileKey);
@@ -151,7 +151,7 @@ public static class FileEncryption
                     CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
                     CryptographicOperations.ZeroMemory(sharedSecret);
                     CryptographicOperations.ZeroMemory(inputKeyingMaterial);
-                    
+
                     ChaCha20.Encrypt(wrappedFileKeys.Slice(wrappedKeyIndex, fileKey.Length), fileKey, nonce, headerKey);
                     CryptographicOperations.ZeroMemory(headerKey);
                     wrappedKeyIndex += fileKey.Length;
@@ -187,27 +187,27 @@ public static class FileEncryption
         Span<byte> headerKey = stackalloc byte[ChaCha20.KeySize];
         Span<byte> fileKey = stackalloc byte[ChaCha20.KeySize], wrappedFileKeys = new byte[Constants.KeyWrapHeaderLength];
         Span<byte> nonce = stackalloc byte[ChaCha20.NonceSize]; nonce.Clear();
-        
+
         foreach (string inputFilePath in filePaths) {
             try
             {
                 bool isDirectory = IsDirectory(inputFilePath, out string zipFilePath);
-                
+
                 SecureRandom.Fill(seed);
-                crypto_hidden_key_pair(ephemeralPublicKey, ephemeralPrivateKey, seed);
+                crypto_elligator_key_pair(ephemeralPublicKey, ephemeralPrivateKey, seed);
                 CryptographicOperations.ZeroMemory(ephemeralPrivateKey);
-                crypto_hidden_to_curve(unhiddenEphemeralPublicKey, ephemeralPublicKey);
-                
+                crypto_elligator_map(unhiddenEphemeralPublicKey, ephemeralPublicKey);
+
                 SecureRandom.Fill(salt);
                 X25519.DeriveSenderSharedKey(ephemeralSharedSecret, privateKey, unhiddenEphemeralPublicKey, preSharedKey);
                 BLAKE2b.DeriveKey(headerKey, ephemeralSharedSecret, Constants.Personalisation, salt, info: ephemeralPublicKey);
                 CryptographicOperations.ZeroMemory(ephemeralSharedSecret);
-                
+
                 SecureRandom.Fill(fileKey);
                 ChaCha20.Encrypt(wrappedFileKeys[..fileKey.Length], fileKey, nonce, headerKey);
                 CryptographicOperations.ZeroMemory(headerKey);
                 SecureRandom.Fill(wrappedFileKeys[fileKey.Length..]);
-                
+
                 EncryptInputFile(isDirectory ? zipFilePath : inputFilePath, isDirectory, salt, ephemeralPublicKey, wrappedFileKeys, fileKey);
             }
             catch (Exception ex) when (ExceptionFilters.Cryptography(ex))
@@ -230,13 +230,13 @@ public static class FileEncryption
         }
         return isDirectory;
     }
-    
+
     private static void EncryptInputFile(string inputFilePath, bool isDirectory, Span<byte> salt, Span<byte> ephemeralPublicKey, Span<byte> wrappedFileKeys, Span<byte> fileKey)
     {
         string outputFilePath = !Globals.EncryptFileNames ? inputFilePath + Constants.EncryptedExtension : FileHandling.ReplaceFileName(inputFilePath, SecureRandom.GetString(Constants.RandomFileNameLength));
         outputFilePath = FileHandling.GetUniqueFilePath(outputFilePath);
         DisplayMessage.InputToOutput("Encrypting", inputFilePath, outputFilePath);
-        
+
         Span<byte> unencryptedHeader = stackalloc byte[Constants.UnencryptedHeaderLength];
         Spans.Concat(unencryptedHeader, salt, ephemeralPublicKey);
 
