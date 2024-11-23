@@ -28,12 +28,21 @@ public static class PassphrasePrompt
 {
     public static Span<byte> GetNewPassphrase(Span<byte> passphrase)
     {
-        return passphrase.Length switch
+        passphrase = passphrase.Length switch
         {
             0 => EnterNewPassphrase(),
-            1 when ConstantTime.Equals(passphrase, Encoding.UTF8.GetBytes(" ")) => UseRandomPassphrase(),
+            1 when ConstantTime.Equals(passphrase, " "u8) => UseRandomPassphrase(),
             _ => passphrase
         };
+        const int maxAscii = 127;
+        bool lessThanEqualTo = true;
+        foreach (byte b in passphrase) {
+            lessThanEqualTo &= Convert.ToBoolean(((b - maxAscii - 1) >> 31) & 1);
+        }
+        if (!lessThanEqualTo) {
+            DisplayMessage.WriteLine("WARNING: Using non-ASCII characters in a passphrase may cause problems decrypting files/private keys.", ConsoleColor.DarkYellow);
+        }
+        return passphrase;
     }
 
     private static Span<byte> EnterNewPassphrase()
