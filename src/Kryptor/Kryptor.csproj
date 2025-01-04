@@ -16,7 +16,7 @@
     <StartupObject>Kryptor.Program</StartupObject>
     <AssemblyName>kryptor</AssemblyName>
     <ApplicationIcon>Kryptor.ico</ApplicationIcon>
-    <Version>4.1.0</Version>
+    <Version>4.1.1</Version>
     <Authors>Samuel Lucas</Authors>
     <Product>Kryptor</Product>
     <Description>A simple, modern, and secure encryption and signing tool.</Description>
